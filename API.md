@@ -65,6 +65,14 @@ Supporting endpoints:
 The entire `/api/dev` router returns `404` when `ENVIRONMENT=production`, so it
 cannot be reached on a real deploy. Set that var before shipping.
 
+### Why `run_worker_first` matters
+
+`wrangler.json` sets `assets.run_worker_first: ["/api/*"]`. Without it, the SPA
+fallback (`not_found_handling: single-page-application`) answers any browser
+*navigation* with `index.html` before the Worker runs — so `fetch('/api/...')`
+from React works, but typing `/api/dev` in the address bar renders the React app
+instead. Keep that setting, or the console will look like it disappeared.
+
 ## Endpoints
 
 ### `GET /api/boats`
