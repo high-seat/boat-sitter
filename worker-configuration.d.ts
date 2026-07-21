@@ -6,6 +6,10 @@ declare namespace Cloudflare {
 		mainModule: typeof import("./src/worker/index");
 	}
 	interface Env {
+		DB: D1Database;
+		ENVIRONMENT: string;
+		/** Set via: wrangler secret put ADMIN_TOKEN */
+		ADMIN_TOKEN: string;
 	}
 }
 interface Env extends Cloudflare.Env {}

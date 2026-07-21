@@ -2,8 +2,10 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "boat-sitter",
 	"main": "./src/worker/index.ts",
-	"compatibility_date": "2025-10-08",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_date": "2026-07-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"observability": {
 		"enabled": true
 	},
@@ -11,5 +13,16 @@
 	"assets": {
 		"directory": "./dist/client",
 		"not_found_handling": "single-page-application"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "boat-sitter-db",
+			"database_id": "a4e8dd72-4435-4832-bd65-b8d31af71f62",
+			"migrations_dir": "./drizzle"
+		}
+	],
+	"vars": {
+		"ENVIRONMENT": "development"
 	}
 }
