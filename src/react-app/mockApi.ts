@@ -7,6 +7,8 @@
  * reason (imports are `@/mockApi`); it is no longer a mock.
  */
 
+import { lookupCoordinates } from "@/coordinates";
+
 export type EngineType =
   | "Not specified"
   | "No engine"
@@ -157,24 +159,22 @@ export type SupportRequest = {
 // Geo helper (kept client-side; the API also returns coordinates when known)
 // ---------------------------------------------------------------------------
 
-const LOCATION_COORDINATES: Record<string, [number, number]> = {
-  bath: [51.3811, -2.359],
-  bergen: [60.3913, 5.3221],
-  grenada: [12.0561, -61.7488],
-  greece: [38.7066, 20.7019],
-  lefkada: [38.7066, 20.7019],
-  falmouth: [50.1533, -5.0656],
-  palma: [39.5696, 2.6502],
-  sausalito: [37.8591, -122.4853],
-  vancouver: [49.2827, -123.1207],
+// Whangarei isn't in the destinations list but is used by seed data, so keep a
+// couple of extras alongside the shared table.
+const EXTRA_COORDINATES: Record<string, [number, number]> = {
   whangarei: [-35.7251, 174.3237],
+  "st. george's": [12.0561, -61.7488],
 };
 
 export function coordinatesForLocation(location: string, country: string) {
-  const searchable = `${location} ${country}`.toLowerCase();
-  const match = Object.entries(LOCATION_COORDINATES).find(([name]) => searchable.includes(name));
-  const [latitude, longitude] = match?.[1] ?? [20, 0];
-  return { latitude, longitude };
+  const key = location.trim().toLowerCase().replace(/’/g, "'");
+  const extra = EXTRA_COORDINATES[key];
+  if (extra) return { latitude: extra[0], longitude: extra[1] };
+
+  const hit = lookupCoordinates(location, country);
+  // Fall back to [0, 0] (Gulf of Guinea) only when truly unknown — still wrong,
+  // but at least deterministic and obvious, unlike the old [20, 0].
+  return hit ?? { latitude: 0, longitude: 0 };
 }
 
 // ---------------------------------------------------------------------------
