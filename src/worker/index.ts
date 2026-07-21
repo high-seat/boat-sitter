@@ -10,8 +10,20 @@ const app = new Hono<{ Bindings: Env }>();
 app.use("*", logger());
 app.use("/api/*", cors());
 
-app.get("/api/", (c) => c.json({ name: "boat-sitter", version: 1 }));
-app.get("/api/health", (c) => c.json({ ok: true, ts: new Date().toISOString() }));
+app.get("/api/", (context) =>
+  context.json({
+    name: "Boatstead API",
+    runtime: "Cloudflare Workers",
+    status: "ok",
+    version: 1,
+  }),
+);
+app.get("/api/health", (context) =>
+  context.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  }),
+);
 
 app.route("/api/boats", boatsRouter);
 app.route("/api/dev", devRouter);
