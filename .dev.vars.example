@@ -1,3 +1,5 @@
 # Copy to .dev.vars for local development (gitignored).
-# Production: npx wrangler secret put ADMIN_TOKEN
+# .dev.vars overrides wrangler.json `vars` during `wrangler dev`, so local runs
+# stay in development mode (dev console open) while deploys are production.
+ENVIRONMENT=development
 ADMIN_TOKEN=dev-token

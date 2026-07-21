@@ -3817,8 +3817,7 @@ export const localeExtras = {
     "settings.deleteConfirmTitle": "Eliminar a sua conta?",
     "settings.deleteConfirmText":
       "Esta ação não pode ser anulada. A sessão será terminada imediatamente.",
-    "settings.deleteConfirmationLabel":
-      "Introduza {{term}} para confirmar a eliminação da conta",
+    "settings.deleteConfirmationLabel": "Introduza {{term}} para confirmar a eliminação da conta",
     "settings.deletingAccount": "A eliminar...",
     "settings.deleteConfirm": "Sim, eliminar a minha conta",
     "units.meters": "Metros",
@@ -4982,8 +4981,7 @@ export const localeExtras = {
       "Trajno izbrišite profil, spremljene boravke i lokalne podatke računa.",
     "settings.deleteConfirmTitle": "Izbrisati vaš račun?",
     "settings.deleteConfirmText": "Ova se radnja ne može poništiti. Odmah ćete biti odjavljeni.",
-    "settings.deleteConfirmationLabel":
-      "Upišite {{term}} kako biste potvrdili brisanje računa",
+    "settings.deleteConfirmationLabel": "Upišite {{term}} kako biste potvrdili brisanje računa",
     "settings.deletingAccount": "Brisanje...",
     "settings.deleteConfirm": "Da, izbriši moj račun",
     "units.meters": "Metri",
@@ -5560,8 +5558,7 @@ export const localeExtras = {
       "Profilinizi, kaydedilen konaklamaları ve yerel hesap verilerini kalıcı olarak silin.",
     "settings.deleteConfirmTitle": "Hesabınız silinsin mi?",
     "settings.deleteConfirmText": "Bu işlem geri alınamaz. Oturumunuz hemen kapatılacaktır.",
-    "settings.deleteConfirmationLabel":
-      "Hesap silme işlemini onaylamak için {{term}} yazın",
+    "settings.deleteConfirmationLabel": "Hesap silme işlemini onaylamak için {{term}} yazın",
     "settings.deletingAccount": "Siliniyor...",
     "settings.deleteConfirm": "Evet, hesabımı sil",
     "units.meters": "Metre",

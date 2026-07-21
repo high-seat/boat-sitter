@@ -3520,9 +3520,7 @@ function SettingsPage() {
               </button>
               <button
                 className="rounded-xl bg-red-600 px-5 py-3 font-bold text-white disabled:opacity-60"
-                disabled={
-                  deleting || deleteConfirmation !== DELETE_ACCOUNT_CONFIRMATION_TERM
-                }
+                disabled={deleting || deleteConfirmation !== DELETE_ACCOUNT_CONFIRMATION_TERM}
                 onClick={() => {
                   setDeleting(true);
                   void deleteMockAccount(user.name).then(() => {

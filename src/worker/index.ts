@@ -2,8 +2,12 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
+import { applicationsRouter } from "./routes/applications";
 import { boatsRouter } from "./routes/boats";
 import { devRouter } from "./routes/dev";
+import { sitsRouter } from "./routes/sits";
+import { supportRouter } from "./routes/support";
+import { vesselsRouter } from "./routes/vessels";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -26,6 +30,10 @@ app.get("/api/health", (context) =>
 );
 
 app.route("/api/boats", boatsRouter);
+app.route("/api/vessels", vesselsRouter);
+app.route("/api/sits", sitsRouter);
+app.route("/api/applications", applicationsRouter);
+app.route("/api/support", supportRouter);
 app.route("/api/dev", devRouter);
 
 app.notFound((c) =>

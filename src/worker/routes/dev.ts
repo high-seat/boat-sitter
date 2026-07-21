@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { getDb } from "../db";
-import { boats } from "../db/schema";
-import { seedBoats } from "../db/seed-data";
+import { applicationMessages, applications, sits, supportRequests, vessels } from "../db/schema";
+import { seedApplications, seedSits, seedVessels } from "../db/seed-data";
 import { requireAdmin } from "../middleware/auth";
 import { devConsoleHtml } from "./dev-console-html";
 
@@ -9,8 +9,7 @@ import { devConsoleHtml } from "./dev-console-html";
  * Developer-only routes. Mounted at /api/dev.
  *
  * The whole router 404s when ENVIRONMENT === "production", so it cannot be
- * reached on a real deploy even if someone guesses the path. Set that var in
- * wrangler.json (or per-environment) before shipping.
+ * reached on a real deploy even if someone guesses the path.
  */
 export const devRouter = new Hono<{ Bindings: Env }>();
 
@@ -21,74 +20,101 @@ devRouter.use("*", async (c, next) => {
   await next();
 });
 
-/** GET /api/dev — interactive HTML console for exercising the API. */
 devRouter.get("/", (c) => c.html(devConsoleHtml));
 
-/** GET /api/dev/status — row count and environment, for a quick sanity check. */
 devRouter.get("/status", async (c) => {
   const db = getDb(c.env);
-  const rows = await db.select().from(boats);
+  const [v, s, a] = await Promise.all([
+    db.select().from(vessels),
+    db.select().from(sits),
+    db.select().from(applications),
+  ]);
   return c.json({
     environment: c.env.ENVIRONMENT,
     adminTokenConfigured: Boolean(c.env.ADMIN_TOKEN),
-    boatCount: rows.length,
-    ids: rows.map((r) => r.id),
+    vessels: v.length,
+    sits: s.length,
+    applications: a.length,
+    sitIds: s.map((r) => r.id),
   });
 });
 
-/**
- * POST /api/dev/reset — wipe and re-seed from src/worker/db/seed-data.ts.
- * Requires the admin token, since it is destructive.
- */
+/** POST /api/dev/reset — wipe and re-seed from seed-data.ts. */
 devRouter.post("/reset", requireAdmin, async (c) => {
   const db = getDb(c.env);
 
-  await db.delete(boats);
-  await db.insert(boats).values(seedBoats);
+  // Order matters: children before parents (FKs cascade, but be explicit).
+  await db.delete(applicationMessages);
+  await db.delete(applications);
+  await db.delete(sits);
+  await db.delete(vessels);
+  await db.delete(supportRequests);
 
-  const rows = await db.select().from(boats);
-  return c.json({
-    reset: true,
-    inserted: rows.length,
-    ids: rows.map((r) => r.id),
-  });
+  await db.insert(vessels).values(seedVessels);
+  await db.insert(sits).values(seedSits);
+
+  for (const app of seedApplications) {
+    const { messages, ...rest } = app;
+    await db.insert(applications).values({ ...rest, applicantName: rest.applicant.name });
+    if (messages.length) {
+      await db
+        .insert(applicationMessages)
+        .values(messages.map((m) => ({ ...m, applicationId: app.id })));
+    }
+  }
+
+  const s = await db.select().from(sits);
+  return c.json({ reset: true, vessels: seedVessels.length, sits: s.length });
 });
 
-/**
- * GET /api/dev/sample — a valid boat payload with a unique id, ready to POST.
- * Saves you hand-writing JSON when testing creates.
- */
+/** GET /api/dev/sample — a valid vessel + sit pair ready to PUT. */
 devRouter.get("/sample", (c) => {
   const suffix = Math.random().toString(36).slice(2, 7);
+  const vesselId = `test-boat-${suffix}`;
+  const sitId = `test-sit-${suffix}`;
   return c.json({
-    id: `test-boat-${suffix}`,
-    name: "Test Boat",
-    type: "Sailing yacht",
-    length: "34 ft",
-    location: "Palma, Mallorca",
-    country: "Spain",
-    region: "Mediterranean",
-    dates: "1 Jun – 15 Jun",
-    dateStart: "2027-06-01",
-    dateEnd: "2027-06-15",
-    duration: "14 nights",
-    nights: 14,
-    image:
-      "https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&w=1400&q=85",
-    gallery: [],
-    owner: "Test Owner",
-    ownerImage: "https://i.pravatar.cc/160?img=5",
-    rating: 4.5,
-    reviews: 3,
-    applicants: 1,
-    description: "A test listing created from the dev console.",
-    home: "Aft cabin with a proper mattress and a kettle that works.",
-    responsibilities: ["Check bilge daily", "Run engine weekly"],
-    systems: ["Volvo Penta diesel", "Solar"],
-    requirements: ["Some sailing experience"],
-    amenities: ["Wi-Fi", "Shore power"],
-    pet: null,
-    featured: false,
-    published: true,
+    vessel: {
+      id: vesselId,
+      name: "Test Boat",
+      type: "Sailing yacht",
+      length: "34 ft",
+      homePort: "Palma, Spain",
+      image:
+        "https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&w=1400&q=85",
+      gallery: [],
+      owner: "Test Owner",
+      ownerImage: "https://i.pravatar.cc/160?img=5",
+      rating: 4.5,
+      reviews: 3,
+      description: "A test listing created from the dev console.",
+      home: "Aft cabin with a proper mattress and a kettle that works.",
+      systems: ["Volvo Penta diesel", "Solar"],
+      engineType: "Inboard diesel",
+      voltageType: "12 V DC",
+      stoveFuelType: "LPG / propane",
+      amenities: ["Wi-Fi", "Shore power"],
+    },
+    sit: {
+      id: sitId,
+      boatId: vesselId,
+      dates: "1 Jun – 15 Jun",
+      dateStart: "2027-06-01",
+      duration: "14 nights",
+      location: "Palma",
+      country: "Spain",
+      region: "Mediterranean",
+      latitude: 39.5696,
+      longitude: 2.6502,
+      responsibilities: ["Check bilge daily", "Run engine weekly"],
+      requirements: ["Some sailing experience"],
+      minYearsExperience: 1,
+      requiredExperience: [],
+      requiredCertifications: [],
+      requiredSkills: ["Mooring & lines"],
+      applicants: 0,
+      pet: null,
+      featured: false,
+      published: true,
+    },
   });
 });

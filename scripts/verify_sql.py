@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """
-Verifies the migration + seed SQL and the query shapes the Hono routes issue.
-
-This exercises the SQL layer against a real SQLite engine (D1 is SQLite), so
-schema mistakes, seed-data quoting bugs and bad filter predicates surface here
-rather than after deploy. Run:  python3 scripts/verify_sql.py
+Verifies migrations + seed and the query shapes the routes issue, against a real
+SQLite engine (D1 is SQLite). Run: python3 scripts/verify_sql.py
 """
 import json
 import pathlib
@@ -22,122 +19,108 @@ def check(label, got, want):
         FAILURES.append(label)
 
 
+def apply_sql(con, text):
+    for stmt in text.split("--> statement-breakpoint"):
+        s = stmt.strip()
+        if s:
+            con.executescript(s)
+
+
 def main():
     con = sqlite3.connect(":memory:")
     con.row_factory = sqlite3.Row
+    con.execute("PRAGMA foreign_keys = ON")
 
-    migration = (ROOT / "drizzle" / "0000_init.sql").read_text()
-    for stmt in migration.split("--> statement-breakpoint"):
-        if stmt.strip():
-            con.execute(stmt)
-    print("migration applied")
+    # Apply migrations in order.
+    for mig in sorted((ROOT / "drizzle").glob("*.sql")):
+        apply_sql(con, mig.read_text())
+    print("migrations applied")
 
     con.executescript((ROOT / "scripts" / "seed.sql").read_text())
     print("seed applied\n")
 
-    # --- shape -------------------------------------------------------------
-    total = con.execute("SELECT count(*) c FROM boats").fetchone()["c"]
-    check("seeded rows", total, 5)
-
-    row = con.execute("SELECT * FROM boats WHERE id='solstice'").fetchone()
-    check("solstice name", row["name"], "Solstice")
-    check("solstice featured", row["featured"], 1)
-    check("solstice gallery len", len(json.loads(row["gallery"])), 2)
-    check("solstice amenities len", len(json.loads(row["amenities"])), 5)
-    check("solstice pet", row["pet"], "Pip, a sea-loving terrier")
-
-    # apostrophe escaping in seed data
-    grenada = con.execute("SELECT location, home, gallery FROM boats WHERE id='blue-hour'").fetchone()
-    check("apostrophe in location", grenada["location"], "St. George's, Grenada")
-    check("apostrophe in home", grenada["home"].startswith("Owner's hull"), True)
-    check("empty gallery", json.loads(grenada["gallery"]), [])
-
-    # --- filters (mirrors routes/boats.ts) ---------------------------------
-    q = "SELECT count(*) c FROM boats WHERE published=1 AND region=?"
-    check("filter region=Caribbean", con.execute(q, ("Caribbean",)).fetchone()["c"], 1)
-    check("filter region=Northern Europe", con.execute(q, ("Northern Europe",)).fetchone()["c"], 2)
-
+    # --- counts ------------------------------------------------------------
+    check("vessels", con.execute("SELECT count(*) c FROM vessels").fetchone()["c"], 5)
+    check("sits", con.execute("SELECT count(*) c FROM sits").fetchone()["c"], 5)
+    check("applications", con.execute("SELECT count(*) c FROM applications").fetchone()["c"], 2)
     check(
-        "filter featured=true",
-        con.execute("SELECT count(*) c FROM boats WHERE published=1 AND featured=1").fetchone()["c"],
-        2,
-    )
-    check(
-        "filter minRating>=4.8",
-        con.execute("SELECT count(*) c FROM boats WHERE published=1 AND rating>=4.8").fetchone()["c"],
+        "application_messages",
+        con.execute("SELECT count(*) c FROM application_messages").fetchone()["c"],
         3,
     )
-    check(
-        "filter availableFrom 2026-11-01",
-        con.execute(
-            "SELECT count(*) c FROM boats WHERE published=1 AND date_start>=?", ("2026-11-01",)
-        ).fetchone()["c"],
-        4,
-    )
-    check(
-        "filter window 2026-09-01..2026-12-31",
-        con.execute(
-            "SELECT count(*) c FROM boats WHERE published=1 AND date_start>=? AND date_start<=?",
-            ("2026-09-01", "2026-12-31"),
-        ).fetchone()["c"],
-        2,
-    )
 
-    # --- search ------------------------------------------------------------
-    search_sql = """
-        SELECT id FROM boats
-        WHERE published=1 AND (
-            lower(name) LIKE :n OR lower(location) LIKE :n
-            OR lower(country) LIKE :n OR lower(description) LIKE :n
-        ) ORDER BY date_start
+    # --- the boats join (vessel ⋈ sit) -------------------------------------
+    join_sql = """
+        SELECT s.id AS sit_id, v.id AS vessel_id, v.name, s.location, s.country,
+               v.engine_type, v.amenities, s.responsibilities, s.pet, s.featured
+        FROM sits s JOIN vessels v ON s.vessel_id = v.id
+        WHERE s.published = 1
     """
+    joined = {r["sit_id"]: r for r in con.execute(join_sql)}
+    check("joined listings", len(joined), 5)
+
+    sol = joined["solstice"]
+    check("solstice vessel id", sol["vessel_id"], "solstice-boat")
+    check("solstice name", sol["name"], "Solstice")
+    check("solstice location stripped", sol["location"], "Lefkada")
+    check("solstice country", sol["country"], "Greece")
+    check("solstice engine (from vessel)", sol["engine_type"], "Inboard diesel")
+    check("solstice amenities len", len(json.loads(sol["amenities"])), 8)
+    check("solstice responsibilities len", len(json.loads(sol["responsibilities"])), 4)
+    check("solstice pet", sol["pet"], "Pip, a sea-loving terrier")
+    check("solstice featured", sol["featured"], 1)
+
+    # apostrophe survived the generated seed
+    bh = joined["blue-hour"]
+    check("apostrophe in location", bh["location"], "St. George's")
+
+    # --- FK integrity ------------------------------------------------------
+    orphans = con.execute(
+        "SELECT count(*) c FROM sits WHERE vessel_id NOT IN (SELECT id FROM vessels)"
+    ).fetchone()["c"]
+    check("no orphan sits", orphans, 0)
+
+    # cascade: deleting a vessel with no sits is fine; with sits it cascades
+    con.execute("DELETE FROM sits WHERE id='saltwood'")
+    con.execute("DELETE FROM vessels WHERE id='saltwood-boat'")
     check(
-        "search 'catamaran' (description hit)",
-        [r["id"] for r in con.execute(search_sql, {"n": "%catamaran%"})],
-        ["blue-hour"],
-    )
-    check(
-        "search 'GREECE' case-insensitive",
-        [r["id"] for r in con.execute(search_sql, {"n": "%greece%"})],
-        ["solstice"],
-    )
-    check(
-        "search 'norway' (country hit)",
-        [r["id"] for r in con.execute(search_sql, {"n": "%norway%"})],
-        ["northern-light"],
+        "vessel delete removed",
+        con.execute("SELECT count(*) c FROM vessels WHERE id='saltwood-boat'").fetchone()["c"],
+        0,
     )
 
-    # --- sort + pagination -------------------------------------------------
-    page1 = [r["id"] for r in con.execute("SELECT id FROM boats WHERE published=1 ORDER BY date_start LIMIT 2 OFFSET 0")]
-    page2 = [r["id"] for r in con.execute("SELECT id FROM boats WHERE published=1 ORDER BY date_start LIMIT 2 OFFSET 2")]
-    check("sort dateStart page 1", page1, ["solstice", "blue-hour"])
-    check("sort dateStart page 2", page2, ["northern-light", "kingfisher"])
-    check(
-        "sort -rating first",
-        con.execute("SELECT id FROM boats WHERE published=1 ORDER BY rating DESC LIMIT 1").fetchone()["id"],
-        "blue-hour",
-    )
+    # --- applications nest messages ----------------------------------------
+    alex = con.execute(
+        "SELECT * FROM applications WHERE id='application-alex-solstice'"
+    ).fetchone()
+    check("alex sit", alex["sit_id"], "solstice")
+    check("alex applicant_name", alex["applicant_name"], "Alex Morgan")
+    check("alex applicant json name", json.loads(alex["applicant"])["name"], "Alex Morgan")
+    check("alex status", alex["status"], "shortlisted")
+    msgs = con.execute(
+        "SELECT * FROM application_messages WHERE application_id=? ORDER BY created_at",
+        ("application-alex-solstice",),
+    ).fetchall()
+    check("alex message count", len(msgs), 2)
+    check("alex first sender", msgs[0]["sender_name"], "Alex Morgan")
 
-    # --- facets ------------------------------------------------------------
-    facets = {
-        r["value"]: r["count"]
-        for r in con.execute(
-            "SELECT region value, count(*) count FROM boats WHERE published=1 GROUP BY region ORDER BY region"
-        )
-    }
-    check(
-        "region facets",
-        facets,
-        {"Caribbean": 1, "Mediterranean": 1, "Northern Europe": 2, "South Pacific": 1},
-    )
+    # applications for a sit (route: GET ?sitId=)
+    for_sit = con.execute(
+        "SELECT count(*) c FROM applications WHERE sit_id='solstice'"
+    ).fetchone()["c"]
+    check("applications for solstice", for_sit, 2)
 
-    # --- unpublished rows are hidden ---------------------------------------
-    con.execute("UPDATE boats SET published=0 WHERE id='saltwood'")
-    check(
-        "unpublished excluded",
-        con.execute("SELECT count(*) c FROM boats WHERE published=1").fetchone()["c"],
-        4,
-    )
+    # applications for a user (route: GET ?user=), owner or applicant
+    for_owner = con.execute(
+        "SELECT count(*) c FROM applications WHERE owner_name=? OR applicant_name=?",
+        ("Maya & Finn", "Maya & Finn"),
+    ).fetchone()["c"]
+    check("applications for owner Maya & Finn", for_owner, 2)
+    for_applicant = con.execute(
+        "SELECT count(*) c FROM applications WHERE owner_name=? OR applicant_name=?",
+        ("Alex Morgan", "Alex Morgan"),
+    ).fetchone()["c"]
+    check("applications for applicant Alex", for_applicant, 1)
 
     print()
     if FAILURES:

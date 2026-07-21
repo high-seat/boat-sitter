@@ -1,6 +1,22 @@
 # Boat Sitter API
 
-Hono on Cloudflare Workers, backed by D1 via Drizzle.
+Hono on Cloudflare Workers, backed by D1 via Drizzle. The React app talks to it
+entirely through `src/react-app/mockApi.ts` (kept that filename so imports didn't
+change; it is no longer a mock).
+
+## Data model
+
+A listing the sitter browses is **`Boat = vessel ⋈ sit`**:
+
+- **vessel** — the boat itself (name, systems, amenities, owner, engine/voltage/stove)
+- **sit** — a period it needs watching (dates, location, duties, requirements)
+
+One vessel can have many sits. Vessel ids end in `-boat` so the sit id stays the
+clean slug used in URLs (`/boats/solstice`). Plus **applications** (with a nested
+applicant snapshot and a **messages** thread) and **support_requests**.
+
+Array fields (gallery, systems, amenities, responsibilities, …) are JSON text
+columns — always read whole, never joined against.
 
 ## Setup
 
@@ -13,144 +29,80 @@ npm run db:seed:local
 npm run dev
 ```
 
-Then open **http://localhost:5173/api/dev** for the API console.
-
-The D1 database (`boat-sitter-db`) already exists and its id is in
-`wrangler.json`. To create one from scratch instead:
-`npx wrangler d1 create boat-sitter-db` and paste the returned `database_id`.
-
-Admin token for write endpoints:
-
-```bash
-# local: put ADMIN_TOKEN=dev-token in .dev.vars
-echo 'ADMIN_TOKEN=dev-token' > .dev.vars
-
-# production
-npx wrangler secret put ADMIN_TOKEN
-```
+Open **http://localhost:5173/api/dev** for the console. The D1 database
+(`boat-sitter-db`) id is already in `wrangler.json`.
 
 Deploy:
 
 ```bash
-npm run db:migrate:remote
-npm run db:seed:remote   # optional — dev data only
+npm run db:migrate:remote     # applies 0000 + 0001 (drops old boats table, builds new model)
+npm run db:seed:remote        # dev data only
 npm run build && npm run deploy
 ```
 
-## Dev console
+## Endpoints
 
-**http://localhost:5173/api/dev**
+### Public — browse / detail
 
-A browser page for exercising every endpoint — no curl or Postman needed. It has
-filter inputs wired to `GET /api/boats`, a JSON editor for create/update, and a
-response pane showing status code, latency and body.
+| Method | Path             | Notes                                             |
+| ------ | ---------------- | ------------------------------------------------- |
+| GET    | `/api/boats`     | All published listings, vessel ⋈ sit              |
+| GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished |
 
-Typical loop for testing a create:
+### Owner — vessels & sits _(open today; see AUTH.md)_
 
-1. Open `/api/dev`, confirm the admin token field matches your `.dev.vars`
-2. Click **Load sample payload** — generates a valid boat with a unique id
-3. Edit the JSON if you like, click **POST /api/boats**
-4. Click **GET /api/boats** to see it in the list
-5. **Reset + reseed database** puts things back
+| Method | Path                       | Notes                                        |
+| ------ | -------------------------- | -------------------------------------------- |
+| GET    | `/api/vessels` · `?owner=` | List (optionally by owner)                   |
+| GET    | `/api/vessels/:id`         | One vessel                                   |
+| PUT    | `/api/vessels/:id`         | Upsert (create or update)                    |
+| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it   |
+| GET    | `/api/sits`                | List (sits expose `boatId` = vessel id)      |
+| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist |
+| DELETE | `/api/sits/:id`            |                                              |
 
-Supporting endpoints:
+### Applications _(open today; see AUTH.md)_
 
-| Endpoint | Purpose |
-|---|---|
-| `GET /api/dev` | The console page |
-| `GET /api/dev/status` | Row count, environment, whether `ADMIN_TOKEN` is set |
-| `GET /api/dev/sample` | A valid boat payload with a fresh id |
-| `POST /api/dev/reset` *(admin)* | Wipe and re-seed from `seed-data.ts` |
+| Method | Path                             | Notes                                                            |
+| ------ | -------------------------------- | ---------------------------------------------------------------- |
+| GET    | `/api/applications?sitId=`       | Applications for one listing                                     |
+| GET    | `/api/applications?user=`        | Where user is owner **or** applicant                             |
+| POST   | `/api/applications`              | `{ sitId, message, applicant }`; idempotent per (sit, applicant) |
+| PATCH  | `/api/applications/:id`          | `{ status }` (new/shortlisted/accepted/declined)                 |
+| POST   | `/api/applications/:id/messages` | `{ senderName, text }`                                           |
 
-The entire `/api/dev` router returns `404` when `ENVIRONMENT=production`, so it
-cannot be reached on a real deploy. Set that var before shipping.
+### Support
+
+| Method | Path           | Notes                             |
+| ------ | -------------- | --------------------------------- |
+| POST   | `/api/support` | `{ topic, name, email, message }` |
+
+## Dev console — http://localhost:5173/api/dev
+
+Browser page to exercise everything. Create flow: **Load sample vessel + sit** →
+**Save vessel** → **Save sit** (the sit references the vessel by `boatId`, so
+order matters) → **GET /api/boats** to see the joined listing. **Reset + reseed**
+(needs the admin token) restores seed data.
+
+The whole `/api/dev` router 404s when `ENVIRONMENT=production`.
 
 ### Why `run_worker_first` matters
 
-`wrangler.json` sets `assets.run_worker_first: ["/api/*"]`. Without it, the SPA
-fallback (`not_found_handling: single-page-application`) answers any browser
-*navigation* with `index.html` before the Worker runs — so `fetch('/api/...')`
-from React works, but typing `/api/dev` in the address bar renders the React app
-instead. Keep that setting, or the console will look like it disappeared.
-
-## Endpoints
-
-### `GET /api/boats`
-
-Lists published boats.
-
-| Param | Type | Notes |
-|---|---|---|
-| `region` | string | Exact match, e.g. `Mediterranean` |
-| `country` | string | Exact match |
-| `type` | string | e.g. `Catamaran` |
-| `featured` | `true` \| `false` | |
-| `minRating` | number | 0–5 |
-| `availableFrom` | `YYYY-MM-DD` | listings starting on/after |
-| `availableTo` | `YYYY-MM-DD` | listings starting on/before |
-| `q` | string | matches name, location, country, description |
-| `sort` | enum | `dateStart` (default), `-dateStart`, `rating`, `-rating`, `applicants`, `-applicants`, `name` |
-| `page` | int | default 1 |
-| `limit` | int | default 12, max 50 |
-
-```json
-{
-  "data": [{ "id": "solstice", "name": "Solstice", "...": "..." }],
-  "meta": { "page": 1, "limit": 12, "total": 5, "totalPages": 1, "hasMore": false }
-}
-```
-
-```bash
-curl 'http://localhost:5173/api/boats?region=Caribbean&sort=-rating'
-curl 'http://localhost:5173/api/boats?q=catamaran'
-curl 'http://localhost:5173/api/boats?availableFrom=2026-11-01&limit=2&page=2'
-```
-
-### `GET /api/boats/facets`
-
-Distinct filter values with counts, for building the filter UI.
-
-```json
-{
-  "regions": [{ "value": "Caribbean", "count": 1 }],
-  "countries": [{ "value": "Grenada", "count": 1 }],
-  "types": [{ "value": "Catamaran", "count": 1 }]
-}
-```
-
-### `GET /api/boats/:id`
-
-Single listing. `404` if missing or unpublished.
-
-### `POST /api/boats` *(admin)*
-
-Requires `Authorization: Bearer $ADMIN_TOKEN`. Body validated with Zod; see
-`boatBodySchema` in `src/worker/routes/boats.ts`. `409` if the id already exists.
-
-### `PATCH /api/boats/:id` *(admin)*
-
-Partial update. `id` cannot be changed.
-
-### `DELETE /api/boats/:id` *(admin)*
-
-## Data model note
-
-`gallery`, `responsibilities`, `systems`, `requirements` and `amenities` are JSON
-text columns, not child tables. This data is always read as a whole listing and
-never joined against, so normalising it would add joins for no benefit. If you
-later need to filter by a specific amenity at scale, promote `amenities` to its
-own table plus a join table.
+`wrangler.json` sets `assets.run_worker_first: ["/api/*"]`. Without it the SPA
+fallback answers browser navigations to `/api/...` with `index.html`, so the app
+renders instead of the API responding.
 
 ## Seed data
 
-`src/worker/db/seed-data.ts` is the single source of truth. `scripts/seed.sql`
-is generated from it — do not edit that file by hand:
+`src/worker/db/seed-data.ts` is the single source of truth (vessels + sits +
+applications). `scripts/seed.sql` is generated from it — don't edit by hand:
 
 ```bash
-npm run db:seed:generate   # seed-data.ts  ->  scripts/seed.sql
+npm run db:seed:generate
 ```
 
-This keeps the CLI seed and the dev-console reset endpoint from drifting apart.
+The dev-console reset endpoint reads the same `seed-data.ts`, so CLI and console
+never drift.
 
 ## Verifying the SQL layer
 
@@ -158,6 +110,12 @@ This keeps the CLI seed and the dev-console reset endpoint from drifting apart.
 npm run db:verify
 ```
 
-Runs the migration and seed against an in-memory SQLite database (D1 *is*
-SQLite) and asserts the filter, search, sort, pagination and facet queries
-return what the routes expect.
+Applies both migrations + the seed to an in-memory SQLite database (D1 _is_
+SQLite) and asserts the join, FK integrity/cascade, application nesting, and the
+owner/applicant/sit application queries. 27 checks.
+
+## Auth
+
+Identity is still client-supplied — writes are open. See **AUTH.md** for the plan
+to close this with Better Auth before real users. Do not expose write endpoints
+on a public URL until that lands.
