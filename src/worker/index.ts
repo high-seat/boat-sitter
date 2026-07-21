@@ -24,7 +24,31 @@ app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json({ error: err.message }, err.status);
   }
+
+  // Always log the full error — visible via `wrangler tail`.
   console.error("Unhandled error:", err);
+
+  const message = err instanceof Error ? err.message : String(err);
+
+  // A missing table almost always means migrations were not applied to this
+  // environment. Say so explicitly rather than making someone read a stack.
+  if (/no such table/i.test(message)) {
+    return c.json(
+      {
+        error: "Database not migrated",
+        detail: message,
+        fix: "Run: npx wrangler d1 migrations apply boat-sitter-db --remote",
+      },
+      500,
+    );
+  }
+
+  // Outside production, return the real message so debugging does not require
+  // a second terminal running `wrangler tail`.
+  if (c.env.ENVIRONMENT !== "production") {
+    return c.json({ error: "Internal server error", detail: message }, 500);
+  }
+
   return c.json({ error: "Internal server error" }, 500);
 });
 
