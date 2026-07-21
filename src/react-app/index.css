@@ -1,68 +1,189 @@
+@import "tailwindcss";
+@plugin 'tailwindcss-animate';
+
+@theme {
+  --color-cream: #f8f5ee;
+  --color-white: #ffffff;
+  --color-navy: #092c3e;
+  --color-ink: #163643;
+  --color-slate: #63747b;
+  --color-line: #dce3df;
+  --color-teal: #0c7b78;
+  --color-aqua: #80d7d0;
+  --color-seafoam: #dff1ec;
+  --color-coral: #ef7057;
+  --color-coral-dark: #da5b44;
+  --color-sun: #f4b942;
+  --font-display: "Manrope", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --shadow-card: 0 18px 50px -30px rgba(9, 44, 62, 0.35);
+  --shadow-float: 0 22px 60px -24px rgba(9, 44, 62, 0.35);
+}
+
 :root {
-	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-	line-height: 1.5;
-	font-weight: 400;
-
-	color-scheme: light dark;
-	color: rgba(255, 255, 255, 0.87);
-	background-color: #242424;
-
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-a {
-	font-weight: 500;
-	color: #646cff;
-	text-decoration: inherit;
+* {
+  box-sizing: border-box;
 }
-a:hover {
-	color: #535bf2;
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-	margin: 0;
-	display: flex;
-	place-items: center;
-	min-width: 320px;
-	min-height: 100vh;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
 }
 
-h1 {
-	font-size: 3.2em;
-	line-height: 1.1;
+button,
+select {
+  cursor: pointer;
 }
 
-button {
-	border-radius: 8px;
-	border: 1px solid transparent;
-	padding: 0.6em 1.2em;
-	font-size: 1em;
-	font-weight: 500;
-	font-family: inherit;
-	background-color: #1a1a1a;
-	cursor: pointer;
-	transition: border-color 0.25s;
-}
-button:hover {
-	border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-	outline: 4px auto -webkit-focus-ring-color;
+.eyebrow {
+  margin-bottom: 0.55rem;
+  color: var(--color-teal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-@media (prefers-color-scheme: light) {
-	:root {
-		color: #213547;
-		background-color: #ffffff;
-	}
-	a:hover {
-		color: #747bff;
-	}
-	button {
-		background-color: #f9f9f9;
-	}
+.section-title {
+  color: var(--color-navy);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.detail-title {
+  color: var(--color-navy);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--color-navy);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.form-input {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  background: var(--color-cream);
+  padding: 0.75rem 0.9rem;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-aqua) 30%, transparent);
+}
+
+.boatstead-rdp.rdp-root {
+  --rdp-accent-color: var(--color-teal);
+  --rdp-accent-background-color: color-mix(in srgb, var(--color-aqua) 24%, white);
+  --rdp-today-color: var(--color-coral);
+  --rdp-range_start-date-background-color: var(--color-teal);
+  --rdp-range_end-date-background-color: var(--color-teal);
+  --rdp-range_middle-background-color: color-mix(in srgb, var(--color-aqua) 28%, white);
+  --rdp-range_middle-color: var(--color-navy);
+  --rdp-range_start-color: white;
+  --rdp-range_end-color: white;
+  --rdp-day-height: 2.55rem;
+  --rdp-day-width: 2.625rem;
+  --rdp-day_button-height: 2.3rem;
+  --rdp-day_button-width: 2.3rem;
+  --rdp-day_button-border-radius: 999px;
+  --rdp-selected-border: 2px solid transparent;
+  --rdp-outside-opacity: 0.32;
+  --rdp-disabled-opacity: 0.22;
+  --rdp-nav-height: 2.5rem;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.boatstead-rdp .rdp-month_caption {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--color-navy);
+}
+
+.boatstead-rdp .rdp-weekday {
+  color: var(--color-slate);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.boatstead-rdp .rdp-day_button {
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.boatstead-rdp .rdp-day_button:hover:not(:disabled) {
+  background: var(--color-seafoam);
+}
+
+.ocean-orb {
+  background:
+    radial-gradient(circle at 35% 35%, rgba(128, 215, 208, 0.68), transparent 33%),
+    linear-gradient(145deg, rgba(223, 241, 236, 0.9), rgba(223, 241, 236, 0));
+  filter: blur(2px);
+}
+
+.hero-image {
+  position: relative;
+  box-shadow: 30px 30px 0 var(--color-seafoam);
+}
+
+.hero-image::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(9, 44, 62, 0.18), transparent 40%);
+  content: "";
+}
+
+::selection {
+  background: var(--color-aqua);
+  color: var(--color-navy);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 99px;
+  background: var(--color-line);
+}
+
+@media (max-width: 767px) {
+  .hero-image {
+    box-shadow: 15px 15px 0 var(--color-seafoam);
+  }
 }
