@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
 import { boatsRouter } from "./routes/boats";
+import { devRouter } from "./routes/dev";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -13,6 +14,7 @@ app.get("/api/", (c) => c.json({ name: "boat-sitter", version: 1 }));
 app.get("/api/health", (c) => c.json({ ok: true, ts: new Date().toISOString() }));
 
 app.route("/api/boats", boatsRouter);
+app.route("/api/dev", devRouter);
 
 app.notFound((c) =>
   c.req.path.startsWith("/api/") ? c.json({ error: "Not found" }, 404) : c.notFound(),

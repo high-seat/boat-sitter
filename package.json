@@ -41,6 +41,8 @@
 		"build": "tsc -b && vite build",
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
+		"db:seed:generate": "node --experimental-strip-types scripts/generate-seed-sql.ts",
+		"db:verify": "python3 scripts/verify_sql.py",
 		"db:migrate:local": "wrangler d1 migrations apply boat-sitter-db --local",
 		"db:migrate:remote": "wrangler d1 migrations apply boat-sitter-db --remote",
 		"db:seed:local": "wrangler d1 execute boat-sitter-db --local --file=./scripts/seed.sql",
