@@ -1369,7 +1369,6 @@ function BoatsPage() {
     <main className="px-5 py-10 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-2xl">
-          <p className="eyebrow">{t("boats.kicker")}</p>
           <h1 className="section-title">{t("boats.title")}</h1>
           <p className="mt-3 text-slate">{t("boats.subtitle")}</p>
         </div>
@@ -1813,7 +1812,6 @@ function ApplyModal({
           <>
             <div className="flex items-start justify-between">
               <div>
-                <p className="eyebrow">{t("apply.kicker")}</p>
                 <h2 className="font-display text-2xl font-bold text-navy">
                   {t("apply.title", { boat: boat.name })}
                 </h2>
@@ -2515,7 +2513,6 @@ function DetailPage() {
           </aside>
         </div>
         <section className="mt-14">
-          <p className="eyebrow">{t("map.locationKicker")}</p>
           <h2 className="section-title">{t("map.sitLocation")}</h2>
           <p className="mt-3 text-slate">
             {t("map.locationText", {
@@ -2610,7 +2607,6 @@ function SavedPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
-      <p className="eyebrow">{t("saved.kicker")}</p>
       <h1 className="section-title">{t("saved.title")}</h1>
       <label
         className={`mt-6 flex w-fit cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition ${
@@ -2735,7 +2731,6 @@ function HowItWorksPage() {
   return (
     <main>
       <section className="bg-navy px-5 py-20 text-center text-white">
-        <p className="eyebrow text-aqua!">{t("how.kicker")}</p>
         <h1 className="mx-auto max-w-3xl font-display text-5xl font-extrabold tracking-tighter md:text-6xl">
           {t("how.title")}
         </h1>
@@ -3051,7 +3046,6 @@ function ProfileEditor({ close }: { close: () => void }) {
       <div className="mx-auto my-6 max-w-2xl rounded-3xl bg-white p-6 shadow-float md:p-8">
         <div className="flex items-start justify-between">
           <div>
-            <p className="eyebrow">{t("profile.settings")}</p>
             <h2 className="font-display text-2xl font-bold text-navy">{t("profile.edit")}</h2>
             <p className="mt-2 text-sm text-slate">{t("profile.editHint")}</p>
           </div>
@@ -4543,14 +4537,34 @@ function SitEditor({
             </button>
           </div>
           {!sit && (
-            <div
-              className="flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-5 py-4 text-sm leading-6 text-navy"
-              role="note"
-            >
-              <Info className="mt-0.5 shrink-0 text-teal" size={20} />
-              <div>
-                <p className="font-bold">{t("sitEditor.createEditLimitTitle")}</p>
-                <p className="mt-1 text-slate">{t("sitEditor.createEditLimit")}</p>
+            <div className="mt-6 space-y-4">
+              <div
+                className="flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                role="note"
+              >
+                <ShipWheel className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                <div className="min-w-0">
+                  <p className="font-bold">{t("sitEditor.boatDetailsBannerTitle")}</p>
+                  <p className="mt-1">{t("sitEditor.boatDetailsBanner")}</p>
+                  {form.boatId ? (
+                    <Link
+                      className="mt-2 inline-flex font-bold text-amber-900 underline decoration-amber-400 underline-offset-2 hover:text-navy"
+                      to={`/owner/boats/${form.boatId}/edit`}
+                    >
+                      {t("sitEditor.boatDetailsBannerCta")}
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+              <div
+                className="flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-5 py-4 text-sm leading-6 text-navy"
+                role="note"
+              >
+                <Info className="mt-0.5 shrink-0 text-teal" size={20} />
+                <div>
+                  <p className="font-bold">{t("sitEditor.createEditLimitTitle")}</p>
+                  <p className="mt-1 text-slate">{t("sitEditor.createEditLimit")}</p>
+                </div>
               </div>
             </div>
           )}
@@ -5538,7 +5552,6 @@ function OwnerBoatsPage() {
     <main className="mx-auto max-w-6xl px-5 py-12 lg:px-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
-          <p className="eyebrow">{t("owner.dashboard")}</p>
           <h1 className="section-title">{t("owner.manage")}</h1>
           <p className="mt-3 text-slate">{t("owner.dashboardHint")}</p>
         </div>
@@ -6115,7 +6128,6 @@ function SettingsPage() {
   return (
     <>
       <main className="mx-auto max-w-3xl px-5 py-14 lg:px-8">
-        <p className="eyebrow">{t("settings.kicker")}</p>
         <h1 className="section-title">{t("settings.title")}</h1>
         <p className="mt-3 text-slate">{t("settings.subtitle")}</p>
 
@@ -6557,7 +6569,6 @@ function SafetyPage() {
     <main>
       <section className="bg-navy px-5 py-16 text-white">
         <div className="mx-auto max-w-4xl">
-          <p className="eyebrow text-aqua!">{t("safety.kicker")}</p>
           <h1 className="font-display text-4xl font-extrabold md:text-5xl">{t("safety.title")}</h1>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-white/70">{t("safety.intro")}</p>
         </div>
@@ -6635,7 +6646,6 @@ function SupportPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-14 lg:px-8">
-      <p className="eyebrow">{t("support.kicker")}</p>
       <h1 className="section-title">{t("support.title")}</h1>
       <p className="mt-3 max-w-2xl text-slate">{t("support.intro")}</p>
       <div className="mt-10 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
@@ -6781,7 +6791,6 @@ function TermsPage() {
   const { t } = useTranslation();
   return (
     <main className="mx-auto max-w-4xl px-5 py-14 lg:px-8">
-      <p className="eyebrow">{t("terms.kicker")}</p>
       <h1 className="section-title">{t("terms.title")}</h1>
       <p className="mt-3 text-sm text-slate">{t("terms.updated")}</p>
       <aside className="mt-6 rounded-2xl border border-coral/30 bg-coral/10 p-5 font-semibold text-navy">
@@ -7279,7 +7288,6 @@ function ApplicationReviewPage() {
       >
         <ArrowLeft size={17} /> {t("applications.backToSits")}
       </button>
-      <p className="eyebrow">{t("applications.kicker")}</p>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="section-title">{t("applications.title", { boat: vessel?.name ?? "" })}</h1>
@@ -8209,7 +8217,6 @@ function MessagesPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-14 lg:px-8">
-      <p className="eyebrow">{t("messages.kicker")}</p>
       <h1 className="section-title">{t("messages.title")}</h1>
       {!user ? (
         <div className="mt-8 rounded-2xl border border-line bg-white py-16 text-center">

@@ -430,6 +430,9 @@ const localeExtrasSource = {
       "This sit has received applicants, so its details can no longer be changed. You can still review applications and message sitters.",
     "sitEditor.createTitle": "Create a boat sit",
     "sitEditor.createShort": "Create a sit",
+    "sitEditor.boatDetailsBannerTitle": "Keep boat details up to date",
+    "sitEditor.boatDetailsBanner": "Photos, systems, and amenities come from the boat profile. Review them before publishing so sitters see accurate information.",
+    "sitEditor.boatDetailsBannerCta": "Update boat details",
     "sitEditor.createEditLimitTitle": "Editable until someone applies",
     "sitEditor.createEditLimit":
       "You can change sit details until the first application arrives. After that, editing is locked so applicants see a stable listing.",
@@ -1363,6 +1366,9 @@ const localeExtrasSource = {
       "Cette garde a reçu des candidatures, ses détails ne peuvent plus être modifiés. Vous pouvez toujours examiner les candidatures et écrire aux gardiens.",
     "sitEditor.createTitle": "Créer une garde de bateau",
     "sitEditor.createShort": "Créer une garde",
+    "sitEditor.boatDetailsBannerTitle": "Tenez à jour les détails du bateau",
+    "sitEditor.boatDetailsBanner": "Les photos, systèmes et équipements viennent du profil du bateau. Vérifiez-les avant de publier pour que les gardiens voient des informations exactes.",
+    "sitEditor.boatDetailsBannerCta": "Mettre à jour le bateau",
     "sitEditor.createEditLimitTitle": "Modifiable jusqu’à la première candidature",
     "sitEditor.createEditLimit":
       "Vous pouvez modifier les détails de la garde jusqu’à l’arrivée de la première candidature. Ensuite, la modification est verrouillée pour que les candidats voient une annonce stable.",
@@ -2309,6 +2315,9 @@ const localeExtrasSource = {
       "Esta estancia ya tiene solicitantes, por lo que sus detalles ya no se pueden cambiar. Aún puede revisar solicitudes y escribir a los cuidadores.",
     "sitEditor.createTitle": "Crear un asiento en barco",
     "sitEditor.createShort": "crear una sentada",
+    "sitEditor.boatDetailsBannerTitle": "Mantén actualizados los detalles del barco",
+    "sitEditor.boatDetailsBanner": "Las fotos, sistemas y comodidades vienen del perfil del barco. Revísalos antes de publicar para que los cuidadores vean información precisa.",
+    "sitEditor.boatDetailsBannerCta": "Actualizar detalles del barco",
     "sitEditor.createEditLimitTitle": "Editable hasta la primera solicitud",
     "sitEditor.createEditLimit":
       "Puede cambiar los detalles de la estancia hasta que llegue la primera solicitud. Después, la edición se bloquea para que los candidatos vean un anuncio estable.",
@@ -3252,6 +3261,9 @@ const localeExtrasSource = {
       "Questa permanenza ha ricevuto candidature, quindi i dettagli non possono più essere modificati. Puoi ancora esaminare le candidature e scrivere ai sitter.",
     "sitEditor.createTitle": "Crea un posto in barca",
     "sitEditor.createShort": "Crea una seduta",
+    "sitEditor.boatDetailsBannerTitle": "Mantieni aggiornati i dettagli della barca",
+    "sitEditor.boatDetailsBanner": "Foto, sistemi e comfort arrivano dal profilo della barca. Controllali prima di pubblicare così i sitter vedono informazioni accurate.",
+    "sitEditor.boatDetailsBannerCta": "Aggiorna dettagli barca",
     "sitEditor.createEditLimitTitle": "Modificabile fino alla prima candidatura",
     "sitEditor.createEditLimit":
       "Puoi modificare i dettagli della permanenza fino all’arrivo della prima candidatura. Dopo, la modifica è bloccata così i candidati vedono un annuncio stabile.",
@@ -4198,6 +4210,9 @@ const localeExtrasSource = {
       "Für diesen Aufenthalt gibt es bereits Bewerbungen, daher können die Details nicht mehr geändert werden. Sie können Bewerbungen weiterhin prüfen und Sitter anschreiben.",
     "sitEditor.createTitle": "Erstellen Sie einen Bootssitz",
     "sitEditor.createShort": "Erstellen Sie eine Sitzung",
+    "sitEditor.boatDetailsBannerTitle": "Bootdetails aktuell halten",
+    "sitEditor.boatDetailsBanner": "Fotos, Systeme und Ausstattung stammen aus dem Bootsprofil. Prüfen Sie sie vor dem Veröffentlichen, damit Sitter genaue Angaben sehen.",
+    "sitEditor.boatDetailsBannerCta": "Bootdetails aktualisieren",
     "sitEditor.createEditLimitTitle": "Bearbeitbar bis zur ersten Bewerbung",
     "sitEditor.createEditLimit":
       "Sie können die Sit-Details ändern, bis die erste Bewerbung eingeht. Danach ist die Bearbeitung gesperrt, damit Bewerber eine stabile Anzeige sehen.",
@@ -5140,6 +5155,9 @@ const localeExtrasSource = {
       "Deze sit heeft kandidaten ontvangen, dus de details kunnen niet meer worden gewijzigd. U kunt nog steeds aanvragen bekijken en sitters berichten.",
     "sitEditor.createTitle": "Creëer een bootzit",
     "sitEditor.createShort": "Creëer een zit",
+    "sitEditor.boatDetailsBannerTitle": "Houd bootgegevens up-to-date",
+    "sitEditor.boatDetailsBanner": "Foto’s, systemen en voorzieningen komen uit het bootprofiel. Controleer ze vóór publicatie zodat oppassers juiste informatie zien.",
+    "sitEditor.boatDetailsBannerCta": "Bootgegevens bijwerken",
     "sitEditor.createEditLimitTitle": "Bewerkbaar tot de eerste aanvraag",
     "sitEditor.createEditLimit":
       "U kunt de sitgegevens wijzigen tot de eerste aanvraag binnenkomt. Daarna is bewerken vergrendeld, zodat kandidaten een stabiele vermelding zien.",
@@ -6076,6 +6094,9 @@ const localeExtrasSource = {
       "Esta estadia já recebeu candidaturas, por isso os detalhes já não podem ser alterados. Ainda pode rever candidaturas e escrever aos cuidadores.",
     "sitEditor.createTitle": "Crie um assento de barco",
     "sitEditor.createShort": "Crie um assento",
+    "sitEditor.boatDetailsBannerTitle": "Mantenha os detalhes do barco atualizados",
+    "sitEditor.boatDetailsBanner": "Fotos, sistemas e comodidades vêm do perfil do barco. Reveja-os antes de publicar para que os cuidadores vejam informação correta.",
+    "sitEditor.boatDetailsBannerCta": "Atualizar detalhes do barco",
     "sitEditor.createEditLimitTitle": "Editável até a primeira candidatura",
     "sitEditor.createEditLimit":
       "Pode alterar os detalhes da estadia até chegar a primeira candidatura. Depois disso, a edição fica bloqueada para que os candidatos vejam um anúncio estável.",
@@ -7018,6 +7039,9 @@ const localeExtrasSource = {
       "Αυτή η φύλαξη έχει λάβει αιτήσεις, επομένως τα στοιχεία της δεν μπορούν πλέον να αλλάξουν. Μπορείτε ακόμα να ελέγξετε αιτήσεις και να στείλετε μηνύματα στους φύλακες.",
     "sitEditor.createTitle": "Δημιουργήστε μια βάρκα",
     "sitEditor.createShort": "Δημιουργήστε ένα κάθισμα",
+    "sitEditor.boatDetailsBannerTitle": "Κρατήστε ενημερωμένες τις λεπτομέρειες του σκάφους",
+    "sitEditor.boatDetailsBanner": "Φωτογραφίες, συστήματα και ανέσεις προέρχονται από το προφίλ του σκάφους. Ελέγξτε τα πριν τη δημοσίευση ώστε οι φύλακες να βλέπουν ακριβείς πληροφορίες.",
+    "sitEditor.boatDetailsBannerCta": "Ενημέρωση λεπτομερειών σκάφους",
     "sitEditor.createEditLimitTitle": "Επεξεργάσιμο μέχρι την πρώτη αίτηση",
     "sitEditor.createEditLimit":
       "Μπορείτε να αλλάξετε τα στοιχεία της φύλαξης μέχρι να φτάσει η πρώτη αίτηση. Μετά, η επεξεργασία κλειδώνει ώστε οι υποψήφιοι να βλέπουν σταθερή αγγελία.",
@@ -7965,6 +7989,9 @@ const localeExtrasSource = {
       "Ovo čuvanje je primilo prijave, stoga se detalji više ne mogu mijenjati. I dalje možete pregledavati prijave i slati poruke čuvarima.",
     "sitEditor.createTitle": "Stvorite mjesto za čamac",
     "sitEditor.createShort": "Stvorite sjedište",
+    "sitEditor.boatDetailsBannerTitle": "Držite detalje plovila ažurnima",
+    "sitEditor.boatDetailsBanner": "Fotografije, sustavi i sadržaji dolaze iz profila plovila. Pregledajte ih prije objave kako bi čuvari vidjeli točne informacije.",
+    "sitEditor.boatDetailsBannerCta": "Ažuriraj detalje plovila",
     "sitEditor.createEditLimitTitle": "Može se uređivati do prve prijave",
     "sitEditor.createEditLimit":
       "Detalje čuvanja možete mijenjati do dolaska prve prijave. Nakon toga uređivanje je zaključano kako bi kandidati vidjeli stabilan oglas.",
@@ -8889,6 +8916,9 @@ const localeExtrasSource = {
       "Bu konaklama başvurular aldı, bu yüzden ayrıntıları artık değiştirilemez. Başvuruları incelemeye ve bakıcılara mesaj göndermeye devam edebilirsiniz.",
     "sitEditor.createTitle": "Bir tekne oturağı oluşturun",
     "sitEditor.createShort": "Oturma alanı oluştur",
+    "sitEditor.boatDetailsBannerTitle": "Tekne ayrıntılarını güncel tutun",
+    "sitEditor.boatDetailsBanner": "Fotoğraflar, sistemler ve olanaklar tekne profilinden gelir. Bakıcıların doğru bilgi görmesi için yayınlamadan önce gözden geçirin.",
+    "sitEditor.boatDetailsBannerCta": "Tekne ayrıntılarını güncelle",
     "sitEditor.createEditLimitTitle": "İlk başvuruya kadar düzenlenebilir",
     "sitEditor.createEditLimit":
       "İlk başvuru gelene kadar konaklama ayrıntılarını değiştirebilirsiniz. Bundan sonra düzenleme kilitlenir, böylece adaylar sabit bir ilan görür.",
@@ -9815,6 +9845,9 @@ const localeExtrasSource = {
       "Denna sits har tagit emot sökande, så dess uppgifter kan inte längre ändras. Du kan fortfarande granska ansökningar och meddelandevakter.",
     "sitEditor.createTitle": "Skapa en båt sitta",
     "sitEditor.createShort": "Skapa en sit",
+    "sitEditor.boatDetailsBannerTitle": "Håll båtdetaljerna uppdaterade",
+    "sitEditor.boatDetailsBanner": "Foton, system och bekvämligheter kommer från båtprofilen. Granska dem innan du publicerar så att sittare ser korrekt information.",
+    "sitEditor.boatDetailsBannerCta": "Uppdatera båtdetaljer",
     "sitEditor.createEditLimitTitle": "Kan redigeras tills någon ansöker",
     "sitEditor.createEditLimit":
       "Du kan ändra sitt detaljer tills den första ansökan kommer. Efter det är redigeringen låst så att sökande ser en stabil lista.",
@@ -10741,6 +10774,9 @@ const localeExtrasSource = {
       "Dette setet har mottatt søkere, så detaljene kan ikke lenger endres. Du kan fortsatt gå gjennom søknader og meldingsvakter.",
     "sitEditor.createTitle": "Lag en båtsitte",
     "sitEditor.createShort": "Lag en sit",
+    "sitEditor.boatDetailsBannerTitle": "Hold båtdetaljene oppdatert",
+    "sitEditor.boatDetailsBanner": "Bilder, systemer og fasiliteter kommer fra båtprofilen. Se over dem før du publiserer, så sitters ser riktig informasjon.",
+    "sitEditor.boatDetailsBannerCta": "Oppdater båtdetaljer",
     "sitEditor.createEditLimitTitle": "Kan redigeres til noen søker",
     "sitEditor.createEditLimit":
       "Du kan endre sittedetaljer til den første søknaden kommer. Etter det er redigering låst slik at søkere ser en stabil oppføring.",
@@ -11666,6 +11702,9 @@ const localeExtrasSource = {
       "Dette møde har modtaget ansøgere, så dets detaljer kan ikke længere ændres. Du kan stadig gennemgå ansøgninger og beskedsittere.",
     "sitEditor.createTitle": "Opret en bådsit",
     "sitEditor.createShort": "Opret en sit",
+    "sitEditor.boatDetailsBannerTitle": "Hold bådoplysningerne opdaterede",
+    "sitEditor.boatDetailsBanner": "Fotos, systemer og faciliteter kommer fra bådprofilen. Gennemgå dem før du udgiver, så sitters ser korrekte oplysninger.",
+    "sitEditor.boatDetailsBannerCta": "Opdater bådoplysninger",
     "sitEditor.createEditLimitTitle": "Kan redigeres, indtil nogen ansøger",
     "sitEditor.createEditLimit":
       "Du kan ændre sit detaljer, indtil den første ansøgning ankommer. Derefter er redigering låst, så ansøgere ser en stabil liste.",
@@ -12590,6 +12629,9 @@ const localeExtrasSource = {
       "Tämä istunto on vastaanottanut hakijoita, joten sen tietoja ei voi enää muuttaa. Voit edelleen tarkastella hakemuksia ja viestien välittäjiä.",
     "sitEditor.createTitle": "Luo veneistuin",
     "sitEditor.createShort": "Luo istumapaikka",
+    "sitEditor.boatDetailsBannerTitle": "Pidä veneen tiedot ajan tasalla",
+    "sitEditor.boatDetailsBanner": "Kuvat, järjestelmät ja mukavuudet tulevat veneprofiilista. Tarkista ne ennen julkaisua, jotta hoitajat näkevät oikeat tiedot.",
+    "sitEditor.boatDetailsBannerCta": "Päivitä veneen tiedot",
     "sitEditor.createEditLimitTitle": "Muokattava, kunnes joku hakee",
     "sitEditor.createEditLimit":
       "Voit muuttaa istunnon tietoja, kunnes ensimmäinen hakemus saapuu. Sen jälkeen muokkaus on lukittu, joten hakijat näkevät vakaan listauksen.",
@@ -13521,6 +13563,9 @@ const localeExtrasSource = {
       "このシートは応募者を受け付けているため、詳細を変更することはできません。アプリケーションを確認したり、シッターにメッセージを送信したりすることはできます。",
     "sitEditor.createTitle": "ボートの座席を作成する",
     "sitEditor.createShort": "座る場所を作成する",
+    "sitEditor.boatDetailsBannerTitle": "ボートの詳細を最新に保つ",
+    "sitEditor.boatDetailsBanner": "写真、設備、アメニティはボートのプロフィールから表示されます。シッターが正確な情報を見られるよう、公開前に確認してください。",
+    "sitEditor.boatDetailsBannerCta": "ボートの詳細を更新",
     "sitEditor.createEditLimitTitle": "誰かが申請するまで編集可能",
     "sitEditor.createEditLimit":
       "最初のアプリケーションが到着するまでは、座席の詳細を変更できます。その後、編集はロックされるため、応募者には安定したリストが表示されます。",
@@ -14440,6 +14485,9 @@ const localeExtrasSource = {
       "This sit has received applicants, so its details can no longer be changed. You can still review applications and message sitters.",
     "sitEditor.createTitle": "Create a boat sit",
     "sitEditor.createShort": "Create a sit",
+    "sitEditor.boatDetailsBannerTitle": "Keep boat details up to date",
+    "sitEditor.boatDetailsBanner": "Photos, systems, and amenities come from the boat profile. Review them before publishing so sitters see accurate information.",
+    "sitEditor.boatDetailsBannerCta": "Update boat details",
     "sitEditor.createEditLimitTitle": "Editable until someone applies",
     "sitEditor.createEditLimit":
       "You can change sit details until the first application arrives. After that, editing is locked so applicants see a stable listing.",

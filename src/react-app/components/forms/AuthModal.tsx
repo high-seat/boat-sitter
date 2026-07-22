@@ -139,7 +139,6 @@ export function AuthModal() {
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="eyebrow">{t("auth.kicker")}</p>
             <h2 className="font-display text-2xl font-bold text-navy" id="auth-title">
               {mode === "login" ? t("auth.loginTitle") : t("auth.signupTitle")}
             </h2>

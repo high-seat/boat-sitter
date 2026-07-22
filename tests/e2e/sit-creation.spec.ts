@@ -29,6 +29,14 @@ test.describe("sit creation flow", () => {
     await seedVerifiedOwner(page);
     const modal = await openCreateSitModal(page);
 
+    await expect(modal.getByText(/Keep boat details up to date/i)).toBeVisible();
+    await expect(
+      modal.getByText(/Photos, systems, and amenities come from the boat profile/i),
+    ).toBeVisible();
+    await expect(modal.getByRole("link", { name: /Update boat details/i })).toHaveAttribute(
+      "href",
+      /\/owner\/boats\/.+\/edit/,
+    );
     await expect(modal.getByText(/Editable until someone applies/i)).toBeVisible();
     await expect(modal.getByRole("radio", { name: /Accommodation/i })).toBeChecked();
     await expect(modal.getByText(/^Region$/i)).toHaveCount(0);

@@ -21,6 +21,7 @@ import {
   formatApplicationSystemMessage,
   getLatestPendingVideoCallProposal,
 } from "@/components/applications/formatApplicationSystemMessage";
+import { VideoCallCalendarLinks } from "@/components/applications/VideoCallCalendarLinks";
 
 export function ConversationPanel({
   application,
@@ -290,6 +291,22 @@ export function ConversationPanel({
                         {formatApplicationSystemMessage(t, message, application, currentUser)}
                       </p>
                       {details ? <p className="mt-2 font-semibold text-navy">{details}</p> : null}
+                      {message.systemKind === "videoCallAccepted" && message.videoCall ? (
+                        <VideoCallCalendarLinks
+                          event={{
+                            title: t("applications.videoCall.calendarTitle", {
+                              name: otherPartyName,
+                              boat: application.boatName,
+                            }),
+                            description: t("applications.videoCall.calendarDescription", {
+                              name: otherPartyName,
+                              boat: application.boatName,
+                            }),
+                            startsAt: message.videoCall.startsAt,
+                            durationMinutes: message.videoCall.durationMinutes,
+                          }}
+                        />
+                      ) : null}
                       {canRespond ? (
                         <div className="mt-3 flex flex-wrap gap-2">
                           <button

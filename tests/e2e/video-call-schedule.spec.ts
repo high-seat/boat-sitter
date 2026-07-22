@@ -1,4 +1,4 @@
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type Browser } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
 
 function futureDateIso(daysAhead: number) {
@@ -139,6 +139,55 @@ test.describe("video call scheduling", () => {
       await expect(
         sitterPage.getByText(/Alex Morgan suggested a different time/i).first(),
       ).toBeVisible();
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("accepted call shows Google and Apple calendar links", async ({ page, browser }) => {
+    await seedVerifiedOwner(page);
+    await page.goto("/owner/sits/solstice/applications");
+    await page.getByRole("button", { name: /Alex Morgan/i }).first().click();
+    await page.getByRole("button", { name: /Request video call/i }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.locator('input[type="date"]').fill(futureDateIso(2));
+    await dialog.locator('input[type="time"]').fill("15:00");
+    await dialog.locator("select").selectOption("30");
+    await dialog.getByRole("button", { name: /Send proposal/i }).click();
+    await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
+
+    const shared = await page.evaluate(() => {
+      const keys = [
+        "harbourly-applications",
+        "harbourly-vessels",
+        "harbourly-sits",
+        "harbourly-boats",
+        "boatstead-applications-v3",
+      ];
+      return Object.fromEntries(
+        keys
+          .map((key) => [key, localStorage.getItem(key)] as const)
+          .filter((entry): entry is [string, string] => entry[1] != null),
+      );
+    });
+
+    const { context, page: sitterPage } = await openAlexMessagesWithSharedData(browser, shared);
+    try {
+      await sitterPage.getByRole("button", { name: /Maya|Solstice/i }).first().click();
+      await sitterPage.getByRole("button", { name: /Accept time/i }).click();
+      await expect(sitterPage.getByText(/Video call confirmed/i).first()).toBeVisible();
+      await expect(sitterPage.getByText(/Add to calendar/i).first()).toBeVisible();
+
+      const google = sitterPage.getByRole("link", { name: /Google Calendar/i });
+      const apple = sitterPage.getByRole("link", { name: /Apple Calendar/i });
+      await expect(google).toBeVisible();
+      await expect(apple).toBeVisible();
+      await expect(google).toHaveAttribute(
+        "href",
+        /https:\/\/calendar\.google\.com\/calendar\/render\?/,
+      );
+      await expect(apple).toHaveAttribute("href", /^data:text\/calendar/);
+      await expect(apple).toHaveAttribute("download", "boatstead-video-call.ics");
     } finally {
       await context.close();
     }

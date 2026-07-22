@@ -32,20 +32,20 @@ export function WithdrawInterestDialog({
       titleId="withdraw-interest-confirm-title"
       tone="danger"
     >
-      <label className="mt-5 block">
-        <span className="form-label">{t("sits.withdrawExplanationLabel")}</span>
-        <textarea
-          className="form-input mt-1 min-h-24 resize-y"
-          disabled={pending}
-          maxLength={500}
-          onChange={(event) => setExplanation(event.target.value)}
-          placeholder={t("sits.withdrawExplanationPlaceholder")}
-          value={explanation}
-        />
-        <span className="mt-1.5 block text-xs leading-5 text-slate">
-          {t("sits.withdrawExplanationHint")}
-        </span>
-      </label>
+      <div className="mt-5">
+        <label className="block">
+          <span className="form-label">{t("sits.withdrawExplanationLabel")}</span>
+          <textarea
+            className="form-input mt-1 min-h-24 resize-y"
+            disabled={pending}
+            maxLength={500}
+            onChange={(event) => setExplanation(event.target.value)}
+            placeholder={t("sits.withdrawExplanationPlaceholder")}
+            value={explanation}
+          />
+        </label>
+        <p className="mt-1.5 text-xs leading-5 text-slate">{t("sits.withdrawExplanationHint")}</p>
+      </div>
     </ConfirmDialog>
   );
 }

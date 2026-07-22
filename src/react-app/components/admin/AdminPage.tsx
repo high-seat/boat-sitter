@@ -130,7 +130,6 @@ export function AdminPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-14 lg:px-8">
-      <p className="eyebrow">{t("admin.kicker")}</p>
       <h1 className="section-title">{t("admin.title")}</h1>
       <p className="mt-3 max-w-2xl text-slate">{t("admin.subtitle")}</p>
 
