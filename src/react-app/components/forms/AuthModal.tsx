@@ -7,13 +7,9 @@ import {
   GoogleLoginButton,
 } from "react-social-login-buttons";
 import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
-import {
-  continueWithSocialProvider,
-  loginMockAccount,
-  signUpMockAccount,
-  type SocialProvider,
-} from "@/mockAuth";
-import { signInWithGoogle } from "@/authClient";
+import { continueWithSocialProvider, type SocialProvider } from "@/mockAuth";
+import { signInWithEmail, signInWithGoogle, signUpWithEmail } from "@/authClient";
+import { hydrateSession } from "@/session";
 import { useFeatureFlag } from "@/featureFlags";
 import { useAppStore } from "@/store";
 
@@ -101,11 +97,23 @@ export function AuthModal() {
     }
     setPending(true);
     try {
-      const account =
+      const result =
         mode === "signup"
-          ? await signUpMockAccount({ ...form, acceptedTerms })
-          : await loginMockAccount(form.email, form.password);
-      finishLogin(account);
+          ? await signUpWithEmail({
+              email: form.email,
+              password: form.password,
+              name: form.name.trim(),
+            })
+          : await signInWithEmail(form.email, form.password);
+      if (result.error) {
+        throw new Error(result.error.message ?? "auth.failed");
+      }
+      // Real Better Auth session cookie is now set — populate the store from it.
+      await hydrateSession();
+      setOpen(false);
+      setForm({ email: "", name: "", password: "" });
+      setAcceptedTerms(false);
+      setError("");
     } catch (caught) {
       setError(t(caught instanceof Error ? caught.message : "auth.failed"));
     } finally {
