@@ -1,5 +1,9 @@
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut, ApiError } from "@/apiClient";
 import { lookupCoordinates } from "@/coordinates";
+import {
+  boatsSearchQueryString,
+  type BoatSearchParams,
+} from "../shared/boatsSearch";
 
 export type ApiEngineType = string;
 export type ApiVoltageType = string;
@@ -211,6 +215,9 @@ type ApiBoat = {
   amenities: string[];
   pet: string | null;
   featured: boolean;
+  sitType?: "liveaboard" | "daytimeChecks";
+  accepted?: boolean;
+  applicationsOpen?: boolean;
 };
 
 type ApiVessel = {
@@ -255,6 +262,7 @@ type ApiSit = {
   pet?: string | null;
   featured: boolean;
   published: boolean;
+  sitType?: "liveaboard" | "daytimeChecks";
 };
 
 type ApiApplication = {
@@ -411,7 +419,7 @@ export function normalizeApiBoat(row: ApiBoat): Boat {
     description: row.description,
     home: row.home,
     responsibilities: row.responsibilities,
-    sitType: "liveaboard" as SitType,
+    sitType: (row.sitType === "daytimeChecks" ? "daytimeChecks" : "liveaboard") as SitType,
     systems: row.systems,
     engineType: asEngineType(row.engineType),
     voltageType: asVoltageType(row.voltageType),
@@ -425,8 +433,8 @@ export function normalizeApiBoat(row: ApiBoat): Boat {
     pet: row.pet ?? undefined,
     featured: row.featured,
     maxGuests: 2,
-    applicationsOpen: true,
-    accepted: false,
+    applicationsOpen: row.applicationsOpen ?? true,
+    accepted: Boolean(row.accepted),
   };
 }
 
@@ -468,7 +476,7 @@ export function normalizeApiSit(row: ApiSit): Sit {
     latitude: coords.latitude,
     longitude: coords.longitude,
     approximateLocation: true,
-    sitType: "liveaboard",
+    sitType: row.sitType === "daytimeChecks" ? "daytimeChecks" : "liveaboard",
     responsibilities: row.responsibilities,
     requirements: row.requirements,
     minYearsExperience: row.minYearsExperience ?? undefined,
@@ -528,6 +536,7 @@ export function sitToApiBody(sit: Sit) {
     pet: sit.pet ?? null,
     featured: Boolean(sit.featured),
     published: sit.applicationsOpen !== false,
+    sitType: sit.sitType ?? "liveaboard",
   };
 }
 
@@ -574,6 +583,34 @@ export function normalizeApiApplication(row: ApiApplication): SitApplication {
 export async function apiGetBoats(): Promise<Boat[]> {
   const rows = await apiGet<ApiBoat[]>("/api/boats");
   return rows.map(normalizeApiBoat);
+}
+
+export async function apiGetBoatsPage(params: BoatSearchParams): Promise<{
+  boats: Boat[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> {
+  const qs = boatsSearchQueryString(params);
+  const res = await fetch(`/api/boats${qs}`, { credentials: "include" });
+  const body = (await res.json()) as {
+    data?: ApiBoat[];
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(res.status, body.error || res.statusText, body);
+  }
+  const boats = (body.data ?? []).map(normalizeApiBoat);
+  const total = body.total ?? boats.length;
+  const limit = body.limit ?? (params.limit && params.limit > 0 ? params.limit : boats.length || 1);
+  const page = body.page ?? 0;
+  const totalPages = body.totalPages ?? Math.max(1, Math.ceil(total / limit));
+  return { boats, total, page, limit, totalPages };
 }
 
 export async function apiGetBoat(id: string): Promise<Boat | undefined> {

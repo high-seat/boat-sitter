@@ -146,6 +146,28 @@ export const seedVessels: NewVessel[] = [
     stoveFuelType: "Not specified",
     amenities: ["Shore power", "Wi-Fi"],
   },
+  {
+    id: "sea-glass-boat",
+    name: "Sea Glass",
+    type: "Motor yacht",
+    length: "34 ft",
+    homePort: "Sausalito, United States",
+    image:
+      "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1400&q=85",
+    gallery: [],
+    owner: "Priya",
+    ownerImage: "https://i.pravatar.cc/160?img=20",
+    rating: 4.8,
+    reviews: 7,
+    description:
+      "A tidy motor yacht on the Sausalito waterfront. We need daytime checks while we travel — no overnight stays required.",
+    home: "Day access only: check systems, wipe condensation, and confirm shore power.",
+    systems: ["Shore power", "Battery monitor", "Bilge alarm"],
+    engineType: "Inboard diesel",
+    voltageType: "12 V DC",
+    stoveFuelType: "Electric / induction",
+    amenities: ["Shore power", "Wi-Fi", "Gated access"],
+  },
 ];
 
 export const seedSits: NewSit[] = [
@@ -175,6 +197,7 @@ export const seedSits: NewSit[] = [
     pet: "Pip, a sea-loving terrier",
     featured: true,
     published: true,
+    sitType: "liveaboard",
   },
   {
     id: "blue-hour",
@@ -201,6 +224,7 @@ export const seedSits: NewSit[] = [
     pet: null,
     featured: false,
     published: true,
+    sitType: "liveaboard",
   },
   {
     id: "northern-light",
@@ -227,6 +251,7 @@ export const seedSits: NewSit[] = [
     pet: null,
     featured: false,
     published: true,
+    sitType: "liveaboard",
   },
   {
     id: "kingfisher",
@@ -253,6 +278,7 @@ export const seedSits: NewSit[] = [
     pet: "Two cats, Rigging and Halyard",
     featured: true,
     published: true,
+    sitType: "liveaboard",
   },
   {
     id: "saltwood",
@@ -279,6 +305,34 @@ export const seedSits: NewSit[] = [
     pet: null,
     featured: false,
     published: true,
+    sitType: "liveaboard",
+  },
+  {
+    id: "sea-glass",
+    vesselId: "sea-glass-boat",
+    dates: "8 Aug – 22 Aug",
+    dateStart: "2026-08-08",
+    duration: "14 nights",
+    location: "Sausalito",
+    country: "United States",
+    latitude: 37.8591,
+    longitude: -122.4853,
+    responsibilities: [
+      "Daytime systems check and bilge look",
+      "Confirm shore power and battery state",
+      "Wipe condensation and air the cabin",
+      "Send a short mid-week update",
+    ],
+    requirements: ["Reliable daytime availability", "Basic electrics"],
+    minYearsExperience: 1,
+    requiredExperience: [],
+    requiredCertifications: [],
+    requiredSkills: ["Shore power"],
+    applicants: 4,
+    pet: null,
+    featured: false,
+    published: true,
+    sitType: "daytimeChecks",
   },
 ];
 

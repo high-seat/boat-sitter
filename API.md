@@ -50,7 +50,7 @@ npm run build && npm run deploy
 
 | Method | Path             | Notes                                             |
 | ------ | ---------------- | ------------------------------------------------- |
-| GET    | `/api/boats`     | All published listings, vessel ⋈ sit              |
+| GET    | `/api/boats`     | Filters applied in D1 SQL: `q`, `type`, `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
 | GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished |
 
 ### Owner — vessels & sits _(writes require Better Auth session)_

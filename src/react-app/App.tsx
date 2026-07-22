@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   Anchor,
@@ -111,8 +111,6 @@ import {
   getSitPhase,
   canLeaveReview,
   reviewDaysRemaining,
-  parseSitDate,
-  startOfLocalDay,
   SIT_PHASES,
   type SitPhase,
 } from "@/dateUtils";
@@ -127,6 +125,7 @@ import {
   findConfirmedSitDateConflict,
   getBoat,
   getBoats,
+  getBoatsPage,
   getApplicationsForSit,
   getApplicationsForUser,
   getPublicMemberProfile,
@@ -1142,79 +1141,6 @@ function HomePage() {
 
 const BOATS_PER_PAGE = 9;
 
-function recommendedSitScore(
-  boat: Boat,
-  user: {
-    preferredCountries?: string[];
-    skills?: string[];
-  } | null,
-  savedIds: string[],
-  now = new Date(),
-) {
-  let score = 0;
-  const open =
-    isAcceptingApplications(boat) &&
-    !boat.accepted &&
-    (boat.phase === "acceptingApplicants" || !boat.phase);
-
-  if (open) score += 1000;
-  else if (!boat.accepted) score += 200;
-  else score -= 600;
-
-  if (boat.featured) score += 220;
-  if (isHappeningSoon(boat.dateStart, now)) score += 160;
-  if (savedIds.includes(boat.id)) score += 80;
-
-  if (user?.preferredCountries?.length) {
-    const country = boat.country.trim().toLowerCase();
-    const preferred = user.preferredCountries.some((item) => {
-      const value = item.trim().toLowerCase();
-      return (
-        Boolean(value) && (country === value || country.includes(value) || value.includes(country))
-      );
-    });
-    if (preferred) score += 320;
-  }
-
-  if (user?.skills?.length) {
-    const required = [
-      ...(boat.requiredSkills ?? []),
-      ...(boat.requiredCertifications ?? []),
-      ...(boat.requiredExperience ?? []),
-      ...boat.requirements,
-    ];
-    const skillSet = user.skills.map((skill) => skill.trim().toLowerCase()).filter(Boolean);
-    let matches = 0;
-    for (const requirement of required) {
-      const needle = requirement.trim().toLowerCase();
-      if (!needle) continue;
-      if (
-        skillSet.some(
-          (skill) => skill === needle || skill.includes(needle) || needle.includes(skill),
-        )
-      ) {
-        matches += 1;
-      }
-    }
-    score += matches * 45;
-  }
-
-  score += boat.rating * 18;
-  score += Math.min(boat.reviews, 25) * 2;
-
-  const start = parseSitDate(boat.dateStart);
-  if (start) {
-    const today = startOfLocalDay(now);
-    const days = Math.round((start.getTime() - today.getTime()) / 86_400_000);
-    if (days < 0) score -= 250;
-    else score += Math.max(0, 140 - days);
-  }
-
-  if (open) score -= Math.min(boat.applicants, 20) * 4;
-
-  return score;
-}
-
 function parseSitTypeParam(value: string | null): "all" | SitType {
   if (value === "liveaboard" || value === "daytimeChecks") return value;
   return "all";
@@ -1222,9 +1148,6 @@ function parseSitTypeParam(value: string | null): "all" | SitType {
 
 function BoatsPage() {
   const { t } = useTranslation();
-  const user = useAppStore((state) => state.user);
-  const saved = useAppStore((state) => state.saved);
-  const { data: boats = [], isLoading } = useQuery({ queryKey: ["boats"], queryFn: getBoats });
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get("q") ?? "");
   const [type, setType] = useState(params.get("type") ?? "All vessels");
@@ -1235,111 +1158,131 @@ function BoatsPage() {
     startDate: params.get("from") ?? "",
     endDate: params.get("to") ?? "",
   });
-  const [petOnly, setPetOnly] = useState(false);
-  const [availability, setAvailability] = useState<"all" | "open" | "accepted">("all");
+  const [petOnly, setPetOnly] = useState(params.get("pet") === "1" || params.get("pet") === "true");
+  const [availability, setAvailability] = useState<"all" | "open" | "accepted">(() => {
+    const value = params.get("availability");
+    return value === "open" || value === "accepted" ? value : "all";
+  });
   const [view, setView] = useState<"list" | "map">("list");
   const [sort, setSort] = useState<
     "recommended" | "soonest" | "latest" | "shortest" | "longest" | "popular"
-  >("recommended");
-  const [page, setPage] = useState(0);
+  >(() => {
+    const value = params.get("sort");
+    if (
+      value === "soonest" ||
+      value === "latest" ||
+      value === "shortest" ||
+      value === "longest" ||
+      value === "popular" ||
+      value === "recommended"
+    ) {
+      return value;
+    }
+    return "recommended";
+  });
+  const [page, setPage] = useState(() => {
+    const value = Number.parseInt(params.get("page") ?? "0", 10);
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  });
   const resultsTopRef = useRef<HTMLDivElement>(null);
 
-  function updateLocationQuery(value: string) {
-    setQuery(value);
+  function syncBoatSearchUrl(next: {
+    q?: string;
+    type?: string;
+    sitType?: "all" | SitType;
+    from?: string;
+    to?: string;
+    pet?: boolean;
+    availability?: "all" | "open" | "accepted";
+    sort?: typeof sort;
+    page?: number;
+  }) {
     const nextParams = new URLSearchParams(window.location.search);
-    if (value) nextParams.set("q", value);
+    const q = next.q ?? query;
+    const vesselType = next.type ?? type;
+    const sitType = next.sitType ?? sitTypeFilter;
+    const from = next.from ?? dates.startDate;
+    const to = next.to ?? dates.endDate;
+    const pet = next.pet ?? petOnly;
+    const avail = next.availability ?? availability;
+    const sortValue = next.sort ?? sort;
+    const pageValue = next.page ?? page;
+
+    if (q) nextParams.set("q", q);
     else nextParams.delete("q");
+    if (vesselType && vesselType !== "All vessels") nextParams.set("type", vesselType);
+    else nextParams.delete("type");
+    if (sitType !== "all") nextParams.set("sitType", sitType);
+    else nextParams.delete("sitType");
+    if (from) nextParams.set("from", from);
+    else nextParams.delete("from");
+    if (to) nextParams.set("to", to);
+    else nextParams.delete("to");
+    if (pet) nextParams.set("pet", "1");
+    else nextParams.delete("pet");
+    if (avail !== "all") nextParams.set("availability", avail);
+    else nextParams.delete("availability");
+    if (sortValue !== "recommended") nextParams.set("sort", sortValue);
+    else nextParams.delete("sort");
+    if (pageValue > 0) nextParams.set("page", String(pageValue));
+    else nextParams.delete("page");
+
     const search = nextParams.toString();
     window.history.replaceState(
       null,
       "",
       `${window.location.pathname}${search ? `?${search}` : ""}`,
     );
+  }
+
+  const searchParams = useMemo(
+    () => ({
+      q: query || undefined,
+      type: type === "All vessels" ? undefined : type,
+      sitType: sitTypeFilter,
+      from: dates.startDate || undefined,
+      to: dates.endDate || undefined,
+      pet: petOnly || undefined,
+      availability,
+      sort,
+      page: view === "map" ? 0 : page,
+      // Map needs the full filtered set; list uses server pages of BOATS_PER_PAGE.
+      limit: view === "map" ? 0 : BOATS_PER_PAGE,
+    }),
+    [
+      availability,
+      dates.endDate,
+      dates.startDate,
+      page,
+      petOnly,
+      query,
+      sitTypeFilter,
+      sort,
+      type,
+      view,
+    ],
+  );
+
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["boats", "search", searchParams],
+    queryFn: () => getBoatsPage(searchParams),
+    placeholderData: keepPreviousData,
+  });
+
+  const boats = data?.boats ?? [];
+  const totalItems = data?.total ?? 0;
+  const currentPage = data?.page ?? page;
+  const totalPages = data?.totalPages ?? 1;
+
+  function updateLocationQuery(value: string) {
+    setQuery(value);
+    syncBoatSearchUrl({ q: value, page: 0 });
   }
 
   function updateSitTypeFilter(value: "all" | SitType) {
     setSitTypeFilter(value);
-    const nextParams = new URLSearchParams(window.location.search);
-    if (value === "all") nextParams.delete("sitType");
-    else nextParams.set("sitType", value);
-    const search = nextParams.toString();
-    window.history.replaceState(
-      null,
-      "",
-      `${window.location.pathname}${search ? `?${search}` : ""}`,
-    );
+    syncBoatSearchUrl({ sitType: value, page: 0 });
   }
-
-  const filtered = useMemo(
-    () =>
-      boats.filter((boat) => {
-        const searchValues = query
-          .split("|")
-          .map((value) => value.trim().toLowerCase())
-          .filter(Boolean);
-        const searchable = `${boat.location} ${boat.country} ${boat.name}`.toLowerCase();
-        const matchesQuery =
-          searchValues.length === 0 || searchValues.some((value) => searchable.includes(value));
-        const matchesType = type === "All vessels" || boat.type === type;
-        const boatSitType = boat.sitType ?? "liveaboard";
-        const matchesSitType = sitTypeFilter === "all" || boatSitType === sitTypeFilter;
-        const boatStart = new Date(`${boat.dateStart}T00:00:00`);
-        const boatEnd = new Date(boatStart);
-        boatEnd.setDate(boatEnd.getDate() + Number.parseInt(boat.duration, 10));
-        const requestedStart = dates.startDate
-          ? new Date(`${dates.startDate}T00:00:00`)
-          : undefined;
-        const requestedEnd = dates.endDate ? new Date(`${dates.endDate}T00:00:00`) : undefined;
-        const matchesDates =
-          (!requestedStart || boatEnd >= requestedStart) &&
-          (!requestedEnd || boatStart <= requestedEnd);
-        const matchesAvailability =
-          availability === "all" ||
-          (availability === "accepted" ? Boolean(boat.accepted) : !boat.accepted);
-        return (
-          matchesQuery &&
-          matchesType &&
-          matchesSitType &&
-          matchesDates &&
-          matchesAvailability &&
-          (!petOnly || Boolean(boat.pet))
-        );
-      }),
-    [availability, boats, dates.endDate, dates.startDate, petOnly, query, sitTypeFilter, type],
-  );
-  const sorted = useMemo(
-    () =>
-      [...filtered].sort((a, b) => {
-        if (sort === "recommended") {
-          return (
-            recommendedSitScore(b, user, saved) - recommendedSitScore(a, user, saved) ||
-            a.dateStart.localeCompare(b.dateStart)
-          );
-        }
-        if (sort === "latest") return b.dateStart.localeCompare(a.dateStart);
-        if (sort === "shortest") {
-          return Number.parseInt(a.duration, 10) - Number.parseInt(b.duration, 10);
-        }
-        if (sort === "longest") {
-          return Number.parseInt(b.duration, 10) - Number.parseInt(a.duration, 10);
-        }
-        if (sort === "popular") {
-          return (
-            b.applicants - a.applicants ||
-            b.rating - a.rating ||
-            b.reviews - a.reviews ||
-            a.dateStart.localeCompare(b.dateStart)
-          );
-        }
-        return a.dateStart.localeCompare(b.dateStart);
-      }),
-    [filtered, saved, sort, user],
-  );
-  const totalPages = Math.max(1, Math.ceil(sorted.length / BOATS_PER_PAGE));
-  const currentPage = Math.min(page, totalPages - 1);
-  const pageStart = currentPage * BOATS_PER_PAGE;
-  const pageEnd = Math.min(pageStart + BOATS_PER_PAGE, sorted.length);
-  const pagedBoats = useMemo(() => sorted.slice(pageStart, pageEnd), [pageEnd, pageStart, sorted]);
 
   useEffect(() => {
     setPage(0);
@@ -1351,22 +1294,27 @@ function BoatsPage() {
 
   function goToPage(nextPage: number) {
     setPage(nextPage);
+    syncBoatSearchUrl({ page: nextPage });
     resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function renderFilteredResults() {
-    if (filtered.length && view === "map") {
+    if (totalItems && view === "map") {
       return (
         <div className="mt-6">
-          <BoatMap boats={sorted} />
+          <BoatMap boats={boats} />
         </div>
       );
     }
-    if (filtered.length) {
+    if (totalItems) {
       return (
         <>
-          <div className="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-            {pagedBoats.map((boat) => (
+          <div
+            className={`mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3 ${
+              isFetching ? "opacity-70" : ""
+            }`}
+          >
+            {boats.map((boat) => (
               <BoatCard boat={boat} key={boat.id} />
             ))}
           </div>
@@ -1374,7 +1322,7 @@ function BoatsPage() {
             currentPage={currentPage}
             onPageChange={goToPage}
             pageSize={BOATS_PER_PAGE}
-            totalItems={sorted.length}
+            totalItems={totalItems}
           />
         </>
       );
@@ -1404,6 +1352,8 @@ function BoatsPage() {
     setDates({ startDate: "", endDate: "" });
     setPetOnly(false);
     setAvailability("all");
+    setSort("recommended");
+    setPage(0);
     window.history.replaceState(null, "", window.location.pathname);
   }
 
@@ -1427,11 +1377,21 @@ function BoatsPage() {
           <DestinationAutocomplete multiple onChange={updateLocationQuery} value={query} />
           <DateRangePicker
             endDate={dates.endDate}
-            onChange={setDates}
+            onChange={(next) => {
+              setDates(next);
+              syncBoatSearchUrl({ from: next.startDate, to: next.endDate, page: 0 });
+            }}
             startDate={dates.startDate}
             variant="browse"
           />
-          <Select onChange={(event) => setType(event.target.value)} value={type}>
+          <Select
+            onChange={(event) => {
+              const value = event.target.value;
+              setType(value);
+              syncBoatSearchUrl({ type: value, page: 0 });
+            }}
+            value={type}
+          >
             <option value="All vessels">{t("search.anyVessel")}</option>
             {VESSEL_TYPES.map((option) => (
               <option key={option} value={option}>
@@ -1455,7 +1415,11 @@ function BoatsPage() {
               <input
                 checked={petOnly}
                 className="size-4 accent-teal"
-                onChange={(event) => setPetOnly(event.target.checked)}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setPetOnly(value);
+                  syncBoatSearchUrl({ pet: value, page: 0 });
+                }}
                 type="checkbox"
               />
               {t("boats.pets")}
@@ -1463,7 +1427,11 @@ function BoatsPage() {
           </label>
           <Select
             aria-label={t("boats.availabilityLabel")}
-            onChange={(event) => setAvailability(event.target.value as "all" | "open" | "accepted")}
+            onChange={(event) => {
+              const value = event.target.value as "all" | "open" | "accepted";
+              setAvailability(value);
+              syncBoatSearchUrl({ availability: value, page: 0 });
+            }}
             value={availability}
           >
             <option value="all">{t("boats.availabilityAll")}</option>
@@ -1479,13 +1447,13 @@ function BoatsPage() {
               className="mt-9 flex flex-wrap items-center justify-between gap-3"
               ref={resultsTopRef}
             >
-              <p className="text-sm text-slate">{t("boats.results", { count: filtered.length })}</p>
+              <p className="text-sm text-slate">{t("boats.results", { count: totalItems })}</p>
               <div className="flex items-center gap-2">
                 <div
-                  aria-disabled={filtered.length === 0}
+                  aria-disabled={totalItems === 0}
                   aria-label={t("map.viewLabel")}
                   className={`flex rounded-xl border border-line bg-white p-1 ${
-                    filtered.length === 0 ? "opacity-50" : ""
+                    totalItems === 0 ? "opacity-50" : ""
                   }`}
                   role="group"
                 >
@@ -1494,7 +1462,7 @@ function BoatsPage() {
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold disabled:cursor-not-allowed ${
                       view === "list" ? "bg-seafoam text-teal" : "text-slate"
                     }`}
-                    disabled={filtered.length === 0}
+                    disabled={totalItems === 0}
                     onClick={() => setView("list")}
                     type="button"
                   >
@@ -1505,7 +1473,7 @@ function BoatsPage() {
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold disabled:cursor-not-allowed ${
                       view === "map" ? "bg-seafoam text-teal" : "text-slate"
                     }`}
-                    disabled={filtered.length === 0}
+                    disabled={totalItems === 0}
                     onClick={() => setView("map")}
                     type="button"
                   >
@@ -1515,14 +1483,18 @@ function BoatsPage() {
                 {view === "list" && (
                   <label
                     className={`flex items-center gap-2 text-sm text-slate ${
-                      filtered.length === 0 ? "opacity-50" : ""
+                      totalItems === 0 ? "opacity-50" : ""
                     }`}
                   >
                     <span className="sr-only">{t("boats.sortLabel")}</span>
                     <Select
                       aria-label={t("boats.sortLabel")}
-                      disabled={filtered.length === 0}
-                      onChange={(event) => setSort(event.target.value as typeof sort)}
+                      disabled={totalItems === 0}
+                      onChange={(event) => {
+                        const value = event.target.value as typeof sort;
+                        setSort(value);
+                        syncBoatSearchUrl({ sort: value, page: 0 });
+                      }}
                       value={sort}
                       variant="sort"
                     >

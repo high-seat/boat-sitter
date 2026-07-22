@@ -87,6 +87,8 @@ export const sits = sqliteTable(
     pet: text("pet"),
     featured: integer("featured", { mode: "boolean" }).notNull().default(false),
     published: integer("published", { mode: "boolean" }).notNull().default(true),
+    /** liveaboard | daytimeChecks — matches the frontend SitType. */
+    sitType: text("sit_type").notNull().default("liveaboard"),
 
     createdAt: text("created_at")
       .notNull()
@@ -100,6 +102,7 @@ export const sits = sqliteTable(
     index("sits_country_idx").on(t.country),
     index("sits_date_start_idx").on(t.dateStart),
     index("sits_published_idx").on(t.published),
+    index("sits_sit_type_idx").on(t.sitType),
   ],
 );
 

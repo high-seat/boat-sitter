@@ -35,6 +35,7 @@ const sitSchema = z.object({
   pet: z.string().nullish(),
   featured: z.boolean().default(false),
   published: z.boolean().default(true),
+  sitType: z.enum(["liveaboard", "daytimeChecks"]).default("liveaboard"),
 });
 
 /** Map the frontend Sit shape (boatId) to the DB row (vesselId). */

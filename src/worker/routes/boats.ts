@@ -3,26 +3,30 @@ import { Hono } from "hono";
 import { getDb } from "../db";
 import { sits, vessels } from "../db/schema";
 import { joinBoat } from "../lib/join";
+import { queryBoatsPage } from "../lib/boatsQuery";
+import { parseBoatsSearchParams } from "../../shared/boatsSearch";
 
 /**
  * Public browse/detail. Returns vessel ⋈ sit as the frontend `Boat`.
  *
- * The frontend does its own filtering/sorting/pagination client-side over the
- * full list, so these endpoints stay simple: return every published listing,
- * joined. (If the catalogue grows large, push filters down to SQL — the
- * indexes on sits are already in place.)
+ * List filters / sort / pagination are applied in D1 SQL
+ * (`q`, `type`, `sitType`, `from`, `to`, `pet`, `availability`, `sort`,
+ * `page`, `limit`). Omit `limit` (or set it ≤ 0) for the full match set.
  */
 export const boatsRouter = new Hono<{ Bindings: Env }>();
 
 boatsRouter.get("/", async (c) => {
   const db = getDb(c.env);
-  const rows = await db
-    .select({ vessel: vessels, sit: sits })
-    .from(sits)
-    .innerJoin(vessels, eq(sits.vesselId, vessels.id))
-    .where(eq(sits.published, true));
+  const params = parseBoatsSearchParams(c.req.query());
+  const result = await queryBoatsPage(db, params);
 
-  return c.json({ data: rows.map((r) => joinBoat(r.vessel, r.sit)) });
+  return c.json({
+    data: result.items,
+    total: result.total,
+    page: result.page,
+    limit: result.limit,
+    totalPages: result.totalPages,
+  });
 });
 
 boatsRouter.get("/:id", async (c) => {

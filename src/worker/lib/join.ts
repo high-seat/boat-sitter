@@ -41,6 +41,7 @@ export interface Boat {
   amenities: string[];
   pet: string | null;
   featured: boolean;
+  sitType: "liveaboard" | "daytimeChecks";
 }
 
 export function joinBoat(vessel: Vessel, sit: Sit): Boat {
@@ -80,5 +81,6 @@ export function joinBoat(vessel: Vessel, sit: Sit): Boat {
     amenities: vessel.amenities,
     pet: sit.pet,
     featured: sit.featured,
+    sitType: (sit.sitType === "daytimeChecks" ? "daytimeChecks" : "liveaboard"),
   };
 }

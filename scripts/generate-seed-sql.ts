@@ -69,6 +69,7 @@ const sitCols = [
   ["pet", "pet"],
   ["featured", "featured"],
   ["published", "published"],
+  ["sitType", "sit_type"],
 ] as const;
 
 const mapRow = (cols: readonly (readonly [string, string])[], obj: Record<string, unknown>) =>

@@ -14,6 +14,7 @@ import {
   apiGetApplicationsForUser,
   apiGetBoat,
   apiGetBoats,
+  apiGetBoatsPage,
   apiGetNotifications,
   apiGetPublicProfile,
   apiGetReviewForApplication,
@@ -32,6 +33,7 @@ import {
   hasApiSession,
 } from "@/apiRemote";
 import { ApiError } from "@/apiClient";
+import { paginateBoats, type BoatSearchParams } from "../shared/boatsSearch";
 
 export type { SitPhase };
 export { getSitPhase, SIT_PHASES, sitDateRangesOverlap } from "@/dateUtils";
@@ -1262,6 +1264,53 @@ export async function getBoats(): Promise<Boat[]> {
   return readSits()
     .map((sit) => joinSit(sit, vessels, acceptedIds))
     .filter((listing): listing is Boat => Boolean(listing));
+}
+
+export async function getBoatsPage(params: BoatSearchParams): Promise<{
+  boats: Boat[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> {
+  try {
+    const remote = await apiGetBoatsPage(params);
+    const hasFilters = Boolean(
+      params.q ||
+        (params.type && params.type !== "All vessels") ||
+        (params.sitType && params.sitType !== "all") ||
+        params.from ||
+        params.to ||
+        params.pet ||
+        (params.availability && params.availability !== "all"),
+    );
+    // Trust the Worker when authenticated, when it has matches, or when filters
+    // intentionally returned an empty page. Fall through only for an unseeded
+    // empty catalogue with no session (local demo / e2e without D1 seed).
+    if ((await hasApiSession()) || remote.total > 0 || hasFilters) {
+      return {
+        ...remote,
+        boats: remote.boats.map(fromApiBoat),
+      };
+    }
+  } catch {
+    // Fall through to local demo data when the Worker/D1 path is unavailable.
+  }
+
+  await wait();
+  const vessels = readVessels();
+  const acceptedIds = acceptedSitIds();
+  const all = readSits()
+    .map((sit) => joinSit(sit, vessels, acceptedIds))
+    .filter((listing): listing is Boat => Boolean(listing));
+  const result = paginateBoats(all, params);
+  return {
+    boats: result.items,
+    total: result.total,
+    page: result.page,
+    limit: result.limit,
+    totalPages: result.totalPages,
+  };
 }
 
 export async function getBoat(id: string): Promise<Boat | undefined> {
