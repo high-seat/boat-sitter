@@ -58,11 +58,7 @@ function parseDurationNights(duration: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-function overlapsDateRange(
-  boat: BoatSearchItem,
-  from?: string,
-  to?: string,
-): boolean {
+function overlapsDateRange(boat: BoatSearchItem, from?: string, to?: string): boolean {
   if (!from && !to) return true;
   const boatStart = new Date(`${boat.dateStart}T00:00:00`);
   if (Number.isNaN(boatStart.getTime())) return false;
@@ -71,8 +67,7 @@ function overlapsDateRange(
   const requestedStart = from ? new Date(`${from}T00:00:00`) : undefined;
   const requestedEnd = to ? new Date(`${to}T00:00:00`) : undefined;
   return (
-    (!requestedStart || boatEnd >= requestedStart) &&
-    (!requestedEnd || boatStart <= requestedEnd)
+    (!requestedStart || boatEnd >= requestedStart) && (!requestedEnd || boatStart <= requestedEnd)
   );
 }
 
@@ -107,10 +102,7 @@ function recommendedScore(boat: BoatSearchItem, now = new Date()): number {
   return score;
 }
 
-export function filterBoats<T extends BoatSearchItem>(
-  boats: T[],
-  params: BoatSearchParams,
-): T[] {
+export function filterBoats<T extends BoatSearchItem>(boats: T[], params: BoatSearchParams): T[] {
   const searchValues = (params.q ?? "")
     .split("|")
     .map((value) => value.trim().toLowerCase())

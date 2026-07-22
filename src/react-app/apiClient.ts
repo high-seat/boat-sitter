@@ -24,10 +24,7 @@ async function parseJson(res: Response): Promise<unknown> {
   }
 }
 
-export async function apiRequest<T>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
+export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
@@ -40,7 +37,10 @@ export async function apiRequest<T>(
   const body = await parseJson(res);
   if (!res.ok) {
     const message =
-      body && typeof body === "object" && "error" in body && typeof (body as { error: unknown }).error === "string"
+      body &&
+      typeof body === "object" &&
+      "error" in body &&
+      typeof (body as { error: unknown }).error === "string"
         ? (body as { error: string }).error
         : res.statusText || `Request failed (${res.status})`;
     throw new ApiError(res.status, message, body);

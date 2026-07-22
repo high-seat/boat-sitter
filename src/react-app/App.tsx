@@ -99,10 +99,7 @@ import {
   phoneCountryCodeFromLocation,
   resolvePhoneCountryCode,
 } from "@/phoneCountryCode";
-import {
-  ChangeEmailModal,
-  ChangePasswordModal,
-} from "@/components/forms/ChangeCredentialsModals";
+import { ChangeEmailModal, ChangePasswordModal } from "@/components/forms/ChangeCredentialsModals";
 import { EmailConfirmationStatus } from "@/components/settings/EmailConfirmationStatus";
 import { UserSafetyActions, BlockedUserBanner } from "@/components/moderation/UserSafetyActions";
 import { getIntlLocale, normalizeLanguageCode, SUPPORTED_LANGUAGES } from "@/i18n";
@@ -1868,7 +1865,9 @@ function ApplyModal({
         )}
         <label className="mt-5 block">
           <span className="form-label">{t("apply.partySize")}</span>
-          <Select variant="form" onChange={(event) => setPartySize(Number(event.target.value))}
+          <Select
+            variant="form"
+            onChange={(event) => setPartySize(Number(event.target.value))}
             value={partySize}
           >
             {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
@@ -1900,10 +1899,7 @@ function ApplyModal({
             <div>
               <p className="font-semibold">{t("apply.contactDetailsTerms")}</p>
               <p className="mt-1">{t("apply.contactDetailsBlocked")}</p>
-              <Link
-                className="mt-2 inline-flex font-bold underline underline-offset-2"
-                to="/terms"
-              >
+              <Link className="mt-2 inline-flex font-bold underline underline-offset-2" to="/terms">
                 {t("footer.terms")}
               </Link>
             </div>
@@ -2085,9 +2081,7 @@ function DetailPage() {
       : []),
     ...(listingBoat.requiredExperience ?? []),
     ...(listingBoat.requiredCertifications ?? []),
-    ...(listingBoat.requiredSkills ?? []).filter(
-      (skill) => !isNonSmokerRequirementLabel(skill),
-    ),
+    ...(listingBoat.requiredSkills ?? []).filter((skill) => !isNonSmokerRequirementLabel(skill)),
     ...(resolveNonSmokerRequired(listingBoat) ? [t("requirement.nonSmoker")] : []),
     ...withoutNonSmokerRequirementLabels(listingBoat.requirements),
   ].filter((item, index, all) => all.indexOf(item) === index);
@@ -2111,9 +2105,7 @@ function DetailPage() {
           <ArrowLeft size={17} /> {t("detail.back")}
         </button>
         <div className="relative">
-          <div
-            className={`grid h-136 gap-2 overflow-hidden rounded-3xl ${photoGridClass}`}
-          >
+          <div className={`grid h-136 gap-2 overflow-hidden rounded-3xl ${photoGridClass}`}>
             <button
               aria-label={t("lightbox.viewPhoto", { number: 1 })}
               className="min-h-0 h-full w-full overflow-hidden"
@@ -4548,10 +4540,7 @@ function SitEditor({
   const showSitVerificationLoading =
     isCreating && identityVerificationEnabled && verificationLoading;
   const showSitVerificationGate =
-    isCreating &&
-    identityVerificationEnabled &&
-    !canCreateSit &&
-    Boolean(verificationChecks);
+    isCreating && identityVerificationEnabled && !canCreateSit && Boolean(verificationChecks);
   let sitSaveButtonLabel = t("sitEditor.publish");
   if (mutation.isPending) sitSaveButtonLabel = t("common.saving");
   else if (sit) sitSaveButtonLabel = t("sitEditor.save");
@@ -5194,9 +5183,7 @@ function OwnerBoatsPage() {
   });
   let canCreateSit = true;
   if (identityVerificationEnabled) {
-    canCreateSit = ownerVerificationChecks
-      ? isFullyVerified(ownerVerificationChecks)
-      : false;
+    canCreateSit = ownerVerificationChecks ? isFullyVerified(ownerVerificationChecks) : false;
   }
   const removeVesselMutation = useMutation({
     mutationFn: deleteVessel,
@@ -6237,7 +6224,9 @@ function SettingsPage() {
         {activeTab === "personal" && (
           <div className="mt-8 space-y-8">
             <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-              <h2 className="font-display text-xl font-bold text-navy">{t("settings.personalTitle")}</h2>
+              <h2 className="font-display text-xl font-bold text-navy">
+                {t("settings.personalTitle")}
+              </h2>
               <p className="mt-2 text-sm leading-6 text-slate">{t("settings.personalHint")}</p>
               <form className="mt-6 space-y-5" onSubmit={submitPersonalDetails}>
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -6247,12 +6236,17 @@ function SettingsPage() {
                       autoComplete="name"
                       className="form-input"
                       onChange={(event) =>
-                        setPersonalForm((current) => ({ ...current, legalName: event.target.value }))
+                        setPersonalForm((current) => ({
+                          ...current,
+                          legalName: event.target.value,
+                        }))
                       }
                       required
                       value={personalForm.legalName}
                     />
-                    <p className="mt-2 text-sm leading-6 text-slate">{t("settings.legalNameHint")}</p>
+                    <p className="mt-2 text-sm leading-6 text-slate">
+                      {t("settings.legalNameHint")}
+                    </p>
                   </label>
                   <div>
                     <span className="form-label">{t("profile.location")}</span>
@@ -6364,7 +6358,9 @@ function SettingsPage() {
                       <option value="imperial">{t("settings.imperial")}</option>
                     </Select>
                   </label>
-                  <p className="mt-3 text-sm leading-6 text-slate">{t("settings.measurementHint")}</p>
+                  <p className="mt-3 text-sm leading-6 text-slate">
+                    {t("settings.measurementHint")}
+                  </p>
                 </div>
               </div>
             </section>
@@ -6434,7 +6430,9 @@ function SettingsPage() {
         {activeTab === "preferences" && (
           <div className="mt-8 space-y-8">
             <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-              <h2 className="font-display text-xl font-bold text-navy">{t("settings.emailsTitle")}</h2>
+              <h2 className="font-display text-xl font-bold text-navy">
+                {t("settings.emailsTitle")}
+              </h2>
               <p className="mt-2 text-sm leading-6 text-slate">{t("settings.emailsHint")}</p>
               <div className="mt-5 space-y-3">
                 {EMAIL_NOTIFICATION_KEYS.map((key) => (
@@ -7477,9 +7475,7 @@ function ApplicationReviewPage() {
           </div>
         )}
 
-      {pageLoading ? (
-        <div className="mt-8 h-80 animate-pulse rounded-2xl bg-seafoam" />
-      ) : null}
+      {pageLoading ? <div className="mt-8 h-80 animate-pulse rounded-2xl bg-seafoam" /> : null}
       {!pageLoading && applications.length ? (
         <div className="mt-8 space-y-6">
           {acceptedApplications.length > 0 &&
@@ -7900,78 +7896,78 @@ function ApplicationReviewPage() {
                     </p>
                   </div>
 
-                {anotherApplicantAccepted ? (
-                  <div
-                    className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
-                    role="status"
-                  >
-                    <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
-                    <div>
-                      <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
-                      <p className="mt-1">
-                        {t("applications.anotherAcceptedBanner", {
-                          name: primaryAcceptedApplication.applicant.name,
-                        })}
-                      </p>
+                  {anotherApplicantAccepted ? (
+                    <div
+                      className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                      role="status"
+                    >
+                      <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                      <div>
+                        <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
+                        <p className="mt-1">
+                          {t("applications.anotherAcceptedBanner", {
+                            name: primaryAcceptedApplication.applicant.name,
+                          })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ) : null}
-                {!anotherApplicantAccepted && selected.status === "accepted" ? (
-                  <div className="mt-6">
-                    <button
-                      className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
-                      disabled={statusMutation.isPending}
-                      onClick={() => {
-                        setSharePhone(false);
-                        setConfirmingStatus("unaccept");
-                      }}
-                      type="button"
-                    >
-                      {t("applications.action.unaccept")}
-                    </button>
-                  </div>
-                ) : null}
-                {!anotherApplicantAccepted && selected.status !== "accepted" ? (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    <label
-                      className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
-                        selected.status === "shortlisted"
-                          ? "border-amber-400 bg-amber-100 text-amber-900"
-                          : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                      }`}
-                    >
-                      <input
-                        checked={selected.status === "shortlisted"}
-                        className="size-4 accent-amber-600"
-                        disabled={statusMutation.isPending}
-                        onChange={(event) =>
-                          statusMutation.mutate({
-                            id: selected.id,
-                            status: event.target.checked ? "shortlisted" : "new",
-                          })
-                        }
-                        type="checkbox"
-                      />
-                      {t("applications.action.shortlisted")}
-                    </label>
-                    {(["accepted", "declined"] as const).map((status) => (
+                  ) : null}
+                  {!anotherApplicantAccepted && selected.status === "accepted" ? (
+                    <div className="mt-6">
                       <button
-                        className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
-                          selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
-                        }`}
+                        className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
                         disabled={statusMutation.isPending}
-                        key={status}
                         onClick={() => {
                           setSharePhone(false);
-                          setConfirmingStatus(status);
+                          setConfirmingStatus("unaccept");
                         }}
                         type="button"
                       >
-                        {t(`applications.action.${status}`)}
+                        {t("applications.action.unaccept")}
                       </button>
-                    ))}
-                  </div>
-                ) : null}
+                    </div>
+                  ) : null}
+                  {!anotherApplicantAccepted && selected.status !== "accepted" ? (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <label
+                        className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
+                          selected.status === "shortlisted"
+                            ? "border-amber-400 bg-amber-100 text-amber-900"
+                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                        }`}
+                      >
+                        <input
+                          checked={selected.status === "shortlisted"}
+                          className="size-4 accent-amber-600"
+                          disabled={statusMutation.isPending}
+                          onChange={(event) =>
+                            statusMutation.mutate({
+                              id: selected.id,
+                              status: event.target.checked ? "shortlisted" : "new",
+                            })
+                          }
+                          type="checkbox"
+                        />
+                        {t("applications.action.shortlisted")}
+                      </label>
+                      {(["accepted", "declined"] as const).map((status) => (
+                        <button
+                          className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
+                            selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
+                          }`}
+                          disabled={statusMutation.isPending}
+                          key={status}
+                          onClick={() => {
+                            setSharePhone(false);
+                            setConfirmingStatus(status);
+                          }}
+                          type="button"
+                        >
+                          {t(`applications.action.${status}`)}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </section>
 
                 <ConversationPanel

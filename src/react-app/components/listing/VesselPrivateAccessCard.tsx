@@ -1,10 +1,7 @@
 import { type ReactNode } from "react";
 import { KeyRound, Lock, MapPinned, Wifi } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  hasSitPrivateDetails,
-  type SitPrivateDetails,
-} from "@/mockApi";
+import { hasSitPrivateDetails, type SitPrivateDetails } from "@/mockApi";
 import { mapsAddressSearchUrl } from "@/mapUtils";
 import { CopyIconButton } from "@/components/ui/CopyIconButton";
 

@@ -48,49 +48,49 @@ npm run build && npm run deploy
 
 ### Public — browse / detail
 
-| Method | Path             | Notes                                             |
-| ------ | ---------------- | ------------------------------------------------- |
+| Method | Path             | Notes                                                                                                                                                                                                                               |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | GET    | `/api/boats`     | Filters applied in D1 SQL: `q`, `type`, `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
-| GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished |
+| GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished                                                                                                                                                                                   |
 
 ### Owner — vessels & sits _(writes require Better Auth session)_
 
-| Method | Path                       | Notes                                        |
-| ------ | -------------------------- | -------------------------------------------- |
-| GET    | `/api/vessels` · `?owner=` | List (optionally by owner)                   |
-| GET    | `/api/vessels/:id`         | One vessel                                   |
+| Method | Path                       | Notes                                         |
+| ------ | -------------------------- | --------------------------------------------- |
+| GET    | `/api/vessels` · `?owner=` | List (optionally by owner)                    |
+| GET    | `/api/vessels/:id`         | One vessel                                    |
 | PUT    | `/api/vessels/:id`         | Upsert (create or update); owner from session |
-| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it   |
-| GET    | `/api/sits`                | List (sits expose `boatId` = vessel id)      |
-| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist |
-| DELETE | `/api/sits/:id`            |                                              |
+| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it    |
+| GET    | `/api/sits`                | List (sits expose `boatId` = vessel id)       |
+| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist  |
+| DELETE | `/api/sits/:id`            |                                               |
 
 ### Applications _(writes require Better Auth session)_
 
-| Method | Path                             | Notes                                                            |
-| ------ | -------------------------------- | ---------------------------------------------------------------- |
-| GET    | `/api/applications?sitId=`       | Applications for one listing                                     |
-| GET    | `/api/applications?user=`        | Where user is owner **or** applicant                             |
+| Method | Path                             | Notes                                                              |
+| ------ | -------------------------------- | ------------------------------------------------------------------ |
+| GET    | `/api/applications?sitId=`       | Applications for one listing                                       |
+| GET    | `/api/applications?user=`        | Where user is owner **or** applicant                               |
 | POST   | `/api/applications`              | `{ sitId, message, partySize?, applicant }`; identity from session |
-| PATCH  | `/api/applications/:id`          | `{ status, ownerPhone? }`; owner only; emits system messages     |
-| POST   | `/api/applications/:id/withdraw` | Applicant withdraw + system message                              |
-| POST   | `/api/applications/:id/messages` | `{ text }`; sender from session                                  |
-| POST   | `/api/applications/:id/phone`    | `{ phoneNumber }` phone-share system message                     |
+| PATCH  | `/api/applications/:id`          | `{ status, ownerPhone? }`; owner only; emits system messages       |
+| POST   | `/api/applications/:id/withdraw` | Applicant withdraw + system message                                |
+| POST   | `/api/applications/:id/messages` | `{ text }`; sender from session                                    |
+| POST   | `/api/applications/:id/phone`    | `{ phoneNumber }` phone-share system message                       |
 
 ### Profile, reviews, notifications _(Better Auth session)_
 
-| Method | Path                         | Notes                                      |
-| ------ | ---------------------------- | ------------------------------------------ |
-| GET    | `/api/me`                    | `{ user, profile }` (creates profile row)  |
-| GET    | `/api/me/profile`            | Current member profile                     |
-| PUT    | `/api/me/profile`            | Patch profile fields                       |
-| DELETE | `/api/me`                    | Delete account + owned vessels/apps/reviews |
-| GET    | `/api/profiles/:name`        | Public profile by display name             |
-| GET    | `/api/notifications`         | Inbox for the signed-in user               |
-| GET    | `/api/reviews?sitter=`       | Reviews for a sitter                       |
-| GET    | `/api/reviews?applicationId=`| One review or null                         |
-| POST   | `/api/reviews`               | Owner leaves a review                      |
-| POST   | `/api/reviews/:id/response`  | Sitter responds                            |
+| Method | Path                          | Notes                                       |
+| ------ | ----------------------------- | ------------------------------------------- |
+| GET    | `/api/me`                     | `{ user, profile }` (creates profile row)   |
+| GET    | `/api/me/profile`             | Current member profile                      |
+| PUT    | `/api/me/profile`             | Patch profile fields                        |
+| DELETE | `/api/me`                     | Delete account + owned vessels/apps/reviews |
+| GET    | `/api/profiles/:name`         | Public profile by display name              |
+| GET    | `/api/notifications`          | Inbox for the signed-in user                |
+| GET    | `/api/reviews?sitter=`        | Reviews for a sitter                        |
+| GET    | `/api/reviews?applicationId=` | One review or null                          |
+| POST   | `/api/reviews`                | Owner leaves a review                       |
+| POST   | `/api/reviews/:id/response`   | Sitter responds                             |
 
 ### Support
 

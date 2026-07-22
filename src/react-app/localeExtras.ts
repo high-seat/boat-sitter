@@ -436,7 +436,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Create a boat sit",
     "sitEditor.createShort": "Create a sit",
     "sitEditor.boatDetailsBannerTitle": "Keep boat details up to date",
-    "sitEditor.boatDetailsBanner": "Photos, systems, and amenities come from the boat profile. Review them before publishing so sitters see accurate information.",
+    "sitEditor.boatDetailsBanner":
+      "Photos, systems, and amenities come from the boat profile. Review them before publishing so sitters see accurate information.",
     "sitEditor.boatDetailsBannerCta": "Update boat details",
     "sitEditor.createEditLimitTitle": "Editable until someone applies",
     "sitEditor.createEditLimit":
@@ -1377,7 +1378,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Créer une garde de bateau",
     "sitEditor.createShort": "Créer une garde",
     "sitEditor.boatDetailsBannerTitle": "Tenez à jour les détails du bateau",
-    "sitEditor.boatDetailsBanner": "Les photos, systèmes et équipements viennent du profil du bateau. Vérifiez-les avant de publier pour que les gardiens voient des informations exactes.",
+    "sitEditor.boatDetailsBanner":
+      "Les photos, systèmes et équipements viennent du profil du bateau. Vérifiez-les avant de publier pour que les gardiens voient des informations exactes.",
     "sitEditor.boatDetailsBannerCta": "Mettre à jour le bateau",
     "sitEditor.createEditLimitTitle": "Modifiable jusqu’à la première candidature",
     "sitEditor.createEditLimit":
@@ -2331,7 +2333,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Crear un asiento en barco",
     "sitEditor.createShort": "crear una sentada",
     "sitEditor.boatDetailsBannerTitle": "Mantén actualizados los detalles del barco",
-    "sitEditor.boatDetailsBanner": "Las fotos, sistemas y comodidades vienen del perfil del barco. Revísalos antes de publicar para que los cuidadores vean información precisa.",
+    "sitEditor.boatDetailsBanner":
+      "Las fotos, sistemas y comodidades vienen del perfil del barco. Revísalos antes de publicar para que los cuidadores vean información precisa.",
     "sitEditor.boatDetailsBannerCta": "Actualizar detalles del barco",
     "sitEditor.createEditLimitTitle": "Editable hasta la primera solicitud",
     "sitEditor.createEditLimit":
@@ -3282,7 +3285,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Crea un posto in barca",
     "sitEditor.createShort": "Crea una seduta",
     "sitEditor.boatDetailsBannerTitle": "Mantieni aggiornati i dettagli della barca",
-    "sitEditor.boatDetailsBanner": "Foto, sistemi e comfort arrivano dal profilo della barca. Controllali prima di pubblicare così i sitter vedono informazioni accurate.",
+    "sitEditor.boatDetailsBanner":
+      "Foto, sistemi e comfort arrivano dal profilo della barca. Controllali prima di pubblicare così i sitter vedono informazioni accurate.",
     "sitEditor.boatDetailsBannerCta": "Aggiorna dettagli barca",
     "sitEditor.createEditLimitTitle": "Modificabile fino alla prima candidatura",
     "sitEditor.createEditLimit":
@@ -4236,7 +4240,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Erstellen Sie einen Bootssitz",
     "sitEditor.createShort": "Erstellen Sie eine Sitzung",
     "sitEditor.boatDetailsBannerTitle": "Bootdetails aktuell halten",
-    "sitEditor.boatDetailsBanner": "Fotos, Systeme und Ausstattung stammen aus dem Bootsprofil. Prüfen Sie sie vor dem Veröffentlichen, damit Sitter genaue Angaben sehen.",
+    "sitEditor.boatDetailsBanner":
+      "Fotos, Systeme und Ausstattung stammen aus dem Bootsprofil. Prüfen Sie sie vor dem Veröffentlichen, damit Sitter genaue Angaben sehen.",
     "sitEditor.boatDetailsBannerCta": "Bootdetails aktualisieren",
     "sitEditor.createEditLimitTitle": "Bearbeitbar bis zur ersten Bewerbung",
     "sitEditor.createEditLimit":
@@ -5186,7 +5191,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Creëer een bootzit",
     "sitEditor.createShort": "Creëer een zit",
     "sitEditor.boatDetailsBannerTitle": "Houd bootgegevens up-to-date",
-    "sitEditor.boatDetailsBanner": "Foto’s, systemen en voorzieningen komen uit het bootprofiel. Controleer ze vóór publicatie zodat oppassers juiste informatie zien.",
+    "sitEditor.boatDetailsBanner":
+      "Foto’s, systemen en voorzieningen komen uit het bootprofiel. Controleer ze vóór publicatie zodat oppassers juiste informatie zien.",
     "sitEditor.boatDetailsBannerCta": "Bootgegevens bijwerken",
     "sitEditor.createEditLimitTitle": "Bewerkbaar tot de eerste aanvraag",
     "sitEditor.createEditLimit":
@@ -6130,7 +6136,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Crie um assento de barco",
     "sitEditor.createShort": "Crie um assento",
     "sitEditor.boatDetailsBannerTitle": "Mantenha os detalhes do barco atualizados",
-    "sitEditor.boatDetailsBanner": "Fotos, sistemas e comodidades vêm do perfil do barco. Reveja-os antes de publicar para que os cuidadores vejam informação correta.",
+    "sitEditor.boatDetailsBanner":
+      "Fotos, sistemas e comodidades vêm do perfil do barco. Reveja-os antes de publicar para que os cuidadores vejam informação correta.",
     "sitEditor.boatDetailsBannerCta": "Atualizar detalhes do barco",
     "sitEditor.createEditLimitTitle": "Editável até a primeira candidatura",
     "sitEditor.createEditLimit":
@@ -7080,7 +7087,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Δημιουργήστε μια βάρκα",
     "sitEditor.createShort": "Δημιουργήστε ένα κάθισμα",
     "sitEditor.boatDetailsBannerTitle": "Κρατήστε ενημερωμένες τις λεπτομέρειες του σκάφους",
-    "sitEditor.boatDetailsBanner": "Φωτογραφίες, συστήματα και ανέσεις προέρχονται από το προφίλ του σκάφους. Ελέγξτε τα πριν τη δημοσίευση ώστε οι φύλακες να βλέπουν ακριβείς πληροφορίες.",
+    "sitEditor.boatDetailsBanner":
+      "Φωτογραφίες, συστήματα και ανέσεις προέρχονται από το προφίλ του σκάφους. Ελέγξτε τα πριν τη δημοσίευση ώστε οι φύλακες να βλέπουν ακριβείς πληροφορίες.",
     "sitEditor.boatDetailsBannerCta": "Ενημέρωση λεπτομερειών σκάφους",
     "sitEditor.createEditLimitTitle": "Επεξεργάσιμο μέχρι την πρώτη αίτηση",
     "sitEditor.createEditLimit":
@@ -8035,7 +8043,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Stvorite mjesto za čamac",
     "sitEditor.createShort": "Stvorite sjedište",
     "sitEditor.boatDetailsBannerTitle": "Držite detalje plovila ažurnima",
-    "sitEditor.boatDetailsBanner": "Fotografije, sustavi i sadržaji dolaze iz profila plovila. Pregledajte ih prije objave kako bi čuvari vidjeli točne informacije.",
+    "sitEditor.boatDetailsBanner":
+      "Fotografije, sustavi i sadržaji dolaze iz profila plovila. Pregledajte ih prije objave kako bi čuvari vidjeli točne informacije.",
     "sitEditor.boatDetailsBannerCta": "Ažuriraj detalje plovila",
     "sitEditor.createEditLimitTitle": "Može se uređivati do prve prijave",
     "sitEditor.createEditLimit":
@@ -8967,7 +8976,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Bir tekne oturağı oluşturun",
     "sitEditor.createShort": "Oturma alanı oluştur",
     "sitEditor.boatDetailsBannerTitle": "Tekne ayrıntılarını güncel tutun",
-    "sitEditor.boatDetailsBanner": "Fotoğraflar, sistemler ve olanaklar tekne profilinden gelir. Bakıcıların doğru bilgi görmesi için yayınlamadan önce gözden geçirin.",
+    "sitEditor.boatDetailsBanner":
+      "Fotoğraflar, sistemler ve olanaklar tekne profilinden gelir. Bakıcıların doğru bilgi görmesi için yayınlamadan önce gözden geçirin.",
     "sitEditor.boatDetailsBannerCta": "Tekne ayrıntılarını güncelle",
     "sitEditor.createEditLimitTitle": "İlk başvuruya kadar düzenlenebilir",
     "sitEditor.createEditLimit":
@@ -9901,7 +9911,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Skapa en båt sitta",
     "sitEditor.createShort": "Skapa en sit",
     "sitEditor.boatDetailsBannerTitle": "Håll båtdetaljerna uppdaterade",
-    "sitEditor.boatDetailsBanner": "Foton, system och bekvämligheter kommer från båtprofilen. Granska dem innan du publicerar så att sittare ser korrekt information.",
+    "sitEditor.boatDetailsBanner":
+      "Foton, system och bekvämligheter kommer från båtprofilen. Granska dem innan du publicerar så att sittare ser korrekt information.",
     "sitEditor.boatDetailsBannerCta": "Uppdatera båtdetaljer",
     "sitEditor.createEditLimitTitle": "Kan redigeras tills någon ansöker",
     "sitEditor.createEditLimit":
@@ -10835,7 +10846,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Lag en båtsitte",
     "sitEditor.createShort": "Lag en sit",
     "sitEditor.boatDetailsBannerTitle": "Hold båtdetaljene oppdatert",
-    "sitEditor.boatDetailsBanner": "Bilder, systemer og fasiliteter kommer fra båtprofilen. Se over dem før du publiserer, så sitters ser riktig informasjon.",
+    "sitEditor.boatDetailsBanner":
+      "Bilder, systemer og fasiliteter kommer fra båtprofilen. Se over dem før du publiserer, så sitters ser riktig informasjon.",
     "sitEditor.boatDetailsBannerCta": "Oppdater båtdetaljer",
     "sitEditor.createEditLimitTitle": "Kan redigeres til noen søker",
     "sitEditor.createEditLimit":
@@ -11768,7 +11780,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Opret en bådsit",
     "sitEditor.createShort": "Opret en sit",
     "sitEditor.boatDetailsBannerTitle": "Hold bådoplysningerne opdaterede",
-    "sitEditor.boatDetailsBanner": "Fotos, systemer og faciliteter kommer fra bådprofilen. Gennemgå dem før du udgiver, så sitters ser korrekte oplysninger.",
+    "sitEditor.boatDetailsBanner":
+      "Fotos, systemer og faciliteter kommer fra bådprofilen. Gennemgå dem før du udgiver, så sitters ser korrekte oplysninger.",
     "sitEditor.boatDetailsBannerCta": "Opdater bådoplysninger",
     "sitEditor.createEditLimitTitle": "Kan redigeres, indtil nogen ansøger",
     "sitEditor.createEditLimit":
@@ -12700,7 +12713,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Luo veneistuin",
     "sitEditor.createShort": "Luo istumapaikka",
     "sitEditor.boatDetailsBannerTitle": "Pidä veneen tiedot ajan tasalla",
-    "sitEditor.boatDetailsBanner": "Kuvat, järjestelmät ja mukavuudet tulevat veneprofiilista. Tarkista ne ennen julkaisua, jotta hoitajat näkevät oikeat tiedot.",
+    "sitEditor.boatDetailsBanner":
+      "Kuvat, järjestelmät ja mukavuudet tulevat veneprofiilista. Tarkista ne ennen julkaisua, jotta hoitajat näkevät oikeat tiedot.",
     "sitEditor.boatDetailsBannerCta": "Päivitä veneen tiedot",
     "sitEditor.createEditLimitTitle": "Muokattava, kunnes joku hakee",
     "sitEditor.createEditLimit":
@@ -13639,7 +13653,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "ボートの座席を作成する",
     "sitEditor.createShort": "座る場所を作成する",
     "sitEditor.boatDetailsBannerTitle": "ボートの詳細を最新に保つ",
-    "sitEditor.boatDetailsBanner": "写真、設備、アメニティはボートのプロフィールから表示されます。シッターが正確な情報を見られるよう、公開前に確認してください。",
+    "sitEditor.boatDetailsBanner":
+      "写真、設備、アメニティはボートのプロフィールから表示されます。シッターが正確な情報を見られるよう、公開前に確認してください。",
     "sitEditor.boatDetailsBannerCta": "ボートの詳細を更新",
     "sitEditor.createEditLimitTitle": "誰かが申請するまで編集可能",
     "sitEditor.createEditLimit":
@@ -14566,7 +14581,8 @@ const localeExtrasSource = {
     "sitEditor.createTitle": "Create a boat sit",
     "sitEditor.createShort": "Create a sit",
     "sitEditor.boatDetailsBannerTitle": "Keep boat details up to date",
-    "sitEditor.boatDetailsBanner": "Photos, systems, and amenities come from the boat profile. Review them before publishing so sitters see accurate information.",
+    "sitEditor.boatDetailsBanner":
+      "Photos, systems, and amenities come from the boat profile. Review them before publishing so sitters see accurate information.",
     "sitEditor.boatDetailsBannerCta": "Update boat details",
     "sitEditor.createEditLimitTitle": "Editable until someone applies",
     "sitEditor.createEditLimit":

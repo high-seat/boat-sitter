@@ -4,6 +4,7 @@ import { getDb } from "../db";
 import { applicationMessages, applications, sits, supportRequests, vessels } from "../db/schema";
 import { seedApplications, seedSits, seedVessels } from "../db/seed-data";
 import { requireAdmin } from "../middleware/auth";
+import { sendNotificationEmail } from "../email";
 import { devConsoleHtml } from "./dev-console-html";
 
 /**
@@ -66,6 +67,25 @@ devRouter.post("/reset", requireAdmin, async (c) => {
 
   const s = await db.select().from(sits);
   return c.json({ reset: true, vessels: seedVessels.length, sits: s.length });
+});
+
+/** GET /api/dev/test-email — send one test email via Resend to NOTIFY_EMAIL. */
+devRouter.get("/test-email", async (c) => {
+  if (!c.env.RESEND_API_KEY) {
+    return c.json({ ok: false, error: "RESEND_API_KEY not set in .dev.vars" }, 400);
+  }
+  if (!c.env.NOTIFY_EMAIL) {
+    return c.json({ ok: false, error: "NOTIFY_EMAIL not set in .dev.vars" }, 400);
+  }
+  await sendNotificationEmail(c.env, {
+    subject: "Boatstead test email ✅",
+    heading: "Your email notifications work",
+    body: "If you're reading this in your inbox, Resend is configured correctly.",
+    actionUrl: c.env.BETTER_AUTH_URL,
+    actionLabel: "Open the app",
+    to: c.env.NOTIFY_EMAIL,
+  });
+  return c.json({ ok: true, sentTo: c.env.NOTIFY_EMAIL, note: "Check your inbox (and spam)." });
 });
 
 /** GET /api/dev/sample — a valid vessel + sit pair ready to PUT. */

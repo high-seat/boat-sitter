@@ -10,8 +10,7 @@ test.describe("boat access details", () => {
     const access = page.getByRole("region", { name: /Boat access details/i });
     await expect(access).toBeVisible();
 
-    const address =
-      "Berth B12, Lefkas Marina, Lefkada 311 00, Greece";
+    const address = "Berth B12, Lefkas Marina, Lefkada 311 00, Greece";
     const mapsLink = access.getByRole("link", { name: new RegExp(address) });
     await expect(mapsLink).toHaveAttribute(
       "href",
@@ -20,13 +19,13 @@ test.describe("boat access details", () => {
 
     await access.getByRole("button", { name: /Copy Wi-Fi network/i }).click();
     await expect(access.getByRole("button", { name: /^Copied$/i })).toBeVisible();
-    await expect.poll(async () => page.evaluate(() => navigator.clipboard.readText())).toBe(
-      "Solstice-Guest",
-    );
+    await expect
+      .poll(async () => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe("Solstice-Guest");
 
     await access.getByRole("button", { name: /Copy Wi-Fi password/i }).click();
-    await expect.poll(async () => page.evaluate(() => navigator.clipboard.readText())).toBe(
-      "aegean-sun-42",
-    );
+    await expect
+      .poll(async () => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe("aegean-sun-42");
   });
 });

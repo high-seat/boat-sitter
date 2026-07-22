@@ -3,11 +3,7 @@ import { Ellipsis, Flag, Languages, Phone, Send, Video, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getIntlLocale } from "@/i18n";
 import { type ApplicationMessage, type SitApplication } from "@/mockApi";
-import {
-  REPORT_REASONS,
-  useAppStore,
-  type ReportReason,
-} from "@/store";
+import { REPORT_REASONS, useAppStore, type ReportReason } from "@/store";
 import { translateWithGoogle } from "@/translationService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Select } from "@/components/ui/Select";

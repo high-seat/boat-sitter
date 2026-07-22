@@ -6,11 +6,7 @@ import {
   type VideoCallCalendarEvent,
 } from "@/videoCallCalendar";
 
-export function VideoCallCalendarLinks({
-  event,
-}: {
-  event: VideoCallCalendarEvent;
-}) {
+export function VideoCallCalendarLinks({ event }: { event: VideoCallCalendarEvent }) {
   const { t } = useTranslation();
   const googleUrl = buildGoogleCalendarUrl(event);
   const appleUrl = buildAppleCalendarUrl(event);

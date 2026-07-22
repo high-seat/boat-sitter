@@ -3,13 +3,7 @@ import { Check, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { IconTooltip } from "@/components/ui/IconTooltip";
 
-export function CopyIconButton({
-  value,
-  label,
-}: {
-  value: string;
-  label: string;
-}) {
+export function CopyIconButton({ value, label }: { value: string; label: string }) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
@@ -33,11 +27,7 @@ export function CopyIconButton({
   return (
     <IconTooltip label={tooltip} side="top">
       <button
-        aria-label={
-          copied
-            ? t("privateAccess.copied")
-            : t("privateAccess.copyAria", { label })
-        }
+        aria-label={copied ? t("privateAccess.copied") : t("privateAccess.copyAria", { label })}
         className="grid size-8 shrink-0 place-items-center rounded-lg text-teal transition hover:bg-white/80 hover:text-navy"
         onClick={() => void copyValue()}
         type="button"

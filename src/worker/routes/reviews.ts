@@ -123,35 +123,30 @@ const responseSchema = z.object({
   text: z.string().min(8),
 });
 
-reviewsRouter.post(
-  "/:id/response",
-  requireUser,
-  zValidator("json", responseSchema),
-  async (c) => {
-    const db = getDb(c.env);
-    const user = c.get("user")!;
-    const id = c.req.param("id");
-    const { text } = c.req.valid("json");
+reviewsRouter.post("/:id/response", requireUser, zValidator("json", responseSchema), async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const id = c.req.param("id");
+  const { text } = c.req.valid("json");
 
-    const existing = await db.query.reviews.findFirst({ where: eq(reviews.id, id) });
-    if (!existing) return c.json({ error: "REVIEW_NOT_FOUND" }, 404);
-    if (existing.sitterUserId && existing.sitterUserId !== user.id) {
-      return c.json({ error: "REVIEW_SITTER_ONLY" }, 403);
-    }
-    if (!existing.sitterUserId && existing.sitterName !== user.name) {
-      return c.json({ error: "REVIEW_SITTER_ONLY" }, 403);
-    }
-    if (existing.responseText) return c.json({ error: "REVIEW_RESPONSE_EXISTS" }, 409);
+  const existing = await db.query.reviews.findFirst({ where: eq(reviews.id, id) });
+  if (!existing) return c.json({ error: "REVIEW_NOT_FOUND" }, 404);
+  if (existing.sitterUserId && existing.sitterUserId !== user.id) {
+    return c.json({ error: "REVIEW_SITTER_ONLY" }, 403);
+  }
+  if (!existing.sitterUserId && existing.sitterName !== user.name) {
+    return c.json({ error: "REVIEW_SITTER_ONLY" }, 403);
+  }
+  if (existing.responseText) return c.json({ error: "REVIEW_RESPONSE_EXISTS" }, 409);
 
-    const [row] = await db
-      .update(reviews)
-      .set({
-        responseText: text.trim(),
-        responseCreatedAt: new Date().toISOString(),
-      })
-      .where(eq(reviews.id, id))
-      .returning();
+  const [row] = await db
+    .update(reviews)
+    .set({
+      responseText: text.trim(),
+      responseCreatedAt: new Date().toISOString(),
+    })
+    .where(eq(reviews.id, id))
+    .returning();
 
-    return c.json({ data: shapeReview(row) });
-  },
-);
+  return c.json({ data: shapeReview(row) });
+});

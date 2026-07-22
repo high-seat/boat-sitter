@@ -1277,12 +1277,12 @@ export async function getBoatsPage(params: BoatSearchParams): Promise<{
     const remote = await apiGetBoatsPage(params);
     const hasFilters = Boolean(
       params.q ||
-        (params.type && params.type !== "All vessels") ||
-        (params.sitType && params.sitType !== "all") ||
-        params.from ||
-        params.to ||
-        params.pet ||
-        (params.availability && params.availability !== "all"),
+      (params.type && params.type !== "All vessels") ||
+      (params.sitType && params.sitType !== "all") ||
+      params.from ||
+      params.to ||
+      params.pet ||
+      (params.availability && params.availability !== "all"),
     );
     // Trust the Worker when authenticated, when it has matches, or when filters
     // intentionally returned an empty page. Fall through only for an unseeded
@@ -2241,7 +2241,8 @@ export async function sendApplication(
       );
     } catch (error) {
       if (error instanceof ApiError) {
-        if (error.message === "APPLICATION_SIT_NOT_FOUND") throw new Error("APPLICATION_SIT_NOT_FOUND");
+        if (error.message === "APPLICATION_SIT_NOT_FOUND")
+          throw new Error("APPLICATION_SIT_NOT_FOUND");
         if (error.message === "APPLICATIONS_CLOSED") throw new Error("APPLICATIONS_CLOSED");
       }
       throw error;

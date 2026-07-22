@@ -8,10 +8,12 @@ import {
   applicationMessages,
   applications,
   sits,
+  user,
   vessels,
   type MessagePayload,
 } from "../db/schema";
 import { insertNotification } from "../lib/notifications";
+import { sendNotificationEmail } from "../email";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -236,10 +238,27 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
     href: `/owner/sits/${sitId}/applications`,
   });
 
+  await sendNotificationEmail(c.env, {
+    subject: `New application for ${listing[0].vessel.name}`,
+    heading: "You have a new sitter application",
+    body: `${applicantName} applied to sit ${listing[0].vessel.name}.`,
+    actionUrl: `${c.env.BETTER_AUTH_URL}/owner/sits/${sitId}/applications`,
+    actionLabel: "Review application",
+    to: await emailForUserId(c.env, listing[0].vessel.ownerUserId),
+  });
+
   const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   const msgs = await loadMessages(c.env, [id]);
   return c.json({ data: shape(row!, msgs) }, 201);
 });
+
+/** Look up a logged-in user's real email by their auth user id. */
+async function emailForUserId(env: Env, userId: string | null | undefined) {
+  if (!userId) return undefined;
+  const db = getDb(env);
+  const u = await db.query.user.findFirst({ where: eq(user.id, userId) });
+  return u?.email ?? undefined;
+}
 
 async function ownerIdForApplication(env: Env, appRow: ApplicationRow) {
   const db = getDb(env);
@@ -265,7 +284,7 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
     .update(applications)
     .set({
       status,
-      ownerPhone: status === "accepted" ? (ownerPhone?.trim() || null) : null,
+      ownerPhone: status === "accepted" ? ownerPhone?.trim() || null : null,
     })
     .where(eq(applications.id, id))
     .returning();
@@ -314,12 +333,28 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
       boatName: appRow.boatName,
       href: `/owner/sits/${appRow.sitId}/applications`,
     });
+    await sendNotificationEmail(c.env, {
+      subject: `Your application for ${appRow.boatName} was accepted`,
+      heading: "Your application was accepted 🎉",
+      body: `${user.name} accepted your application to sit ${appRow.boatName}.`,
+      actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
+      actionLabel: "Open conversation",
+      to: await emailForUserId(c.env, appRow.applicantUserId),
+    });
   } else if (status === "declined") {
     await insertSystemMessage(c.env, {
       applicationId: id,
       senderName: user.name,
       text: `${user.name} declined this application`,
       systemKind: "declined",
+    });
+    await sendNotificationEmail(c.env, {
+      subject: `Update on your application for ${appRow.boatName}`,
+      heading: "Application update",
+      body: `Your application to sit ${appRow.boatName} was not taken forward this time.`,
+      actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
+      actionLabel: "View details",
+      to: await emailForUserId(c.env, appRow.applicantUserId),
     });
   }
 
@@ -415,10 +450,8 @@ applicationsRouter.post(
       createdAt: new Date().toISOString(),
     });
 
-    const recipientName =
-      user.id === app.applicantUserId ? app.ownerName : app.applicantName;
-    const recipientId =
-      user.id === app.applicantUserId ? ownerId : app.applicantUserId;
+    const recipientName = user.id === app.applicantUserId ? app.ownerName : app.applicantName;
+    const recipientId = user.id === app.applicantUserId ? ownerId : app.applicantUserId;
     await insertNotification(db, {
       userId: recipientId,
       userName: recipientName,
@@ -426,6 +459,14 @@ applicationsRouter.post(
       actor: user.name,
       boatName: app.boatName,
       href: `/messages?application=${id}`,
+    });
+    await sendNotificationEmail(c.env, {
+      subject: `New message about ${app.boatName}`,
+      heading: `New message from ${user.name}`,
+      body: `${user.name} sent you a message about ${app.boatName}.`,
+      actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
+      actionLabel: "Reply",
+      to: await emailForUserId(c.env, recipientId),
     });
 
     const msgs = await loadMessages(c.env, [id]);
@@ -463,10 +504,8 @@ applicationsRouter.post(
       payload: { sharedPhone },
     });
 
-    const recipientName =
-      user.id === app.applicantUserId ? app.ownerName : app.applicantName;
-    const recipientId =
-      user.id === app.applicantUserId ? ownerId : app.applicantUserId;
+    const recipientName = user.id === app.applicantUserId ? app.ownerName : app.applicantName;
+    const recipientId = user.id === app.applicantUserId ? ownerId : app.applicantUserId;
     await insertNotification(db, {
       userId: recipientId,
       userName: recipientName,

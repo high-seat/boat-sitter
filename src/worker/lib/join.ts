@@ -81,6 +81,6 @@ export function joinBoat(vessel: Vessel, sit: Sit): Boat {
     amenities: vessel.amenities,
     pet: sit.pet,
     featured: sit.featured,
-    sitType: (sit.sitType === "daytimeChecks" ? "daytimeChecks" : "liveaboard"),
+    sitType: sit.sitType === "daytimeChecks" ? "daytimeChecks" : "liveaboard",
   };
 }

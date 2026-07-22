@@ -38,12 +38,20 @@ function statusLabel(status: string) {
 
 ```tsx
 // Bad
-{loading ? <Spinner /> : error ? <Error /> : <Content />}
+{
+  loading ? <Spinner /> : error ? <Error /> : <Content />;
+}
 
 // Good
-{loading ? <Spinner /> : null}
-{!loading && error ? <Error /> : null}
-{!loading && !error ? <Content /> : null}
+{
+  loading ? <Spinner /> : null;
+}
+{
+  !loading && error ? <Error /> : null;
+}
+{
+  !loading && !error ? <Content /> : null;
+}
 
 // Or extract:
 function Body() {

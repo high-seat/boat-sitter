@@ -114,8 +114,7 @@ export function DestinationAutocomplete({
     return undefined;
   }
 
-  let containerClass =
-    "relative flex flex-1 items-center gap-3 rounded-xl bg-cream px-4";
+  let containerClass = "relative flex flex-1 items-center gap-3 rounded-xl bg-cream px-4";
   if (variant === "home") {
     containerClass =
       "relative flex items-center gap-3 border-b border-line px-5 py-4 md:border-r md:border-b-0";

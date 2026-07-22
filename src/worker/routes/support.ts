@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { getDb } from "../db";
 import { supportRequests } from "../db/schema";
+import { sendNotificationEmail } from "../email";
 
 export const supportRouter = new Hono<{ Bindings: Env }>();
 
@@ -20,6 +21,14 @@ supportRouter.post("/", zValidator("json", schema), async (c) => {
     .insert(supportRequests)
     .values({ id: `support-${Date.now()}`, ...c.req.valid("json"), createdAt })
     .returning();
+
+  await sendNotificationEmail(c.env, {
+    subject: `New support request: ${row.topic}`,
+    heading: "New support request",
+    body: `From ${row.name} (${row.email}) — topic: ${row.topic}.<br><br>${row.message}`,
+    to: row.email,
+  });
+
   // Frontend SupportRequest has no id field; return the shape it expects.
   return c.json({
     data: {

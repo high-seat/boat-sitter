@@ -4,15 +4,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import {
-  applications,
-  notifications,
-  profiles,
-  reviews,
-  sits,
-  user,
-  vessels,
-} from "../db/schema";
+import { applications, notifications, profiles, reviews, sits, user, vessels } from "../db/schema";
 import { requireUser } from "../middleware/auth";
 
 /**

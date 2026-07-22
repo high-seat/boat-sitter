@@ -452,7 +452,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Agenda",
     "applications.videoCall.appleCalendar": "Calendrier Apple",
     "applications.videoCall.calendarTitle": "Appel vidéo avec {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Appel vidéo Boatstead avec {{name}} au sujet de {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Appel vidéo Boatstead avec {{name}} au sujet de {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} minutes",
     "applications.videoCall.durationMinutes_one": "1 minute",
@@ -810,7 +811,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Calendar",
     "applications.videoCall.appleCalendar": "Calendario de Apple",
     "applications.videoCall.calendarTitle": "Videollamada con {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Videollamada de Boatstead con {{name}} sobre {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Videollamada de Boatstead con {{name}} sobre {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} minutos",
     "applications.videoCall.durationMinutes_one": "1 minuto",
@@ -1169,7 +1171,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Calendar",
     "applications.videoCall.appleCalendar": "Calendario Apple",
     "applications.videoCall.calendarTitle": "Videochiamata con {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Videochiamata Boatstead con {{name}} su {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Videochiamata Boatstead con {{name}} su {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} minuti",
     "applications.videoCall.durationMinutes_one": "1 minuto",
@@ -1890,7 +1893,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Agenda",
     "applications.videoCall.appleCalendar": "Apple Agenda",
     "applications.videoCall.calendarTitle": "Videogesprek met {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Boatstead-videogesprek met {{name}} over {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Boatstead-videogesprek met {{name}} over {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} minuten",
     "applications.videoCall.durationMinutes_one": "1 minuut",
@@ -2249,7 +2253,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Calendar",
     "applications.videoCall.appleCalendar": "Calendário Apple",
     "applications.videoCall.calendarTitle": "Videochamada com {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Videochamada Boatstead com {{name}} sobre {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Videochamada Boatstead com {{name}} sobre {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} minutos",
     "applications.videoCall.durationMinutes_one": "1 minuto",
@@ -2603,7 +2608,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Calendar",
     "applications.videoCall.appleCalendar": "Ημερολόγιο Apple",
     "applications.videoCall.calendarTitle": "Βιντεοκλήση με {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Βιντεοκλήση Boatstead με {{name}} για το {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Βιντεοκλήση Boatstead με {{name}} για το {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} λεπτά",
     "applications.videoCall.durationMinutes_one": "1 λεπτό",
@@ -2964,7 +2970,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google kalendar",
     "applications.videoCall.appleCalendar": "Apple kalendar",
     "applications.videoCall.calendarTitle": "Video poziv s {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Boatstead video poziv s {{name}} o brodu {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Boatstead video poziv s {{name}} o brodu {{boat}}.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} minuta",
     "applications.videoCall.durationMinutes_few": "{{count}} minute",
@@ -3318,7 +3325,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Takvim",
     "applications.videoCall.appleCalendar": "Apple Takvim",
     "applications.videoCall.calendarTitle": "{{name}} ile görüntülü arama · {{boat}}",
-    "applications.videoCall.calendarDescription": "{{boat}} hakkında {{name}} ile Boatstead görüntülü araması.",
+    "applications.videoCall.calendarDescription":
+      "{{boat}} hakkında {{name}} ile Boatstead görüntülü araması.",
     "applications.videoCall.proposedDetails": "{{when}} · {{duration}}",
     "applications.videoCall.durationMinutes_other": "{{count}} dakika",
     "applications.videoCall.durationMinutes_one": "1 dakika",
@@ -4022,7 +4030,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google Kalender",
     "applications.videoCall.appleCalendar": "Apple Kalender",
     "applications.videoCall.calendarTitle": "Videosamtale med {{name}} · {{boat}}",
-    "applications.videoCall.calendarDescription": "Boatstead-videosamtale med {{name}} om {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Boatstead-videosamtale med {{name}} om {{boat}}.",
     "applications.videoCall.suggestDifferent": "Foreslå et annet tidspunkt",
     "applications.videoCall.decline": "Avslå",
     "applications.videoCall.pastError": "Velg en dato og et klokkeslett i fremtiden.",
@@ -4719,7 +4728,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Google-kalenteri",
     "applications.videoCall.appleCalendar": "Apple-kalenteri",
     "applications.videoCall.calendarTitle": "Videopuhelu henkilön {{name}} kanssa · {{boat}}",
-    "applications.videoCall.calendarDescription": "Boatstead-videopuhelu henkilön {{name}} kanssa aiheesta {{boat}}.",
+    "applications.videoCall.calendarDescription":
+      "Boatstead-videopuhelu henkilön {{name}} kanssa aiheesta {{boat}}.",
     "applications.videoCall.suggestDifferent": "Ehdota eri aikaa",
     "applications.videoCall.decline": "Hylkää",
     "applications.videoCall.pastError": "Valitse päivämäärä ja aika tulevaisuudessa.",
@@ -5067,7 +5077,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.googleCalendar": "Googleカレンダー",
     "applications.videoCall.appleCalendar": "Appleカレンダー",
     "applications.videoCall.calendarTitle": "{{name}}とのビデオ通話 · {{boat}}",
-    "applications.videoCall.calendarDescription": "{{boat}}についての{{name}}とのBoatsteadビデオ通話。",
+    "applications.videoCall.calendarDescription":
+      "{{boat}}についての{{name}}とのBoatsteadビデオ通話。",
     "applications.videoCall.suggestDifferent": "別の時間を提案する",
     "applications.videoCall.decline": "衰退",
     "applications.videoCall.pastError": "将来の日付と時刻を選択してください。",

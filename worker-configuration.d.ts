@@ -15,6 +15,9 @@ declare namespace Cloudflare {
     BETTER_AUTH_URL: string;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
+    RESEND_API_KEY?: string;
+    NOTIFY_EMAIL?: string;
+    EMAIL_FROM?: string;
     /** Optional comma-separated sign-up allowlist; empty = open sign-up */
     ALLOWED_EMAILS?: string;
   }

@@ -1,9 +1,6 @@
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut, ApiError } from "@/apiClient";
 import { lookupCoordinates } from "@/coordinates";
-import {
-  boatsSearchQueryString,
-  type BoatSearchParams,
-} from "../shared/boatsSearch";
+import { boatsSearchQueryString, type BoatSearchParams } from "../shared/boatsSearch";
 
 export type ApiEngineType = string;
 export type ApiVoltageType = string;
@@ -174,7 +171,12 @@ function normalizeGallery(gallery: Array<string | BoatPhoto> | undefined | null)
   return (gallery ?? []).map((entry) => (typeof entry === "string" ? { url: entry } : entry));
 }
 
-function coordsFor(location: string, country: string, latitude: number | null, longitude: number | null) {
+function coordsFor(
+  location: string,
+  country: string,
+  latitude: number | null,
+  longitude: number | null,
+) {
   if (latitude != null && longitude != null) return { latitude, longitude };
   return lookupCoordinates(location, country) ?? { latitude: 20, longitude: 0 };
 }
@@ -541,9 +543,11 @@ export function sitToApiBody(sit: Sit) {
 }
 
 export function normalizeApiApplication(row: ApiApplication): SitApplication {
-  const status = (["new", "shortlisted", "accepted", "declined", "withdrawn"].includes(row.status)
-    ? row.status
-    : "new") as ApplicationStatus;
+  const status = (
+    ["new", "shortlisted", "accepted", "declined", "withdrawn"].includes(row.status)
+      ? row.status
+      : "new"
+  ) as ApplicationStatus;
   return {
     id: row.id,
     sitId: row.sitId,
@@ -801,9 +805,7 @@ export async function apiGetReviewsForSitter(sitterName: string): Promise<ApiRev
   return apiGet<ApiReview[]>(`/api/reviews?sitter=${encodeURIComponent(sitterName)}`);
 }
 
-export async function apiGetReviewForApplication(
-  applicationId: string,
-): Promise<ApiReview | null> {
+export async function apiGetReviewForApplication(applicationId: string): Promise<ApiReview | null> {
   return apiGet<ApiReview | null>(
     `/api/reviews?applicationId=${encodeURIComponent(applicationId)}`,
   );

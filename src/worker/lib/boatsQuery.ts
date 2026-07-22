@@ -79,17 +79,17 @@ function buildOrderBy(sort: BoatSearchParams["sort"]) {
     case "longest":
       return [desc(sql`CAST(${sits.duration} AS INTEGER)`), asc(sits.dateStart)];
     case "popular":
-      return [desc(sits.applicants), desc(vessels.rating), desc(vessels.reviews), asc(sits.dateStart)];
+      return [
+        desc(sits.applicants),
+        desc(vessels.rating),
+        desc(vessels.reviews),
+        asc(sits.dateStart),
+      ];
     case "soonest":
       return [asc(sits.dateStart), asc(sits.id)];
     case "recommended":
     default:
-      return [
-        desc(sits.featured),
-        desc(vessels.rating),
-        asc(sits.dateStart),
-        asc(sits.applicants),
-      ];
+      return [desc(sits.featured), desc(vessels.rating), asc(sits.dateStart), asc(sits.applicants)];
   }
 }
 
@@ -97,9 +97,7 @@ export async function queryBoatsPage(
   db: Db,
   params: BoatSearchParams,
 ): Promise<
-  BoatSearchResult<
-    ReturnType<typeof joinBoat> & { accepted: boolean; applicationsOpen: boolean }
-  >
+  BoatSearchResult<ReturnType<typeof joinBoat> & { accepted: boolean; applicationsOpen: boolean }>
 > {
   const where = buildWhere(params);
   const orderBy = buildOrderBy(params.sort ?? "recommended");
@@ -113,11 +111,11 @@ export async function queryBoatsPage(
   const totalCount = Number(total) || 0;
   const limitRaw = params.limit;
   const returnAll = limitRaw == null || limitRaw <= 0;
-  const limit = returnAll ? Math.max(totalCount, 1) : Math.min(50, Math.max(1, Math.floor(limitRaw)));
+  const limit = returnAll
+    ? Math.max(totalCount, 1)
+    : Math.min(50, Math.max(1, Math.floor(limitRaw)));
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));
-  const page = returnAll
-    ? 0
-    : Math.min(Math.max(0, Math.floor(params.page ?? 0)), totalPages - 1);
+  const page = returnAll ? 0 : Math.min(Math.max(0, Math.floor(params.page ?? 0)), totalPages - 1);
   const offset = returnAll ? 0 : page * limit;
 
   if (totalCount === 0) {

@@ -147,7 +147,10 @@ test.describe("video call scheduling", () => {
   test("accepted call shows Google and Apple calendar links", async ({ page, browser }) => {
     await seedVerifiedOwner(page);
     await page.goto("/owner/sits/solstice/applications");
-    await page.getByRole("button", { name: /Alex Morgan/i }).first().click();
+    await page
+      .getByRole("button", { name: /Alex Morgan/i })
+      .first()
+      .click();
     await page.getByRole("button", { name: /Request video call/i }).click();
     const dialog = page.getByRole("dialog");
     await dialog.locator('input[type="date"]').fill(futureDateIso(2));
@@ -173,7 +176,10 @@ test.describe("video call scheduling", () => {
 
     const { context, page: sitterPage } = await openAlexMessagesWithSharedData(browser, shared);
     try {
-      await sitterPage.getByRole("button", { name: /Maya|Solstice/i }).first().click();
+      await sitterPage
+        .getByRole("button", { name: /Maya|Solstice/i })
+        .first()
+        .click();
       await sitterPage.getByRole("button", { name: /Accept time/i }).click();
       await expect(sitterPage.getByText(/Video call confirmed/i).first()).toBeVisible();
       await expect(sitterPage.getByText(/Add to calendar/i).first()).toBeVisible();

@@ -41,7 +41,10 @@ test.describe("settings phone country code", () => {
     const locationInput = page.getByPlaceholder(/Start typing a city/i);
     await locationInput.click();
     await locationInput.fill("Brighton");
-    await page.getByRole("option", { name: /Brighton/i }).first().click();
+    await page
+      .getByRole("option", { name: /Brighton/i })
+      .first()
+      .click();
     await expect(page.getByRole("textbox", { name: /Country calling code/i })).toHaveValue("+44");
   });
 });

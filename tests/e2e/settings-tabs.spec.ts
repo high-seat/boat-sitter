@@ -8,7 +8,9 @@ test.describe("settings account tabs", () => {
 
     await expect(page.getByRole("heading", { name: /^Account$/i })).toBeVisible();
     await expect(page.getByRole("button", { name: "Personal details", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Password & security", exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Password & security", exact: true }),
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: "Preferences", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Privacy", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /Email notifications/i })).toHaveCount(0);
