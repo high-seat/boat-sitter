@@ -1,3 +1,4 @@
+import { invalidateApiSessionCache } from "@/apiRemote";
 import { useAppStore } from "@/store";
 
 /**
@@ -9,20 +10,78 @@ import { useAppStore } from "@/store";
  * reads it back on the next load.
  */
 export async function hydrateSession(): Promise<void> {
+  invalidateApiSessionCache();
   try {
     const res = await fetch("/api/me", { credentials: "include" });
     if (!res.ok) return;
-    const { user } = (await res.json()) as {
+    const body = (await res.json()) as {
       user: { name: string; email: string; image?: string | null } | null;
+      profile?: {
+        name: string;
+        email: string;
+        emailConfirmed?: boolean;
+        legalName: string;
+        image: string;
+        coverImage?: string;
+        bio: string;
+        location: string;
+        languages: string[];
+        preferredCountries: string[];
+        skills: string[];
+        preferredLanguage: string;
+        measurementSystem: "metric" | "imperial";
+        emailNotifications: Record<string, boolean>;
+        sitDefaults: Record<string, unknown>;
+        memberSince: number;
+        phoneCountryCode: string;
+        phoneNumber: string;
+      } | null;
     };
-    if (user) {
-      useAppStore.getState().loginAs({
-        name: user.name,
-        image:
-          user.image ??
-          `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`,
-        email: user.email,
-      });
+    if (!body.user) return;
+
+    const store = useAppStore.getState();
+    store.loginAs({
+      name: body.user.name,
+      image:
+        body.user.image ??
+        `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(body.user.name)}`,
+      email: body.user.email,
+    });
+
+    if (body.profile) {
+      const profile = body.profile;
+      // Apply without re-POSTing to the API (local merge only).
+      useAppStore.setState((state) => ({
+        user: state.user
+          ? {
+              ...state.user,
+              email: profile.email,
+              emailConfirmed: profile.emailConfirmed ?? true,
+              name: profile.name,
+              legalName: profile.legalName,
+              image: profile.image,
+              coverImage: profile.coverImage,
+              bio: profile.bio,
+              location: profile.location,
+              languages: profile.languages,
+              preferredCountries: profile.preferredCountries,
+              skills: profile.skills,
+              preferredLanguage: profile.preferredLanguage,
+              measurementSystem: profile.measurementSystem,
+              emailNotifications: {
+                ...state.user.emailNotifications,
+                ...profile.emailNotifications,
+              },
+              sitDefaults: {
+                ...state.user.sitDefaults,
+                ...(profile.sitDefaults as typeof state.user.sitDefaults),
+              },
+              memberSince: profile.memberSince,
+              phoneCountryCode: profile.phoneCountryCode,
+              phoneNumber: profile.phoneNumber,
+            }
+          : null,
+      }));
     }
   } catch {
     // Offline or auth not migrated — stay logged out.

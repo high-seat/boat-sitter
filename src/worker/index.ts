@@ -7,6 +7,9 @@ import type { AppEnv, SessionUser } from "./context";
 import { applicationsRouter } from "./routes/applications";
 import { boatsRouter } from "./routes/boats";
 import { devRouter } from "./routes/dev";
+import { meRouter, profilesRouter } from "./routes/me";
+import { notificationsRouter } from "./routes/notifications";
+import { reviewsRouter } from "./routes/reviews";
 import { sitsRouter } from "./routes/sits";
 import { supportRouter } from "./routes/support";
 import { vesselsRouter } from "./routes/vessels";
@@ -44,8 +47,10 @@ app.use("*", async (c, next) => {
 // Better Auth handles all its own routes (sign-in, callback, session, sign-out).
 app.on(["GET", "POST"], "/api/auth/*", (c) => buildAuth(c.env).handler(c.req.raw));
 
-// Convenience: who am I?
-app.get("/api/me", (c) => c.json({ user: c.get("user") }));
+app.route("/api/me", meRouter);
+app.route("/api/profiles", profilesRouter);
+app.route("/api/notifications", notificationsRouter);
+app.route("/api/reviews", reviewsRouter);
 
 app.get("/api/", (context) =>
   context.json({
@@ -78,13 +83,10 @@ app.onError((err, c) => {
     return c.json({ error: err.message }, err.status);
   }
 
-  // Always log the full error — visible via `wrangler tail`.
   console.error("Unhandled error:", err);
 
   const message = err instanceof Error ? err.message : String(err);
 
-  // A missing table almost always means migrations were not applied to this
-  // environment. Say so explicitly rather than making someone read a stack.
   if (/no such table/i.test(message)) {
     return c.json(
       {
@@ -96,8 +98,6 @@ app.onError((err, c) => {
     );
   }
 
-  // Outside production, return the real message so debugging does not require
-  // a second terminal running `wrangler tail`.
   if (c.env.ENVIRONMENT !== "production") {
     return c.json({ error: "Internal server error", detail: message }, 500);
   }

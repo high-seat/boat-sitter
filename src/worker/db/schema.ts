@@ -124,6 +124,8 @@ export const applications = sqliteTable(
         skills: string[];
         yearsExperience: number;
         certifications: string[];
+        memberSince?: number;
+        completedSits?: number;
       }>()
       .notNull(),
     applicantName: text("applicant_name").notNull(),
@@ -131,6 +133,8 @@ export const applications = sqliteTable(
 
     initialMessage: text("initial_message").notNull(),
     status: text("status").notNull().default("new"),
+    partySize: integer("party_size").notNull().default(1),
+    ownerPhone: text("owner_phone"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
@@ -142,6 +146,11 @@ export const applications = sqliteTable(
   ],
 );
 
+export type MessagePayload = {
+  videoCall?: { startsAt: string; durationMinutes: number };
+  sharedPhone?: string;
+};
+
 export const applicationMessages = sqliteTable(
   "application_messages",
   {
@@ -151,6 +160,9 @@ export const applicationMessages = sqliteTable(
       .references(() => applications.id, { onDelete: "cascade" }),
     senderName: text("sender_name").notNull(),
     text: text("text").notNull(),
+    kind: text("kind").notNull().default("user"),
+    systemKind: text("system_kind"),
+    payload: text("payload", { mode: "json" }).$type<MessagePayload | null>(),
     createdAt: text("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
@@ -169,6 +181,94 @@ export const supportRequests = sqliteTable("support_requests", {
     .default(sql`CURRENT_TIMESTAMP`),
 });
 
+/** Extended member profile keyed by Better Auth user id. */
+export const profiles = sqliteTable(
+  "profiles",
+  {
+    userId: text("user_id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    legalName: text("legal_name").notNull().default(""),
+    image: text("image").notNull().default(""),
+    coverImage: text("cover_image"),
+    bio: text("bio").notNull().default(""),
+    location: text("location").notNull().default(""),
+    languages: jsonArray("languages"),
+    preferredCountries: jsonArray("preferred_countries"),
+    skills: jsonArray("skills"),
+    preferredLanguage: text("preferred_language").notNull().default("en-US"),
+    measurementSystem: text("measurement_system").notNull().default("metric"),
+    emailNotifications: text("email_notifications", { mode: "json" })
+      .$type<Record<string, boolean>>()
+      .notNull()
+      .default(sql`'{}'`),
+    sitDefaults: text("sit_defaults", { mode: "json" })
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'`),
+    phoneCountryCode: text("phone_country_code").notNull().default("+44"),
+    phoneNumber: text("phone_number").notNull().default(""),
+    memberSince: integer("member_since").notNull().default(2024),
+    yearsExperience: integer("years_experience").notNull().default(0),
+    certifications: jsonArray("certifications"),
+    completedSits: integer("completed_sits").notNull().default(0),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("profiles_name_idx").on(t.name)],
+);
+
+export const reviews = sqliteTable(
+  "reviews",
+  {
+    id: text("id").primaryKey(),
+    sitId: text("sit_id").notNull(),
+    boatName: text("boat_name").notNull(),
+    applicationId: text("application_id").notNull().unique(),
+    sitterName: text("sitter_name").notNull(),
+    sitterUserId: text("sitter_user_id"),
+    ownerName: text("owner_name").notNull(),
+    ownerUserId: text("owner_user_id"),
+    ownerImage: text("owner_image").notNull().default(""),
+    rating: integer("rating").notNull(),
+    text: text("text").notNull(),
+    location: text("location").notNull().default(""),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    responseText: text("response_text"),
+    responseCreatedAt: text("response_created_at"),
+  },
+  (t) => [
+    index("reviews_sitter_idx").on(t.sitterName),
+    index("reviews_application_idx").on(t.applicationId),
+  ],
+);
+
+export const notifications = sqliteTable(
+  "notifications",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    userName: text("user_name").notNull(),
+    type: text("type").notNull(),
+    actor: text("actor"),
+    boatName: text("boat_name"),
+    href: text("href").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("notifications_user_id_idx").on(t.userId),
+    index("notifications_user_name_idx").on(t.userName),
+  ],
+);
+
 // Re-export the Better Auth tables so the Drizzle client registers them.
 export { account, session, user, verification } from "./auth-schema";
 
@@ -180,3 +280,6 @@ export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
 export type ApplicationMessage = typeof applicationMessages.$inferSelect;
 export type SupportRequest = typeof supportRequests.$inferSelect;
+export type Profile = typeof profiles.$inferSelect;
+export type Review = typeof reviews.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;

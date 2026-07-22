@@ -1,10 +1,17 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { applicationMessages, applications, sits, vessels } from "../db/schema";
+import {
+  applicationMessages,
+  applications,
+  sits,
+  vessels,
+  type MessagePayload,
+} from "../db/schema";
+import { insertNotification } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -26,11 +33,14 @@ const applicantSchema = z.object({
   skills: z.array(z.string()).default([]),
   yearsExperience: z.number().int().min(0).default(0),
   certifications: z.array(z.string()).default([]),
+  memberSince: z.number().int().optional(),
+  completedSits: z.number().int().min(0).optional(),
 });
 
 const createSchema = z.object({
   sitId: z.string().min(1),
   message: z.string().min(1),
+  partySize: z.number().int().min(1).default(1),
   applicant: applicantSchema,
 });
 
@@ -40,10 +50,33 @@ const messageSchema = z.object({
 
 const statusSchema = z.object({
   status: z.enum(["new", "shortlisted", "accepted", "declined"]),
+  ownerPhone: z.string().optional(),
+});
+
+const withdrawSchema = z.object({
+  explanation: z.string().optional(),
+});
+
+const phoneShareSchema = z.object({
+  phoneNumber: z.string().min(1),
 });
 
 type MessageRow = typeof applicationMessages.$inferSelect;
 type ApplicationRow = typeof applications.$inferSelect;
+
+function shapeMessage(m: MessageRow) {
+  const payload = (m.payload ?? null) as MessagePayload | null;
+  return {
+    id: m.id,
+    senderName: m.senderName,
+    text: m.text,
+    createdAt: m.createdAt,
+    kind: (m.kind === "system" ? "system" : "user") as "user" | "system",
+    systemKind: m.systemKind ?? undefined,
+    videoCall: payload?.videoCall,
+    sharedPhone: payload?.sharedPhone,
+  };
+}
 
 /** Assemble the nested SitApplication the frontend expects. */
 function shape(app: ApplicationRow, messages: MessageRow[]) {
@@ -52,14 +85,20 @@ function shape(app: ApplicationRow, messages: MessageRow[]) {
     sitId: app.sitId,
     boatName: app.boatName,
     ownerName: app.ownerName,
-    applicant: app.applicant,
+    partySize: app.partySize ?? 1,
+    applicant: {
+      ...app.applicant,
+      memberSince: app.applicant.memberSince ?? new Date(app.createdAt).getFullYear(),
+      completedSits: app.applicant.completedSits ?? 0,
+    },
     initialMessage: app.initialMessage,
     status: app.status,
     createdAt: app.createdAt,
+    ownerPhone: app.ownerPhone ?? undefined,
     messages: messages
       .filter((m) => m.applicationId === app.id)
       .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-      .map((m) => ({ id: m.id, senderName: m.senderName, text: m.text, createdAt: m.createdAt })),
+      .map(shapeMessage),
   };
 }
 
@@ -69,6 +108,29 @@ async function loadMessages(env: Env, ids: string[]): Promise<MessageRow[]> {
   const all = await db.select().from(applicationMessages);
   const set = new Set(ids);
   return all.filter((m) => set.has(m.applicationId));
+}
+
+async function insertSystemMessage(
+  env: Env,
+  input: {
+    applicationId: string;
+    senderName: string;
+    text: string;
+    systemKind: string;
+    payload?: MessagePayload | null;
+  },
+) {
+  const db = getDb(env);
+  await db.insert(applicationMessages).values({
+    id: `message-${input.systemKind}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    applicationId: input.applicationId,
+    senderName: input.senderName,
+    text: input.text,
+    kind: "system",
+    systemKind: input.systemKind,
+    payload: input.payload ?? null,
+    createdAt: new Date().toISOString(),
+  });
 }
 
 /**
@@ -106,15 +168,16 @@ applicationsRouter.get("/", async (c) => {
 
 applicationsRouter.post("/", requireUser, zValidator("json", createSchema), async (c) => {
   const db = getDb(c.env);
-  const { sitId, message, applicant } = c.req.valid("json");
+  const { sitId, message, partySize, applicant } = c.req.valid("json");
   const user = c.get("user")!;
 
-  // Identity comes from the session, not the body — the client can only supply
-  // profile details (bio, skills, …), never who they are.
   const applicantName = user.name;
-  const safeApplicant = { ...applicant, name: user.name, image: user.image ?? applicant.image };
+  const safeApplicant = {
+    ...applicant,
+    name: user.name,
+    image: user.image ?? applicant.image,
+  };
 
-  // Idempotency: one application per (sit, user).
   const existing = await db
     .select()
     .from(applications)
@@ -147,6 +210,7 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
     applicantUserId: user.id,
     initialMessage: trimmed,
     status: "new",
+    partySize,
     createdAt,
   });
   await db.insert(applicationMessages).values({
@@ -154,7 +218,22 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
     applicationId: id,
     senderName: applicantName,
     text: trimmed,
+    kind: "user",
     createdAt,
+  });
+
+  await db
+    .update(sits)
+    .set({ applicants: sql`${sits.applicants} + 1`, updatedAt: sql`CURRENT_TIMESTAMP` })
+    .where(eq(sits.id, sitId));
+
+  await insertNotification(db, {
+    userId: listing[0].vessel.ownerUserId,
+    userName: listing[0].vessel.owner,
+    type: "newApplication",
+    actor: applicantName,
+    boatName: listing[0].vessel.name,
+    href: `/owner/sits/${sitId}/applications`,
   });
 
   const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
@@ -162,7 +241,6 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
   return c.json({ data: shape(row!, msgs) }, 201);
 });
 
-/** Load an application plus the vessel owner id, for authorization checks. */
 async function ownerIdForApplication(env: Env, appRow: ApplicationRow) {
   const db = getDb(env);
   const sit = await db.query.sits.findFirst({ where: eq(sits.id, appRow.sitId) });
@@ -171,11 +249,11 @@ async function ownerIdForApplication(env: Env, appRow: ApplicationRow) {
   return vessel?.ownerUserId ?? null;
 }
 
-// Only the listing owner may change an application's status.
 applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), async (c) => {
   const db = getDb(c.env);
   const id = c.req.param("id");
   const user = c.get("user")!;
+  const { status, ownerPhone } = c.req.valid("json");
 
   const appRow = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   if (!appRow) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
@@ -185,14 +263,130 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
 
   const [row] = await db
     .update(applications)
-    .set({ status: c.req.valid("json").status })
+    .set({
+      status,
+      ownerPhone: status === "accepted" ? (ownerPhone?.trim() || null) : null,
+    })
     .where(eq(applications.id, id))
     .returning();
+
+  if (status === "accepted") {
+    await insertSystemMessage(c.env, {
+      applicationId: id,
+      senderName: user.name,
+      text: `${user.name} accepted this application`,
+      systemKind: "accepted",
+    });
+    const openSiblings = await db
+      .select()
+      .from(applications)
+      .where(eq(applications.sitId, appRow.sitId));
+    for (const sibling of openSiblings) {
+      if (sibling.id === id) continue;
+      if (sibling.status !== "new" && sibling.status !== "shortlisted") continue;
+      await insertSystemMessage(c.env, {
+        applicationId: sibling.id,
+        senderName: user.name,
+        text: "Applications for this sit are now closed",
+        systemKind: "applicantsClosed",
+      });
+    }
+    await db
+      .update(sits)
+      .set({ published: false, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .where(eq(sits.id, appRow.sitId));
+
+    if (appRow.applicantUserId) {
+      await insertNotification(db, {
+        userId: appRow.applicantUserId,
+        userName: appRow.applicantName,
+        type: "applicationAccepted",
+        actor: user.name,
+        boatName: appRow.boatName,
+        href: `/messages?application=${id}`,
+      });
+    }
+    await insertNotification(db, {
+      userId: user.id,
+      userName: user.name,
+      type: "sitAccepted",
+      actor: appRow.applicantName,
+      boatName: appRow.boatName,
+      href: `/owner/sits/${appRow.sitId}/applications`,
+    });
+  } else if (status === "declined") {
+    await insertSystemMessage(c.env, {
+      applicationId: id,
+      senderName: user.name,
+      text: `${user.name} declined this application`,
+      systemKind: "declined",
+    });
+  }
+
   const msgs = await loadMessages(c.env, [id]);
   return c.json({ data: shape(row, msgs) });
 });
 
-// Only the two participants (applicant or listing owner) may post messages.
+applicationsRouter.post(
+  "/:id/withdraw",
+  requireUser,
+  zValidator("json", withdrawSchema),
+  async (c) => {
+    const db = getDb(c.env);
+    const id = c.req.param("id");
+    const user = c.get("user")!;
+    const { explanation } = c.req.valid("json");
+
+    const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+    if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+    if (app.applicantUserId !== user.id) {
+      return c.json({ error: "WITHDRAW_NOT_ALLOWED" }, 403);
+    }
+    if (app.status === "withdrawn" || app.status === "declined") {
+      return c.json({ error: "WITHDRAW_NOT_ALLOWED" }, 400);
+    }
+
+    const wasAccepted = app.status === "accepted";
+    const [row] = await db
+      .update(applications)
+      .set({ status: "withdrawn", ownerPhone: null })
+      .where(eq(applications.id, id))
+      .returning();
+
+    await insertSystemMessage(c.env, {
+      applicationId: id,
+      senderName: user.name,
+      text: explanation?.trim() ?? "",
+      systemKind: "withdrawn",
+    });
+
+    const sit = await db.query.sits.findFirst({ where: eq(sits.id, app.sitId) });
+    if (sit) {
+      await db
+        .update(sits)
+        .set({
+          applicants: Math.max(0, sit.applicants - 1),
+          ...(wasAccepted ? { published: true } : {}),
+          updatedAt: sql`CURRENT_TIMESTAMP`,
+        })
+        .where(eq(sits.id, app.sitId));
+    }
+
+    const ownerId = await ownerIdForApplication(c.env, app);
+    await insertNotification(db, {
+      userId: ownerId,
+      userName: app.ownerName,
+      type: "newMessage",
+      actor: user.name,
+      boatName: app.boatName,
+      href: `/messages?application=${id}`,
+    });
+
+    const msgs = await loadMessages(c.env, [id]);
+    return c.json({ data: shape(row, msgs) });
+  },
+);
+
 applicationsRouter.post(
   "/:id/messages",
   requireUser,
@@ -217,7 +411,69 @@ applicationsRouter.post(
       applicationId: id,
       senderName: user.name,
       text: text.trim(),
+      kind: "user",
       createdAt: new Date().toISOString(),
+    });
+
+    const recipientName =
+      user.id === app.applicantUserId ? app.ownerName : app.applicantName;
+    const recipientId =
+      user.id === app.applicantUserId ? ownerId : app.applicantUserId;
+    await insertNotification(db, {
+      userId: recipientId,
+      userName: recipientName,
+      type: "newMessage",
+      actor: user.name,
+      boatName: app.boatName,
+      href: `/messages?application=${id}`,
+    });
+
+    const msgs = await loadMessages(c.env, [id]);
+    return c.json({ data: shape(app, msgs) });
+  },
+);
+
+applicationsRouter.post(
+  "/:id/phone",
+  requireUser,
+  zValidator("json", phoneShareSchema),
+  async (c) => {
+    const db = getDb(c.env);
+    const id = c.req.param("id");
+    const { phoneNumber } = c.req.valid("json");
+    const user = c.get("user")!;
+
+    const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+    if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+
+    const ownerId = await ownerIdForApplication(c.env, app);
+    const isParticipant = user.id === app.applicantUserId || user.id === ownerId;
+    if (!isParticipant) {
+      return c.json({ error: "You are not part of this conversation" }, 403);
+    }
+
+    const sharedPhone = phoneNumber.trim();
+    if (!sharedPhone) return c.json({ error: "PHONE_NUMBER_REQUIRED" }, 400);
+
+    await insertSystemMessage(c.env, {
+      applicationId: id,
+      senderName: user.name,
+      text: `${user.name} shared their phone number`,
+      systemKind: "phoneShared",
+      payload: { sharedPhone },
+    });
+
+    const recipientName =
+      user.id === app.applicantUserId ? app.ownerName : app.applicantName;
+    const recipientId =
+      user.id === app.applicantUserId ? ownerId : app.applicantUserId;
+    await insertNotification(db, {
+      userId: recipientId,
+      userName: recipientName,
+      type: "newMessage",
+      actor: user.name,
+      boatName: app.boatName,
+      href: `/messages?application=${id}`,
     });
 
     const msgs = await loadMessages(c.env, [id]);

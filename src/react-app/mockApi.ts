@@ -6,6 +6,32 @@ import {
   sitDateRangesOverlap,
   type SitPhase,
 } from "@/dateUtils";
+import {
+  apiCreateReview,
+  apiDeleteSit,
+  apiDeleteVessel,
+  apiGetApplicationsForSit,
+  apiGetApplicationsForUser,
+  apiGetBoat,
+  apiGetBoats,
+  apiGetNotifications,
+  apiGetPublicProfile,
+  apiGetReviewForApplication,
+  apiGetReviewsForSitter,
+  apiGetSits,
+  apiGetVessels,
+  apiRespondToReview,
+  apiSaveSit,
+  apiSaveVessel,
+  apiSendApplication,
+  apiSendApplicationMessage,
+  apiShareApplicationPhone,
+  apiSubmitSupportRequest,
+  apiUpdateApplicationStatus,
+  apiWithdrawApplication,
+  hasApiSession,
+} from "@/apiRemote";
+import { ApiError } from "@/apiClient";
 
 export type { SitPhase };
 export { getSitPhase, SIT_PHASES, sitDateRangesOverlap } from "@/dateUtils";
@@ -1190,7 +1216,46 @@ export function isAcceptingApplications(item: { applicationsOpen?: boolean }) {
   return item.applicationsOpen !== false;
 }
 
+function mergeLocalPrivateAccess(vessels: Vessel[]): Vessel[] {
+  const localById = new Map(
+    readVessels()
+      .filter((vessel) => vessel.privateAccess)
+      .map((vessel) => [vessel.id, vessel.privateAccess!] as const),
+  );
+  if (!localById.size) return vessels;
+  return vessels.map((vessel) => {
+    const privateAccess = localById.get(vessel.id);
+    return privateAccess ? { ...vessel, privateAccess } : vessel;
+  });
+}
+
+/** API adapters use loose string enums; cast into the SPA's branded unions. */
+function fromApiBoat(boat: Awaited<ReturnType<typeof apiGetBoats>>[number]): Boat {
+  return boat as Boat;
+}
+
+function fromApiVessel(vessel: Awaited<ReturnType<typeof apiGetVessels>>[number]): Vessel {
+  return vessel as Vessel;
+}
+
+function fromApiSit(sit: Awaited<ReturnType<typeof apiGetSits>>[number]): Sit {
+  return sit as Sit;
+}
+
+function fromApiApplication(
+  application: Awaited<ReturnType<typeof apiGetApplicationsForSit>>[number],
+): SitApplication {
+  return application as SitApplication;
+}
+
 export async function getBoats(): Promise<Boat[]> {
+  try {
+    const remote = await apiGetBoats();
+    // Real session: trust D1 even when empty. Otherwise prefer remote seed, else local demo.
+    if ((await hasApiSession()) || remote.length) return remote.map(fromApiBoat);
+  } catch {
+    // Fall through to local demo data when the Worker/D1 path is unavailable.
+  }
   await wait();
   const vessels = readVessels();
   const acceptedIds = acceptedSitIds();
@@ -1200,6 +1265,13 @@ export async function getBoats(): Promise<Boat[]> {
 }
 
 export async function getBoat(id: string): Promise<Boat | undefined> {
+  try {
+    const remote = await apiGetBoat(id);
+    if (remote) return fromApiBoat(remote);
+    if (await hasApiSession()) return undefined;
+  } catch {
+    // Fall through.
+  }
   await wait(220);
   return joinSit(
     readSits().find((sit) => sit.id === id),
@@ -1208,11 +1280,43 @@ export async function getBoat(id: string): Promise<Boat | undefined> {
 }
 
 export async function getVessels(): Promise<Vessel[]> {
+  if (await hasApiSession()) {
+    try {
+      return mergeLocalPrivateAccess((await apiGetVessels()).map(fromApiVessel));
+    } catch {
+      // Fall through to local.
+    }
+  }
   await wait(250);
   return readVessels();
 }
 
 export async function getSits(): Promise<Sit[]> {
+  if (await hasApiSession()) {
+    try {
+      const remote = (await apiGetSits()).map(fromApiSit);
+      return remote.map((sit) => {
+        const accepted = acceptedSitIds().has(sit.id);
+        const applicationsOpen = sit.applicationsOpen !== false;
+        const nonSmokerRequired = resolveNonSmokerRequired(sit);
+        return {
+          ...sit,
+          accepted,
+          applicationsOpen,
+          nonSmokerRequired,
+          requirements: withoutNonSmokerRequirementLabels(sit.requirements),
+          requiredSkills: withoutNonSmokerRequirementLabels(sit.requiredSkills ?? []),
+          phase: getSitPhase({
+            ...sit,
+            accepted,
+            applicationsOpen,
+          }),
+        };
+      });
+    } catch {
+      // Fall through.
+    }
+  }
   await wait(250);
   const acceptedIds = acceptedSitIds();
   return readSits().map((sit) => {
@@ -1236,7 +1340,6 @@ export async function getSits(): Promise<Sit[]> {
 }
 
 export async function saveVessel(vessel: Vessel): Promise<Vessel> {
-  await wait(500);
   const privateAccess = normalizeVesselPrivateAccess(vessel.privateAccess);
   const normalized: Vessel = {
     ...vessel,
@@ -1247,6 +1350,23 @@ export async function saveVessel(vessel: Vessel): Promise<Vessel> {
   if (!privateAccess) {
     delete normalized.privateAccess;
   }
+
+  if (await hasApiSession()) {
+    const saved = fromApiVessel(await apiSaveVessel(normalized));
+    // Keep Wi-Fi / access codes locally until the Worker stores privateAccess.
+    if (privateAccess) {
+      const current = readVessels();
+      const overlay: Vessel = { ...saved, privateAccess };
+      const next = current.some((item) => item.id === overlay.id)
+        ? current.map((item) => (item.id === overlay.id ? { ...item, ...overlay } : item))
+        : [overlay, ...current];
+      localStorage.setItem("harbourly-vessels", JSON.stringify(next));
+      return overlay;
+    }
+    return saved;
+  }
+
+  await wait(500);
   const current = readVessels();
   const exists = current.some((item) => item.id === normalized.id);
   const next = exists
@@ -1287,6 +1407,14 @@ export async function getSitPrivateAccessForViewer(
 }
 
 export async function deleteVessel(id: string): Promise<void> {
+  if (await hasApiSession()) {
+    await apiDeleteVessel(id);
+    localStorage.setItem(
+      "harbourly-vessels",
+      JSON.stringify(readVessels().filter((vessel) => vessel.id !== id)),
+    );
+    return;
+  }
   await wait(400);
   if (readSits().some((sit) => sit.boatId === id)) {
     throw new Error("VESSEL_HAS_SITS");
@@ -1343,7 +1471,6 @@ export async function saveSit(
     creator?: { name: string; email?: string; phoneNumber?: string };
   },
 ): Promise<Sit> {
-  await wait(500);
   const normalized: Sit = {
     ...sit,
     fullAddress: sit.fullAddress?.trim() || undefined,
@@ -1351,6 +1478,26 @@ export async function saveSit(
     requirements: withoutNonSmokerRequirementLabels(sit.requirements),
     requiredSkills: withoutNonSmokerRequirementLabels(sit.requiredSkills ?? []),
   };
+
+  if (await hasApiSession()) {
+    const currentRemote = await apiGetSits();
+    const exists = currentRemote.some((item) => item.id === normalized.id);
+    if (!exists) {
+      const creator = options?.creator;
+      if (!creator?.name) {
+        throw new Error("SIT_VERIFICATION_REQUIRED");
+      }
+      const { requireMemberVerified } = await import("@/verificationService");
+      await requireMemberVerified(
+        creator.name,
+        { email: creator.email, phoneNumber: creator.phoneNumber },
+        "SIT_VERIFICATION_REQUIRED",
+      );
+    }
+    return fromApiSit(await apiSaveSit(normalized));
+  }
+
+  await wait(500);
   const current = readSits();
   const exists = current.some((item) => item.id === normalized.id);
   if (!exists) {
@@ -1488,6 +1635,28 @@ export async function createDevRandomSit(owner: {
 }
 
 export async function deleteSit(id: string): Promise<void> {
+  if (await hasApiSession()) {
+    const sits = await apiGetSits();
+    const sit = sits.find((item) => item.id === id);
+    if (!sit) return;
+    const accepted = acceptedSitIds().has(id);
+    const phase = getSitPhase({
+      dateStart: sit.dateStart,
+      duration: sit.duration,
+      applicationsOpen: sit.applicationsOpen,
+      accepted,
+      applicants: sit.applicants,
+    });
+    if (phase === "stayUnderway") {
+      throw new Error("SIT_IS_UNDERWAY");
+    }
+    if (phase === "stayCompleted") {
+      throw new Error("SIT_IS_COMPLETED");
+    }
+    await apiDeleteSit(id);
+    return;
+  }
+
   await wait(400);
   const sit = readSits().find((item) => item.id === id);
   if (!sit) return;
@@ -1996,6 +2165,40 @@ export async function sendApplication(
     email: applicant.email,
     phoneNumber: applicant.phoneNumber,
   });
+
+  const applicantProfile = {
+    name: applicant.name,
+    image: applicant.image,
+    location: applicant.location,
+    bio: applicant.bio,
+    languages: applicant.languages,
+    preferredCountries: applicant.preferredCountries,
+    skills: applicant.skills,
+    memberSince: applicant.memberSince,
+    yearsExperience: applicant.yearsExperience ?? 0,
+    certifications: applicant.certifications ?? [],
+    completedSits: applicant.completedSits ?? fallbackCompletedSits(applicant.name),
+  };
+
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(
+        await apiSendApplication({
+          sitId,
+          message: message.trim(),
+          partySize,
+          applicant: applicantProfile,
+        }),
+      );
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.message === "APPLICATION_SIT_NOT_FOUND") throw new Error("APPLICATION_SIT_NOT_FOUND");
+        if (error.message === "APPLICATIONS_CLOSED") throw new Error("APPLICATIONS_CLOSED");
+      }
+      throw error;
+    }
+  }
+
   await wait(700);
   const applications = readApplications();
   const existing = applications.find(
@@ -2058,19 +2261,7 @@ export async function sendApplication(
     boatName: listing.name,
     ownerName: listing.owner,
     partySize: normalizedPartySize,
-    applicant: {
-      name: applicant.name,
-      image: applicant.image,
-      location: applicant.location,
-      bio: applicant.bio,
-      languages: applicant.languages,
-      preferredCountries: applicant.preferredCountries,
-      skills: applicant.skills,
-      memberSince: applicant.memberSince,
-      yearsExperience: applicant.yearsExperience ?? 0,
-      certifications: applicant.certifications ?? [],
-      completedSits: applicant.completedSits ?? fallbackCompletedSits(applicant.name),
-    },
+    applicant: applicantProfile,
     initialMessage: message.trim(),
     status: "new",
     createdAt,
@@ -2095,6 +2286,13 @@ export async function sendApplication(
 }
 
 export async function getApplicationsForSit(sitId: string): Promise<SitApplication[]> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiGetApplicationsForSit(sitId)).map(fromApiApplication);
+    } catch {
+      // Fall through.
+    }
+  }
   await wait(250);
   return readApplications()
     .filter((application) => application.sitId === sitId)
@@ -2102,6 +2300,13 @@ export async function getApplicationsForSit(sitId: string): Promise<SitApplicati
 }
 
 export async function getApplicationsForUser(userName: string): Promise<SitApplication[]> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiGetApplicationsForUser(userName)).map(fromApiApplication);
+    } catch {
+      // Fall through.
+    }
+  }
   await wait(250);
   return readApplications()
     .filter(
@@ -2120,6 +2325,22 @@ export async function updateApplicationStatus(
   status: ApplicationStatus,
   ownerPhone?: string,
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    if (status === "withdrawn") {
+      throw new Error("WITHDRAW_NOT_ALLOWED");
+    }
+    try {
+      return fromApiApplication(
+        await apiUpdateApplicationStatus(applicationId, status, ownerPhone),
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.message === "APPLICATION_NOT_FOUND") {
+        throw new Error("APPLICATION_NOT_FOUND");
+      }
+      throw error;
+    }
+  }
+
   await wait(350);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);
@@ -2169,6 +2390,18 @@ export async function withdrawApplication(
   applicantName: string,
   explanation?: string,
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(await apiWithdrawApplication(applicationId, explanation));
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.message === "APPLICATION_NOT_FOUND") throw new Error("APPLICATION_NOT_FOUND");
+        if (error.message === "WITHDRAW_NOT_ALLOWED") throw new Error("WITHDRAW_NOT_ALLOWED");
+      }
+      throw error;
+    }
+  }
+
   await wait(350);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);
@@ -2220,6 +2453,22 @@ export async function withdrawApplication(
 }
 
 export async function getNotificationsForUser(userName: string): Promise<MockNotification[]> {
+  if (await hasApiSession()) {
+    try {
+      const remote = await apiGetNotifications();
+      return remote.map((item) => ({
+        id: item.id,
+        type: item.type as MockNotification["type"],
+        actor: item.actor,
+        boatName: item.boatName,
+        href: item.href,
+        createdAt: item.createdAt,
+      }));
+    } catch {
+      // Fall through to demo notifications.
+    }
+  }
+
   await wait(250);
   const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60 * 1_000).toISOString();
 
@@ -2282,8 +2531,8 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
 
   return [
     {
-      createdAt: minutesAgo(12),
-      href: "/members/me",
+      createdAt: minutesAgo(5),
+      href: "/boats",
       id: `welcome-${userName}`,
       type: "welcome",
     },
@@ -2295,6 +2544,17 @@ export async function sendApplicationMessage(
   senderName: string,
   text: string,
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(await apiSendApplicationMessage(applicationId, text.trim()));
+    } catch (error) {
+      if (error instanceof ApiError && error.message === "APPLICATION_NOT_FOUND") {
+        throw new Error("APPLICATION_NOT_FOUND");
+      }
+      throw error;
+    }
+  }
+
   await wait(350);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);
@@ -2320,6 +2580,20 @@ export async function shareApplicationPhoneNumber(
   senderName: string,
   phoneNumber: string,
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(await apiShareApplicationPhone(applicationId, phoneNumber));
+    } catch (error) {
+      if (error instanceof ApiError && error.message === "APPLICATION_NOT_FOUND") {
+        throw new Error("APPLICATION_NOT_FOUND");
+      }
+      if (error instanceof ApiError && error.message === "PHONE_NUMBER_REQUIRED") {
+        throw new Error("PHONE_NUMBER_REQUIRED");
+      }
+      throw error;
+    }
+  }
+
   await wait(350);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);
@@ -2476,6 +2750,11 @@ export type SupportRequest = {
 export async function submitSupportRequest(
   request: Omit<SupportRequest, "createdAt">,
 ): Promise<SupportRequest> {
+  try {
+    return await apiSubmitSupportRequest(request);
+  } catch {
+    // Fall through to local persistence when the Worker is unavailable.
+  }
   await wait(650);
   const submission = { ...request, createdAt: new Date().toISOString() };
   const existing = JSON.parse(localStorage.getItem("harbourly-support-requests") ?? "[]");
@@ -2632,6 +2911,13 @@ export function summarizeSitterRating(reviews: SitReview[]): SitterRatingSummary
 }
 
 export async function getReviewsForSitter(sitterName: string): Promise<SitReview[]> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiGetReviewsForSitter(sitterName)) as SitReview[];
+    } catch {
+      // Fall through.
+    }
+  }
   await wait(200);
   return sortReviewsNewest(readReviews().filter((review) => review.sitterName === sitterName));
 }
@@ -2642,11 +2928,29 @@ export async function getSitterRatingSummary(sitterName: string): Promise<Sitter
 }
 
 export async function getReviewForApplication(applicationId: string): Promise<SitReview | null> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiGetReviewForApplication(applicationId)) as SitReview | null;
+    } catch {
+      // Fall through.
+    }
+  }
   await wait(150);
   return readReviews().find((review) => review.applicationId === applicationId) ?? null;
 }
 
 export async function getPublicMemberProfile(name: string): Promise<PublicMemberProfile | null> {
+  if (await hasApiSession()) {
+    try {
+      return await apiGetPublicProfile(name);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        // Fall through to application snapshot.
+      } else {
+        // Fall through.
+      }
+    }
+  }
   await wait(200);
   const fromApplication = readApplications().find(
     (application) => application.applicant.name === name,
@@ -2675,6 +2979,21 @@ export async function createReview(input: {
   text: string;
   ownerName: string;
 }): Promise<SitReview> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiCreateReview({
+        applicationId: input.applicationId,
+        rating: input.rating,
+        text: input.text,
+      })) as SitReview;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(error.message);
+      }
+      throw error;
+    }
+  }
+
   await wait(500);
   const rating = Math.round(input.rating);
   if (rating < 1 || rating > 5) throw new Error("REVIEW_INVALID_RATING");
@@ -2719,6 +3038,20 @@ export async function respondToReview(input: {
   sitterName: string;
   text: string;
 }): Promise<SitReview> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiRespondToReview({
+        reviewId: input.reviewId,
+        text: input.text,
+      })) as SitReview;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(error.message);
+      }
+      throw error;
+    }
+  }
+
   await wait(400);
   const text = input.text.trim();
   if (text.length < 8) throw new Error("REVIEW_RESPONSE_TOO_SHORT");

@@ -6650,10 +6650,11 @@ function SettingsPage() {
                 disabled={deleting || deleteConfirmation !== DELETE_ACCOUNT_CONFIRMATION_TERM}
                 onClick={() => {
                   setDeleting(true);
-                  void deleteMockAccount(user.name).then(() => {
-                    deleteAccount();
-                    navigate("/");
-                  });
+                  void deleteMockAccount(user.name)
+                    .catch(() => {})
+                    .then(() => deleteAccount())
+                    .then(() => navigate("/"))
+                    .finally(() => setDeleting(false));
                 }}
                 type="button"
               >

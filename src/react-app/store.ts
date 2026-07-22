@@ -140,7 +140,7 @@ type AppStore = {
     },
   ) => void;
   updateProfile: (patch: Partial<Omit<UserProfile, "role">>) => void;
-  deleteAccount: () => void;
+  deleteAccount: () => Promise<void>;
   logout: () => void;
 };
 
@@ -232,6 +232,7 @@ export const useAppStore = create<AppStore>()(
           ],
         })),
       loginAs: (user) => {
+        void import("@/apiRemote").then((m) => m.invalidateApiSessionCache());
         const email = user.email?.trim() || fallbackEmail(user.name);
         const location = "Brighton, United Kingdom";
         set({
@@ -256,9 +257,28 @@ export const useAppStore = create<AppStore>()(
           },
         });
       },
-      updateProfile: (patch) =>
-        set((state) => ({ user: state.user ? { ...state.user, ...patch } : null })),
-      deleteAccount: () =>
+      updateProfile: (patch) => {
+        set((state) => ({ user: state.user ? { ...state.user, ...patch } : null }));
+        void import("@/apiRemote").then(async (m) => {
+          if (!(await m.hasApiSession())) return;
+          try {
+            await m.apiUpdateProfile(patch);
+          } catch {
+            // Keep local optimistic update if the Worker is unreachable.
+          }
+        });
+      },
+      deleteAccount: async () => {
+        void import("@/apiRemote").then((m) => m.invalidateApiSessionCache());
+        try {
+          const m = await import("@/apiRemote");
+          if (await m.hasApiSession()) {
+            await m.apiDeleteAccount();
+          }
+        } catch {
+          // Still clear local state even if remote delete fails.
+        }
+        void import("@/authClient").then((m) => m.signOut()).catch(() => {});
         set({
           saved: [],
           archivedConversations: [],
@@ -266,10 +286,12 @@ export const useAppStore = create<AppStore>()(
           blockedUsers: [],
           userReports: [],
           user: null,
-        }),
+        });
+      },
       logout: () => {
         // End the Better Auth session server-side too, so a reload doesn't
         // silently log the user back in from the session cookie.
+        void import("@/apiRemote").then((m) => m.invalidateApiSessionCache());
         void import("@/authClient").then((m) => m.signOut()).catch(() => {});
         set({ user: null });
       },
