@@ -18,6 +18,18 @@ const queryClient = new QueryClient({
   },
 });
 
+// Near-real-time chat + notifications via interval polling. Only refetches while
+// the query is mounted (conversation open / bell in view) and the tab is focused
+// (refetchIntervalInBackground defaults to false), so it's cheap.
+queryClient.setQueryDefaults(["applications"], {
+  refetchInterval: 5_000,
+  staleTime: 0,
+});
+queryClient.setQueryDefaults(["notifications"], {
+  refetchInterval: 15_000,
+  staleTime: 0,
+});
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
