@@ -34,9 +34,7 @@ test.describe("sit creation flow", () => {
     await expect(modal.getByText(/^Region$/i)).toHaveCount(0);
     await expect(modal.getByText(/for example Mediterranean/i)).toHaveCount(0);
     await expect(modal.locator(".form-label", { hasText: /^Full address$/i })).toBeVisible();
-    await expect(
-      modal.getByText(/Not shared until you accept an applicant/i),
-    ).toBeVisible();
+    await expect(modal.getByText(/Not shared until you accept an applicant/i)).toBeVisible();
     const publish = modal.getByRole("button", { name: /Publish sit/i });
     await expect(publish).toBeDisabled();
     await expect(publish).toHaveAttribute("title", /Still needed:.*Sit dates/i);

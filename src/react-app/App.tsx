@@ -94,14 +94,20 @@ import { DateRangePicker } from "@/components/forms/DateRangePicker";
 import { ImageUploadControl } from "@/components/forms/ImageUploadControl";
 import { PhoneCountryCodeSelect } from "@/components/forms/PhoneCountryCodeSelect";
 import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
-import {
-  ChangeEmailModal,
-  ChangePasswordModal,
-} from "@/components/forms/ChangeCredentialsModals";
+import { ChangeEmailModal, ChangePasswordModal } from "@/components/forms/ChangeCredentialsModals";
 import { EmailConfirmationStatus } from "@/components/settings/EmailConfirmationStatus";
 import { UserSafetyActions, BlockedUserBanner } from "@/components/moderation/UserSafetyActions";
 import { getIntlLocale, normalizeLanguageCode, SUPPORTED_LANGUAGES } from "@/i18n";
-import { isHappeningSoon, getSitPhase, canLeaveReview, reviewDaysRemaining, parseSitDate, startOfLocalDay, SIT_PHASES, type SitPhase } from "@/dateUtils";
+import {
+  isHappeningSoon,
+  getSitPhase,
+  canLeaveReview,
+  reviewDaysRemaining,
+  parseSitDate,
+  startOfLocalDay,
+  SIT_PHASES,
+  type SitPhase,
+} from "@/dateUtils";
 import { deleteMockAccount } from "@/mockAuth";
 import { LanguageSelect } from "@/components/layout/LanguageSelect";
 import { NotificationsMenu } from "@/components/layout/NotificationsMenu";
@@ -796,11 +802,7 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
           <span className="block text-[11px] font-bold uppercase tracking-[0.13em] text-slate">
             {t("search.vessel")}
           </span>
-          <Select
-            onChange={(event) => setType(event.target.value)}
-            value={type}
-            variant="inline"
-          >
+          <Select onChange={(event) => setType(event.target.value)} value={type} variant="inline">
             <option value="">{t("search.anyVessel")}</option>
             {VESSEL_TYPES.map((vesselType) => (
               <option key={vesselType} value={vesselType}>
@@ -1159,7 +1161,9 @@ function recommendedSitScore(
     const country = boat.country.trim().toLowerCase();
     const preferred = user.preferredCountries.some((item) => {
       const value = item.trim().toLowerCase();
-      return Boolean(value) && (country === value || country.includes(value) || value.includes(country));
+      return (
+        Boolean(value) && (country === value || country.includes(value) || value.includes(country))
+      );
     });
     if (preferred) score += 320;
   }
@@ -1265,8 +1269,7 @@ function BoatsPage() {
           .split("|")
           .map((value) => value.trim().toLowerCase())
           .filter(Boolean);
-        const searchable =
-          `${boat.location} ${boat.country} ${boat.name}`.toLowerCase();
+        const searchable = `${boat.location} ${boat.country} ${boat.name}`.toLowerCase();
         const matchesQuery =
           searchValues.length === 0 || searchValues.some((value) => searchable.includes(value));
         const matchesType = type === "All vessels" || boat.type === type;
@@ -1328,10 +1331,7 @@ function BoatsPage() {
   const currentPage = Math.min(page, totalPages - 1);
   const pageStart = currentPage * BOATS_PER_PAGE;
   const pageEnd = Math.min(pageStart + BOATS_PER_PAGE, sorted.length);
-  const pagedBoats = useMemo(
-    () => sorted.slice(pageStart, pageEnd),
-    [pageEnd, pageStart, sorted],
-  );
+  const pagedBoats = useMemo(() => sorted.slice(pageStart, pageEnd), [pageEnd, pageStart, sorted]);
 
   useEffect(() => {
     setPage(0);
@@ -1391,9 +1391,7 @@ function BoatsPage() {
           </Select>
           <Select
             aria-label={t("boats.sitTypeLabel")}
-            onChange={(event) =>
-              updateSitTypeFilter(event.target.value as "all" | SitType)
-            }
+            onChange={(event) => updateSitTypeFilter(event.target.value as "all" | SitType)}
             value={sitTypeFilter}
           >
             <option value="all">{t("boats.sitTypeAll")}</option>
@@ -1415,9 +1413,7 @@ function BoatsPage() {
           </label>
           <Select
             aria-label={t("boats.availabilityLabel")}
-            onChange={(event) =>
-              setAvailability(event.target.value as "all" | "open" | "accepted")
-            }
+            onChange={(event) => setAvailability(event.target.value as "all" | "open" | "accepted")}
             value={availability}
           >
             <option value="all">{t("boats.availabilityAll")}</option>
@@ -1429,7 +1425,10 @@ function BoatsPage() {
           <BoatsPageLoadingSkeleton />
         ) : (
           <>
-            <div className="mt-9 flex flex-wrap items-center justify-between gap-3" ref={resultsTopRef}>
+            <div
+              className="mt-9 flex flex-wrap items-center justify-between gap-3"
+              ref={resultsTopRef}
+            >
               <p className="text-sm text-slate">{t("boats.results", { count: filtered.length })}</p>
               <div className="flex items-center gap-2">
                 <div
@@ -1509,7 +1508,9 @@ function BoatsPage() {
             ) : (
               <div className="mt-16 rounded-2xl border border-line bg-white py-16 text-center">
                 <LifeBuoy className="mx-auto text-teal" size={36} />
-                <h2 className="mt-4 font-display text-xl font-bold text-navy">{t("boats.empty")}</h2>
+                <h2 className="mt-4 font-display text-xl font-bold text-navy">
+                  {t("boats.empty")}
+                </h2>
                 <p className="mt-2 text-sm text-slate">{t("boats.emptyHint")}</p>
                 {filtersActive && (
                   <button
@@ -1906,7 +1907,9 @@ function ApplyModal({
                 )}
                 <label className="mt-5 block">
                   <span className="form-label">{t("apply.partySize")}</span>
-                  <Select variant="form" onChange={(event) => setPartySize(Number(event.target.value))}
+                  <Select
+                    variant="form"
+                    onChange={(event) => setPartySize(Number(event.target.value))}
                     value={partySize}
                   >
                     {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
@@ -2028,21 +2031,14 @@ function DetailPage() {
       ? findConfirmedSitDateConflict(userApplications, sits, user.name, boat)
       : undefined;
   const canSeePrivateAccess =
-    Boolean(user) &&
-    (user?.name === boat?.owner || activeApplication?.status === "accepted");
+    Boolean(user) && (user?.name === boat?.owner || activeApplication?.status === "accepted");
   const { data: privateAccess } = useQuery({
     queryKey: ["sit-private-access", id, user?.name],
     queryFn: () => getSitPrivateAccessForViewer(id, user!.name),
     enabled: Boolean(boat && user && canSeePrivateAccess),
   });
   const { data: applicantVerification } = useQuery({
-    queryKey: [
-      "verification-checks",
-      user?.name,
-      user?.email,
-      user?.phoneNumber,
-      "apply-gate",
-    ],
+    queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "apply-gate"],
     enabled: Boolean(user && boat && user.name !== boat.owner),
     queryFn: () =>
       getMemberVerificationChecks(user!.name, {
@@ -2066,9 +2062,7 @@ function DetailPage() {
       description: boat.description,
       home: boat.home,
       ...(boat.pet ? { pet: boat.pet } : {}),
-      ...Object.fromEntries(
-        boat.responsibilities.map((item, index) => [`resp-${index}`, item]),
-      ),
+      ...Object.fromEntries(boat.responsibilities.map((item, index) => [`resp-${index}`, item])),
     };
   }, [boat]);
   const ownerTranslation = useAutoTranslatedOwnerContent(
@@ -2087,9 +2081,7 @@ function DetailPage() {
       : []),
     ...(boat.requiredExperience ?? []),
     ...(boat.requiredCertifications ?? []),
-    ...(boat.requiredSkills ?? []).filter(
-      (skill) => !isNonSmokerRequirementLabel(skill),
-    ),
+    ...(boat.requiredSkills ?? []).filter((skill) => !isNonSmokerRequirementLabel(skill)),
     ...(resolveNonSmokerRequired(boat) ? [t("requirement.nonSmoker")] : []),
     ...withoutNonSmokerRequirementLabels(boat.requirements),
   ].filter((item, index, all) => all.indexOf(item) === index);
@@ -2169,7 +2161,9 @@ function DetailPage() {
                 type="button"
               >
                 <img
-                  alt={photos[1].caption?.trim() || t("detail.surroundingsAlt", { boat: boat.name })}
+                  alt={
+                    photos[1].caption?.trim() || t("detail.surroundingsAlt", { boat: boat.name })
+                  }
                   className={coverPhotoClassName()}
                   onError={(event) => {
                     event.currentTarget.src = fallbackImage;
@@ -2221,9 +2215,7 @@ function DetailPage() {
                 type="button"
               >
                 <Heart
-                  className={
-                    user && saved.includes(boat.id) ? "fill-coral text-coral" : ""
-                  }
+                  className={user && saved.includes(boat.id) ? "fill-coral text-coral" : ""}
                   size={20}
                 />
               </button>
@@ -2459,11 +2451,7 @@ function DetailPage() {
                   Boolean(confirmedSitConflict)
                 }
                 onClick={() => {
-                  if (
-                    !isAcceptingApplications(boat) ||
-                    activeApplication ||
-                    confirmedSitConflict
-                  ) {
+                  if (!isAcceptingApplications(boat) || activeApplication || confirmedSitConflict) {
                     return;
                   }
                   if (user) setApplying(true);
@@ -2516,10 +2504,10 @@ function DetailPage() {
               {applicantNeedsVerification &&
                 isAcceptingApplications(boat) &&
                 !confirmedSitConflict && (
-                <p className="mt-3 text-center text-xs leading-5 text-amber-800">
-                  {t("apply.verificationRequiredText")}
-                </p>
-              )}
+                  <p className="mt-3 text-center text-xs leading-5 text-amber-800">
+                    {t("apply.verificationRequiredText")}
+                  </p>
+                )}
               <p className="mt-3 text-center text-xs text-slate">
                 {t("detail.applicants", { count: boat.applicants })}
               </p>
@@ -2572,9 +2560,7 @@ function SavedPage() {
     enabled: Boolean(user),
   });
   const savedBoats = boats.filter((boat) => saved.includes(boat.id));
-  const visibleBoats = showAll
-    ? savedBoats
-    : savedBoats.filter((boat) => !boat.accepted);
+  const visibleBoats = showAll ? savedBoats : savedBoats.filter((boat) => !boat.accepted);
   const totalPages = Math.max(1, Math.ceil(visibleBoats.length / BOATS_PER_PAGE));
   const currentPage = Math.min(page, totalPages - 1);
   const pageStart = currentPage * BOATS_PER_PAGE;
@@ -3272,7 +3258,11 @@ function MemberPage() {
   const [editing, setEditing] = useState(false);
   const identityVerificationEnabled = useFeatureFlag("identityVerification");
   const queryClient = useQueryClient();
-  const { data: boat, isLoading: boatLoading, isFetched: boatFetched } = useQuery({
+  const {
+    data: boat,
+    isLoading: boatLoading,
+    isFetched: boatFetched,
+  } = useQuery({
     queryKey: ["boat", id],
     queryFn: async () => (await getBoat(id)) ?? null,
     enabled: Boolean(currentUser) && !isMe,
@@ -3320,7 +3310,10 @@ function MemberPage() {
         email: currentUser?.email,
         phoneNumber: currentUser?.phoneNumber,
       }),
-    enabled: Boolean(currentUser) && Boolean(profileName) && (isMe || isSitterNameProfile || isBoatOwnerProfile),
+    enabled:
+      Boolean(currentUser) &&
+      Boolean(profileName) &&
+      (isMe || isSitterNameProfile || isBoatOwnerProfile),
   });
   const verifyMutation = useMutation({
     mutationFn: () => startVerification(currentUser!.name),
@@ -3408,8 +3401,7 @@ function MemberPage() {
       ? {
           name: boat!.owner,
           image: boat!.ownerImage,
-          coverImage:
-            currentUser?.name === boat!.owner ? currentUser.coverImage : undefined,
+          coverImage: currentUser?.name === boat!.owner ? currentUser.coverImage : undefined,
           activity: t("member.member"),
           location: memberDetails[id]?.location ?? formatSitLocation(boat!.location, boat!.country),
           since: memberDetails[id]?.since ?? "2022",
@@ -3444,11 +3436,7 @@ function MemberPage() {
           <div className="relative isolate">
             <div className="h-40 bg-navy">
               {profile.coverImage ? (
-                <img
-                  alt=""
-                  className="size-full object-cover"
-                  src={profile.coverImage}
-                />
+                <img alt="" className="size-full object-cover" src={profile.coverImage} />
               ) : (
                 <div className="pointer-events-none h-full bg-[radial-gradient(circle_at_20%_100%,#80d7d0,transparent_35%),radial-gradient(circle_at_80%_0%,#ef7057,transparent_30%)] opacity-40" />
               )}
@@ -3461,77 +3449,77 @@ function MemberPage() {
                   src={profile.image}
                 />
                 <div className="relative z-10 flex w-full flex-wrap gap-3 sm:ml-auto sm:w-auto sm:max-w-[calc(100%-9.5rem)] sm:justify-end sm:pb-1">
-                {!isMe && (
-                  <>
-                    {existingConversation && (
-                      <Link
-                        className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                        to={`/messages?application=${encodeURIComponent(existingConversation.id)}`}
+                  {!isMe && (
+                    <>
+                      {existingConversation && (
+                        <Link
+                          className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                          to={`/messages?application=${encodeURIComponent(existingConversation.id)}`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <MessageCircle size={17} /> {t("member.message")}
+                          </span>
+                        </Link>
+                      )}
+                      <UserSafetyActions image={profile.image} name={profile.name} />
+                    </>
+                  )}
+                  {isMe && (
+                    <>
+                      <button
+                        className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                        onClick={() => setEditing(true)}
+                        type="button"
                       >
-                        <span className="flex items-center gap-2">
-                          <MessageCircle size={17} /> {t("member.message")}
-                        </span>
+                        <Pencil size={16} /> {t("profile.edit")}
+                      </button>
+                      <Link
+                        className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                        to="/settings"
+                      >
+                        <Settings size={16} /> {t("settings.title")}
                       </Link>
-                    )}
-                    <UserSafetyActions image={profile.image} name={profile.name} />
-                  </>
-                )}
-                {isMe && (
-                  <>
-                    <button
-                      className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                      onClick={() => setEditing(true)}
-                      type="button"
-                    >
-                      <Pencil size={16} /> {t("profile.edit")}
-                    </button>
-                    <Link
-                      className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                      to="/settings"
-                    >
-                      <Settings size={16} /> {t("settings.title")}
-                    </Link>
-                  </>
-                )}
-                {identityVerificationEnabled &&
-                  (verificationChecks ? (
-                    <IdentityVerificationBadge checks={verificationChecks} />
-                  ) : (
-                    <span className="flex items-center gap-2 rounded-full bg-cream px-4 py-2.5 text-sm font-bold text-slate">
-                      <ShieldCheck size={17} /> {t("member.verificationNeeded")}
-                    </span>
-                  ))}
+                    </>
+                  )}
+                  {identityVerificationEnabled &&
+                    (verificationChecks ? (
+                      <IdentityVerificationBadge checks={verificationChecks} />
+                    ) : (
+                      <span className="flex items-center gap-2 rounded-full bg-cream px-4 py-2.5 text-sm font-bold text-slate">
+                        <ShieldCheck size={17} /> {t("member.verificationNeeded")}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
-            {!isMe && <BlockedUserBanner name={profile.name} />}
-            <div className="mt-5">
-              <p className="eyebrow">{profile.activity}</p>
-              <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy">
-                {profile.name}
-              </h1>
-              <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate">
-                <span className="flex items-center gap-1.5">
-                  <MapPin size={16} /> {profile.location}
-                </span>
-                {profile.showSitterReviews ? (
-                  profile.reviews > 0 ? (
-                    <span className="flex items-center gap-1.5 font-bold text-navy">
-                      <Star className="fill-sun text-sun" size={16} /> {profile.rating.toFixed(1)} ·{" "}
+              {!isMe && <BlockedUserBanner name={profile.name} />}
+              <div className="mt-5">
+                <p className="eyebrow">{profile.activity}</p>
+                <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy">
+                  {profile.name}
+                </h1>
+                <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate">
+                  <span className="flex items-center gap-1.5">
+                    <MapPin size={16} /> {profile.location}
+                  </span>
+                  {profile.showSitterReviews ? (
+                    profile.reviews > 0 ? (
+                      <span className="flex items-center gap-1.5 font-bold text-navy">
+                        <Star className="fill-sun text-sun" size={16} /> {profile.rating.toFixed(1)}{" "}
+                        · {t("member.reviews", { count: profile.reviews })}
+                      </span>
+                    ) : (
+                      <span>{t("reviews.noRatingYet")}</span>
+                    )
+                  ) : (
+                    <span className="flex items-center gap-1.5">
+                      <Star className="fill-sun text-sun" size={16} /> {profile.rating} ·{" "}
                       {t("member.reviews", { count: profile.reviews })}
                     </span>
-                  ) : (
-                    <span>{t("reviews.noRatingYet")}</span>
-                  )
-                ) : (
-                  <span className="flex items-center gap-1.5">
-                    <Star className="fill-sun text-sun" size={16} /> {profile.rating} ·{" "}
-                    {t("member.reviews", { count: profile.reviews })}
-                  </span>
-                )}
-                <span>{t("member.since", { year: profile.since })}</span>
-              </p>
+                  )}
+                  <span>{t("member.since", { year: profile.since })}</span>
+                </p>
+              </div>
             </div>
-          </div>
           </div>
         </div>
 
@@ -3588,11 +3576,11 @@ function MemberPage() {
               currentUser &&
               pendingReviewSit &&
               canLeaveReview(pendingReviewSit) && (
-              <LeaveReviewForm
-                application={pendingReviewApplication}
-                ownerName={currentUser.name}
-              />
-            )}
+                <LeaveReviewForm
+                  application={pendingReviewApplication}
+                  ownerName={currentUser.name}
+                />
+              )}
             {profile.showSitterReviews && (
               <SitterReviewsSection
                 currentUserName={currentUser?.name}
@@ -3796,384 +3784,398 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   return (
     <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-14">
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
-      <div className="order-2 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="eyebrow">{t("owner.tools")}</p>
-            <h1 className="font-display text-3xl font-bold text-navy">
-              {boat ? t("vesselEditor.editTitle", { boat: boat.name }) : t("vesselEditor.addTitle")}
-            </h1>
+        <div className="order-2 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="eyebrow">{t("owner.tools")}</p>
+              <h1 className="font-display text-3xl font-bold text-navy">
+                {boat
+                  ? t("vesselEditor.editTitle", { boat: boat.name })
+                  : t("vesselEditor.addTitle")}
+              </h1>
+            </div>
+            <button
+              className="flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
+              onClick={close}
+              type="button"
+            >
+              <ArrowLeft size={16} /> {t("common.back")}
+            </button>
           </div>
-          <button
-            className="flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
-            onClick={close}
-            type="button"
-          >
-            <ArrowLeft size={16} /> {t("common.back")}
-          </button>
-        </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <label>
-            <span className="form-label">{t("vesselEditor.type")}</span>
-            <Select variant="form" onChange={(event) => setForm({ ...form, type: event.target.value })}
-              value={form.type}
-            >
-              {VESSEL_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {displayLabel(t, type)}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            <span className="form-label">{t("vesselEditor.engineType")}</span>
-            <Select variant="form" onChange={(event) =>
-                setForm({ ...form, engineType: event.target.value as EngineType })
-              }
-              value={form.engineType}
-            >
-              {ENGINE_TYPES.map((engineType) => (
-                <option key={engineType} value={engineType}>
-                  {displayLabel(t, engineType)}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            <span className="form-label">{t("vesselEditor.voltageType")}</span>
-            <Select variant="form" onChange={(event) =>
-                setForm({ ...form, voltageType: event.target.value as VoltageType })
-              }
-              value={form.voltageType}
-            >
-              {VOLTAGE_TYPES.map((voltageType) => (
-                <option key={voltageType} value={voltageType}>
-                  {displayLabel(t, voltageType)}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            <span className="form-label">{t("vesselEditor.stoveFuelType")}</span>
-            <Select variant="form" onChange={(event) =>
-                setForm({ ...form, stoveFuelType: event.target.value as StoveFuelType })
-              }
-              value={form.stoveFuelType}
-            >
-              {STOVE_FUEL_TYPES.map((stoveFuelType) => (
-                <option key={stoveFuelType} value={stoveFuelType}>
-                  {displayLabel(t, stoveFuelType)}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            <span className="form-label">{t("vesselEditor.length")}</span>
-            <span className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
-              <input
-                className="form-input"
-                inputMode="decimal"
-                min="0"
-                onChange={(event) => setLengthValue(event.target.value)}
-                placeholder={t("vesselEditor.lengthValuePlaceholder")}
-                step="0.1"
-                type="number"
-                value={lengthValue}
-              />
-              <Select variant="form" aria-label={t("vesselEditor.lengthUnit")}
-                onChange={(event) => {
-                  const nextUnit = event.target.value as LengthUnit;
-                  setLengthValue((current) => convertBoatLength(current, lengthUnit, nextUnit));
-                  setLengthUnit(nextUnit);
-                }}
-                value={lengthUnit}
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <label>
+              <span className="form-label">{t("vesselEditor.type")}</span>
+              <Select
+                variant="form"
+                onChange={(event) => setForm({ ...form, type: event.target.value })}
+                value={form.type}
               >
-                <option value="m">{t("units.meters")}</option>
-                <option value="ft">{t("units.feet")}</option>
+                {VESSEL_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {displayLabel(t, type)}
+                  </option>
+                ))}
               </Select>
-            </span>
-          </label>
-          {fields.map((field) => (
-            <label className={field.wide ? "sm:col-span-2" : ""} key={field.key}>
-              <span className="form-label">{field.label}</span>
-              <input
-                className="form-input"
-                onChange={(event) => setForm({ ...form, [field.key]: event.target.value })}
-                placeholder={field.placeholder}
-                value={form[field.key]}
-              />
             </label>
-          ))}
-          <div className="sm:col-span-2">
-            <span className="form-label">{t("vesselEditor.homePort")}</span>
-            <DestinationAutocomplete
-              cityOnly
-              includeCountry
-              onChange={(homePort) => setForm({ ...form, homePort })}
-              value={form.homePort}
-              variant="profile"
-            />
-            <p className="mt-2 text-xs leading-5 text-slate">{t("vesselEditor.homePortHint")}</p>
-          </div>
-          <section className="sm:col-span-2">
-            <span className="form-label">{t("vesselEditor.coverImage")}</span>
-            <div className="grid gap-3 rounded-2xl border border-line bg-cream/50 p-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(13rem,0.7fr)]">
-              <div className="aspect-video overflow-hidden rounded-xl bg-seafoam">
-                {form.image ? (
-                  <img
-                    alt={t("vesselEditor.coverPreviewAlt")}
-                    className="size-full object-cover"
-                    src={form.image}
-                  />
-                ) : (
-                  <div className="grid size-full place-items-center text-center text-slate">
-                    <div>
-                      <ImagePlus className="mx-auto mb-2 text-teal" size={28} />
-                      <p className="text-sm font-semibold">{t("vesselEditor.noCover")}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col justify-center gap-2">
-                <ImageUploadControl
-                  hasImage={Boolean(form.image)}
-                  onFile={(file) => void uploadImage(file)}
-                  pending={imageUploading}
+            <label>
+              <span className="form-label">{t("vesselEditor.engineType")}</span>
+              <Select
+                variant="form"
+                onChange={(event) =>
+                  setForm({ ...form, engineType: event.target.value as EngineType })
+                }
+                value={form.engineType}
+              >
+                {ENGINE_TYPES.map((engineType) => (
+                  <option key={engineType} value={engineType}>
+                    {displayLabel(t, engineType)}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <label>
+              <span className="form-label">{t("vesselEditor.voltageType")}</span>
+              <Select
+                variant="form"
+                onChange={(event) =>
+                  setForm({ ...form, voltageType: event.target.value as VoltageType })
+                }
+                value={form.voltageType}
+              >
+                {VOLTAGE_TYPES.map((voltageType) => (
+                  <option key={voltageType} value={voltageType}>
+                    {displayLabel(t, voltageType)}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <label>
+              <span className="form-label">{t("vesselEditor.stoveFuelType")}</span>
+              <Select
+                variant="form"
+                onChange={(event) =>
+                  setForm({ ...form, stoveFuelType: event.target.value as StoveFuelType })
+                }
+                value={form.stoveFuelType}
+              >
+                {STOVE_FUEL_TYPES.map((stoveFuelType) => (
+                  <option key={stoveFuelType} value={stoveFuelType}>
+                    {displayLabel(t, stoveFuelType)}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <label>
+              <span className="form-label">{t("vesselEditor.length")}</span>
+              <span className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
+                <input
+                  className="form-input"
+                  inputMode="decimal"
+                  min="0"
+                  onChange={(event) => setLengthValue(event.target.value)}
+                  placeholder={t("vesselEditor.lengthValuePlaceholder")}
+                  step="0.1"
+                  type="number"
+                  value={lengthValue}
                 />
-                {form.image && (
-                  <button
-                    className="self-start text-xs font-bold text-coral"
-                    onClick={() => {
-                      setForm({ ...form, image: "" });
-                      setImageError("");
-                    }}
-                    type="button"
-                  >
-                    {t("upload.remove")}
-                  </button>
-                )}
-              </div>
-            </div>
-            {imageError && (
-              <p className="mt-2 text-sm font-semibold text-coral" role="alert">
-                {imageError}
-              </p>
-            )}
-          </section>
-          <section className="sm:col-span-2">
-            <span className="form-label">{t("vesselEditor.gallery")}</span>
-            <p className="mb-3 text-sm text-slate">{t("vesselEditor.galleryHint")}</p>
-            <div className="rounded-2xl border border-line bg-cream/50 p-3">
-              {gallery.length === 0 ? (
-                <p className="mb-3 text-sm font-semibold text-slate">{t("vesselEditor.galleryEmpty")}</p>
-              ) : (
-                <ul className="mb-3 grid gap-3 sm:grid-cols-2">
-                  {gallery.map((photo, index) => (
-                    <li
-                      className="overflow-hidden rounded-xl border border-line bg-white"
-                      key={`${photo.url}-${index}`}
-                    >
-                      <div className="aspect-video overflow-hidden bg-seafoam">
-                        <img
-                          alt={t("vesselEditor.galleryPhotoAlt", { number: index + 1 })}
-                          className="size-full object-cover"
-                          src={photo.url}
-                        />
-                      </div>
-                      <div className="space-y-2 p-3">
-                        <label>
-                          <span className="form-label">{t("vesselEditor.galleryCaption")}</span>
-                          <input
-                            className="form-input"
-                            maxLength={160}
-                            onChange={(event) => updateGalleryCaption(index, event.target.value)}
-                            placeholder={t("vesselEditor.galleryCaptionPlaceholder")}
-                            value={photo.caption ?? ""}
-                          />
-                        </label>
-                        <button
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-coral"
-                          onClick={() => removeGalleryPhoto(index)}
-                          type="button"
-                        >
-                          <Trash2 size={14} />
-                          {t("vesselEditor.removeGalleryPhoto")}
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <ImageUploadControl
-                hasImage={gallery.length > 0}
-                multiple
-                onFiles={(files) => void uploadGalleryImages(files)}
-                pending={galleryUploading}
-              />
-            </div>
-            {galleryError && (
-              <p className="mt-2 text-sm font-semibold text-coral" role="alert">
-                {galleryError}
-              </p>
-            )}
-          </section>
-          {[
-            ["description", t("vesselEditor.about"), t("vesselEditor.aboutPlaceholder")],
-            ["home", t("vesselEditor.lifeAboard"), t("vesselEditor.lifePlaceholder")],
-            ["systems", t("vesselEditor.systems"), t("vesselEditor.systemsPlaceholder")],
-            ["customAmenities", t("vesselEditor.otherFeatures"), t("vesselEditor.onePerLine")],
-          ].map(([key, label, placeholder]) => (
-            <label className="sm:col-span-2" key={key}>
-              <span className="form-label">{label}</span>
-              <textarea
-                className="form-input min-h-24 resize-y"
-                onChange={(event) => setForm({ ...form, [key]: event.target.value })}
-                placeholder={placeholder}
-                value={form[key as keyof typeof form] as string}
-              />
-            </label>
-          ))}
-          <section className="sm:col-span-2 rounded-2xl border border-teal/30 bg-seafoam/40 p-4 md:p-5">
-            <div className="flex items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-teal">
-                <KeyRound aria-hidden="true" size={18} />
+                <Select
+                  variant="form"
+                  aria-label={t("vesselEditor.lengthUnit")}
+                  onChange={(event) => {
+                    const nextUnit = event.target.value as LengthUnit;
+                    setLengthValue((current) => convertBoatLength(current, lengthUnit, nextUnit));
+                    setLengthUnit(nextUnit);
+                  }}
+                  value={lengthUnit}
+                >
+                  <option value="m">{t("units.meters")}</option>
+                  <option value="ft">{t("units.feet")}</option>
+                </Select>
               </span>
-              <div className="min-w-0">
-                <h2 className="font-display text-lg font-bold text-navy">
-                  {t("vesselEditor.privateAccessTitle")}
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-slate">
-                  {t("vesselEditor.privateAccessHint")}
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label>
-                <span className="form-label">{t("vesselEditor.wifiNetwork")}</span>
+            </label>
+            {fields.map((field) => (
+              <label className={field.wide ? "sm:col-span-2" : ""} key={field.key}>
+                <span className="form-label">{field.label}</span>
                 <input
-                  autoComplete="off"
                   className="form-input"
-                  onChange={(event) => setForm({ ...form, wifiNetwork: event.target.value })}
-                  placeholder={t("vesselEditor.wifiNetworkPlaceholder")}
-                  value={form.wifiNetwork}
+                  onChange={(event) => setForm({ ...form, [field.key]: event.target.value })}
+                  placeholder={field.placeholder}
+                  value={form[field.key]}
                 />
               </label>
-              <label>
-                <span className="form-label">{t("vesselEditor.wifiPassword")}</span>
-                <input
-                  autoComplete="off"
-                  className="form-input"
-                  onChange={(event) => setForm({ ...form, wifiPassword: event.target.value })}
-                  placeholder={t("vesselEditor.wifiPasswordPlaceholder")}
-                  value={form.wifiPassword}
-                />
-              </label>
-              <label className="sm:col-span-2">
-                <span className="form-label">{t("vesselEditor.accessCodes")}</span>
-                <textarea
-                  className="form-input min-h-24 resize-y"
-                  onChange={(event) => setForm({ ...form, accessCodes: event.target.value })}
-                  placeholder={t("vesselEditor.accessCodesPlaceholder")}
-                  value={form.accessCodes}
-                />
-              </label>
-              <label className="sm:col-span-2">
-                <span className="form-label">{t("vesselEditor.otherPrivateNotes")}</span>
-                <textarea
-                  className="form-input min-h-24 resize-y"
-                  onChange={(event) => setForm({ ...form, otherPrivateNotes: event.target.value })}
-                  placeholder={t("vesselEditor.otherPrivateNotesPlaceholder")}
-                  value={form.otherPrivateNotes}
-                />
-              </label>
+            ))}
+            <div className="sm:col-span-2">
+              <span className="form-label">{t("vesselEditor.homePort")}</span>
+              <DestinationAutocomplete
+                cityOnly
+                includeCountry
+                onChange={(homePort) => setForm({ ...form, homePort })}
+                value={form.homePort}
+                variant="profile"
+              />
+              <p className="mt-2 text-xs leading-5 text-slate">{t("vesselEditor.homePortHint")}</p>
             </div>
-          </section>
-        </div>
-        <section className="mt-7">
-          <p className="eyebrow">{t("vesselEditor.featuresKicker")}</p>
-          <h3 className="font-display text-lg font-bold text-navy">
-            {t("vesselEditor.featuresTitle")}
-          </h3>
-          <p className="mt-1 text-sm text-slate">{t("vesselEditor.featuresHint")}</p>
-          <div className="mt-5 space-y-5">
-            {BOAT_FEATURE_GROUPS.map((group) => (
-              <div key={group.title}>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                  {t(FEATURE_GROUP_KEYS[group.title])}
-                </p>
-                <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-                  {group.options.map((feature) => {
-                    const selected = form.amenities.includes(feature);
-                    return (
-                      <button
-                        aria-pressed={selected}
-                        className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${
-                          selected
-                            ? "border-teal bg-seafoam text-teal"
-                            : "border-line bg-white text-navy hover:border-teal"
-                        }`}
-                        key={feature}
-                        onClick={() =>
-                          setForm({
-                            ...form,
-                            amenities: selected
-                              ? form.amenities.filter((item) => item !== feature)
-                              : [...form.amenities, feature],
-                          })
-                        }
-                        type="button"
-                      >
-                        <FeatureIcon feature={feature} />
-                        <span className="min-w-0 flex-1">{displayLabel(t, feature)}</span>
-                        {selected && <Check className="shrink-0" size={15} />}
-                      </button>
-                    );
-                  })}
+            <section className="sm:col-span-2">
+              <span className="form-label">{t("vesselEditor.coverImage")}</span>
+              <div className="grid gap-3 rounded-2xl border border-line bg-cream/50 p-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(13rem,0.7fr)]">
+                <div className="aspect-video overflow-hidden rounded-xl bg-seafoam">
+                  {form.image ? (
+                    <img
+                      alt={t("vesselEditor.coverPreviewAlt")}
+                      className="size-full object-cover"
+                      src={form.image}
+                    />
+                  ) : (
+                    <div className="grid size-full place-items-center text-center text-slate">
+                      <div>
+                        <ImagePlus className="mx-auto mb-2 text-teal" size={28} />
+                        <p className="text-sm font-semibold">{t("vesselEditor.noCover")}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col justify-center gap-2">
+                  <ImageUploadControl
+                    hasImage={Boolean(form.image)}
+                    onFile={(file) => void uploadImage(file)}
+                    pending={imageUploading}
+                  />
+                  {form.image && (
+                    <button
+                      className="self-start text-xs font-bold text-coral"
+                      onClick={() => {
+                        setForm({ ...form, image: "" });
+                        setImageError("");
+                      }}
+                      type="button"
+                    >
+                      {t("upload.remove")}
+                    </button>
+                  )}
                 </div>
               </div>
+              {imageError && (
+                <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                  {imageError}
+                </p>
+              )}
+            </section>
+            <section className="sm:col-span-2">
+              <span className="form-label">{t("vesselEditor.gallery")}</span>
+              <p className="mb-3 text-sm text-slate">{t("vesselEditor.galleryHint")}</p>
+              <div className="rounded-2xl border border-line bg-cream/50 p-3">
+                {gallery.length === 0 ? (
+                  <p className="mb-3 text-sm font-semibold text-slate">
+                    {t("vesselEditor.galleryEmpty")}
+                  </p>
+                ) : (
+                  <ul className="mb-3 grid gap-3 sm:grid-cols-2">
+                    {gallery.map((photo, index) => (
+                      <li
+                        className="overflow-hidden rounded-xl border border-line bg-white"
+                        key={`${photo.url}-${index}`}
+                      >
+                        <div className="aspect-video overflow-hidden bg-seafoam">
+                          <img
+                            alt={t("vesselEditor.galleryPhotoAlt", { number: index + 1 })}
+                            className="size-full object-cover"
+                            src={photo.url}
+                          />
+                        </div>
+                        <div className="space-y-2 p-3">
+                          <label>
+                            <span className="form-label">{t("vesselEditor.galleryCaption")}</span>
+                            <input
+                              className="form-input"
+                              maxLength={160}
+                              onChange={(event) => updateGalleryCaption(index, event.target.value)}
+                              placeholder={t("vesselEditor.galleryCaptionPlaceholder")}
+                              value={photo.caption ?? ""}
+                            />
+                          </label>
+                          <button
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-coral"
+                            onClick={() => removeGalleryPhoto(index)}
+                            type="button"
+                          >
+                            <Trash2 size={14} />
+                            {t("vesselEditor.removeGalleryPhoto")}
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <ImageUploadControl
+                  hasImage={gallery.length > 0}
+                  multiple
+                  onFiles={(files) => void uploadGalleryImages(files)}
+                  pending={galleryUploading}
+                />
+              </div>
+              {galleryError && (
+                <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                  {galleryError}
+                </p>
+              )}
+            </section>
+            {[
+              ["description", t("vesselEditor.about"), t("vesselEditor.aboutPlaceholder")],
+              ["home", t("vesselEditor.lifeAboard"), t("vesselEditor.lifePlaceholder")],
+              ["systems", t("vesselEditor.systems"), t("vesselEditor.systemsPlaceholder")],
+              ["customAmenities", t("vesselEditor.otherFeatures"), t("vesselEditor.onePerLine")],
+            ].map(([key, label, placeholder]) => (
+              <label className="sm:col-span-2" key={key}>
+                <span className="form-label">{label}</span>
+                <textarea
+                  className="form-input min-h-24 resize-y"
+                  onChange={(event) => setForm({ ...form, [key]: event.target.value })}
+                  placeholder={placeholder}
+                  value={form[key as keyof typeof form] as string}
+                />
+              </label>
             ))}
+            <section className="sm:col-span-2 rounded-2xl border border-teal/30 bg-seafoam/40 p-4 md:p-5">
+              <div className="flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-teal">
+                  <KeyRound aria-hidden="true" size={18} />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="font-display text-lg font-bold text-navy">
+                    {t("vesselEditor.privateAccessTitle")}
+                  </h2>
+                  <p className="mt-1 text-sm leading-6 text-slate">
+                    {t("vesselEditor.privateAccessHint")}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <label>
+                  <span className="form-label">{t("vesselEditor.wifiNetwork")}</span>
+                  <input
+                    autoComplete="off"
+                    className="form-input"
+                    onChange={(event) => setForm({ ...form, wifiNetwork: event.target.value })}
+                    placeholder={t("vesselEditor.wifiNetworkPlaceholder")}
+                    value={form.wifiNetwork}
+                  />
+                </label>
+                <label>
+                  <span className="form-label">{t("vesselEditor.wifiPassword")}</span>
+                  <input
+                    autoComplete="off"
+                    className="form-input"
+                    onChange={(event) => setForm({ ...form, wifiPassword: event.target.value })}
+                    placeholder={t("vesselEditor.wifiPasswordPlaceholder")}
+                    value={form.wifiPassword}
+                  />
+                </label>
+                <label className="sm:col-span-2">
+                  <span className="form-label">{t("vesselEditor.accessCodes")}</span>
+                  <textarea
+                    className="form-input min-h-24 resize-y"
+                    onChange={(event) => setForm({ ...form, accessCodes: event.target.value })}
+                    placeholder={t("vesselEditor.accessCodesPlaceholder")}
+                    value={form.accessCodes}
+                  />
+                </label>
+                <label className="sm:col-span-2">
+                  <span className="form-label">{t("vesselEditor.otherPrivateNotes")}</span>
+                  <textarea
+                    className="form-input min-h-24 resize-y"
+                    onChange={(event) =>
+                      setForm({ ...form, otherPrivateNotes: event.target.value })
+                    }
+                    placeholder={t("vesselEditor.otherPrivateNotesPlaceholder")}
+                    value={form.otherPrivateNotes}
+                  />
+                </label>
+              </div>
+            </section>
           </div>
-        </section>
-        <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
-          <button
-            className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
-            onClick={close}
-            type="button"
-          >
-            {t("common.cancel")}
-          </button>
-          <button
-            className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
-            disabled={mutation.isPending || !form.name || !form.homePort}
-            onClick={() => mutation.mutate()}
-            type="button"
-          >
-            {mutation.isPending
-              ? t("common.saving")
-              : boat
-                ? t("vesselEditor.save")
-                : t("vesselEditor.publish")}
-          </button>
+          <section className="mt-7">
+            <p className="eyebrow">{t("vesselEditor.featuresKicker")}</p>
+            <h3 className="font-display text-lg font-bold text-navy">
+              {t("vesselEditor.featuresTitle")}
+            </h3>
+            <p className="mt-1 text-sm text-slate">{t("vesselEditor.featuresHint")}</p>
+            <div className="mt-5 space-y-5">
+              {BOAT_FEATURE_GROUPS.map((group) => (
+                <div key={group.title}>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                    {t(FEATURE_GROUP_KEYS[group.title])}
+                  </p>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                    {group.options.map((feature) => {
+                      const selected = form.amenities.includes(feature);
+                      return (
+                        <button
+                          aria-pressed={selected}
+                          className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${
+                            selected
+                              ? "border-teal bg-seafoam text-teal"
+                              : "border-line bg-white text-navy hover:border-teal"
+                          }`}
+                          key={feature}
+                          onClick={() =>
+                            setForm({
+                              ...form,
+                              amenities: selected
+                                ? form.amenities.filter((item) => item !== feature)
+                                : [...form.amenities, feature],
+                            })
+                          }
+                          type="button"
+                        >
+                          <FeatureIcon feature={feature} />
+                          <span className="min-w-0 flex-1">{displayLabel(t, feature)}</span>
+                          {selected && <Check className="shrink-0" size={15} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+          <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
+            <button
+              className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
+              onClick={close}
+              type="button"
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
+              disabled={mutation.isPending || !form.name || !form.homePort}
+              onClick={() => mutation.mutate()}
+              type="button"
+            >
+              {mutation.isPending
+                ? t("common.saving")
+                : boat
+                  ? t("vesselEditor.save")
+                  : t("vesselEditor.publish")}
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
-        <EditorLivePreview hint={t("editorPreview.vesselHint")}>
-          <VesselPreviewCard
-            vessel={{
-              name: form.name,
-              type: form.type,
-              length: lengthValue
-                ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`)
-                : "",
-              homePort: form.homePort,
-              image: form.image,
-              engineType: form.engineType,
-              voltageType: form.voltageType,
-              stoveFuelType: form.stoveFuelType,
-            }}
-          />
-        </EditorLivePreview>
-      </div>
+        <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
+          <EditorLivePreview hint={t("editorPreview.vesselHint")}>
+            <VesselPreviewCard
+              vessel={{
+                name: form.name,
+                type: form.type,
+                length: lengthValue ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`) : "",
+                homePort: form.homePort,
+                image: form.image,
+                engineType: form.engineType,
+                voltageType: form.voltageType,
+                stoveFuelType: form.stoveFuelType,
+              }}
+            />
+          </EditorLivePreview>
+        </div>
       </div>
     </main>
   );
@@ -4300,9 +4302,7 @@ function SitEditor({
     requiredSkills: sit?.requiredSkills ?? [],
     maxGuests: String(sit?.maxGuests ?? 2),
     pet: sit?.pet ?? "",
-    nonSmokerRequired: sit
-      ? resolveNonSmokerRequired(sit)
-      : sitDefaults.nonSmokerRequired,
+    nonSmokerRequired: sit ? resolveNonSmokerRequired(sit) : sitDefaults.nonSmokerRequired,
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState("");
@@ -4526,419 +4526,424 @@ function SitEditor({
     <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-14">
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="order-2 min-w-0 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="eyebrow">{t("sitEditor.kicker")}</p>
-            <h1 className="font-display text-3xl font-bold text-navy">
-              {sit ? t("sitEditor.editTitle") : t("sitEditor.createTitle")}
-            </h1>
-            <p className="mt-2 text-sm text-slate">{t("sitEditor.hint")}</p>
-          </div>
-          <button
-            className="flex shrink-0 items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
-            onClick={close}
-            type="button"
-          >
-            <ArrowLeft size={16} /> {t("common.back")}
-          </button>
-        </div>
-        {!sit && (
-          <div
-            className="flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-5 py-4 text-sm leading-6 text-navy"
-            role="note"
-          >
-            <Info className="mt-0.5 shrink-0 text-teal" size={20} />
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-bold">{t("sitEditor.createEditLimitTitle")}</p>
-              <p className="mt-1 text-slate">{t("sitEditor.createEditLimit")}</p>
+              <p className="eyebrow">{t("sitEditor.kicker")}</p>
+              <h1 className="font-display text-3xl font-bold text-navy">
+                {sit ? t("sitEditor.editTitle") : t("sitEditor.createTitle")}
+              </h1>
+              <p className="mt-2 text-sm text-slate">{t("sitEditor.hint")}</p>
             </div>
-          </div>
-        )}
-        {isCreating && identityVerificationEnabled && verificationLoading ? (
-          <p className="mt-6 text-sm text-slate">{t("sitEditor.verificationChecking")}</p>
-        ) : isCreating && identityVerificationEnabled && !canCreateSit && verificationChecks ? (
-          <div className="mt-6 space-y-5">
-            <div
-              className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
-              role="alert"
-            >
-              <ShieldCheck className="mt-0.5 shrink-0" size={18} />
-              <div>
-                <p className="font-semibold">{t("sitEditor.verificationRequiredTitle")}</p>
-                <p className="mt-1">{t("sitEditor.verificationRequiredText")}</p>
-              </div>
-            </div>
-            <IdentityVerificationCard
-              checks={verificationChecks}
-              isSelf
-              onStartVerification={() => verifyMutation.mutate()}
-              verifying={verifyMutation.isPending}
-            />
-            <Link
-              className="inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
-              onClick={close}
-              to="/members/me"
-            >
-              {t("sitEditor.verificationRequiredCta")}
-            </Link>
             <button
-              className="block w-full text-sm font-semibold text-slate hover:text-navy"
+              className="flex shrink-0 items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
               onClick={close}
               type="button"
             >
-              {t("common.cancel")}
+              <ArrowLeft size={16} /> {t("common.back")}
             </button>
           </div>
-        ) : (
-          <>
-        {locked && (
-          <div
-            className="mt-5 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
-            role="status"
-          >
-            <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
-            <div>
-              <p className="font-bold">{t("sitEditor.lockedBannerTitle")}</p>
-              <p className="mt-1">{t("sitEditor.lockedBanner")}</p>
+          {!sit && (
+            <div
+              className="flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-5 py-4 text-sm leading-6 text-navy"
+              role="note"
+            >
+              <Info className="mt-0.5 shrink-0 text-teal" size={20} />
+              <div>
+                <p className="font-bold">{t("sitEditor.createEditLimitTitle")}</p>
+                <p className="mt-1 text-slate">{t("sitEditor.createEditLimit")}</p>
+              </div>
             </div>
-          </div>
-        )}
-        <fieldset className="mt-6 space-y-5 disabled:opacity-70" disabled={locked}>
-          <VesselPicker
-            disabled={Boolean(sit) || locked}
-            onChange={(boatId) => {
-              const vessel = vessels.find((item) => item.id === boatId);
-              const homePort = splitHomePort(vessel?.homePort ?? "");
-              setForm({
-                ...form,
-                boatId,
-                ...(sameAsHomePort
-                  ? { location: homePort.location, country: homePort.country }
-                  : {}),
-              });
-            }}
-            value={form.boatId}
-            vessels={vessels}
-          />
-          <section className="rounded-2xl border border-line bg-cream/60 p-4">
-            <label className="flex cursor-pointer items-start gap-3">
-              <input
-                checked={sameAsHomePort}
-                className="mt-0.5 size-4 accent-teal"
-                onChange={(event) => {
-                  const checked = event.target.checked;
-                  setSameAsHomePort(checked);
-                  if (checked) {
-                    const vessel = vessels.find((item) => item.id === form.boatId);
+          )}
+          {isCreating && identityVerificationEnabled && verificationLoading ? (
+            <p className="mt-6 text-sm text-slate">{t("sitEditor.verificationChecking")}</p>
+          ) : isCreating && identityVerificationEnabled && !canCreateSit && verificationChecks ? (
+            <div className="mt-6 space-y-5">
+              <div
+                className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+                role="alert"
+              >
+                <ShieldCheck className="mt-0.5 shrink-0" size={18} />
+                <div>
+                  <p className="font-semibold">{t("sitEditor.verificationRequiredTitle")}</p>
+                  <p className="mt-1">{t("sitEditor.verificationRequiredText")}</p>
+                </div>
+              </div>
+              <IdentityVerificationCard
+                checks={verificationChecks}
+                isSelf
+                onStartVerification={() => verifyMutation.mutate()}
+                verifying={verifyMutation.isPending}
+              />
+              <Link
+                className="inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
+                onClick={close}
+                to="/members/me"
+              >
+                {t("sitEditor.verificationRequiredCta")}
+              </Link>
+              <button
+                className="block w-full text-sm font-semibold text-slate hover:text-navy"
+                onClick={close}
+                type="button"
+              >
+                {t("common.cancel")}
+              </button>
+            </div>
+          ) : (
+            <>
+              {locked && (
+                <div
+                  className="mt-5 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                  role="status"
+                >
+                  <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                  <div>
+                    <p className="font-bold">{t("sitEditor.lockedBannerTitle")}</p>
+                    <p className="mt-1">{t("sitEditor.lockedBanner")}</p>
+                  </div>
+                </div>
+              )}
+              <fieldset className="mt-6 space-y-5 disabled:opacity-70" disabled={locked}>
+                <VesselPicker
+                  disabled={Boolean(sit) || locked}
+                  onChange={(boatId) => {
+                    const vessel = vessels.find((item) => item.id === boatId);
                     const homePort = splitHomePort(vessel?.homePort ?? "");
                     setForm({
                       ...form,
-                      location: homePort.location,
-                      country: homePort.country,
+                      boatId,
+                      ...(sameAsHomePort
+                        ? { location: homePort.location, country: homePort.country }
+                        : {}),
                     });
-                  }
-                }}
-                type="checkbox"
-              />
-              <span>
-                <span className="block text-sm font-bold text-navy">
-                  {t("sitEditor.sameAsHomePort", {
-                    homePort: vessels.find((vessel) => vessel.id === form.boatId)?.homePort ?? "",
-                  })}
-                </span>
-                <span className="mt-1 block text-xs leading-5 text-slate">
-                  {t("sitEditor.sameAsHomePortHint")}
-                </span>
-              </span>
-            </label>
-          </section>
-          {!sameAsHomePort && (
-            <section className="grid gap-4 rounded-2xl border border-line p-4 sm:grid-cols-2">
-              <div>
-                <span className="form-label">{t("sitEditor.location")}</span>
-                <DestinationAutocomplete
-                  cityOnly
-                  onChange={(location) => setForm({ ...form, location })}
-                  onSelect={(destination) =>
-                    setForm({
-                      ...form,
-                      location: destination.name,
-                      country: destination.detail,
-                    })
-                  }
-                  placeholder={t("sitEditor.locationPlaceholder")}
-                  value={form.location}
-                  variant="profile"
+                  }}
+                  value={form.boatId}
+                  vessels={vessels}
                 />
-              </div>
-              <div>
-                <span className="form-label">{t("sitEditor.country")}</span>
-                <DestinationAutocomplete
-                  countryOnly
-                  onChange={(country) => setForm({ ...form, country })}
-                  placeholder={t("sitEditor.countryPlaceholder")}
-                  value={form.country}
-                  variant="profile"
-                />
-              </div>
-            </section>
-          )}
-          <section className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
-            <label className="block">
-              <span className="form-label">{t("sitEditor.fullAddress")}</span>
-              <textarea
-                className="form-input mt-1 min-h-24"
-                onChange={(event) => setForm({ ...form, fullAddress: event.target.value })}
-                placeholder={t("sitEditor.fullAddressPlaceholder")}
-                value={form.fullAddress}
-              />
-            </label>
-            <p className="mt-2 text-xs leading-5 text-slate" role="note">
-              {t("sitEditor.fullAddressHint")}
-            </p>
-          </section>
-          <div>
-            <span className="form-label">{t("sitEditor.dates")}</span>
-            <DateRangePicker
-              endDate={form.endDate}
-              onChange={({ startDate, endDate }) => setForm({ ...form, startDate, endDate })}
-              startDate={form.startDate}
-              variant="browse"
-            />
-          </div>
-          <fieldset>
-            <legend className="form-label">{t("sitEditor.sitType")}</legend>
-            <div className="mt-2 grid gap-3 sm:grid-cols-2">
-              <label
-                className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
-                  form.sitType === "liveaboard"
-                    ? "border-teal bg-seafoam"
-                    : "border-line hover:border-teal/50"
-                }`}
-              >
-                <input
-                  checked={form.sitType === "liveaboard"}
-                  className="mt-1 size-4 accent-teal"
-                  name="sitType"
-                  onChange={() => setForm({ ...form, sitType: "liveaboard" })}
-                  type="radio"
-                  value="liveaboard"
-                />
-                <span>
-                  <span className="block text-sm font-bold text-navy">
-                    {t("sitType.liveaboard")}
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-slate">
-                    {t("sitType.liveaboardHint")}
-                  </span>
-                </span>
-              </label>
-              <label
-                className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
-                  form.sitType === "daytimeChecks"
-                    ? "border-teal bg-seafoam"
-                    : "border-line hover:border-teal/50"
-                }`}
-              >
-                <input
-                  checked={form.sitType === "daytimeChecks"}
-                  className="mt-1 size-4 accent-teal"
-                  name="sitType"
-                  onChange={() => setForm({ ...form, sitType: "daytimeChecks" })}
-                  type="radio"
-                  value="daytimeChecks"
-                />
-                <span>
-                  <span className="block text-sm font-bold text-navy">
-                    {t("sitType.daytimeChecks")}
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-slate">
-                    {t("sitType.daytimeChecksHint")}
-                  </span>
-                </span>
-              </label>
-            </div>
-          </fieldset>
-          <label>
-            <span className="form-label">{t("sitEditor.maxGuests")}</span>
-            <input
-              className="form-input"
-              max="12"
-              min="1"
-              onChange={(event) => setForm({ ...form, maxGuests: event.target.value })}
-              required
-              type="number"
-              value={form.maxGuests}
-            />
-            <span className="mt-1.5 block text-xs leading-5 text-slate">
-              {t("sitEditor.maxGuestsHint")}
-            </span>
-          </label>
-          <label>
-            <span className="form-label">{t("sitEditor.responsibilities")}</span>
-            <textarea
-              className="form-input min-h-28 resize-y"
-              onChange={(event) => setForm({ ...form, responsibilities: event.target.value })}
-              placeholder={t("sitEditor.responsibilitiesPlaceholder")}
-              value={form.responsibilities}
-            />
-          </label>
-          <section className="rounded-2xl border border-line bg-cream/60 p-5">
-            <p className="eyebrow">{t("sitEditor.requirementsKicker")}</p>
-            <h3 className="font-display text-lg font-bold text-navy">
-              {t("sitEditor.requirementsTitle")}
-            </h3>
-            <label className="mt-5 block">
-              <span className="form-label">{t("sitEditor.minimumYears")}</span>
-              <Select variant="form" onChange={(event) => setForm({ ...form, minYearsExperience: event.target.value })}
-                value={form.minYearsExperience}
-              >
-                <option value="0">{t("sitEditor.noMinimum")}</option>
-                {[1, 2, 3, 5, 10].map((years) => (
-                  <option key={years} value={years}>
-                    {t("sitEditor.yearsPlus", { count: years })}
-                  </option>
-                ))}
-              </Select>
-            </label>
-            {[
-              {
-                title: t("sitEditor.vesselExperience"),
-                field: "requiredExperience" as const,
-                options: SITTER_EXPERIENCE,
-              },
-              {
-                title: t("sitEditor.certifications"),
-                field: "requiredCertifications" as const,
-                options: SITTER_CERTIFICATIONS,
-              },
-              {
-                title: t("sitEditor.skills"),
-                field: "requiredSkills" as const,
-                options: SITTER_SKILLS,
-              },
-            ].map((group) => (
-              <div className="mt-5" key={group.field}>
-                <p className="form-label">{group.title}</p>
-                <div className="flex flex-wrap gap-2">
-                  {group.options.map((option) => {
-                    const selected = form[group.field].includes(option);
-                    return (
-                      <button
-                        className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
-                          selected
-                            ? "border-teal bg-seafoam text-teal"
-                            : "border-line bg-white text-slate hover:border-teal"
-                        }`}
-                        key={option}
-                        onClick={() => toggleRequirement(group.field, option)}
-                        type="button"
-                      >
-                        {selected && <Check className="mr-1 inline" size={13} />}
-                        {displayLabel(t, option)}
-                      </button>
-                    );
-                  })}
+                <section className="rounded-2xl border border-line bg-cream/60 p-4">
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      checked={sameAsHomePort}
+                      className="mt-0.5 size-4 accent-teal"
+                      onChange={(event) => {
+                        const checked = event.target.checked;
+                        setSameAsHomePort(checked);
+                        if (checked) {
+                          const vessel = vessels.find((item) => item.id === form.boatId);
+                          const homePort = splitHomePort(vessel?.homePort ?? "");
+                          setForm({
+                            ...form,
+                            location: homePort.location,
+                            country: homePort.country,
+                          });
+                        }
+                      }}
+                      type="checkbox"
+                    />
+                    <span>
+                      <span className="block text-sm font-bold text-navy">
+                        {t("sitEditor.sameAsHomePort", {
+                          homePort:
+                            vessels.find((vessel) => vessel.id === form.boatId)?.homePort ?? "",
+                        })}
+                      </span>
+                      <span className="mt-1 block text-xs leading-5 text-slate">
+                        {t("sitEditor.sameAsHomePortHint")}
+                      </span>
+                    </span>
+                  </label>
+                </section>
+                {!sameAsHomePort && (
+                  <section className="grid gap-4 rounded-2xl border border-line p-4 sm:grid-cols-2">
+                    <div>
+                      <span className="form-label">{t("sitEditor.location")}</span>
+                      <DestinationAutocomplete
+                        cityOnly
+                        onChange={(location) => setForm({ ...form, location })}
+                        onSelect={(destination) =>
+                          setForm({
+                            ...form,
+                            location: destination.name,
+                            country: destination.detail,
+                          })
+                        }
+                        placeholder={t("sitEditor.locationPlaceholder")}
+                        value={form.location}
+                        variant="profile"
+                      />
+                    </div>
+                    <div>
+                      <span className="form-label">{t("sitEditor.country")}</span>
+                      <DestinationAutocomplete
+                        countryOnly
+                        onChange={(country) => setForm({ ...form, country })}
+                        placeholder={t("sitEditor.countryPlaceholder")}
+                        value={form.country}
+                        variant="profile"
+                      />
+                    </div>
+                  </section>
+                )}
+                <section className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
+                  <label className="block">
+                    <span className="form-label">{t("sitEditor.fullAddress")}</span>
+                    <textarea
+                      className="form-input mt-1 min-h-24"
+                      onChange={(event) => setForm({ ...form, fullAddress: event.target.value })}
+                      placeholder={t("sitEditor.fullAddressPlaceholder")}
+                      value={form.fullAddress}
+                    />
+                  </label>
+                  <p className="mt-2 text-xs leading-5 text-slate" role="note">
+                    {t("sitEditor.fullAddressHint")}
+                  </p>
+                </section>
+                <div>
+                  <span className="form-label">{t("sitEditor.dates")}</span>
+                  <DateRangePicker
+                    endDate={form.endDate}
+                    onChange={({ startDate, endDate }) => setForm({ ...form, startDate, endDate })}
+                    startDate={form.startDate}
+                    variant="browse"
+                  />
                 </div>
+                <fieldset>
+                  <legend className="form-label">{t("sitEditor.sitType")}</legend>
+                  <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                    <label
+                      className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                        form.sitType === "liveaboard"
+                          ? "border-teal bg-seafoam"
+                          : "border-line hover:border-teal/50"
+                      }`}
+                    >
+                      <input
+                        checked={form.sitType === "liveaboard"}
+                        className="mt-1 size-4 accent-teal"
+                        name="sitType"
+                        onChange={() => setForm({ ...form, sitType: "liveaboard" })}
+                        type="radio"
+                        value="liveaboard"
+                      />
+                      <span>
+                        <span className="block text-sm font-bold text-navy">
+                          {t("sitType.liveaboard")}
+                        </span>
+                        <span className="mt-1 block text-xs leading-5 text-slate">
+                          {t("sitType.liveaboardHint")}
+                        </span>
+                      </span>
+                    </label>
+                    <label
+                      className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                        form.sitType === "daytimeChecks"
+                          ? "border-teal bg-seafoam"
+                          : "border-line hover:border-teal/50"
+                      }`}
+                    >
+                      <input
+                        checked={form.sitType === "daytimeChecks"}
+                        className="mt-1 size-4 accent-teal"
+                        name="sitType"
+                        onChange={() => setForm({ ...form, sitType: "daytimeChecks" })}
+                        type="radio"
+                        value="daytimeChecks"
+                      />
+                      <span>
+                        <span className="block text-sm font-bold text-navy">
+                          {t("sitType.daytimeChecks")}
+                        </span>
+                        <span className="mt-1 block text-xs leading-5 text-slate">
+                          {t("sitType.daytimeChecksHint")}
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+                </fieldset>
+                <label>
+                  <span className="form-label">{t("sitEditor.maxGuests")}</span>
+                  <input
+                    className="form-input"
+                    max="12"
+                    min="1"
+                    onChange={(event) => setForm({ ...form, maxGuests: event.target.value })}
+                    required
+                    type="number"
+                    value={form.maxGuests}
+                  />
+                  <span className="mt-1.5 block text-xs leading-5 text-slate">
+                    {t("sitEditor.maxGuestsHint")}
+                  </span>
+                </label>
+                <label>
+                  <span className="form-label">{t("sitEditor.responsibilities")}</span>
+                  <textarea
+                    className="form-input min-h-28 resize-y"
+                    onChange={(event) => setForm({ ...form, responsibilities: event.target.value })}
+                    placeholder={t("sitEditor.responsibilitiesPlaceholder")}
+                    value={form.responsibilities}
+                  />
+                </label>
+                <section className="rounded-2xl border border-line bg-cream/60 p-5">
+                  <p className="eyebrow">{t("sitEditor.requirementsKicker")}</p>
+                  <h3 className="font-display text-lg font-bold text-navy">
+                    {t("sitEditor.requirementsTitle")}
+                  </h3>
+                  <label className="mt-5 block">
+                    <span className="form-label">{t("sitEditor.minimumYears")}</span>
+                    <Select
+                      variant="form"
+                      onChange={(event) =>
+                        setForm({ ...form, minYearsExperience: event.target.value })
+                      }
+                      value={form.minYearsExperience}
+                    >
+                      <option value="0">{t("sitEditor.noMinimum")}</option>
+                      {[1, 2, 3, 5, 10].map((years) => (
+                        <option key={years} value={years}>
+                          {t("sitEditor.yearsPlus", { count: years })}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                  {[
+                    {
+                      title: t("sitEditor.vesselExperience"),
+                      field: "requiredExperience" as const,
+                      options: SITTER_EXPERIENCE,
+                    },
+                    {
+                      title: t("sitEditor.certifications"),
+                      field: "requiredCertifications" as const,
+                      options: SITTER_CERTIFICATIONS,
+                    },
+                    {
+                      title: t("sitEditor.skills"),
+                      field: "requiredSkills" as const,
+                      options: SITTER_SKILLS,
+                    },
+                  ].map((group) => (
+                    <div className="mt-5" key={group.field}>
+                      <p className="form-label">{group.title}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {group.options.map((option) => {
+                          const selected = form[group.field].includes(option);
+                          return (
+                            <button
+                              className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                                selected
+                                  ? "border-teal bg-seafoam text-teal"
+                                  : "border-line bg-white text-slate hover:border-teal"
+                              }`}
+                              key={option}
+                              onClick={() => toggleRequirement(group.field, option)}
+                              type="button"
+                            >
+                              {selected && <Check className="mr-1 inline" size={13} />}
+                              {displayLabel(t, option)}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-white px-4 py-3">
+                    <input
+                      checked={form.nonSmokerRequired}
+                      className="mt-1 size-4 accent-teal"
+                      onChange={(event) =>
+                        setForm({ ...form, nonSmokerRequired: event.target.checked })
+                      }
+                      type="checkbox"
+                    />
+                    <span>
+                      <span className="block text-sm font-bold text-navy">
+                        {t("sitEditor.nonSmoker")}
+                      </span>
+                      <span className="mt-1 block text-sm leading-6 text-slate">
+                        {t("sitEditor.nonSmokerHint")}
+                      </span>
+                    </span>
+                  </label>
+                </section>
+                <label>
+                  <span className="form-label">{t("sitEditor.additional")}</span>
+                  <textarea
+                    className="form-input min-h-24 resize-y"
+                    onChange={(event) => setForm({ ...form, requirements: event.target.value })}
+                    placeholder={t("sitEditor.additionalPlaceholder")}
+                    value={form.requirements}
+                  />
+                </label>
+                <label>
+                  <span className="form-label">{t("sitEditor.pets")}</span>
+                  <input
+                    className="form-input"
+                    onChange={(event) => setForm({ ...form, pet: event.target.value })}
+                    placeholder={t("sitEditor.petsPlaceholder")}
+                    value={form.pet}
+                  />
+                </label>
+                {!locked && (
+                  <TermsAgreementCheckbox
+                    checked={acceptedTerms}
+                    i18nKey="sitEditor.termsAgreement"
+                    onChange={(checked) => {
+                      setAcceptedTerms(checked);
+                      if (checked) setTermsError("");
+                    }}
+                  />
+                )}
+                {termsError && (
+                  <p className="text-sm font-semibold text-coral" role="alert">
+                    {termsError}
+                  </p>
+                )}
+              </fieldset>
+              <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
+                <button
+                  className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
+                  onClick={close}
+                  type="button"
+                >
+                  {locked ? t("common.close") : t("common.cancel")}
+                </button>
+                {!locked && (
+                  <IconTooltip
+                    hidden={!publishBlockedTooltip || mutation.isPending}
+                    label={publishBlockedTooltip}
+                    side="top"
+                    wrap
+                  >
+                    <button
+                      className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
+                      disabled={publishDisabled}
+                      onClick={() => {
+                        if (!acceptedTerms) {
+                          setTermsError(t("sitEditor.termsRequired"));
+                          return;
+                        }
+                        setTermsError("");
+                        mutation.mutate();
+                      }}
+                      title={
+                        publishBlockedTooltip && !mutation.isPending
+                          ? publishBlockedTooltip
+                          : undefined
+                      }
+                      type="button"
+                    >
+                      {mutation.isPending
+                        ? t("common.saving")
+                        : sit
+                          ? t("sitEditor.save")
+                          : t("sitEditor.publish")}
+                    </button>
+                  </IconTooltip>
+                )}
               </div>
-            ))}
-            <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-white px-4 py-3">
-              <input
-                checked={form.nonSmokerRequired}
-                className="mt-1 size-4 accent-teal"
-                onChange={(event) =>
-                  setForm({ ...form, nonSmokerRequired: event.target.checked })
-                }
-                type="checkbox"
-              />
-              <span>
-                <span className="block text-sm font-bold text-navy">
-                  {t("sitEditor.nonSmoker")}
-                </span>
-                <span className="mt-1 block text-sm leading-6 text-slate">
-                  {t("sitEditor.nonSmokerHint")}
-                </span>
-              </span>
-            </label>
-          </section>
-          <label>
-            <span className="form-label">{t("sitEditor.additional")}</span>
-            <textarea
-              className="form-input min-h-24 resize-y"
-              onChange={(event) => setForm({ ...form, requirements: event.target.value })}
-              placeholder={t("sitEditor.additionalPlaceholder")}
-              value={form.requirements}
-            />
-          </label>
-          <label>
-            <span className="form-label">{t("sitEditor.pets")}</span>
-            <input
-              className="form-input"
-              onChange={(event) => setForm({ ...form, pet: event.target.value })}
-              placeholder={t("sitEditor.petsPlaceholder")}
-              value={form.pet}
-            />
-          </label>
-          {!locked && (
-            <TermsAgreementCheckbox
-              checked={acceptedTerms}
-              i18nKey="sitEditor.termsAgreement"
-              onChange={(checked) => {
-                setAcceptedTerms(checked);
-                if (checked) setTermsError("");
-              }}
-            />
+            </>
           )}
-          {termsError && (
-            <p className="text-sm font-semibold text-coral" role="alert">
-              {termsError}
-            </p>
-          )}
-        </fieldset>
-        <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
-          <button
-            className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
-            onClick={close}
-            type="button"
-          >
-            {locked ? t("common.close") : t("common.cancel")}
-          </button>
-          {!locked && (
-            <IconTooltip
-              hidden={!publishBlockedTooltip || mutation.isPending}
-              label={publishBlockedTooltip}
-              side="top"
-              wrap
-            >
-              <button
-                className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
-                disabled={publishDisabled}
-                onClick={() => {
-                  if (!acceptedTerms) {
-                    setTermsError(t("sitEditor.termsRequired"));
-                    return;
-                  }
-                  setTermsError("");
-                  mutation.mutate();
-                }}
-                title={
-                  publishBlockedTooltip && !mutation.isPending
-                    ? publishBlockedTooltip
-                    : undefined
-                }
-                type="button"
-              >
-                {mutation.isPending
-                  ? t("common.saving")
-                  : sit
-                    ? t("sitEditor.save")
-                    : t("sitEditor.publish")}
-              </button>
-            </IconTooltip>
-          )}
-        </div>
-          </>
-        )}
         </div>
         <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
           <EditorLivePreview hint={t("editorPreview.sitHint")}>
@@ -5051,8 +5056,7 @@ function SitEditorPage({ mode }: { mode: "new" | "edit" }) {
   const locked =
     mode === "edit" &&
     Boolean(sit) &&
-    (sit!.applicants > 0 ||
-      ownerApplications.some((application) => application.sitId === sit!.id));
+    (sit!.applicants > 0 || ownerApplications.some((application) => application.sitId === sit!.id));
 
   return (
     <SitEditor
@@ -5121,7 +5125,13 @@ function OwnerBoatsPage() {
     enabled: Boolean(user),
   });
   const { data: ownerVerificationChecks, isLoading: ownerVerificationLoading } = useQuery({
-    queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "owner-create-sit"],
+    queryKey: [
+      "verification-checks",
+      user?.name,
+      user?.email,
+      user?.phoneNumber,
+      "owner-create-sit",
+    ],
     queryFn: () =>
       getMemberVerificationChecks(user!.name, {
         isSelf: true,
@@ -5164,13 +5174,8 @@ function OwnerBoatsPage() {
     },
   });
   const withdrawMutation = useMutation({
-    mutationFn: ({
-      applicationId,
-      explanation,
-    }: {
-      applicationId: string;
-      explanation: string;
-    }) => withdrawApplication(applicationId, user!.name, explanation),
+    mutationFn: ({ applicationId, explanation }: { applicationId: string; explanation: string }) =>
+      withdrawApplication(applicationId, user!.name, explanation),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
       await queryClient.invalidateQueries({ queryKey: ["sits"] });
@@ -5226,8 +5231,7 @@ function OwnerBoatsPage() {
           ? [sitPhaseFilter]
           : [];
   const showArchivedSection =
-    archivedOwnedSits.length > 0 &&
-    (sitPhaseFilter === "all" || sitPhaseFilter === "archived");
+    archivedOwnedSits.length > 0 && (sitPhaseFilter === "all" || sitPhaseFilter === "archived");
   function sitterApplicationMatchesPhaseFilter(application: SitApplication) {
     if (sitPhaseFilter === "all") return true;
     if (sitPhaseFilter === "archived") return false;
@@ -5327,9 +5331,7 @@ function OwnerBoatsPage() {
               }}
               type="button"
             >
-              {isAcceptingApplications(sit)
-                ? t("owner.closeRequests")
-                : t("owner.openRequests")}
+              {isAcceptingApplications(sit) ? t("owner.closeRequests") : t("owner.openRequests")}
             </button>
           ) : null}
           {!isArchived && resolveSitPhase(sit) === "stayUnderway" && (
@@ -5348,8 +5350,7 @@ function OwnerBoatsPage() {
           >
             <MessageCircle size={16} />{" "}
             {t("applications.reviewCount", {
-              count: ownerApplications.filter((application) => application.sitId === sit.id)
-                .length,
+              count: ownerApplications.filter((application) => application.sitId === sit.id).length,
             })}
           </button>
           {!isArchived &&
@@ -5657,59 +5658,59 @@ function OwnerBoatsPage() {
               </button>
             );
             return (
-            <article
-              className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-4 shadow-card sm:flex-row sm:items-center"
-              key={boat.id}
-            >
-              <img
-                alt={boat.name}
-                className="aspect-2/1 w-full rounded-xl object-cover sm:size-32"
-                src={boat.image}
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                  {displayLabel(t, boat.type)} ·{" "}
-                  {formatBoatLength(
-                    boat.length,
-                    user?.measurementSystem ?? detectMeasurementSystem(),
+              <article
+                className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-4 shadow-card sm:flex-row sm:items-center"
+                key={boat.id}
+              >
+                <img
+                  alt={boat.name}
+                  className="aspect-2/1 w-full rounded-xl object-cover sm:size-32"
+                  src={boat.image}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                    {displayLabel(t, boat.type)} ·{" "}
+                    {formatBoatLength(
+                      boat.length,
+                      user?.measurementSystem ?? detectMeasurementSystem(),
+                    )}
+                  </p>
+                  <p className="mt-1 font-display text-xl font-bold text-navy">{boat.name}</p>
+                  <p className="mt-1 text-sm text-slate">
+                    {t("detail.homePort", { homePort: boat.homePort })}
+                  </p>
+                  <p className="mt-1 text-xs text-slate">
+                    {t("owner.engineSummary", { engine: displayLabel(t, boat.engineType) })}
+                  </p>
+                  <p className="mt-1 text-xs text-slate">
+                    {t("owner.voltageSummary", { voltage: displayLabel(t, boat.voltageType) })}
+                  </p>
+                  <p className="mt-1 text-xs text-slate">
+                    {t("owner.stoveSummary", { fuel: displayLabel(t, boat.stoveFuelType) })}
+                  </p>
+                  <p className="mt-2 text-xs font-semibold text-teal">
+                    {t("owner.sitPeriods", {
+                      count: ownedSits.filter((sit) => sit.boatId === boat.id).length,
+                    })}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                    onClick={() => navigate(`/owner/boats/${boat.id}/edit`)}
+                    type="button"
+                  >
+                    <Pencil size={16} /> {t("common.edit")}
+                  </button>
+                  {hasSits ? (
+                    <IconTooltip label={t("owner.deleteBlocked")} wrap>
+                      {deleteButton}
+                    </IconTooltip>
+                  ) : (
+                    deleteButton
                   )}
-                </p>
-                <p className="mt-1 font-display text-xl font-bold text-navy">{boat.name}</p>
-                <p className="mt-1 text-sm text-slate">
-                  {t("detail.homePort", { homePort: boat.homePort })}
-                </p>
-                <p className="mt-1 text-xs text-slate">
-                  {t("owner.engineSummary", { engine: displayLabel(t, boat.engineType) })}
-                </p>
-                <p className="mt-1 text-xs text-slate">
-                  {t("owner.voltageSummary", { voltage: displayLabel(t, boat.voltageType) })}
-                </p>
-                <p className="mt-1 text-xs text-slate">
-                  {t("owner.stoveSummary", { fuel: displayLabel(t, boat.stoveFuelType) })}
-                </p>
-                <p className="mt-2 text-xs font-semibold text-teal">
-                  {t("owner.sitPeriods", {
-                    count: ownedSits.filter((sit) => sit.boatId === boat.id).length,
-                  })}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                  onClick={() => navigate(`/owner/boats/${boat.id}/edit`)}
-                  type="button"
-                >
-                  <Pencil size={16} /> {t("common.edit")}
-                </button>
-                {hasSits ? (
-                  <IconTooltip label={t("owner.deleteBlocked")} wrap>
-                    {deleteButton}
-                  </IconTooltip>
-                ) : (
-                  deleteButton
-                )}
-              </div>
-            </article>
+                </div>
+              </article>
             );
           })}
         </div>
@@ -5723,9 +5724,7 @@ function OwnerBoatsPage() {
                   {t("sits.hostingHeading")}
                 </h2>
               ) : (
-                <p className="text-sm text-slate">
-                  {t("owner.sitPhaseFilterHint")}
-                </p>
+                <p className="text-sm text-slate">{t("owner.sitPhaseFilterHint")}</p>
               )}
               <label className="flex items-center gap-2 text-sm text-slate sm:ml-auto">
                 <span className="sr-only">{t("owner.sitPhaseFilter")}</span>
@@ -5741,9 +5740,7 @@ function OwnerBoatsPage() {
                   {SIT_PHASES.map((phase) => (
                     <option key={phase} value={phase}>
                       {t(`sitPhase.${phase}`)}
-                      {ownedSitsByPhase[phase].length
-                        ? ` (${ownedSitsByPhase[phase].length})`
-                        : ""}
+                      {ownedSitsByPhase[phase].length ? ` (${ownedSitsByPhase[phase].length})` : ""}
                     </option>
                   ))}
                   <option value="archived">
@@ -5757,19 +5754,19 @@ function OwnerBoatsPage() {
           {ownedSits.length > 0 &&
             visibleOwnedPhases.length === 0 &&
             sitPhaseFilter !== "archived" && (
-            <div className="rounded-2xl border border-dashed border-line bg-white py-12 text-center">
-              <p className="font-display text-lg font-bold text-navy">
-                {t("owner.sitPhaseEmpty")}
-              </p>
-              <button
-                className="mt-4 text-sm font-bold text-teal hover:underline"
-                onClick={() => setSitPhaseFilter("all")}
-                type="button"
-              >
-                {t("owner.sitPhaseFilterAll")}
-              </button>
-            </div>
-          )}
+              <div className="rounded-2xl border border-dashed border-line bg-white py-12 text-center">
+                <p className="font-display text-lg font-bold text-navy">
+                  {t("owner.sitPhaseEmpty")}
+                </p>
+                <button
+                  className="mt-4 text-sm font-bold text-teal hover:underline"
+                  onClick={() => setSitPhaseFilter("all")}
+                  type="button"
+                >
+                  {t("owner.sitPhaseFilterAll")}
+                </button>
+              </div>
+            )}
           {visibleOwnedPhases.map((phase) => (
             <section className="space-y-4" key={phase}>
               <div className="flex flex-wrap items-center gap-3">
@@ -6147,7 +6144,9 @@ function SettingsPage() {
 
         {activeTab === "personal" && (
           <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold text-navy">{t("settings.personalTitle")}</h2>
+            <h2 className="font-display text-xl font-bold text-navy">
+              {t("settings.personalTitle")}
+            </h2>
             <p className="mt-2 text-sm leading-6 text-slate">{t("settings.personalHint")}</p>
             <form className="mt-6 space-y-5" onSubmit={submitPersonalDetails}>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -6169,7 +6168,9 @@ function SettingsPage() {
                   <DestinationAutocomplete
                     cityOnly
                     includeCountry
-                    onChange={(location) => setPersonalForm((current) => ({ ...current, location }))}
+                    onChange={(location) =>
+                      setPersonalForm((current) => ({ ...current, location }))
+                    }
                     value={personalForm.location}
                     variant="profile"
                   />
@@ -6225,12 +6226,16 @@ function SettingsPage() {
         {activeTab === "security" && (
           <div className="mt-8 space-y-8">
             <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-              <h2 className="font-display text-xl font-bold text-navy">{t("settings.securityTitle")}</h2>
+              <h2 className="font-display text-xl font-bold text-navy">
+                {t("settings.securityTitle")}
+              </h2>
               <p className="mt-2 text-sm leading-6 text-slate">{t("settings.accountHint")}</p>
 
               <div className="mt-6">
                 <span className="form-label">{t("auth.email")}</span>
-                <p className="mt-1 wrap-break-word text-base font-semibold text-navy">{user.email}</p>
+                <p className="mt-1 wrap-break-word text-base font-semibold text-navy">
+                  {user.email}
+                </p>
               </div>
 
               <EmailConfirmationStatus
@@ -6280,7 +6285,9 @@ function SettingsPage() {
 
         {activeTab === "notifications" && (
           <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold text-navy">{t("settings.emailsTitle")}</h2>
+            <h2 className="font-display text-xl font-bold text-navy">
+              {t("settings.emailsTitle")}
+            </h2>
             <p className="mt-2 text-sm leading-6 text-slate">{t("settings.emailsHint")}</p>
             <div className="mt-5 space-y-3">
               {EMAIL_NOTIFICATION_KEYS.map((key) => (
@@ -6557,9 +6564,7 @@ function SafetyPage() {
       </section>
       <div className="mx-auto grid max-w-4xl gap-5 px-5 py-12">
         <section className="rounded-2xl border border-coral/30 bg-coral/10 p-6">
-          <h2 className="font-display text-xl font-bold text-navy">
-            {t("how.liveaboardTitle")}
-          </h2>
+          <h2 className="font-display text-xl font-bold text-navy">{t("how.liveaboardTitle")}</h2>
           <p className="mt-2 leading-7 text-slate">{t("how.liveaboardText")}</p>
         </section>
         {SAFETY_SECTIONS.map((section) => (
@@ -6655,7 +6660,9 @@ function SupportPage() {
             <form className="mt-5 space-y-4" onSubmit={(event) => void submit(event)}>
               <label className="block">
                 <span className="form-label">{t("support.topic")}</span>
-                <Select variant="form" onChange={(event) => setForm({ ...form, topic: event.target.value })}
+                <Select
+                  variant="form"
+                  onChange={(event) => setForm({ ...form, topic: event.target.value })}
                   required
                   value={form.topic}
                 >
@@ -6689,7 +6696,9 @@ function SupportPage() {
                       <p className="mt-0.5 truncate text-sm text-slate">{user.email}</p>
                     </div>
                   </div>
-                  <p className="mt-3 text-xs leading-5 text-slate">{t("support.accountDetailsHint")}</p>
+                  <p className="mt-3 text-xs leading-5 text-slate">
+                    {t("support.accountDetailsHint")}
+                  </p>
                 </aside>
               ) : (
                 <>
@@ -6841,19 +6850,17 @@ function SitTypeBadge({
         isLiveaboard ? "bg-teal/10 text-teal" : "bg-sun/20 text-amber-700"
       } ${size === "md" ? "px-3 py-1.5 text-xs" : "px-2.5 py-1 text-[11px]"}`}
     >
-      {isLiveaboard ? <Home size={size === "md" ? 14 : 12} /> : <Sun size={size === "md" ? 14 : 12} />}
+      {isLiveaboard ? (
+        <Home size={size === "md" ? 14 : 12} />
+      ) : (
+        <Sun size={size === "md" ? 14 : 12} />
+      )}
       {t(`sitType.${type}Short`)}
     </span>
   );
 }
 
-function SitPhaseBadge({
-  phase,
-  size = "sm",
-}: {
-  phase: SitPhase;
-  size?: "sm" | "md";
-}) {
+function SitPhaseBadge({ phase, size = "sm" }: { phase: SitPhase; size?: "sm" | "md" }) {
   const { t } = useTranslation();
   const colors: Record<SitPhase, string> = {
     acceptingApplicants: "bg-aqua/20 text-teal",
@@ -6894,9 +6901,7 @@ function SitPhaseStepper({ phase }: { phase: SitPhase }) {
             <span className="block text-[10px] font-bold uppercase tracking-wider opacity-70">
               {t("sitPhase.step", { number: index + 1 })}
             </span>
-            <span className="mt-1 block text-xs font-bold leading-4">
-              {t(`sitPhase.${step}`)}
-            </span>
+            <span className="mt-1 block text-xs font-bold leading-4">{t(`sitPhase.${step}`)}</span>
           </li>
         );
       })}
@@ -7036,10 +7041,7 @@ function FlagSitIssueModal({
   );
 }
 
-function applicationRequirementMatch(
-  application: SitApplication,
-  sit: Sit | undefined,
-) {
+function applicationRequirementMatch(application: SitApplication, sit: Sit | undefined) {
   const requiredSkills = sit?.requiredSkills ?? [];
   const requiredCertifications = sit?.requiredCertifications ?? [];
   const minimumYears = sit?.minYearsExperience ?? 0;
@@ -7079,9 +7081,7 @@ function ApplicationReviewPage() {
     "accepted" | "declined" | "unaccept" | null
   >(null);
   const [sharePhone, setSharePhone] = useState(false);
-  const [sort, setSort] = useState<"newest" | "experience" | "skillMatch" | "priorSits">(
-    "newest",
-  );
+  const [sort, setSort] = useState<"newest" | "experience" | "skillMatch" | "priorSits">("newest");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
   const [experienceFilter, setExperienceFilter] = useState<
     "any" | "meetsMin" | "fivePlus" | "tenPlus"
@@ -7101,8 +7101,7 @@ function ApplicationReviewPage() {
           const years = application.applicant.yearsExperience;
           return (
             experienceFilter === "any" ||
-            (experienceFilter === "meetsMin" &&
-              (minimumYears <= 0 || years >= minimumYears)) ||
+            (experienceFilter === "meetsMin" && (minimumYears <= 0 || years >= minimumYears)) ||
             (experienceFilter === "fivePlus" && years >= 5) ||
             (experienceFilter === "tenPlus" && years >= 10)
           );
@@ -7114,13 +7113,11 @@ function ApplicationReviewPage() {
   const visibleApplications = useMemo(() => {
     const filtered = applications.filter((application) => {
       if (application.status === "accepted") return false;
-      const matchesStatus =
-        statusFilter === "all" || application.status === statusFilter;
+      const matchesStatus = statusFilter === "all" || application.status === statusFilter;
       const years = application.applicant.yearsExperience;
       const matchesExperience =
         experienceFilter === "any" ||
-        (experienceFilter === "meetsMin" &&
-          (minimumYears <= 0 || years >= minimumYears)) ||
+        (experienceFilter === "meetsMin" && (minimumYears <= 0 || years >= minimumYears)) ||
         (experienceFilter === "fivePlus" && years >= 5) ||
         (experienceFilter === "tenPlus" && years >= 10);
       return matchesStatus && matchesExperience;
@@ -7309,27 +7306,27 @@ function ApplicationReviewPage() {
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
           {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
-              <button
-                className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
-                  isAcceptingApplications(sit)
-                    ? "border-line bg-white text-navy hover:border-teal"
-                    : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
-                }`}
-                disabled={toggleApplicationsMutation.isPending}
-                onClick={() => {
-                  if (isAcceptingApplications(sit)) {
-                    setCloseApplicationsConfirm(true);
-                    return;
-                  }
-                  toggleApplicationsMutation.mutate();
-                }}
-                type="button"
-              >
-                {isAcceptingApplications(sit)
-                  ? t("applications.closeRequests")
-                  : t("applications.openRequests")}
-              </button>
-            )}
+            <button
+              className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
+                isAcceptingApplications(sit)
+                  ? "border-line bg-white text-navy hover:border-teal"
+                  : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
+              }`}
+              disabled={toggleApplicationsMutation.isPending}
+              onClick={() => {
+                if (isAcceptingApplications(sit)) {
+                  setCloseApplicationsConfirm(true);
+                  return;
+                }
+                toggleApplicationsMutation.mutate();
+              }}
+              type="button"
+            >
+              {isAcceptingApplications(sit)
+                ? t("applications.closeRequests")
+                : t("applications.openRequests")}
+            </button>
+          )}
           {sit && resolveSitPhase(sit) === "stayUnderway" && (
             <button
               className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
@@ -7360,13 +7357,13 @@ function ApplicationReviewPage() {
       {sit &&
         !isAcceptingApplications(sit) &&
         (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
-        <div
-          className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
-          role="status"
-        >
-          {t("applications.requestsClosedNotice")}
-        </div>
-      )}
+          <div
+            className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
+            role="status"
+          >
+            {t("applications.requestsClosedNotice")}
+          </div>
+        )}
       {sit &&
         resolveSitPhase(sit) === "acceptingApplicants" &&
         !sit.accepted &&
@@ -7389,530 +7386,536 @@ function ApplicationReviewPage() {
         <div className="mt-8 space-y-6">
           {acceptedApplications.length > 0 &&
             (statusFilter === "all" || statusFilter === "accepted") && (
-            <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
-                  <h2 className="mt-1 font-display text-2xl font-bold text-navy">
-                    {acceptedApplications.length === 1
-                      ? t("applications.acceptedTitle")
-                      : t("applications.acceptedTitlePlural", {
-                          count: acceptedApplications.length,
-                        })}
-                  </h2>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
-                    {t("applications.acceptedHint")}
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
-                  <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
-                </span>
-              </div>
-              {sit && resolveSitPhase(sit) === "applicantChosen" && (
-                <div
-                  className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                  role="status"
-                >
-                  <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
+              <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
-                    <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
+                    <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
+                    <h2 className="mt-1 font-display text-2xl font-bold text-navy">
+                      {acceptedApplications.length === 1
+                        ? t("applications.acceptedTitle")
+                        : t("applications.acceptedTitlePlural", {
+                            count: acceptedApplications.length,
+                          })}
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
+                      {t("applications.acceptedHint")}
+                    </p>
                   </div>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
+                    <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
+                  </span>
                 </div>
-              )}
-              {sit && resolveSitPhase(sit) === "stayUnderway" && (
-                <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                  <div className="flex gap-3">
-                    <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
+                {sit && resolveSitPhase(sit) === "applicantChosen" && (
+                  <div
+                    className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                    role="status"
+                  >
+                    <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
                     <div>
-                      <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
-                      <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
+                      <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
+                      <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
                     </div>
                   </div>
-                  <button
-                    className="shrink-0 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
-                    onClick={() => setFlaggingIssue(true)}
-                    type="button"
-                  >
-                    {t("sitIssue.flagButton")}
-                  </button>
-                </div>
-              )}
-              {sit && canLeaveReview(sit) && (
-                <div
-                  className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                  role="status"
-                >
-                  {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
-                </div>
-              )}
-              <div className="mt-5 grid gap-3">
-                {acceptedApplications.map((application) => {
-                  const isSelected = application.id === selected?.id;
-                  return (
+                )}
+                {sit && resolveSitPhase(sit) === "stayUnderway" && (
+                  <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div className="flex gap-3">
+                      <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
+                      <div>
+                        <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
+                        <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
+                      </div>
+                    </div>
                     <button
-                      className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
-                        isSelected
-                          ? "border-teal shadow-card ring-2 ring-teal/25"
-                          : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
-                      }`}
-                      key={application.id}
-                      onClick={() => {
-                        setSelectedId(application.id);
-                        window.requestAnimationFrame(() => {
-                          document
-                            .getElementById("application-detail-panel")
-                            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                        });
-                      }}
+                      className="shrink-0 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
+                      onClick={() => setFlaggingIssue(true)}
                       type="button"
                     >
-                      <img
-                        alt=""
-                        className="size-16 rounded-full object-cover"
-                        src={application.applicant.image}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-center gap-2">
-                          <span className="font-display text-xl font-bold text-navy">
-                            {application.applicant.name}
-                          </span>
-                          <ApplicationStatusBadge status={application.status} />
-                        </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                          <span className="flex items-center gap-1.5">
-                            <MapPin size={14} /> {application.applicant.location}
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <Users size={14} />{" "}
-                            {t("applications.partySize")}: {application.partySize}
-                          </span>
-                          <SitterRatingBadge sitterName={application.applicant.name} />
-                        </span>
-                      </span>
-                      <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
-                        {isSelected ? (
-                          <>
-                            <Check size={16} />
-                            {t("applications.acceptedViewing")}
-                          </>
-                        ) : (
-                          <>
-                            <ArrowLeft size={16} className="rotate-180" />
-                            {t("applications.acceptedView")}
-                          </>
-                        )}
-                      </span>
+                      {t("sitIssue.flagButton")}
                     </button>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+                  </div>
+                )}
+                {sit && canLeaveReview(sit) && (
+                  <div
+                    className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                    role="status"
+                  >
+                    {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
+                  </div>
+                )}
+                <div className="mt-5 grid gap-3">
+                  {acceptedApplications.map((application) => {
+                    const isSelected = application.id === selected?.id;
+                    return (
+                      <button
+                        className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
+                          isSelected
+                            ? "border-teal shadow-card ring-2 ring-teal/25"
+                            : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
+                        }`}
+                        key={application.id}
+                        onClick={() => {
+                          setSelectedId(application.id);
+                          window.requestAnimationFrame(() => {
+                            document
+                              .getElementById("application-detail-panel")
+                              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          });
+                        }}
+                        type="button"
+                      >
+                        <img
+                          alt=""
+                          className="size-16 rounded-full object-cover"
+                          src={application.applicant.image}
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="font-display text-xl font-bold text-navy">
+                              {application.applicant.name}
+                            </span>
+                            <ApplicationStatusBadge status={application.status} />
+                          </span>
+                          <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                            <span className="flex items-center gap-1.5">
+                              <MapPin size={14} /> {application.applicant.location}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Users size={14} /> {t("applications.partySize")}:{" "}
+                              {application.partySize}
+                            </span>
+                            <SitterRatingBadge sitterName={application.applicant.name} />
+                          </span>
+                        </span>
+                        <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
+                          {isSelected ? (
+                            <>
+                              <Check size={16} />
+                              {t("applications.acceptedViewing")}
+                            </>
+                          ) : (
+                            <>
+                              <ArrowLeft size={16} className="rotate-180" />
+                              {t("applications.acceptedView")}
+                            </>
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
           <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-          <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
-            <div className="space-y-2 border-b border-line pb-3">
-              <label className="block">
-                <span className="sr-only">{t("applications.sortLabel")}</span>
-                <Select variant="form" aria-label={t("applications.sortLabel")}
-                  onChange={(event) =>
-                    setSort(event.target.value as typeof sort)
-                  }
-                  value={sort}
-                >
-                  <option value="newest">{t("applications.sortNewest")}</option>
-                  <option value="experience">{t("applications.sortExperience")}</option>
-                  <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
-                  <option value="priorSits">{t("applications.sortPriorSits")}</option>
-                </Select>
-              </label>
-              <label className="block">
-                <span className="sr-only">{t("applications.filterStatusLabel")}</span>
-                <Select variant="form" aria-label={t("applications.filterStatusLabel")}
-                  onChange={(event) =>
-                    setStatusFilter(event.target.value as typeof statusFilter)
-                  }
-                  value={statusFilter}
-                >
-                  <option value="all">{t("applications.filterStatusAll")}</option>
-                  {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map((status) => (
-                    <option key={status} value={status}>
-                      {t(`applications.status.${status}`)}
-                    </option>
-                  ))}
-                </Select>
-              </label>
-              <label className="block">
-                <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
-                <Select variant="form" aria-label={t("applications.filterExperienceLabel")}
-                  onChange={(event) =>
-                    setExperienceFilter(event.target.value as typeof experienceFilter)
-                  }
-                  value={experienceFilter}
-                >
-                  <option value="any">{t("applications.filterExperienceAny")}</option>
-                  <option value="meetsMin">{t("applications.filterExperienceMeetsMin")}</option>
-                  <option value="fivePlus">{t("applications.filterExperienceFivePlus")}</option>
-                  <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
-                </Select>
-              </label>
-              <p className="px-1 text-xs font-semibold text-slate">
-                {t("applications.filteredCount", {
-                  count:
-                    statusFilter === "accepted"
-                      ? acceptedApplications.length
-                      : visibleApplications.length,
-                  total:
-                    statusFilter === "accepted"
-                      ? applications.filter((application) => application.status === "accepted")
-                          .length
-                      : applications.filter((application) => application.status !== "accepted")
-                          .length,
-                })}
-              </p>
-            </div>
-            <div className="mt-2 space-y-1">
-              {statusFilter === "accepted" ? (
-                <p className="px-3 py-6 text-center text-sm text-slate">
-                  {acceptedApplications.length
-                    ? t("applications.acceptedListHint")
-                    : t("applications.filterEmpty")}
-                </p>
-              ) : visibleApplications.length ? (
-                visibleApplications.map((application) => {
-                  const match = applicationRequirementMatch(application, sit);
-                  return (
-                    <button
-                      className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
-                        application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
-                      }`}
-                      key={application.id}
-                      onClick={() => setSelectedId(application.id)}
-                      type="button"
-                    >
-                      <img
-                        alt=""
-                        className="size-11 rounded-full object-cover"
-                        src={application.applicant.image}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-bold text-navy">
-                          {application.applicant.name}
-                        </span>
-                        <span className="mt-1 block text-[11px] font-semibold text-slate">
-                          {t("applications.listMeta", {
-                            years: application.applicant.yearsExperience,
-                            matches: match.matchCount,
-                            total: match.matchTotal || 0,
-                            sits: application.applicant.completedSits,
-                          })}
-                        </span>
-                        <span className="mt-1 block">
-                          <ApplicationStatusBadge status={application.status} />
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })
-              ) : (
-                <p className="px-3 py-6 text-center text-sm text-slate">
-                  {t("applications.filterEmpty")}
-                </p>
-              )}
-            </div>
-          </aside>
-
-          {selected ? (
-          <div className="space-y-6" id="application-detail-panel">
-            {selected.status !== "accepted" && primaryAcceptedApplication ? (
-              <button
-                className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
-                onClick={() => {
-                  setSelectedId(primaryAcceptedApplication.id);
-                  window.requestAnimationFrame(() => {
-                    document
-                      .getElementById("application-detail-panel")
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  });
-                }}
-                type="button"
-              >
-                <ArrowLeft size={16} />
-                {t("applications.returnToAccepted", {
-                  name: primaryAcceptedApplication.applicant.name,
-                })}
-              </button>
-            ) : null}
-            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                <img
-                  alt={selected.applicant.name}
-                  className="size-20 rounded-full object-cover"
-                  src={selected.applicant.image}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="font-display text-2xl font-bold text-navy">
-                      {selected.applicant.name}
-                    </h2>
-                    <ApplicationStatusBadge status={selected.status} />
-                  </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                    <p className="flex items-center gap-1.5">
-                      <MapPin size={14} /> {selected.applicant.location}
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <CalendarDays size={14} />{" "}
-                      {t("member.since", { year: selected.applicant.memberSince })}
-                    </p>
-                    <SitterRatingBadge sitterName={selected.applicant.name} />
-                  </div>
-                  <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-                    <Link
-                      className="text-sm font-bold text-teal hover:text-navy"
-                      to={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                    >
-                      {t("reviews.viewProfile")}
-                    </Link>
-                    <UserSafetyActions
-                      image={selected.applicant.image}
-                      name={selected.applicant.name}
-                    />
-                  </div>
-                  <BlockedUserBanner name={selected.applicant.name} />
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-xl bg-cream p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                    {t("applications.experience")}
-                  </p>
-                  <p className="mt-2 font-bold text-navy">
-                    {t("applications.yearsExperience", {
-                      count: selected.applicant.yearsExperience,
-                    })}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-cream p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                    {t("applications.requirementMatch")}
-                  </p>
-                  <p className="mt-2 font-bold text-navy">
-                    {matchTotal
-                      ? t("applications.matchCount", { count: matchCount, total: matchTotal })
-                      : t("applications.noSpecificRequirements")}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-cream p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                    {t("applications.priorSits")}
-                  </p>
-                  <p className="mt-2 font-bold text-navy">
-                    {t("applications.priorSitsCount", {
-                      count: selected.applicant.completedSits,
-                    })}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-cream p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                    {t("applications.partySize")}
-                  </p>
-                  <p className="mt-2 flex items-center gap-2 font-bold text-navy">
-                    <Users size={17} /> {selected.partySize}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <SitterReviewsSection
-                  limit={3}
-                  profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                  showEmpty={false}
-                  sitterName={selected.applicant.name}
-                />
-              </div>
-
-              {selected.status === "accepted" && sit && canLeaveReview(sit) && (
-                <div className="mt-6">
-                  <LeaveReviewForm application={selected} ownerName={user.name} />
-                </div>
-              )}
-
-              {[
-                {
-                  label: t("applications.certifications"),
-                  values: selected.applicant.certifications,
-                  highlighted: [] as string[],
-                },
-                {
-                  label: t("applications.skills"),
-                  values: selected.applicant.skills,
-                  highlighted: requiredSkills,
-                },
-                {
-                  label: t("applications.languages"),
-                  values: selected.applicant.languages,
-                  highlighted: user.languages,
-                },
-                {
-                  label: t("profile.preferredCountries"),
-                  values: selected.applicant.preferredCountries ?? [],
-                  highlighted: [] as string[],
-                },
-              ].map(({ highlighted, label, values }) => (
-                <div className="mt-5" key={label}>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate">{label}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {values.map((value) => {
-                      const isHighlighted = highlighted.some(
-                        (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
-                      );
-                      return (
-                        <span
-                          className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                            isHighlighted
-                              ? "border-teal/40 bg-seafoam text-teal"
-                              : "border-line bg-white text-navy"
-                          }`}
-                          key={value}
-                        >
-                          {isHighlighted && <Check aria-hidden="true" size={13} />}
-                          {value}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-
-              <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                  {t("applications.initialMessage")}
-                </p>
-                <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
-                  {selected.initialMessage}
+            <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
+              <div className="space-y-2 border-b border-line pb-3">
+                <label className="block">
+                  <span className="sr-only">{t("applications.sortLabel")}</span>
+                  <Select
+                    variant="form"
+                    aria-label={t("applications.sortLabel")}
+                    onChange={(event) => setSort(event.target.value as typeof sort)}
+                    value={sort}
+                  >
+                    <option value="newest">{t("applications.sortNewest")}</option>
+                    <option value="experience">{t("applications.sortExperience")}</option>
+                    <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
+                    <option value="priorSits">{t("applications.sortPriorSits")}</option>
+                  </Select>
+                </label>
+                <label className="block">
+                  <span className="sr-only">{t("applications.filterStatusLabel")}</span>
+                  <Select
+                    variant="form"
+                    aria-label={t("applications.filterStatusLabel")}
+                    onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
+                    value={statusFilter}
+                  >
+                    <option value="all">{t("applications.filterStatusAll")}</option>
+                    {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map(
+                      (status) => (
+                        <option key={status} value={status}>
+                          {t(`applications.status.${status}`)}
+                        </option>
+                      ),
+                    )}
+                  </Select>
+                </label>
+                <label className="block">
+                  <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
+                  <Select
+                    variant="form"
+                    aria-label={t("applications.filterExperienceLabel")}
+                    onChange={(event) =>
+                      setExperienceFilter(event.target.value as typeof experienceFilter)
+                    }
+                    value={experienceFilter}
+                  >
+                    <option value="any">{t("applications.filterExperienceAny")}</option>
+                    <option value="meetsMin">{t("applications.filterExperienceMeetsMin")}</option>
+                    <option value="fivePlus">{t("applications.filterExperienceFivePlus")}</option>
+                    <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
+                  </Select>
+                </label>
+                <p className="px-1 text-xs font-semibold text-slate">
+                  {t("applications.filteredCount", {
+                    count:
+                      statusFilter === "accepted"
+                        ? acceptedApplications.length
+                        : visibleApplications.length,
+                    total:
+                      statusFilter === "accepted"
+                        ? applications.filter((application) => application.status === "accepted")
+                            .length
+                        : applications.filter((application) => application.status !== "accepted")
+                            .length,
+                  })}
                 </p>
               </div>
+              <div className="mt-2 space-y-1">
+                {statusFilter === "accepted" ? (
+                  <p className="px-3 py-6 text-center text-sm text-slate">
+                    {acceptedApplications.length
+                      ? t("applications.acceptedListHint")
+                      : t("applications.filterEmpty")}
+                  </p>
+                ) : visibleApplications.length ? (
+                  visibleApplications.map((application) => {
+                    const match = applicationRequirementMatch(application, sit);
+                    return (
+                      <button
+                        className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
+                          application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
+                        }`}
+                        key={application.id}
+                        onClick={() => setSelectedId(application.id)}
+                        type="button"
+                      >
+                        <img
+                          alt=""
+                          className="size-11 rounded-full object-cover"
+                          src={application.applicant.image}
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-bold text-navy">
+                            {application.applicant.name}
+                          </span>
+                          <span className="mt-1 block text-[11px] font-semibold text-slate">
+                            {t("applications.listMeta", {
+                              years: application.applicant.yearsExperience,
+                              matches: match.matchCount,
+                              total: match.matchTotal || 0,
+                              sits: application.applicant.completedSits,
+                            })}
+                          </span>
+                          <span className="mt-1 block">
+                            <ApplicationStatusBadge status={application.status} />
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <p className="px-3 py-6 text-center text-sm text-slate">
+                    {t("applications.filterEmpty")}
+                  </p>
+                )}
+              </div>
+            </aside>
 
-              {anotherApplicantAccepted ? (
-                <div
-                  className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
-                  role="status"
-                >
-                  <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
-                  <div>
-                    <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
-                    <p className="mt-1">
-                      {t("applications.anotherAcceptedBanner", {
-                        name: primaryAcceptedApplication.applicant.name,
-                      })}
-                    </p>
-                  </div>
-                </div>
-              ) : selected.status === "accepted" ? (
-                <div className="mt-6">
+            {selected ? (
+              <div className="space-y-6" id="application-detail-panel">
+                {selected.status !== "accepted" && primaryAcceptedApplication ? (
                   <button
-                    className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
-                    disabled={statusMutation.isPending}
+                    className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
                     onClick={() => {
-                      setSharePhone(false);
-                      setConfirmingStatus("unaccept");
+                      setSelectedId(primaryAcceptedApplication.id);
+                      window.requestAnimationFrame(() => {
+                        document
+                          .getElementById("application-detail-panel")
+                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      });
                     }}
                     type="button"
                   >
-                    {t("applications.action.unaccept")}
+                    <ArrowLeft size={16} />
+                    {t("applications.returnToAccepted", {
+                      name: primaryAcceptedApplication.applicant.name,
+                    })}
                   </button>
-                </div>
-              ) : (
-                <div className="mt-6 flex flex-wrap gap-2">
-                  <label
-                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
-                      selected.status === "shortlisted"
-                        ? "border-amber-400 bg-amber-100 text-amber-900"
-                        : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                    }`}
-                  >
-                    <input
-                      checked={selected.status === "shortlisted"}
-                      className="size-4 accent-amber-600"
-                      disabled={statusMutation.isPending}
-                      onChange={(event) =>
-                        statusMutation.mutate({
-                          id: selected.id,
-                          status: event.target.checked ? "shortlisted" : "new",
-                        })
-                      }
-                      type="checkbox"
+                ) : null}
+                <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                    <img
+                      alt={selected.applicant.name}
+                      className="size-20 rounded-full object-cover"
+                      src={selected.applicant.image}
                     />
-                    {t("applications.action.shortlisted")}
-                  </label>
-                  {(["accepted", "declined"] as const).map((status) => (
-                    <button
-                      className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
-                        selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
-                      }`}
-                      disabled={statusMutation.isPending}
-                      key={status}
-                      onClick={() => {
-                        setSharePhone(false);
-                        setConfirmingStatus(status);
-                      }}
-                      type="button"
-                    >
-                      {t(`applications.action.${status}`)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </section>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="font-display text-2xl font-bold text-navy">
+                          {selected.applicant.name}
+                        </h2>
+                        <ApplicationStatusBadge status={selected.status} />
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                        <p className="flex items-center gap-1.5">
+                          <MapPin size={14} /> {selected.applicant.location}
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <CalendarDays size={14} />{" "}
+                          {t("member.since", { year: selected.applicant.memberSince })}
+                        </p>
+                        <SitterRatingBadge sitterName={selected.applicant.name} />
+                      </div>
+                      <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
+                      <div className="mt-4 flex flex-wrap items-center gap-3">
+                        <Link
+                          className="text-sm font-bold text-teal hover:text-navy"
+                          to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                        >
+                          {t("reviews.viewProfile")}
+                        </Link>
+                        <UserSafetyActions
+                          image={selected.applicant.image}
+                          name={selected.applicant.name}
+                        />
+                      </div>
+                      <BlockedUserBanner name={selected.applicant.name} />
+                    </div>
+                  </div>
 
-            <ConversationPanel
-              application={selected}
-              currentUser={user.name}
-              onRequestVideoCall={(proposal) =>
-                videoCallMutation.mutate({ id: selected.id, proposal })
-              }
-              onRespondToVideoCall={({ action, messageId, proposal }) => {
-                if (action === "accept") {
-                  videoCallAcceptMutation.mutate({ id: selected.id, messageId });
-                  return;
-                }
-                if (action === "decline") {
-                  videoCallDeclineMutation.mutate({ id: selected.id, messageId });
-                  return;
-                }
-                if (proposal) {
-                  videoCallMutation.mutate({
-                    id: selected.id,
-                    proposal,
-                    counter: true,
-                  });
-                }
-              }}
-              onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
-              onSharePhone={(phoneNumber) =>
-                sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
-              }
-              pending={
-                messageMutation.isPending ||
-                videoCallMutation.isPending ||
-                videoCallAcceptMutation.isPending ||
-                videoCallDeclineMutation.isPending ||
-                sharePhoneMutation.isPending
-              }
-              translationLanguage={user.preferredLanguage}
-            />
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.experience")}
+                      </p>
+                      <p className="mt-2 font-bold text-navy">
+                        {t("applications.yearsExperience", {
+                          count: selected.applicant.yearsExperience,
+                        })}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.requirementMatch")}
+                      </p>
+                      <p className="mt-2 font-bold text-navy">
+                        {matchTotal
+                          ? t("applications.matchCount", { count: matchCount, total: matchTotal })
+                          : t("applications.noSpecificRequirements")}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.priorSits")}
+                      </p>
+                      <p className="mt-2 font-bold text-navy">
+                        {t("applications.priorSitsCount", {
+                          count: selected.applicant.completedSits,
+                        })}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.partySize")}
+                      </p>
+                      <p className="mt-2 flex items-center gap-2 font-bold text-navy">
+                        <Users size={17} /> {selected.partySize}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <SitterReviewsSection
+                      limit={3}
+                      profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                      showEmpty={false}
+                      sitterName={selected.applicant.name}
+                    />
+                  </div>
+
+                  {selected.status === "accepted" && sit && canLeaveReview(sit) && (
+                    <div className="mt-6">
+                      <LeaveReviewForm application={selected} ownerName={user.name} />
+                    </div>
+                  )}
+
+                  {[
+                    {
+                      label: t("applications.certifications"),
+                      values: selected.applicant.certifications,
+                      highlighted: [] as string[],
+                    },
+                    {
+                      label: t("applications.skills"),
+                      values: selected.applicant.skills,
+                      highlighted: requiredSkills,
+                    },
+                    {
+                      label: t("applications.languages"),
+                      values: selected.applicant.languages,
+                      highlighted: user.languages,
+                    },
+                    {
+                      label: t("profile.preferredCountries"),
+                      values: selected.applicant.preferredCountries ?? [],
+                      highlighted: [] as string[],
+                    },
+                  ].map(({ highlighted, label, values }) => (
+                    <div className="mt-5" key={label}>
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {label}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {values.map((value) => {
+                          const isHighlighted = highlighted.some(
+                            (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
+                          );
+                          return (
+                            <span
+                              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                                isHighlighted
+                                  ? "border-teal/40 bg-seafoam text-teal"
+                                  : "border-line bg-white text-navy"
+                              }`}
+                              key={value}
+                            >
+                              {isHighlighted && <Check aria-hidden="true" size={13} />}
+                              {value}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
+                    <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                      {t("applications.initialMessage")}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
+                      {selected.initialMessage}
+                    </p>
+                  </div>
+
+                  {anotherApplicantAccepted ? (
+                    <div
+                      className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                      role="status"
+                    >
+                      <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                      <div>
+                        <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
+                        <p className="mt-1">
+                          {t("applications.anotherAcceptedBanner", {
+                            name: primaryAcceptedApplication.applicant.name,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ) : selected.status === "accepted" ? (
+                    <div className="mt-6">
+                      <button
+                        className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
+                        disabled={statusMutation.isPending}
+                        onClick={() => {
+                          setSharePhone(false);
+                          setConfirmingStatus("unaccept");
+                        }}
+                        type="button"
+                      >
+                        {t("applications.action.unaccept")}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <label
+                        className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
+                          selected.status === "shortlisted"
+                            ? "border-amber-400 bg-amber-100 text-amber-900"
+                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                        }`}
+                      >
+                        <input
+                          checked={selected.status === "shortlisted"}
+                          className="size-4 accent-amber-600"
+                          disabled={statusMutation.isPending}
+                          onChange={(event) =>
+                            statusMutation.mutate({
+                              id: selected.id,
+                              status: event.target.checked ? "shortlisted" : "new",
+                            })
+                          }
+                          type="checkbox"
+                        />
+                        {t("applications.action.shortlisted")}
+                      </label>
+                      {(["accepted", "declined"] as const).map((status) => (
+                        <button
+                          className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
+                            selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
+                          }`}
+                          disabled={statusMutation.isPending}
+                          key={status}
+                          onClick={() => {
+                            setSharePhone(false);
+                            setConfirmingStatus(status);
+                          }}
+                          type="button"
+                        >
+                          {t(`applications.action.${status}`)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </section>
+
+                <ConversationPanel
+                  application={selected}
+                  currentUser={user.name}
+                  onRequestVideoCall={(proposal) =>
+                    videoCallMutation.mutate({ id: selected.id, proposal })
+                  }
+                  onRespondToVideoCall={({ action, messageId, proposal }) => {
+                    if (action === "accept") {
+                      videoCallAcceptMutation.mutate({ id: selected.id, messageId });
+                      return;
+                    }
+                    if (action === "decline") {
+                      videoCallDeclineMutation.mutate({ id: selected.id, messageId });
+                      return;
+                    }
+                    if (proposal) {
+                      videoCallMutation.mutate({
+                        id: selected.id,
+                        proposal,
+                        counter: true,
+                      });
+                    }
+                  }}
+                  onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
+                  onSharePhone={(phoneNumber) =>
+                    sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
+                  }
+                  pending={
+                    messageMutation.isPending ||
+                    videoCallMutation.isPending ||
+                    videoCallAcceptMutation.isPending ||
+                    videoCallDeclineMutation.isPending ||
+                    sharePhoneMutation.isPending
+                  }
+                  translationLanguage={user.preferredLanguage}
+                />
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
+                <MessageCircle className="mx-auto text-teal" size={38} />
+                <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
+              </div>
+            )}
           </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
-              <MessageCircle className="mx-auto text-teal" size={38} />
-              <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
-            </div>
-          )}
-        </div>
         </div>
       ) : (
         <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
@@ -8121,8 +8124,7 @@ function MessagesPage() {
     conversationPageStart,
     conversationPageStart + CONVERSATIONS_PER_PAGE,
   );
-  const conversationRangeStart =
-    tabApplications.length === 0 ? 0 : conversationPageStart + 1;
+  const conversationRangeStart = tabApplications.length === 0 ? 0 : conversationPageStart + 1;
   const conversationRangeEnd = Math.min(
     conversationPageStart + CONVERSATIONS_PER_PAGE,
     tabApplications.length,
@@ -8221,7 +8223,9 @@ function MessagesPage() {
               <button
                 aria-pressed={messagesTab === tab}
                 className={`flex-1 rounded-lg px-6 py-2.5 text-sm font-bold transition sm:flex-none ${
-                  messagesTab === tab ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
+                  messagesTab === tab
+                    ? "bg-white text-navy shadow-sm"
+                    : "text-slate hover:text-navy"
                 }`}
                 key={tab}
                 onClick={() => setMessagesTab(tab)}
@@ -8311,9 +8315,7 @@ function MessagesPage() {
               <div className="min-w-0">
                 {(() => {
                   const otherName =
-                    selected.ownerName === user.name
-                      ? selected.applicant.name
-                      : selected.ownerName;
+                    selected.ownerName === user.name ? selected.applicant.name : selected.ownerName;
                   const otherImage =
                     selected.ownerName === user.name
                       ? selected.applicant.image
@@ -8364,9 +8366,7 @@ function MessagesPage() {
                         <div className="flex flex-wrap items-center gap-3">
                           <ApplicationStatusBadge status={selected.status} />
                           <IconTooltip
-                            label={
-                              isArchived ? t("messages.unarchive") : t("messages.archive")
-                            }
+                            label={isArchived ? t("messages.unarchive") : t("messages.archive")}
                           >
                             <button
                               aria-label={

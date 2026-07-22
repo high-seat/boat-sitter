@@ -50,7 +50,10 @@ test.describe("withdraw with explanation", () => {
     await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
     await page.getByRole("button", { name: /^Sits/i }).click();
 
-    const activeCard = page.locator("article").filter({ hasText: /Solstice/i }).first();
+    const activeCard = page
+      .locator("article")
+      .filter({ hasText: /Solstice/i })
+      .first();
     await expect(activeCard.getByRole("button", { name: /Withdraw interest/i })).toBeVisible();
     await activeCard.getByRole("button", { name: /Withdraw interest/i }).click();
 
@@ -72,9 +75,7 @@ test.describe("withdraw with explanation", () => {
 
     await withdrawnCard.getByRole("link", { name: /^Messages$/i }).click();
     await expect(page.getByText(/Interest withdrawn/i).first()).toBeVisible();
-    await expect(
-      page.getByText(/You withdrew your interest in this sit/i).first(),
-    ).toBeVisible();
+    await expect(page.getByText(/You withdrew your interest in this sit/i).first()).toBeVisible();
     await expect(
       page.getByText(/Dates no longer work for me after a schedule change/i).first(),
     ).toBeVisible();

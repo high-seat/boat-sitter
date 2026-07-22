@@ -211,9 +211,7 @@ export async function changeMockAccountEmail(input: {
   }
   const updated = { ...account, email: newEmail, emailConfirmed: false };
   saveAccounts(
-    existing.map((candidate) =>
-      candidate.email === currentEmail ? updated : candidate,
-    ),
+    existing.map((candidate) => (candidate.email === currentEmail ? updated : candidate)),
   );
   return publicAccount(updated);
 }

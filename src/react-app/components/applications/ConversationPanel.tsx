@@ -9,11 +9,7 @@ import {
   type SitApplication,
 } from "@/mockApi";
 import { VesselPrivateAccessCard } from "@/components/listing/VesselPrivateAccessCard";
-import {
-  REPORT_REASONS,
-  useAppStore,
-  type ReportReason,
-} from "@/store";
+import { REPORT_REASONS, useAppStore, type ReportReason } from "@/store";
 import { translateWithGoogle } from "@/translationService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Select } from "@/components/ui/Select";
@@ -161,9 +157,7 @@ export function ConversationPanel({
     enabled: application.status === "accepted",
   });
   const otherPartyName =
-    currentUser === application.ownerName
-      ? application.applicant.name
-      : application.ownerName;
+    currentUser === application.ownerName ? application.applicant.name : application.ownerName;
   const profilePhone = user?.phoneNumber.trim()
     ? `${user.phoneCountryCode} ${user.phoneNumber.trim()}`
     : "";
@@ -239,12 +233,7 @@ export function ConversationPanel({
               );
             }
             if (message.systemKind === "withdrawn") {
-              const body = formatApplicationSystemMessage(
-                t,
-                message,
-                application,
-                currentUser,
-              );
+              const body = formatApplicationSystemMessage(t, message, application, currentUser);
               if (message.text.trim()) {
                 return (
                   <div className="flex justify-center" key={message.id}>
@@ -300,9 +289,7 @@ export function ConversationPanel({
                       <p className="mt-1 text-slate">
                         {formatApplicationSystemMessage(t, message, application, currentUser)}
                       </p>
-                      {details ? (
-                        <p className="mt-2 font-semibold text-navy">{details}</p>
-                      ) : null}
+                      {details ? <p className="mt-2 font-semibold text-navy">{details}</p> : null}
                       {canRespond ? (
                         <div className="mt-3 flex flex-wrap gap-2">
                           <button
@@ -484,11 +471,17 @@ export function ConversationPanel({
             {t("applications.sharePhoneInChat")}
           </button>
         </div>
-        <p className="mt-2 text-xs leading-5 text-slate">{t("applications.requestVideoCallHint")}</p>
+        <p className="mt-2 text-xs leading-5 text-slate">
+          {t("applications.requestVideoCallHint")}
+        </p>
         {profilePhone ? (
-          <p className="mt-1 text-xs leading-5 text-slate">{t("applications.sharePhoneInChatHint")}</p>
+          <p className="mt-1 text-xs leading-5 text-slate">
+            {t("applications.sharePhoneInChatHint")}
+          </p>
         ) : (
-          <p className="mt-1 text-xs leading-5 text-coral">{t("applications.sharePhoneUnavailable")}</p>
+          <p className="mt-1 text-xs leading-5 text-coral">
+            {t("applications.sharePhoneUnavailable")}
+          </p>
         )}
       </div>
       {sharePhoneConfirmOpen && profilePhone ? (
@@ -764,10 +757,7 @@ function ReportMessageModal({
               </p>
             ) : null}
             <div className="mt-7 grid gap-3">
-              <button
-                className="rounded-xl bg-coral px-5 py-3 font-bold text-white"
-                type="submit"
-              >
+              <button className="rounded-xl bg-coral px-5 py-3 font-bold text-white" type="submit">
                 {t("messageReport.submit")}
               </button>
               <button

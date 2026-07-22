@@ -1133,9 +1133,7 @@ function readSits(): Sit[] {
           maxGuests: Math.max(1, Math.floor(sit.maxGuests ?? 2)),
         };
       });
-      return ensureHandcraftedSitTypes(
-        ensureSolsticeFullAddress(mergeGeneratedSits(storedSits)),
-      );
+      return ensureHandcraftedSitTypes(ensureSolsticeFullAddress(mergeGeneratedSits(storedSits)));
     } catch {
       // Fall through to the legacy seed.
     }

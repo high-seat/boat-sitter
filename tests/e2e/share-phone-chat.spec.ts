@@ -7,7 +7,10 @@ test.describe("share phone in chat", () => {
     await page.goto("/owner/sits/solstice/applications");
     await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
 
-    await page.getByRole("button", { name: /Alex Morgan/i }).first().click();
+    await page
+      .getByRole("button", { name: /Alex Morgan/i })
+      .first()
+      .click();
     await page.getByRole("button", { name: /Share phone number/i }).click();
 
     const dialog = page.getByRole("dialog");

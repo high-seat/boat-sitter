@@ -132,10 +132,12 @@ test.describe("withdrawn requested sits", () => {
     await expect(requested.getByText(/^Accepted$/i).first()).toBeVisible();
     await expect(requested.locator("article").filter({ hasText: /Withdrawn/i })).toHaveCount(0);
     await expect(
-      withdrawn.locator("article").filter({ hasText: /Solstice/i }).getByRole("img").first(),
+      withdrawn
+        .locator("article")
+        .filter({ hasText: /Solstice/i })
+        .getByRole("img")
+        .first(),
     ).toBeVisible();
-    await expect(
-      requested.locator("article").getByRole("img").first(),
-    ).toBeVisible();
+    await expect(requested.locator("article").getByRole("img").first()).toBeVisible();
   });
 });
