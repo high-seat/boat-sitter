@@ -425,10 +425,7 @@ export function CommandPalette() {
 
     if (onMessages) {
       contextualItems.push(
-        <CommandItem
-          key="go-applications-owner"
-          onSelect={() => run(() => navigate("/my-sits"))}
-        >
+        <CommandItem key="go-applications-owner" onSelect={() => run(() => navigate("/my-sits"))}>
           <Anchor className="size-4" />
           Open boat dashboard
         </CommandItem>,

@@ -94,12 +94,7 @@ export async function hydrateSession(): Promise<void> {
         blockedUsers: prefs.blockedUsers,
         userReports: prefs.userReports.map((report) => ({
           ...report,
-          reason: report.reason as
-            | "spam"
-            | "harassment"
-            | "scam"
-            | "inappropriate"
-            | "other",
+          reason: report.reason as "spam" | "harassment" | "scam" | "inappropriate" | "other",
         })),
       });
     } catch {

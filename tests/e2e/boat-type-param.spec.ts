@@ -14,7 +14,9 @@ test.describe("boat type URL param", () => {
 
     await page.goto("/boats?type=motor-yacht");
     await expect(page.getByLabel("Vessel", { exact: true })).toHaveValue("Motor yacht");
-    await expect(page.getByRole("heading", { name: /Sea Glass|Northern Light/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Sea Glass|Northern Light/i }).first(),
+    ).toBeVisible();
   });
 
   test("still accepts legacy type labels in the URL", async ({ page }) => {

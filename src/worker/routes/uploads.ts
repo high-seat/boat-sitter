@@ -38,7 +38,7 @@ uploadsRouter.post("/", requireUser, async (c) => {
   }
 
   const user = c.get("user")!;
-  const ext = file.type === "image/png" ? "png" : file.type === "image/jpeg" ? "jpg" : "webp";
+  const ext = { "image/png": "png", "image/jpeg": "jpg" }[file.type] ?? "webp";
   const key = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const bytes = await file.arrayBuffer();
 

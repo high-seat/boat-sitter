@@ -64,9 +64,7 @@ vesselsRouter.get("/", async (c) => {
     ? await db.select().from(vessels).where(eq(vessels.owner, owner))
     : await db.select().from(vessels);
   return c.json({
-    data: rows.map((row) =>
-      stripPrivateAccess(row, Boolean(user && row.ownerUserId === user.id)),
-    ),
+    data: rows.map((row) => stripPrivateAccess(row, Boolean(user && row.ownerUserId === user.id))),
   });
 });
 
@@ -106,9 +104,9 @@ vesselsRouter.put("/:id", requireUser, zValidator("json", vesselSchema), async (
     privateAccess &&
     Boolean(
       privateAccess.wifiNetwork ||
-        privateAccess.wifiPassword ||
-        privateAccess.accessCodes ||
-        privateAccess.otherNotes,
+      privateAccess.wifiPassword ||
+      privateAccess.accessCodes ||
+      privateAccess.otherNotes,
     );
 
   const values = {

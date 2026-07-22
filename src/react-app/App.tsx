@@ -2051,9 +2051,7 @@ function DetailPage() {
   });
   const { data: applicantVerification } = useQuery({
     queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "apply-gate"],
-    enabled: Boolean(
-      requireVerificationToSit && user && boat && user.name !== boat.owner,
-    ),
+    enabled: Boolean(requireVerificationToSit && user && boat && user.name !== boat.owner),
     queryFn: () =>
       getMemberVerificationChecks(user!.name, {
         isSelf: true,
@@ -2565,7 +2563,11 @@ function SavedPage() {
   const [page, setPage] = useState(0);
   const resultsTopRef = useRef<HTMLDivElement>(null);
   const availability = showAll ? "all" : "open";
-  const { data: visibleBoats = [], isLoading, isFetching } = useQuery({
+  const {
+    data: visibleBoats = [],
+    isLoading,
+    isFetching,
+  } = useQuery({
     queryKey: ["saved-listings", availability, saved],
     queryFn: () => getSavedListings({ availability, savedIds: saved }),
     enabled: Boolean(user),
@@ -4556,13 +4558,9 @@ function SitEditor({
           }).format(publishBlockedReasons),
         })
       : "";
-  const showSitVerificationLoading =
-    isCreating && requireVerificationToSit && verificationLoading;
+  const showSitVerificationLoading = isCreating && requireVerificationToSit && verificationLoading;
   const showSitVerificationGate =
-    isCreating &&
-    requireVerificationToSit &&
-    !canCreateSit &&
-    Boolean(verificationChecks);
+    isCreating && requireVerificationToSit && !canCreateSit && Boolean(verificationChecks);
   let sitSaveButtonLabel = t("sitEditor.publish");
   if (mutation.isPending) sitSaveButtonLabel = t("common.saving");
   else if (sit) sitSaveButtonLabel = t("sitEditor.save");
@@ -5142,9 +5140,7 @@ function OwnerBoatsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
-  const activeTab: "boats" | "sits" = location.pathname.startsWith("/my-boats")
-    ? "boats"
-    : "sits";
+  const activeTab: "boats" | "sits" = location.pathname.startsWith("/my-boats") ? "boats" : "sits";
   const [sitPhaseFilter, setSitPhaseFilter] = useState<"all" | SitPhase | "archived">("all");
   const [flaggingSit, setFlaggingSit] = useState<Sit | null>(null);
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState<Sit | null>(null);
@@ -5207,9 +5203,7 @@ function OwnerBoatsPage() {
   });
   let canCreateSit = true;
   if (requireVerificationToSit) {
-    canCreateSit = ownerVerificationChecks
-      ? isFullyVerified(ownerVerificationChecks)
-      : false;
+    canCreateSit = ownerVerificationChecks ? isFullyVerified(ownerVerificationChecks) : false;
   }
   const removeVesselMutation = useMutation({
     mutationFn: deleteVessel,
@@ -7421,15 +7415,69 @@ function ApplicationReviewPage() {
       {pageLoading ? <ApplicationReviewSkeleton /> : null}
       {!pageLoading ? (
         <>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="section-title">{t("applications.title", { boat: vessel?.name ?? "" })}</h1>
-          <p className="mt-3 text-slate">
-            {t("applications.subtitle", { count: applications.length })}
-          </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="section-title">
+                {t("applications.title", { boat: vessel?.name ?? "" })}
+              </h1>
+              <p className="mt-3 text-slate">
+                {t("applications.subtitle", { count: applications.length })}
+              </p>
+              {sit && (
+                <div className="mt-3">
+                  <SitPhaseBadge
+                    phase={
+                      sit.phase ??
+                      getSitPhase({
+                        dateStart: sit.dateStart,
+                        duration: sit.duration,
+                        applicationsOpen: sit.applicationsOpen,
+                        accepted: sit.accepted,
+                        applicants: sit.applicants,
+                      })
+                    }
+                    size="md"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
+                <button
+                  className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
+                    isAcceptingApplications(sit)
+                      ? "border-line bg-white text-navy hover:border-teal"
+                      : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
+                  }`}
+                  disabled={toggleApplicationsMutation.isPending}
+                  onClick={() => {
+                    if (isAcceptingApplications(sit)) {
+                      setCloseApplicationsConfirm(true);
+                      return;
+                    }
+                    toggleApplicationsMutation.mutate();
+                  }}
+                  type="button"
+                >
+                  {isAcceptingApplications(sit)
+                    ? t("applications.closeRequests")
+                    : t("applications.openRequests")}
+                </button>
+              )}
+              {sit && resolveSitPhase(sit) === "stayUnderway" && (
+                <button
+                  className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
+                  onClick={() => setFlaggingIssue(true)}
+                  type="button"
+                >
+                  <Flag size={16} /> {t("sitIssue.flagButton")}
+                </button>
+              )}
+            </div>
+          </div>
           {sit && (
-            <div className="mt-3">
-              <SitPhaseBadge
+            <div className="mt-6">
+              <SitPhaseStepper
                 phase={
                   sit.phase ??
                   getSitPhase({
@@ -7440,161 +7488,294 @@ function ApplicationReviewPage() {
                     applicants: sit.applicants,
                   })
                 }
-                size="md"
               />
             </div>
           )}
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
-            <button
-              className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
-                isAcceptingApplications(sit)
-                  ? "border-line bg-white text-navy hover:border-teal"
-                  : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
-              }`}
-              disabled={toggleApplicationsMutation.isPending}
-              onClick={() => {
-                if (isAcceptingApplications(sit)) {
-                  setCloseApplicationsConfirm(true);
-                  return;
-                }
-                toggleApplicationsMutation.mutate();
-              }}
-              type="button"
-            >
-              {isAcceptingApplications(sit)
-                ? t("applications.closeRequests")
-                : t("applications.openRequests")}
-            </button>
-          )}
-          {sit && resolveSitPhase(sit) === "stayUnderway" && (
-            <button
-              className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
-              onClick={() => setFlaggingIssue(true)}
-              type="button"
-            >
-              <Flag size={16} /> {t("sitIssue.flagButton")}
-            </button>
-          )}
-        </div>
-      </div>
-      {sit && (
-        <div className="mt-6">
-          <SitPhaseStepper
-            phase={
-              sit.phase ??
-              getSitPhase({
-                dateStart: sit.dateStart,
-                duration: sit.duration,
-                applicationsOpen: sit.applicationsOpen,
-                accepted: sit.accepted,
-                applicants: sit.applicants,
-              })
-            }
-          />
-        </div>
-      )}
-      {sit &&
-        !isAcceptingApplications(sit) &&
-        (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
-          <div
-            className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
-            role="status"
-          >
-            {t("applications.requestsClosedNotice")}
-          </div>
-        )}
-      {sit &&
-        resolveSitPhase(sit) === "acceptingApplicants" &&
-        !sit.accepted &&
-        applications.length > 0 && (
-          <div
-            className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-            role="status"
-          >
-            <Video className="mt-0.5 shrink-0 text-coral" size={22} />
-            <div>
-              <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
-              <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
-            </div>
-          </div>
-        )}
+          {sit &&
+            !isAcceptingApplications(sit) &&
+            (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
+              <div
+                className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
+                role="status"
+              >
+                {t("applications.requestsClosedNotice")}
+              </div>
+            )}
+          {sit &&
+            resolveSitPhase(sit) === "acceptingApplicants" &&
+            !sit.accepted &&
+            applications.length > 0 && (
+              <div
+                className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                role="status"
+              >
+                <Video className="mt-0.5 shrink-0 text-coral" size={22} />
+                <div>
+                  <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
+                  <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
+                </div>
+              </div>
+            )}
 
-      {applications.length ? (
-        <div className="mt-8 space-y-6">
-          {acceptedApplications.length > 0 &&
-            (statusFilter === "all" || statusFilter === "accepted") && (
-              <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
-                    <h2 className="mt-1 font-display text-2xl font-bold text-navy">
-                      {acceptedApplications.length === 1
-                        ? t("applications.acceptedTitle")
-                        : t("applications.acceptedTitlePlural", {
-                            count: acceptedApplications.length,
-                          })}
-                    </h2>
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
-                      {t("applications.acceptedHint")}
+          {applications.length ? (
+            <div className="mt-8 space-y-6">
+              {acceptedApplications.length > 0 &&
+                (statusFilter === "all" || statusFilter === "accepted") && (
+                  <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
+                        <h2 className="mt-1 font-display text-2xl font-bold text-navy">
+                          {acceptedApplications.length === 1
+                            ? t("applications.acceptedTitle")
+                            : t("applications.acceptedTitlePlural", {
+                                count: acceptedApplications.length,
+                              })}
+                        </h2>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
+                          {t("applications.acceptedHint")}
+                        </p>
+                      </div>
+                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
+                        <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
+                      </span>
+                    </div>
+                    {sit && resolveSitPhase(sit) === "applicantChosen" && (
+                      <div
+                        className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                        role="status"
+                      >
+                        <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
+                        <div>
+                          <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
+                          <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
+                        </div>
+                      </div>
+                    )}
+                    {sit && resolveSitPhase(sit) === "stayUnderway" && (
+                      <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                        <div className="flex gap-3">
+                          <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
+                          <div>
+                            <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
+                            <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
+                          </div>
+                        </div>
+                        <button
+                          className="shrink-0 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
+                          onClick={() => setFlaggingIssue(true)}
+                          type="button"
+                        >
+                          {t("sitIssue.flagButton")}
+                        </button>
+                      </div>
+                    )}
+                    {sit && canLeaveReview(sit) && (
+                      <div
+                        className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                        role="status"
+                      >
+                        {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
+                      </div>
+                    )}
+                    <div className="mt-5 grid gap-3">
+                      {acceptedApplications.map((application) => {
+                        const isSelected = application.id === selected?.id;
+                        return (
+                          <button
+                            className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
+                              isSelected
+                                ? "border-teal shadow-card ring-2 ring-teal/25"
+                                : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
+                            }`}
+                            key={application.id}
+                            onClick={() => {
+                              setSelectedId(application.id);
+                              window.requestAnimationFrame(() => {
+                                document
+                                  .getElementById("application-detail-panel")
+                                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                              });
+                            }}
+                            type="button"
+                          >
+                            <img
+                              alt=""
+                              className="size-16 rounded-full object-cover"
+                              src={application.applicant.image}
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="flex flex-wrap items-center gap-2">
+                                <span className="font-display text-xl font-bold text-navy">
+                                  {application.applicant.name}
+                                </span>
+                                <ApplicationStatusBadge status={application.status} />
+                              </span>
+                              <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                                <span className="flex items-center gap-1.5">
+                                  <MapPin size={14} /> {application.applicant.location}
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                  <Users size={14} /> {t("applications.partySize")}:{" "}
+                                  {application.partySize}
+                                </span>
+                                <SitterRatingBadge sitterName={application.applicant.name} />
+                              </span>
+                            </span>
+                            <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
+                              {isSelected ? (
+                                <>
+                                  <Check size={16} />
+                                  {t("applications.acceptedViewing")}
+                                </>
+                              ) : (
+                                <>
+                                  <ArrowLeft size={16} className="rotate-180" />
+                                  {t("applications.acceptedView")}
+                                </>
+                              )}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+
+              <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+                <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
+                  <div className="space-y-2 border-b border-line pb-3">
+                    <label className="block">
+                      <span className="sr-only">{t("applications.sortLabel")}</span>
+                      <Select
+                        variant="form"
+                        aria-label={t("applications.sortLabel")}
+                        onChange={(event) => setSort(event.target.value as typeof sort)}
+                        value={sort}
+                      >
+                        <option value="newest">{t("applications.sortNewest")}</option>
+                        <option value="experience">{t("applications.sortExperience")}</option>
+                        <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
+                        <option value="priorSits">{t("applications.sortPriorSits")}</option>
+                      </Select>
+                    </label>
+                    <label className="block">
+                      <span className="sr-only">{t("applications.filterStatusLabel")}</span>
+                      <Select
+                        variant="form"
+                        aria-label={t("applications.filterStatusLabel")}
+                        onChange={(event) =>
+                          setStatusFilter(event.target.value as typeof statusFilter)
+                        }
+                        value={statusFilter}
+                      >
+                        <option value="all">{t("applications.filterStatusAll")}</option>
+                        {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map(
+                          (status) => (
+                            <option key={status} value={status}>
+                              {t(`applications.status.${status}`)}
+                            </option>
+                          ),
+                        )}
+                      </Select>
+                    </label>
+                    <label className="block">
+                      <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
+                      <Select
+                        variant="form"
+                        aria-label={t("applications.filterExperienceLabel")}
+                        onChange={(event) =>
+                          setExperienceFilter(event.target.value as typeof experienceFilter)
+                        }
+                        value={experienceFilter}
+                      >
+                        <option value="any">{t("applications.filterExperienceAny")}</option>
+                        <option value="meetsMin">
+                          {t("applications.filterExperienceMeetsMin")}
+                        </option>
+                        <option value="fivePlus">
+                          {t("applications.filterExperienceFivePlus")}
+                        </option>
+                        <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
+                      </Select>
+                    </label>
+                    <p className="px-1 text-xs font-semibold text-slate">
+                      {t("applications.filteredCount", {
+                        count:
+                          statusFilter === "accepted"
+                            ? acceptedApplications.length
+                            : visibleApplications.length,
+                        total:
+                          statusFilter === "accepted"
+                            ? applications.filter(
+                                (application) => application.status === "accepted",
+                              ).length
+                            : applications.filter(
+                                (application) => application.status !== "accepted",
+                              ).length,
+                      })}
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
-                    <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
-                  </span>
-                </div>
-                {sit && resolveSitPhase(sit) === "applicantChosen" && (
-                  <div
-                    className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                    role="status"
-                  >
-                    <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
-                    <div>
-                      <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
-                      <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
-                    </div>
+                  <div className="mt-2 space-y-1">
+                    {statusFilter === "accepted" ? (
+                      <p className="px-3 py-6 text-center text-sm text-slate">
+                        {acceptedApplications.length
+                          ? t("applications.acceptedListHint")
+                          : t("applications.filterEmpty")}
+                      </p>
+                    ) : null}
+                    {statusFilter !== "accepted" && visibleApplications.length
+                      ? visibleApplications.map((application) => {
+                          const match = applicationRequirementMatch(application, sit);
+                          return (
+                            <button
+                              className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
+                                application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
+                              }`}
+                              key={application.id}
+                              onClick={() => setSelectedId(application.id)}
+                              type="button"
+                            >
+                              <img
+                                alt=""
+                                className="size-11 rounded-full object-cover"
+                                src={application.applicant.image}
+                              />
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate font-bold text-navy">
+                                  {application.applicant.name}
+                                </span>
+                                <span className="mt-1 block text-[11px] font-semibold text-slate">
+                                  {t("applications.listMeta", {
+                                    years: application.applicant.yearsExperience,
+                                    matches: match.matchCount,
+                                    total: match.matchTotal || 0,
+                                    sits: application.applicant.completedSits,
+                                  })}
+                                </span>
+                                <span className="mt-1 block">
+                                  <ApplicationStatusBadge status={application.status} />
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })
+                      : null}
+                    {statusFilter !== "accepted" && !visibleApplications.length ? (
+                      <p className="px-3 py-6 text-center text-sm text-slate">
+                        {t("applications.filterEmpty")}
+                      </p>
+                    ) : null}
                   </div>
-                )}
-                {sit && resolveSitPhase(sit) === "stayUnderway" && (
-                  <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                    <div className="flex gap-3">
-                      <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
-                      <div>
-                        <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
-                        <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
-                      </div>
-                    </div>
-                    <button
-                      className="shrink-0 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
-                      onClick={() => setFlaggingIssue(true)}
-                      type="button"
-                    >
-                      {t("sitIssue.flagButton")}
-                    </button>
-                  </div>
-                )}
-                {sit && canLeaveReview(sit) && (
-                  <div
-                    className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                    role="status"
-                  >
-                    {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
-                  </div>
-                )}
-                <div className="mt-5 grid gap-3">
-                  {acceptedApplications.map((application) => {
-                    const isSelected = application.id === selected?.id;
-                    return (
+                </aside>
+
+                {selected ? (
+                  <div className="space-y-6" id="application-detail-panel">
+                    {selected.status !== "accepted" && primaryAcceptedApplication ? (
                       <button
-                        className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
-                          isSelected
-                            ? "border-teal shadow-card ring-2 ring-teal/25"
-                            : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
-                        }`}
-                        key={application.id}
+                        className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
                         onClick={() => {
-                          setSelectedId(application.id);
+                          setSelectedId(primaryAcceptedApplication.id);
                           window.requestAnimationFrame(() => {
                             document
                               .getElementById("application-detail-panel")
@@ -7603,470 +7784,300 @@ function ApplicationReviewPage() {
                         }}
                         type="button"
                       >
+                        <ArrowLeft size={16} />
+                        {t("applications.returnToAccepted", {
+                          name: primaryAcceptedApplication.applicant.name,
+                        })}
+                      </button>
+                    ) : null}
+                    <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+                      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
                         <img
-                          alt=""
-                          className="size-16 rounded-full object-cover"
-                          src={application.applicant.image}
+                          alt={selected.applicant.name}
+                          className="size-20 rounded-full object-cover"
+                          src={selected.applicant.image}
                         />
-                        <span className="min-w-0 flex-1">
-                          <span className="flex flex-wrap items-center gap-2">
-                            <span className="font-display text-xl font-bold text-navy">
-                              {application.applicant.name}
-                            </span>
-                            <ApplicationStatusBadge status={application.status} />
-                          </span>
-                          <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                            <span className="flex items-center gap-1.5">
-                              <MapPin size={14} /> {application.applicant.location}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <Users size={14} /> {t("applications.partySize")}:{" "}
-                              {application.partySize}
-                            </span>
-                            <SitterRatingBadge sitterName={application.applicant.name} />
-                          </span>
-                        </span>
-                        <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
-                          {isSelected ? (
-                            <>
-                              <Check size={16} />
-                              {t("applications.acceptedViewing")}
-                            </>
-                          ) : (
-                            <>
-                              <ArrowLeft size={16} className="rotate-180" />
-                              {t("applications.acceptedView")}
-                            </>
-                          )}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-          <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-            <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
-              <div className="space-y-2 border-b border-line pb-3">
-                <label className="block">
-                  <span className="sr-only">{t("applications.sortLabel")}</span>
-                  <Select
-                    variant="form"
-                    aria-label={t("applications.sortLabel")}
-                    onChange={(event) => setSort(event.target.value as typeof sort)}
-                    value={sort}
-                  >
-                    <option value="newest">{t("applications.sortNewest")}</option>
-                    <option value="experience">{t("applications.sortExperience")}</option>
-                    <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
-                    <option value="priorSits">{t("applications.sortPriorSits")}</option>
-                  </Select>
-                </label>
-                <label className="block">
-                  <span className="sr-only">{t("applications.filterStatusLabel")}</span>
-                  <Select
-                    variant="form"
-                    aria-label={t("applications.filterStatusLabel")}
-                    onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
-                    value={statusFilter}
-                  >
-                    <option value="all">{t("applications.filterStatusAll")}</option>
-                    {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map(
-                      (status) => (
-                        <option key={status} value={status}>
-                          {t(`applications.status.${status}`)}
-                        </option>
-                      ),
-                    )}
-                  </Select>
-                </label>
-                <label className="block">
-                  <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
-                  <Select
-                    variant="form"
-                    aria-label={t("applications.filterExperienceLabel")}
-                    onChange={(event) =>
-                      setExperienceFilter(event.target.value as typeof experienceFilter)
-                    }
-                    value={experienceFilter}
-                  >
-                    <option value="any">{t("applications.filterExperienceAny")}</option>
-                    <option value="meetsMin">{t("applications.filterExperienceMeetsMin")}</option>
-                    <option value="fivePlus">{t("applications.filterExperienceFivePlus")}</option>
-                    <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
-                  </Select>
-                </label>
-                <p className="px-1 text-xs font-semibold text-slate">
-                  {t("applications.filteredCount", {
-                    count:
-                      statusFilter === "accepted"
-                        ? acceptedApplications.length
-                        : visibleApplications.length,
-                    total:
-                      statusFilter === "accepted"
-                        ? applications.filter((application) => application.status === "accepted")
-                            .length
-                        : applications.filter((application) => application.status !== "accepted")
-                            .length,
-                  })}
-                </p>
-              </div>
-              <div className="mt-2 space-y-1">
-                {statusFilter === "accepted" ? (
-                  <p className="px-3 py-6 text-center text-sm text-slate">
-                    {acceptedApplications.length
-                      ? t("applications.acceptedListHint")
-                      : t("applications.filterEmpty")}
-                  </p>
-                ) : null}
-                {statusFilter !== "accepted" && visibleApplications.length
-                  ? visibleApplications.map((application) => {
-                      const match = applicationRequirementMatch(application, sit);
-                      return (
-                        <button
-                          className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
-                            application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
-                          }`}
-                          key={application.id}
-                          onClick={() => setSelectedId(application.id)}
-                          type="button"
-                        >
-                          <img
-                            alt=""
-                            className="size-11 rounded-full object-cover"
-                            src={application.applicant.image}
-                          />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate font-bold text-navy">
-                              {application.applicant.name}
-                            </span>
-                            <span className="mt-1 block text-[11px] font-semibold text-slate">
-                              {t("applications.listMeta", {
-                                years: application.applicant.yearsExperience,
-                                matches: match.matchCount,
-                                total: match.matchTotal || 0,
-                                sits: application.applicant.completedSits,
-                              })}
-                            </span>
-                            <span className="mt-1 block">
-                              <ApplicationStatusBadge status={application.status} />
-                            </span>
-                          </span>
-                        </button>
-                      );
-                    })
-                  : null}
-                {statusFilter !== "accepted" && !visibleApplications.length ? (
-                  <p className="px-3 py-6 text-center text-sm text-slate">
-                    {t("applications.filterEmpty")}
-                  </p>
-                ) : null}
-              </div>
-            </aside>
-
-            {selected ? (
-              <div className="space-y-6" id="application-detail-panel">
-                {selected.status !== "accepted" && primaryAcceptedApplication ? (
-                  <button
-                    className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
-                    onClick={() => {
-                      setSelectedId(primaryAcceptedApplication.id);
-                      window.requestAnimationFrame(() => {
-                        document
-                          .getElementById("application-detail-panel")
-                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      });
-                    }}
-                    type="button"
-                  >
-                    <ArrowLeft size={16} />
-                    {t("applications.returnToAccepted", {
-                      name: primaryAcceptedApplication.applicant.name,
-                    })}
-                  </button>
-                ) : null}
-                <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                    <img
-                      alt={selected.applicant.name}
-                      className="size-20 rounded-full object-cover"
-                      src={selected.applicant.image}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h2 className="font-display text-2xl font-bold text-navy">
-                          {selected.applicant.name}
-                        </h2>
-                        <ApplicationStatusBadge status={selected.status} />
-                      </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                        <p className="flex items-center gap-1.5">
-                          <MapPin size={14} /> {selected.applicant.location}
-                        </p>
-                        <p className="flex items-center gap-1.5">
-                          <CalendarDays size={14} />{" "}
-                          {t("member.since", { year: selected.applicant.memberSince })}
-                        </p>
-                        <SitterRatingBadge sitterName={selected.applicant.name} />
-                      </div>
-                      <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
-                      <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <Link
-                          className="text-sm font-bold text-teal hover:text-navy"
-                          to={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                        >
-                          {t("reviews.viewProfile")}
-                        </Link>
-                        <UserSafetyActions
-                          image={selected.applicant.image}
-                          name={selected.applicant.name}
-                        />
-                      </div>
-                      <BlockedUserBanner name={selected.applicant.name} />
-                    </div>
-                  </div>
-
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl bg-cream p-4">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                        {t("applications.experience")}
-                      </p>
-                      <p className="mt-2 font-bold text-navy">
-                        {t("applications.yearsExperience", {
-                          count: selected.applicant.yearsExperience,
-                        })}
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-cream p-4">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                        {t("applications.requirementMatch")}
-                      </p>
-                      <p className="mt-2 font-bold text-navy">
-                        {matchTotal
-                          ? t("applications.matchCount", { count: matchCount, total: matchTotal })
-                          : t("applications.noSpecificRequirements")}
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-cream p-4">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                        {t("applications.priorSits")}
-                      </p>
-                      <p className="mt-2 font-bold text-navy">
-                        {t("applications.priorSitsCount", {
-                          count: selected.applicant.completedSits,
-                        })}
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-cream p-4">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                        {t("applications.partySize")}
-                      </p>
-                      <p className="mt-2 flex items-center gap-2 font-bold text-navy">
-                        <Users size={17} /> {selected.partySize}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <SitterReviewsSection
-                      limit={3}
-                      profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                      showEmpty={false}
-                      sitterName={selected.applicant.name}
-                    />
-                  </div>
-
-                  {selected.status === "accepted" && sit && canLeaveReview(sit) && (
-                    <div className="mt-6">
-                      <LeaveReviewForm application={selected} ownerName={user.name} />
-                    </div>
-                  )}
-
-                  {[
-                    {
-                      label: t("applications.certifications"),
-                      values: selected.applicant.certifications,
-                      highlighted: [] as string[],
-                    },
-                    {
-                      label: t("applications.skills"),
-                      values: selected.applicant.skills,
-                      highlighted: requiredSkills,
-                    },
-                    {
-                      label: t("applications.languages"),
-                      values: selected.applicant.languages,
-                      highlighted: user.languages,
-                    },
-                    {
-                      label: t("profile.preferredCountries"),
-                      values: selected.applicant.preferredCountries ?? [],
-                      highlighted: [] as string[],
-                    },
-                  ].map(({ highlighted, label, values }) => (
-                    <div className="mt-5" key={label}>
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                        {label}
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {values.map((value) => {
-                          const isHighlighted = highlighted.some(
-                            (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
-                          );
-                          return (
-                            <span
-                              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                                isHighlighted
-                                  ? "border-teal/40 bg-seafoam text-teal"
-                                  : "border-line bg-white text-navy"
-                              }`}
-                              key={value}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <h2 className="font-display text-2xl font-bold text-navy">
+                              {selected.applicant.name}
+                            </h2>
+                            <ApplicationStatusBadge status={selected.status} />
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                            <p className="flex items-center gap-1.5">
+                              <MapPin size={14} /> {selected.applicant.location}
+                            </p>
+                            <p className="flex items-center gap-1.5">
+                              <CalendarDays size={14} />{" "}
+                              {t("member.since", { year: selected.applicant.memberSince })}
+                            </p>
+                            <SitterRatingBadge sitterName={selected.applicant.name} />
+                          </div>
+                          <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
+                          <div className="mt-4 flex flex-wrap items-center gap-3">
+                            <Link
+                              className="text-sm font-bold text-teal hover:text-navy"
+                              to={`/members/${encodeURIComponent(selected.applicant.name)}`}
                             >
-                              {isHighlighted && <Check aria-hidden="true" size={13} />}
-                              {value}
-                            </span>
-                          );
-                        })}
+                              {t("reviews.viewProfile")}
+                            </Link>
+                            <UserSafetyActions
+                              image={selected.applicant.image}
+                              name={selected.applicant.name}
+                            />
+                          </div>
+                          <BlockedUserBanner name={selected.applicant.name} />
+                        </div>
                       </div>
-                    </div>
-                  ))}
 
-                  <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
-                    <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                      {t("applications.initialMessage")}
-                    </p>
-                    <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
-                      {selected.initialMessage}
-                    </p>
-                  </div>
+                      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl bg-cream p-4">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                            {t("applications.experience")}
+                          </p>
+                          <p className="mt-2 font-bold text-navy">
+                            {t("applications.yearsExperience", {
+                              count: selected.applicant.yearsExperience,
+                            })}
+                          </p>
+                        </div>
+                        <div className="rounded-xl bg-cream p-4">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                            {t("applications.requirementMatch")}
+                          </p>
+                          <p className="mt-2 font-bold text-navy">
+                            {matchTotal
+                              ? t("applications.matchCount", {
+                                  count: matchCount,
+                                  total: matchTotal,
+                                })
+                              : t("applications.noSpecificRequirements")}
+                          </p>
+                        </div>
+                        <div className="rounded-xl bg-cream p-4">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                            {t("applications.priorSits")}
+                          </p>
+                          <p className="mt-2 font-bold text-navy">
+                            {t("applications.priorSitsCount", {
+                              count: selected.applicant.completedSits,
+                            })}
+                          </p>
+                        </div>
+                        <div className="rounded-xl bg-cream p-4">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                            {t("applications.partySize")}
+                          </p>
+                          <p className="mt-2 flex items-center gap-2 font-bold text-navy">
+                            <Users size={17} /> {selected.partySize}
+                          </p>
+                        </div>
+                      </div>
 
-                  {anotherApplicantAccepted ? (
-                    <div
-                      className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
-                      role="status"
-                    >
-                      <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
-                      <div>
-                        <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
-                        <p className="mt-1">
-                          {t("applications.anotherAcceptedBanner", {
-                            name: primaryAcceptedApplication.applicant.name,
-                          })}
+                      <div className="mt-6">
+                        <SitterReviewsSection
+                          limit={3}
+                          profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                          showEmpty={false}
+                          sitterName={selected.applicant.name}
+                        />
+                      </div>
+
+                      {selected.status === "accepted" && sit && canLeaveReview(sit) && (
+                        <div className="mt-6">
+                          <LeaveReviewForm application={selected} ownerName={user.name} />
+                        </div>
+                      )}
+
+                      {[
+                        {
+                          label: t("applications.certifications"),
+                          values: selected.applicant.certifications,
+                          highlighted: [] as string[],
+                        },
+                        {
+                          label: t("applications.skills"),
+                          values: selected.applicant.skills,
+                          highlighted: requiredSkills,
+                        },
+                        {
+                          label: t("applications.languages"),
+                          values: selected.applicant.languages,
+                          highlighted: user.languages,
+                        },
+                        {
+                          label: t("profile.preferredCountries"),
+                          values: selected.applicant.preferredCountries ?? [],
+                          highlighted: [] as string[],
+                        },
+                      ].map(({ highlighted, label, values }) => (
+                        <div className="mt-5" key={label}>
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                            {label}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {values.map((value) => {
+                              const isHighlighted = highlighted.some(
+                                (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
+                              );
+                              return (
+                                <span
+                                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                                    isHighlighted
+                                      ? "border-teal/40 bg-seafoam text-teal"
+                                      : "border-line bg-white text-navy"
+                                  }`}
+                                  key={value}
+                                >
+                                  {isHighlighted && <Check aria-hidden="true" size={13} />}
+                                  {value}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
+                        <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                          {t("applications.initialMessage")}
+                        </p>
+                        <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
+                          {selected.initialMessage}
                         </p>
                       </div>
-                    </div>
-                  ) : null}
-                  {!anotherApplicantAccepted && selected.status === "accepted" ? (
-                    <div className="mt-6">
-                      <button
-                        className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
-                        disabled={statusMutation.isPending}
-                        onClick={() => {
-                          setSharePhone(false);
-                          setConfirmingStatus("unaccept");
-                        }}
-                        type="button"
-                      >
-                        {t("applications.action.unaccept")}
-                      </button>
-                    </div>
-                  ) : null}
-                  {!anotherApplicantAccepted && selected.status !== "accepted" ? (
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      <label
-                        className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
-                          selected.status === "shortlisted"
-                            ? "border-amber-400 bg-amber-100 text-amber-900"
-                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                        }`}
-                      >
-                        <input
-                          checked={selected.status === "shortlisted"}
-                          className="size-4 accent-amber-600"
-                          disabled={statusMutation.isPending}
-                          onChange={(event) =>
-                            statusMutation.mutate({
-                              id: selected.id,
-                              status: event.target.checked ? "shortlisted" : "new",
-                            })
-                          }
-                          type="checkbox"
-                        />
-                        {t("applications.action.shortlisted")}
-                      </label>
-                      {(["accepted", "declined"] as const).map((status) => (
-                        <button
-                          className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
-                            selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
-                          }`}
-                          disabled={statusMutation.isPending}
-                          key={status}
-                          onClick={() => {
-                            setSharePhone(false);
-                            setConfirmingStatus(status);
-                          }}
-                          type="button"
-                        >
-                          {t(`applications.action.${status}`)}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-                </section>
 
-                <ConversationPanel
-                  application={selected}
-                  currentUser={user.name}
-                  onRequestVideoCall={(proposal) =>
-                    videoCallMutation.mutate({ id: selected.id, proposal })
-                  }
-                  onRespondToVideoCall={({ action, messageId, proposal }) => {
-                    if (action === "accept") {
-                      videoCallAcceptMutation.mutate({ id: selected.id, messageId });
-                      return;
-                    }
-                    if (action === "decline") {
-                      videoCallDeclineMutation.mutate({ id: selected.id, messageId });
-                      return;
-                    }
-                    if (proposal) {
-                      videoCallMutation.mutate({
-                        id: selected.id,
-                        proposal,
-                        counter: true,
-                      });
-                    }
-                  }}
-                  onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
-                  onSharePhone={(phoneNumber) =>
-                    sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
-                  }
-                  pending={
-                    messageMutation.isPending ||
-                    videoCallMutation.isPending ||
-                    videoCallAcceptMutation.isPending ||
-                    videoCallDeclineMutation.isPending ||
-                    sharePhoneMutation.isPending
-                  }
-                  translationLanguage={user.preferredLanguage}
-                />
+                      {anotherApplicantAccepted ? (
+                        <div
+                          className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                          role="status"
+                        >
+                          <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                          <div>
+                            <p className="font-bold">
+                              {t("applications.anotherAcceptedBannerTitle")}
+                            </p>
+                            <p className="mt-1">
+                              {t("applications.anotherAcceptedBanner", {
+                                name: primaryAcceptedApplication.applicant.name,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      ) : null}
+                      {!anotherApplicantAccepted && selected.status === "accepted" ? (
+                        <div className="mt-6">
+                          <button
+                            className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
+                            disabled={statusMutation.isPending}
+                            onClick={() => {
+                              setSharePhone(false);
+                              setConfirmingStatus("unaccept");
+                            }}
+                            type="button"
+                          >
+                            {t("applications.action.unaccept")}
+                          </button>
+                        </div>
+                      ) : null}
+                      {!anotherApplicantAccepted && selected.status !== "accepted" ? (
+                        <div className="mt-6 flex flex-wrap gap-2">
+                          <label
+                            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
+                              selected.status === "shortlisted"
+                                ? "border-amber-400 bg-amber-100 text-amber-900"
+                                : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                            }`}
+                          >
+                            <input
+                              checked={selected.status === "shortlisted"}
+                              className="size-4 accent-amber-600"
+                              disabled={statusMutation.isPending}
+                              onChange={(event) =>
+                                statusMutation.mutate({
+                                  id: selected.id,
+                                  status: event.target.checked ? "shortlisted" : "new",
+                                })
+                              }
+                              type="checkbox"
+                            />
+                            {t("applications.action.shortlisted")}
+                          </label>
+                          {(["accepted", "declined"] as const).map((status) => (
+                            <button
+                              className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
+                                selected.status === status
+                                  ? "ring-2 ring-current/25 ring-offset-2"
+                                  : ""
+                              }`}
+                              disabled={statusMutation.isPending}
+                              key={status}
+                              onClick={() => {
+                                setSharePhone(false);
+                                setConfirmingStatus(status);
+                              }}
+                              type="button"
+                            >
+                              {t(`applications.action.${status}`)}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                    </section>
+
+                    <ConversationPanel
+                      application={selected}
+                      currentUser={user.name}
+                      onRequestVideoCall={(proposal) =>
+                        videoCallMutation.mutate({ id: selected.id, proposal })
+                      }
+                      onRespondToVideoCall={({ action, messageId, proposal }) => {
+                        if (action === "accept") {
+                          videoCallAcceptMutation.mutate({ id: selected.id, messageId });
+                          return;
+                        }
+                        if (action === "decline") {
+                          videoCallDeclineMutation.mutate({ id: selected.id, messageId });
+                          return;
+                        }
+                        if (proposal) {
+                          videoCallMutation.mutate({
+                            id: selected.id,
+                            proposal,
+                            counter: true,
+                          });
+                        }
+                      }}
+                      onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
+                      onSharePhone={(phoneNumber) =>
+                        sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
+                      }
+                      pending={
+                        messageMutation.isPending ||
+                        videoCallMutation.isPending ||
+                        videoCallAcceptMutation.isPending ||
+                        videoCallDeclineMutation.isPending ||
+                        sharePhoneMutation.isPending
+                      }
+                      translationLanguage={user.preferredLanguage}
+                    />
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
+                    <MessageCircle className="mx-auto text-teal" size={38} />
+                    <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
-                <MessageCircle className="mx-auto text-teal" size={38} />
-                <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : null}
-      {!applications.length ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
-          <MessageCircle className="mx-auto text-teal" size={38} />
-          <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
-        </div>
-      ) : null}
+            </div>
+          ) : null}
+          {!applications.length ? (
+            <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
+              <MessageCircle className="mx-auto text-teal" size={38} />
+              <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
+            </div>
+          ) : null}
         </>
       ) : null}
       {confirmingStatus && selected && (

@@ -460,9 +460,9 @@ export function normalizeApiVessel(row: ApiVessel): Vessel {
     privateAccess &&
     Boolean(
       privateAccess.wifiNetwork ||
-        privateAccess.wifiPassword ||
-        privateAccess.accessCodes ||
-        privateAccess.otherNotes,
+      privateAccess.wifiPassword ||
+      privateAccess.accessCodes ||
+      privateAccess.otherNotes,
     );
   return {
     id: row.id,
@@ -786,9 +786,7 @@ export async function apiShareApplicationPhone(
   return normalizeApiApplication(row);
 }
 
-export async function apiGetSitPrivateAccess(
-  sitId: string,
-): Promise<{
+export async function apiGetSitPrivateAccess(sitId: string): Promise<{
   wifiNetwork?: string;
   wifiPassword?: string;
   accessCodes?: string;
@@ -842,9 +840,10 @@ export async function apiUploadImage(blob: Blob, filename = "image.webp"): Promi
     credentials: "include",
     body: form,
   });
-  const body = (await res.json().catch(() => null)) as
-    | { data?: { url?: string }; error?: string }
-    | null;
+  const body = (await res.json().catch(() => null)) as {
+    data?: { url?: string };
+    error?: string;
+  } | null;
   if (!res.ok) {
     throw new ApiError(res.status, body?.error || res.statusText, body);
   }
@@ -877,9 +876,7 @@ export async function apiGetPrefs(): Promise<ApiUserPrefs> {
   return apiGet<ApiUserPrefs>("/api/prefs");
 }
 
-export async function apiGetSavedListings(
-  availability: "open" | "all" = "open",
-): Promise<Boat[]> {
+export async function apiGetSavedListings(availability: "open" | "all" = "open"): Promise<Boat[]> {
   const qs = availability === "all" ? "?availability=all" : "?availability=open";
   const rows = await apiGet<ApiBoat[]>(`/api/prefs/saved/listings${qs}`);
   return rows.map(normalizeApiBoat);

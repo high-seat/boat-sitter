@@ -25,9 +25,10 @@ export const VESSEL_TYPE_SLUGS = {
 export type VesselTypeSlug = (typeof VESSEL_TYPE_SLUGS)[VesselType];
 
 const SLUG_TO_TYPE = Object.fromEntries(
-  (Object.entries(VESSEL_TYPE_SLUGS) as Array<[VesselType, VesselTypeSlug]>).map(
-    ([type, slug]) => [slug, type],
-  ),
+  (Object.entries(VESSEL_TYPE_SLUGS) as Array<[VesselType, VesselTypeSlug]>).map(([type, slug]) => [
+    slug,
+    type,
+  ]),
 ) as Record<VesselTypeSlug, VesselType>;
 
 export function isVesselType(value: string): value is VesselType {
@@ -48,7 +49,9 @@ export function vesselTypeFromParam(raw: string | null | undefined): VesselType 
   const trimmed = raw.trim();
   if (!trimmed || trimmed === "All vessels") return undefined;
 
-  const fromSlug = SLUG_TO_TYPE[trimmed as VesselTypeSlug] ?? SLUG_TO_TYPE[trimmed.toLowerCase() as VesselTypeSlug];
+  const fromSlug =
+    SLUG_TO_TYPE[trimmed as VesselTypeSlug] ??
+    SLUG_TO_TYPE[trimmed.toLowerCase() as VesselTypeSlug];
   if (fromSlug) return fromSlug;
 
   if (isVesselType(trimmed)) return trimmed;

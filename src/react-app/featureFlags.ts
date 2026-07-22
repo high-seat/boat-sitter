@@ -19,8 +19,7 @@ export const FEATURE_FLAGS = {
   },
   requireVerificationToSit: {
     label: "Require verification to sit",
-    description:
-      "Require identity verification before applying to a sit or creating a stay.",
+    description: "Require identity verification before applying to a sit or creating a stay.",
     default: false,
   },
   loginWithApple: {

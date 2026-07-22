@@ -7,6 +7,7 @@ declare namespace Cloudflare {
   }
   interface Env {
     DB: D1Database;
+    UPLOADS: R2Bucket;
     ENVIRONMENT: string;
     /** Set via: wrangler secret put ADMIN_TOKEN */
     ADMIN_TOKEN: string;

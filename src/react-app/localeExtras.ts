@@ -3119,7 +3119,8 @@ const localeExtrasSource = {
     "owner.backToSits": "Torna ai soggiorni",
     "owner.myBoatsTitle": "Le mie barche",
     "owner.mySitsTitle": "I miei soggiorni",
-    "owner.boatsHint": "Mantieni aggiornati i dettagli dell'imbarcazione per ogni soggiorno che ospiti.",
+    "owner.boatsHint":
+      "Mantieni aggiornati i dettagli dell'imbarcazione per ogni soggiorno che ospiti.",
     "owner.sitsHint": "Gestisci i soggiorni che ospiti e quelli che hai richiesto.",
     "owner.dashboard": "Cruscotto della barca",
     "owner.manage": "Gestisci barche e posti a sedere",
@@ -4077,7 +4078,8 @@ const localeExtrasSource = {
     "owner.myBoatsTitle": "Meine Boote",
     "owner.mySitsTitle": "Meine Aufenthalte",
     "owner.boatsHint": "Halten Sie die Bootdetails für jeden Aufenthalt aktuell, den Sie anbieten.",
-    "owner.sitsHint": "Verwalten Sie Aufenthalte, die Sie anbieten, und solche, die Sie angefragt haben.",
+    "owner.sitsHint":
+      "Verwalten Sie Aufenthalte, die Sie anbieten, und solche, die Sie angefragt haben.",
     "owner.dashboard": "Armaturenbrett für Boote",
     "owner.manage": "Verwalten Sie Boote und Sitze",
     "owner.dashboardHint":
@@ -5986,7 +5988,8 @@ const localeExtrasSource = {
     "owner.backToSits": "Voltar às estadias",
     "owner.myBoatsTitle": "Os meus barcos",
     "owner.mySitsTitle": "As minhas estadias",
-    "owner.boatsHint": "Mantenha os detalhes da embarcação atualizados para cada estadia que organiza.",
+    "owner.boatsHint":
+      "Mantenha os detalhes da embarcação atualizados para cada estadia que organiza.",
     "owner.sitsHint": "Faça a gestão das estadias que organiza e das que solicitou.",
     "owner.dashboard": "Painel do barco",
     "owner.manage": "Gerenciar barcos e assentos",
@@ -6936,7 +6939,8 @@ const localeExtrasSource = {
     "owner.backToSits": "Επιστροφή στις διαμονές",
     "owner.myBoatsTitle": "Τα σκάφη μου",
     "owner.mySitsTitle": "Οι διαμονές μου",
-    "owner.boatsHint": "Κρατήστε τα στοιχεία του σκάφους ενημερωμένα για κάθε διαμονή που φιλοξενείτε.",
+    "owner.boatsHint":
+      "Κρατήστε τα στοιχεία του σκάφους ενημερωμένα για κάθε διαμονή που φιλοξενείτε.",
     "owner.sitsHint": "Διαχειριστείτε τις διαμονές που φιλοξενείτε και αυτές που έχετε ζητήσει.",
     "owner.dashboard": "Ταμπλό σκάφους",
     "owner.manage": "Διαχειριστείτε σκάφη και καθίσματα",

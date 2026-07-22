@@ -591,7 +591,9 @@ applicationsRouter.post("/:id/video-call/:messageId/accept", requireUser, async 
 
   const msgs = await loadMessages(c.env, [id]);
   const proposal = msgs.find((m) => m.id === messageId);
-  const payload = (proposal?.payload ?? null) as { videoCall?: { startsAt: string; durationMinutes: number } } | null;
+  const payload = (proposal?.payload ?? null) as {
+    videoCall?: { startsAt: string; durationMinutes: number };
+  } | null;
   if (
     !proposal ||
     !payload?.videoCall ||
@@ -630,7 +632,9 @@ applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async
 
   const msgs = await loadMessages(c.env, [id]);
   const proposal = msgs.find((m) => m.id === messageId);
-  const payload = (proposal?.payload ?? null) as { videoCall?: { startsAt: string; durationMinutes: number } } | null;
+  const payload = (proposal?.payload ?? null) as {
+    videoCall?: { startsAt: string; durationMinutes: number };
+  } | null;
   if (
     !proposal ||
     !payload?.videoCall ||

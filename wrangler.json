@@ -31,12 +31,5 @@
   "vars": {
     "ENVIRONMENT": "production",
     "BETTER_AUTH_URL": "https://boatstead.sharukrules.workers.dev"
-  },
-  "r2_buckets": [
-    {
-      "bucket_name": "boatstead-images",
-      "binding": "boatstead_images",
-      "remote": true
-    }
-  ]
+  }
 }
