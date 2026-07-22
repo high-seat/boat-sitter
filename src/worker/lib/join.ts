@@ -13,7 +13,6 @@ export interface Boat {
   length: string;
   location: string;
   country: string;
-  region: string;
   latitude: number | null;
   longitude: number | null;
   homePort: string;
@@ -53,7 +52,6 @@ export function joinBoat(vessel: Vessel, sit: Sit): Boat {
     length: vessel.length,
     location: sit.location,
     country: sit.country,
-    region: sit.region,
     latitude: sit.latitude,
     longitude: sit.longitude,
     homePort: vessel.homePort,

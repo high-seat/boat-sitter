@@ -102,7 +102,6 @@ devRouter.get("/sample", (c) => {
       duration: "14 nights",
       location: "Palma",
       country: "Spain",
-      region: "Mediterranean",
       latitude: 39.5696,
       longitude: 2.6502,
       responsibilities: ["Check bilge daily", "Run engine weekly"],

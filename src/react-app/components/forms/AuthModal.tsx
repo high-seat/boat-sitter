@@ -1,8 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { loginMockAccount, signUpMockAccount } from "@/mockAuth";
+import {
+  AppleLoginButton,
+  FacebookLoginButton,
+  GoogleLoginButton,
+} from "react-social-login-buttons";
+import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
+import {
+  continueWithSocialProvider,
+  loginMockAccount,
+  signUpMockAccount,
+  type SocialProvider,
+} from "@/mockAuth";
 import { useAppStore } from "@/store";
+
+const socialButtonStyle = {
+  background: "#ffffff",
+  border: "1px solid #dce3df",
+  borderRadius: "0.75rem",
+  boxShadow: "none",
+  color: "#092c3e",
+  fontFamily: "inherit",
+  fontSize: "0.875rem",
+  fontWeight: 700,
+  height: "2.75rem",
+  margin: "0 0 0.5rem",
+  width: "100%",
+} as const;
+
+const socialButtonActiveStyle = {
+  background: "#f5f7f6",
+} as const;
 
 export function AuthModal() {
   const { t } = useTranslation();
@@ -11,6 +40,7 @@ export function AuthModal() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [form, setForm] = useState({ email: "", name: "", password: "" });
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -18,6 +48,7 @@ export function AuthModal() {
     const handleOpen = (event: Event) => {
       setMode((event as CustomEvent<"login" | "signup">).detail ?? "login");
       setError("");
+      setAcceptedTerms(false);
       setOpen(true);
       window.setTimeout(() => emailRef.current?.focus());
     };
@@ -31,6 +62,14 @@ export function AuthModal() {
       window.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  function finishLogin(account: { email?: string; image: string; name: string }) {
+    loginAs(account);
+    setOpen(false);
+    setForm({ email: "", name: "", password: "" });
+    setAcceptedTerms(false);
+    setError("");
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -47,15 +86,30 @@ export function AuthModal() {
       setError(t("auth.nameInvalid"));
       return;
     }
+    if (mode === "signup" && !acceptedTerms) {
+      setError(t("auth.termsRequired"));
+      return;
+    }
     setPending(true);
     try {
       const account =
         mode === "signup"
-          ? await signUpMockAccount(form)
+          ? await signUpMockAccount({ ...form, acceptedTerms })
           : await loginMockAccount(form.email, form.password);
-      loginAs(account);
-      setOpen(false);
-      setForm({ email: "", name: "", password: "" });
+      finishLogin(account);
+    } catch (caught) {
+      setError(t(caught instanceof Error ? caught.message : "auth.failed"));
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function continueWith(provider: SocialProvider) {
+    setError("");
+    setPending(true);
+    try {
+      const account = await continueWithSocialProvider(provider, { acceptedTerms });
+      finishLogin(account);
     } catch (caught) {
       setError(t(caught instanceof Error ? caught.message : "auth.failed"));
     } finally {
@@ -74,7 +128,7 @@ export function AuthModal() {
       <section
         aria-labelledby="auth-title"
         aria-modal="true"
-        className="w-full max-w-md rounded-3xl bg-white p-6 shadow-float md:p-8"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-float md:p-8"
         role="dialog"
       >
         <div className="flex items-start justify-between">
@@ -109,7 +163,45 @@ export function AuthModal() {
             </button>
           ))}
         </div>
-        <form className="mt-5 space-y-4" onSubmit={(event) => void submit(event)}>
+
+        <div className="mt-5 space-y-0">
+          <GoogleLoginButton
+            activeStyle={socialButtonActiveStyle}
+            disabled={pending}
+            onClick={() => void continueWith("google")}
+            style={socialButtonStyle}
+            text={t("auth.continueWithGoogle")}
+            type="button"
+          />
+          <AppleLoginButton
+            activeStyle={socialButtonActiveStyle}
+            disabled={pending}
+            onClick={() => void continueWith("apple")}
+            style={socialButtonStyle}
+            text={t("auth.continueWithApple")}
+            type="button"
+          />
+          <FacebookLoginButton
+            activeStyle={socialButtonActiveStyle}
+            disabled={pending}
+            iconColor="#3b5998"
+            onClick={() => void continueWith("facebook")}
+            style={socialButtonStyle}
+            text={t("auth.continueWithFacebook")}
+            type="button"
+          />
+        </div>
+        <p className="mt-1 text-center text-xs leading-5 text-slate">{t("auth.socialMockNotice")}</p>
+
+        <div className="my-5 flex items-center gap-3">
+          <span className="h-px flex-1 bg-line" />
+          <span className="text-xs font-bold uppercase tracking-wider text-slate">
+            {t("auth.orEmail")}
+          </span>
+          <span className="h-px flex-1 bg-line" />
+        </div>
+
+        <form className="space-y-4" onSubmit={(event) => void submit(event)}>
           {mode === "signup" && (
             <label className="block">
               <span className="form-label">{t("auth.name")}</span>
@@ -144,6 +236,14 @@ export function AuthModal() {
               <span className="mt-1 block text-xs text-slate">{t("auth.passwordHint")}</span>
             )}
           </label>
+          <TermsAgreementCheckbox
+            checked={acceptedTerms}
+            i18nKey="auth.termsAgreement"
+            onChange={(checked) => {
+              setAcceptedTerms(checked);
+              if (checked && error === t("auth.termsRequired")) setError("");
+            }}
+          />
           {error && (
             <p className="text-sm font-semibold text-coral" role="alert">
               {error}

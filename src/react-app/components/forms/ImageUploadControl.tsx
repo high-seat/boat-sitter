@@ -5,14 +5,30 @@ export function ImageUploadControl({
   hasImage,
   pending,
   onFile,
+  onFiles,
+  multiple = false,
   profile = false,
 }: {
   hasImage: boolean;
   pending: boolean;
-  onFile: (file?: File) => void;
+  onFile?: (file?: File) => void;
+  onFiles?: (files: File[]) => void;
+  multiple?: boolean;
   profile?: boolean;
 }) {
   const { t } = useTranslation();
+  const label = pending
+    ? multiple
+      ? t("upload.processingMultiple")
+      : t("upload.processing")
+    : profile
+      ? t("profile.replacePhoto")
+      : multiple
+        ? t("upload.uploadMultiple")
+        : hasImage
+          ? t("upload.replace")
+          : t("upload.upload");
+
   return (
     <div>
       <label
@@ -21,26 +37,27 @@ export function ImageUploadControl({
         }`}
       >
         <ImagePlus size={18} />
-        {pending
-          ? t("upload.processing")
-          : profile
-            ? t("profile.replacePhoto")
-            : hasImage
-              ? t("upload.replace")
-              : t("upload.upload")}
+        {label}
         <input
           accept="image/jpeg,image/png,image/webp"
           className="sr-only"
           disabled={pending}
+          multiple={multiple}
           onChange={(event) => {
-            onFile(event.target.files?.[0]);
+            const files = [...(event.target.files ?? [])];
+            if (multiple) onFiles?.(files);
+            else onFile?.(files[0]);
             event.target.value = "";
           }}
           type="file"
         />
       </label>
       <p className="mt-2 text-xs leading-relaxed text-slate">
-        {profile ? t("profile.photoUploadHint") : t("upload.hint")}
+        {profile
+          ? t("profile.photoUploadHint")
+          : multiple
+            ? t("upload.hintMultiple")
+            : t("upload.hint")}
       </p>
     </div>
   );

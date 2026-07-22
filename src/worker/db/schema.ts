@@ -64,11 +64,10 @@ export const sits = sqliteTable(
     dateStart: text("date_start").notNull(),
     duration: text("duration").notNull(),
 
-    // Location on the sit is the display town (country stripped); country and
-    // region are separate so the frontend can recombine as needed.
+    // Location on the sit is the display town (country stripped); country is
+    // stored separately so the frontend can recombine as needed.
     location: text("location").notNull(),
     country: text("country").notNull(),
-    region: text("region").notNull().default(""),
     latitude: real("latitude"),
     longitude: real("longitude"),
 
@@ -93,7 +92,6 @@ export const sits = sqliteTable(
   },
   (t) => [
     index("sits_vessel_idx").on(t.vesselId),
-    index("sits_region_idx").on(t.region),
     index("sits_country_idx").on(t.country),
     index("sits_date_start_idx").on(t.dateStart),
     index("sits_published_idx").on(t.published),

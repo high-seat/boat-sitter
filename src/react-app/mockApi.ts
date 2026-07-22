@@ -1,13 +1,8 @@
-/**
- * API client for the boat-sitter backend.
- *
- * This module keeps the exact export surface the app used when it was a
- * localStorage mock, so no calling code had to change — only the bodies now
- * talk to the Cloudflare Worker at /api. The filename is kept for the same
- * reason (imports are `@/mockApi`); it is no longer a mock.
- */
+import { feetToMetresString, normalizeLengthToMetres } from "@/lengthUtils";
+import { getSitPhase, isSitCompletedForReview, canLeaveReview, sitDateRangesOverlap, type SitPhase } from "@/dateUtils";
 
-import { lookupCoordinates } from "@/coordinates";
+export type { SitPhase };
+export { getSitPhase, SIT_PHASES, sitDateRangesOverlap } from "@/dateUtils";
 
 export type EngineType =
   | "Not specified"
@@ -31,6 +26,28 @@ export type StoveFuelType =
   | "Alcohol"
   | "Kerosene";
 
+export type BoatPhoto = {
+  url: string;
+  caption?: string;
+  /** CSS object-position value, e.g. "center 35%" */
+  focus?: string;
+};
+
+export function normalizeBoatPhoto(entry: string | BoatPhoto): BoatPhoto {
+  if (typeof entry === "string") return { url: entry };
+  const caption = entry.caption?.trim();
+  const focus = entry.focus?.trim();
+  return {
+    url: entry.url,
+    ...(caption ? { caption } : {}),
+    ...(focus ? { focus } : {}),
+  };
+}
+
+export function normalizeGallery(gallery: Array<string | BoatPhoto> | undefined | null): BoatPhoto[] {
+  return (gallery ?? []).map(normalizeBoatPhoto);
+}
+
 export type Boat = {
   id: string;
   boatId?: string;
@@ -39,23 +56,28 @@ export type Boat = {
   length: string;
   location: string;
   country: string;
-  region: string;
   latitude: number;
   longitude: number;
+  /** When true or unset, the map pin is city-level only. */
+  approximateLocation?: boolean;
   homePort: string;
   dates: string;
   dateStart: string;
   duration: string;
   image: string;
-  gallery: string[];
+  gallery: BoatPhoto[];
   owner: string;
+  ownerLanguages: string[];
   ownerImage: string;
   rating: number;
   reviews: number;
+  maxGuests?: number;
   applicants: number;
   description: string;
   home: string;
   responsibilities: string[];
+  /** Whether the sitter stays aboard or just does daily visits. Defaults to liveaboard. */
+  sitType?: SitType;
   systems: string[];
   engineType: EngineType;
   voltageType: VoltageType;
@@ -68,6 +90,22 @@ export type Boat = {
   amenities: string[];
   pet?: string;
   featured?: boolean;
+  /** When true, sitters must be non-smokers. */
+  nonSmokerRequired?: boolean;
+  /** True when an application for this sit has been accepted. */
+  accepted?: boolean;
+  /** When false, sitters cannot submit new applications. Defaults to true. */
+  applicationsOpen?: boolean;
+  /** Derived lifecycle phase for this sit. */
+  phase?: SitPhase;
+};
+
+/** Details such as Wi-Fi and access codes; never included on public Boat listings. */
+export type VesselPrivateAccess = {
+  wifiNetwork?: string;
+  wifiPassword?: string;
+  accessCodes?: string;
+  otherNotes?: string;
 };
 
 export type Vessel = Pick<
@@ -80,6 +118,7 @@ export type Vessel = Pick<
   | "image"
   | "gallery"
   | "owner"
+  | "ownerLanguages"
   | "ownerImage"
   | "rating"
   | "reviews"
@@ -90,7 +129,34 @@ export type Vessel = Pick<
   | "voltageType"
   | "stoveFuelType"
   | "amenities"
->;
+> & {
+  privateAccess?: VesselPrivateAccess;
+};
+
+export function hasVesselPrivateAccess(details?: VesselPrivateAccess | null) {
+  if (!details) return false;
+  return Boolean(
+    details.wifiNetwork?.trim() ||
+      details.wifiPassword?.trim() ||
+      details.accessCodes?.trim() ||
+      details.otherNotes?.trim(),
+  );
+}
+
+export function normalizeVesselPrivateAccess(
+  details?: VesselPrivateAccess | null,
+): VesselPrivateAccess | undefined {
+  if (!details) return undefined;
+  const normalized: VesselPrivateAccess = {
+    ...(details.wifiNetwork?.trim() ? { wifiNetwork: details.wifiNetwork.trim() } : {}),
+    ...(details.wifiPassword?.trim() ? { wifiPassword: details.wifiPassword.trim() } : {}),
+    ...(details.accessCodes?.trim() ? { accessCodes: details.accessCodes.trim() } : {}),
+    ...(details.otherNotes?.trim() ? { otherNotes: details.otherNotes.trim() } : {}),
+  };
+  return hasVesselPrivateAccess(normalized) ? normalized : undefined;
+}
+
+export type SitType = "liveaboard" | "daytimeChecks";
 
 export type Sit = {
   id: string;
@@ -100,21 +166,1305 @@ export type Sit = {
   duration: string;
   location: string;
   country: string;
-  region: string;
   latitude: number;
   longitude: number;
+  /** When true or unset, the map pin is city-level only. */
+  approximateLocation?: boolean;
+  /** Whether the sitter stays aboard or just does daily visits. Defaults to liveaboard. */
+  sitType?: SitType;
   responsibilities: string[];
   requirements: string[];
   minYearsExperience?: number;
   requiredExperience?: string[];
   requiredCertifications?: string[];
   requiredSkills?: string[];
+  maxGuests: number;
   applicants: number;
   pet?: string;
   featured?: boolean;
+  /** When true, sitters must be non-smokers. */
+  nonSmokerRequired?: boolean;
+  accepted?: boolean;
+  /** When false, sitters cannot submit new applications. Defaults to true. */
+  applicationsOpen?: boolean;
+  /** Derived lifecycle phase for this sit. */
+  phase?: SitPhase;
 };
 
-export type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined";
+const LOCATION_COORDINATES: Record<string, [number, number]> = {
+  bath: [51.3811, -2.359],
+  grenada: [12.0561, -61.7488],
+  greece: [38.7066, 20.7019],
+  lefkada: [38.7066, 20.7019],
+  palma: [39.5696, 2.6502],
+  sausalito: [37.8591, -122.4853],
+  vancouver: [49.2827, -123.1207],
+};
+
+export function coordinatesForLocation(location: string, country: string) {
+  const searchable = `${location} ${country}`.toLowerCase();
+  const match = Object.entries(LOCATION_COORDINATES).find(([name]) => searchable.includes(name));
+  const [latitude, longitude] = match?.[1] ?? [20, 0];
+  return { latitude, longitude };
+}
+
+const DEMO_LISTING_GALLERY: BoatPhoto[] = [
+  "https://images.pexels.com/photos/163236/luxury-yacht-boat-speed-water-163236.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/273886/pexels-photo-273886.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/540518/pexels-photo-540518.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/237272/pexels-photo-237272.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/42091/pexels-photo-42091.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/1167021/pexels-photo-1167021.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/144634/pexels-photo-144634.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&w=1600&q=88&fp-x=.25",
+  "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=1600&q=88&fp-y=.3",
+  "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1600&q=88",
+  "https://images.unsplash.com/photo-1528154291023-a6525fabe5b4?auto=format&fit=crop&w=1600&q=88",
+  "https://images.unsplash.com/photo-1504813205186-380b1235a5d2?auto=format&fit=crop&w=1600&q=88",
+  "https://images.unsplash.com/photo-1599943238450-b0edf519982b?auto=format&fit=crop&w=1600&q=88",
+].map((url) => ({ url }));
+const RICH_GALLERY_LISTING_IDS = new Set(["solstice", "blue-hour", "mistral"]);
+
+function unsplashBoatCover(photoId: string, focus?: { x?: number; y?: number }) {
+  const params = new URLSearchParams({
+    auto: "format",
+    fit: "crop",
+    crop: "focalpoint",
+    w: "1400",
+    q: "85",
+  });
+  if (focus?.x !== undefined) params.set("fp-x", String(focus.x));
+  if (focus?.y !== undefined) params.set("fp-y", String(focus.y));
+  return `https://images.unsplash.com/${photoId}?${params.toString()}`;
+}
+
+/** One distinct cover per listing. Indices 0–5 are handcrafted; 6–55 are generated boats. */
+const UNIQUE_BOAT_COVERS = [
+  unsplashBoatCover("photo-1540946485063-a40da27545f8", { x: 0.28 }),
+  unsplashBoatCover("photo-1569263979104-865ab7cd8d13", { y: 0.35 }),
+  unsplashBoatCover("photo-1567899378494-47b22a2ae96a"),
+  unsplashBoatCover("photo-1528154291023-a6525fabe5b4", { x: 0.32, y: 0.45 }),
+  unsplashBoatCover("photo-1504813205186-380b1235a5d2"),
+  unsplashBoatCover("photo-1599943238450-b0edf519982b"),
+  unsplashBoatCover("photo-1605281317010-fe5ffe798166"),
+  unsplashBoatCover("photo-1523496922380-91d5afba98a3"),
+  unsplashBoatCover("photo-1526761122248-c31c93f8b2b9"),
+  unsplashBoatCover("photo-1569282066844-679ec34e3416"),
+  unsplashBoatCover("photo-1584772126711-017fae29eadd"),
+  unsplashBoatCover("photo-1598737285721-29346a5c9278"),
+  unsplashBoatCover("photo-1618131920480-5a853847a2a4"),
+  unsplashBoatCover("photo-1622789094987-d75a22f934c4"),
+  unsplashBoatCover("photo-1534447677768-be436bb09401"),
+  unsplashBoatCover("photo-1444487233259-dae9d907a740"),
+  unsplashBoatCover("photo-1509295433237-4b4851f2ab67"),
+  unsplashBoatCover("photo-1522440266570-2a733961e09c"),
+  unsplashBoatCover("photo-1546214755-c5d22447b43b"),
+  unsplashBoatCover("photo-1558268295-a713169178e1"),
+  "https://images.pexels.com/photos/273886/pexels-photo-273886.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/540518/pexels-photo-540518.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/237272/pexels-photo-237272.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/42091/pexels-photo-42091.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1167021/pexels-photo-1167021.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/144634/pexels-photo-144634.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1295036/pexels-photo-1295036.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/813011/pexels-photo-813011.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1838569/pexels-photo-1838569.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/2115367/pexels-photo-2115367.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/239548/pexels-photo-239548.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/296281/pexels-photo-296281.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/355288/pexels-photo-355288.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/358319/pexels-photo-358319.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/416676/pexels-photo-416676.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1117210/pexels-photo-1117210.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1430677/pexels-photo-1430677.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1485894/pexels-photo-1485894.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1656663/pexels-photo-1656663.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1365425/pexels-photo-1365425.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1632365/pexels-photo-1632365.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/169647/pexels-photo-169647.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/171389/pexels-photo-171389.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/221457/pexels-photo-221457.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/240040/pexels-photo-240040.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/296278/pexels-photo-296278.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/3250613/pexels-photo-3250613.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/3293148/pexels-photo-3293148.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/332676/pexels-photo-332676.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/3601425/pexels-photo-3601425.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/378570/pexels-photo-378570.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/460633/pexels-photo-460633.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/4913309/pexels-photo-4913309.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/4913310/pexels-photo-4913310.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/4913311/pexels-photo-4913311.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/5117913/pexels-photo-5117913.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/5117920/pexels-photo-5117920.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/5117921/pexels-photo-5117921.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/5117922/pexels-photo-5117922.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/51767/pexels-photo-51767.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/552779/pexels-photo-552779.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/561463/pexels-photo-561463.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/163236/luxury-yacht-boat-speed-water-163236.jpeg?auto=compress&cs=tinysrgb&w=1400",
+];
+
+const HANDCRAFTED_COVER_INDEX: Record<string, number> = {
+  solstice: 0,
+  "blue-hour": 1,
+  mistral: 2,
+  "little-wren": 3,
+  "north-star": 4,
+  "sea-glass": 5,
+};
+
+function coverIndexForVesselId(id: string) {
+  if (id in HANDCRAFTED_COVER_INDEX) return HANDCRAFTED_COVER_INDEX[id];
+  const match = /^generated-boat-(\d+)$/.exec(id);
+  if (match) return 6 + (Number(match[1]) - 1);
+  let hash = 0;
+  for (const character of id) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  return hash % UNIQUE_BOAT_COVERS.length;
+}
+
+function uniqueCoverForVesselId(id: string) {
+  return UNIQUE_BOAT_COVERS[coverIndexForVesselId(id) % UNIQUE_BOAT_COVERS.length];
+}
+
+function secondaryGalleryForVesselId(id: string) {
+  const index = (coverIndexForVesselId(id) + 17) % UNIQUE_BOAT_COVERS.length;
+  return UNIQUE_BOAT_COVERS[index];
+}
+
+const boats: Boat[] = [
+  {
+    id: "solstice",
+    name: "Solstice",
+    type: "Sailing yacht",
+    length: feetToMetresString(42),
+    location: "Lefkada, Greece",
+    country: "Greece",
+    latitude: 38.7066,
+    longitude: 20.7019,
+    homePort: "Lefkada, Greece",
+    dates: "12 Sep – 4 Oct",
+    dateStart: "2026-09-12",
+    duration: "22 nights",
+    image: uniqueCoverForVesselId("solstice"),
+    gallery: [...DEMO_LISTING_GALLERY],
+    owner: "Maya & Finn",
+    ownerLanguages: ["English", "French"],
+    ownerImage: "https://i.pravatar.cc/160?img=47",
+    rating: 4.9,
+    reviews: 18,
+    applicants: 6,
+    description:
+      "Solstice is our much-loved bluewater cruiser, tucked into a quiet marina on Lefkada. We need a confident liveaboard to keep her aired, secure and happy while we visit family.",
+    home: "Private aft cabin, full galley and a bright saloon. The marina has showers, laundry, a pool and tavernas a short walk away.",
+    responsibilities: [
+      "Check bilges and battery monitor each morning",
+      "Run engine and watermaker weekly",
+      "Adjust lines and fenders after strong weather",
+      "Flush heads and air cabins regularly",
+    ],
+    systems: ["Yanmar diesel", "12V / solar", "Watermaker", "Electric windlass"],
+    engineType: "Inboard diesel",
+    voltageType: "12 V DC",
+    stoveFuelType: "LPG / propane",
+    requirements: ["5+ years sailing", "Diesel troubleshooting", "Liveaboard experience"],
+    amenities: [
+      "Bathroom",
+      "Full kitchen",
+      "Outdoor BBQ",
+      "Air conditioning",
+      "Wi-Fi",
+      "On-site bathrooms & showers",
+      "24/7 security",
+      "Gated access",
+      "On-site laundry",
+      "Swimming pool",
+      "On-site restaurant",
+      "Tender",
+      "Paddleboard",
+      "Shore power",
+    ],
+    pet: "Pip, a sea-loving terrier",
+    featured: true,
+  },
+  {
+    id: "blue-hour",
+    name: "Blue Hour",
+    type: "Catamaran",
+    length: feetToMetresString(46),
+    location: "St. George’s, Grenada",
+    country: "Grenada",
+    latitude: 12.0561,
+    longitude: -61.7488,
+    homePort: "St. George’s, Grenada",
+    dates: "3 Nov – 1 Dec",
+    dateStart: "2026-11-03",
+    duration: "28 nights",
+    image: uniqueCoverForVesselId("blue-hour"),
+    gallery: [],
+    owner: "Jonas",
+    ownerLanguages: ["English", "German"],
+    ownerImage: "https://i.pravatar.cc/160?img=12",
+    rating: 5,
+    reviews: 11,
+    applicants: 9,
+    description:
+      "A spacious Lagoon catamaran on a sheltered mooring. Ideal for a couple who know tropical weather routines and are comfortable using a dinghy.",
+    home: "Owner’s hull, island galley, water views from every window and reliable marina Wi-Fi.",
+    responsibilities: [
+      "Daily mooring and chafe inspection",
+      "Monitor solar, batteries and fridge",
+      "Start both engines weekly",
+      "Secure deck before squalls",
+    ],
+    systems: ["Twin Yanmar diesels", "Lithium bank", "Solar array", "Dinghy outboard"],
+    engineType: "Inboard diesel",
+    voltageType: "24 V DC",
+    stoveFuelType: "LPG / propane",
+    requirements: ["Catamaran experience", "Dinghy handling", "Storm awareness"],
+    amenities: [
+      "Bathroom",
+      "Full kitchen",
+      "Outdoor BBQ",
+      "Wi-Fi",
+      "24/7 security",
+      "Gated access",
+      "On-site laundry",
+      "Tender",
+      "Kayak",
+      "Swim platform",
+    ],
+  },
+  {
+    id: "mistral",
+    name: "Mistral",
+    type: "Motor yacht",
+    length: feetToMetresString(55),
+    location: "Palma, Mallorca",
+    country: "Spain",
+    latitude: 39.5696,
+    longitude: 2.6502,
+    homePort: "Palma, Mallorca, Spain",
+    dates: "18 Oct – 8 Nov",
+    dateStart: "2026-10-18",
+    duration: "21 nights",
+    image: uniqueCoverForVesselId("mistral"),
+    gallery: [],
+    owner: "Elena",
+    ownerLanguages: ["Spanish", "English", "Italian"],
+    ownerImage: "https://i.pravatar.cc/160?img=32",
+    rating: 4.8,
+    reviews: 24,
+    applicants: 12,
+    description:
+      "Mistral is berthed in central Palma. We are looking for a practical sitter who can keep an eye on systems and coordinate one scheduled engineer visit.",
+    home: "Large master cabin, two heads, full galley and flybridge. Cafés and the old town are minutes away.",
+    responsibilities: [
+      "Daily shore power and bilge checks",
+      "Run generator under load weekly",
+      "Meet marine engineer for service",
+      "Fresh-water washdown after rain",
+    ],
+    systems: ["Twin Volvo diesels", "Generator", "Hydraulic passerelle", "Blackwater tank"],
+    engineType: "Inboard diesel",
+    voltageType: "24 V DC",
+    stoveFuelType: "Electric / induction",
+    requirements: ["Motor yacht experience", "Systems confident", "Non-smoker"],
+    amenities: [
+      "Bathroom",
+      "Full kitchen",
+      "Air conditioning",
+      "Wi-Fi",
+      "24/7 security",
+      "Gated access",
+      "On-site bathrooms & showers",
+      "On-site laundry",
+      "Swimming pool",
+      "On-site restaurant",
+      "Parking",
+      "Smart TV",
+    ],
+  },
+  {
+    id: "little-wren",
+    name: "Little Wren",
+    type: "Narrowboat",
+    length: feetToMetresString(58),
+    location: "Bath, England",
+    country: "United Kingdom",
+    latitude: 51.3811,
+    longitude: -2.359,
+    homePort: "Bath, England, United Kingdom",
+    dates: "6 Aug – 20 Aug",
+    dateStart: "2026-08-06",
+    duration: "14 nights",
+    image: uniqueCoverForVesselId("little-wren"),
+    gallery: [],
+    owner: "Tom & Ada",
+    ownerLanguages: ["English"],
+    ownerImage: "https://i.pravatar.cc/160?img=5",
+    rating: 4.9,
+    reviews: 31,
+    applicants: 4,
+    description:
+      "A cosy, characterful narrowboat on a permanent residential mooring just outside Bath, with two easy-going rescue cats aboard.",
+    home: "Wood stove, double berth, compact galley, composting loo and a sunny bow deck.",
+    responsibilities: [
+      "Feed cats morning and evening",
+      "Top up water tank as needed",
+      "Check mooring pins and ropes",
+      "Keep batteries above 60%",
+    ],
+    systems: ["Canaline diesel", "12V / solar", "Solid fuel stove", "Cassette toilet"],
+    engineType: "Inboard diesel",
+    voltageType: "12 V DC",
+    stoveFuelType: "LPG / propane",
+    requirements: ["Boat living experience", "Cat lover", "Comfortable off-grid"],
+    amenities: ["Bathroom", "Full kitchen", "Heating", "Wi-Fi", "Bicycles", "Kayak", "Wood stove"],
+    pet: "Mackerel & Dot, rescue cats",
+  },
+  {
+    id: "north-star",
+    name: "North Star",
+    type: "Trawler",
+    length: feetToMetresString(48),
+    location: "Vancouver, Canada",
+    country: "Canada",
+    latitude: 49.2827,
+    longitude: -123.1207,
+    homePort: "Vancouver, Canada",
+    dates: "10 Jan – 7 Feb",
+    dateStart: "2027-01-10",
+    duration: "28 nights",
+    image: uniqueCoverForVesselId("north-star"),
+    gallery: [],
+    owner: "Clare",
+    ownerLanguages: ["English", "French"],
+    ownerImage: "https://i.pravatar.cc/160?img=44",
+    rating: 5,
+    reviews: 8,
+    applicants: 3,
+    description:
+      "A sturdy Nordhavn in a secure marina. Winter care is mainly heat, humidity and line checks, with a detailed handover and local support.",
+    home: "Warm pilothouse, diesel heating, marina facilities and mountain views.",
+    responsibilities: [
+      "Monitor heaters and dehumidifiers",
+      "Inspect lines after winter fronts",
+      "Check engine room for leaks",
+      "Exercise seacocks fortnightly",
+    ],
+    systems: ["Single Lugger diesel", "Diesel heat", "Generator", "Inverter"],
+    engineType: "Inboard diesel",
+    voltageType: "24 V DC",
+    stoveFuelType: "Diesel",
+    requirements: ["Cold-weather boating", "Engine room confidence", "References"],
+    amenities: [
+      "Bathroom",
+      "Full kitchen",
+      "Heating",
+      "Wi-Fi",
+      "24/7 security",
+      "Gated access",
+      "On-site bathrooms & showers",
+      "On-site laundry",
+      "On-site restaurant",
+      "Parking",
+      "Tender",
+    ],
+  },
+  {
+    id: "sea-glass",
+    name: "Sea Glass",
+    type: "Houseboat",
+    length: feetToMetresString(62),
+    location: "Sausalito, California",
+    country: "United States",
+    latitude: 37.8591,
+    longitude: -122.4853,
+    homePort: "Sausalito, California, United States",
+    dates: "2 Sep – 16 Sep",
+    dateStart: "2026-09-02",
+    duration: "14 nights",
+    image: uniqueCoverForVesselId("sea-glass"),
+    gallery: [],
+    owner: "Rachel",
+    ownerLanguages: ["English"],
+    ownerImage: "https://i.pravatar.cc/160?img=26",
+    rating: 4.7,
+    reviews: 15,
+    applicants: 7,
+    description:
+      "A design-led floating home with a tender and two resident hens ashore. No cruising required, just attentive houseboat care.",
+    home: "Two bedrooms, chef’s kitchen, roof deck and spectacular bay views.",
+    responsibilities: [
+      "Check float and utility connections",
+      "Water roof planters",
+      "Collect mail and feed hens",
+      "Keep tender battery charged",
+    ],
+    systems: ["Shore power", "Holding tank", "Fresh-water connection", "Tender"],
+    engineType: "No engine",
+    voltageType: "48 V DC",
+    stoveFuelType: "Electric / induction",
+    requirements: ["Houseboat experience preferred", "Animal friendly", "Non-smoker"],
+    amenities: [
+      "Bathroom",
+      "Full kitchen",
+      "Outdoor BBQ",
+      "Dedicated workspace",
+      "Gated access",
+      "On-site laundry",
+      "On-site restaurant",
+      "Tender",
+      "Roof deck",
+      "Fiber Wi-Fi",
+    ],
+  },
+];
+
+const nonBoatImageReplacements: Record<string, string> = {
+  "https://images.pexels.com/photos/76959/pexels-photo-76959.jpeg?auto=compress&cs=tinysrgb&w=1600":
+    "https://images.pexels.com/photos/273886/pexels-photo-273886.jpeg?auto=compress&cs=tinysrgb&w=1600&h=1200&fit=crop",
+  "https://images.unsplash.com/photo-1528150177508-7cc0c36cda5c?auto=format&fit=crop&w=1400&q=85":
+    UNIQUE_BOAT_COVERS[0],
+  "https://images.unsplash.com/photo-1499403474843-04e72c14df8a?auto=format&fit=crop&w=1400&q=85":
+    UNIQUE_BOAT_COVERS[1],
+  "https://images.unsplash.com/photo-1566847438217-76e82d383f84?auto=format&fit=crop&w=900&q=85":
+    UNIQUE_BOAT_COVERS[1],
+  "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=900&q=85":
+    UNIQUE_BOAT_COVERS[2],
+};
+
+function ensureBoatImage(image: string) {
+  return nonBoatImageReplacements[image] ?? image;
+}
+
+function ensureVesselCover(vessel: Pick<Vessel, "id" | "image">) {
+  if (vessel.id in HANDCRAFTED_COVER_INDEX || /^generated-boat-\d+$/.test(vessel.id)) {
+    return uniqueCoverForVesselId(vessel.id);
+  }
+  return ensureBoatImage(vessel.image);
+}
+
+function withDemoGallery(vessel: Vessel): Vessel {
+  if (!RICH_GALLERY_LISTING_IDS.has(vessel.id) || vessel.gallery.length >= 10) return vessel;
+  return { ...vessel, gallery: [...DEMO_LISTING_GALLERY] };
+}
+
+const generatedDestinations = [
+  ["Antibes", "France", 43.5804, 7.1251],
+  ["Monaco", "Monaco", 43.7384, 7.4246],
+  ["Split", "Croatia", 43.5081, 16.4402],
+  ["Dubrovnik", "Croatia", 42.6507, 18.0944],
+  ["Corfu", "Greece", 39.6243, 19.9217],
+  ["Bodrum", "Turkey", 37.0344, 27.4305],
+  ["Marmaris", "Turkey", 36.855, 28.2742],
+  ["Lisbon", "Portugal", 38.7223, -9.1393],
+  ["Lagos", "Portugal", 37.1028, -8.6742],
+  ["Barcelona", "Spain", 41.3874, 2.1686],
+  ["Valencia", "Spain", 39.4699, -0.3763],
+  ["Naples", "Italy", 40.8518, 14.2681],
+  ["Sardinia", "Italy", 39.2238, 9.1217],
+  ["Malta", "Malta", 35.8989, 14.5146],
+  ["Amsterdam", "Netherlands", 52.3676, 4.9041],
+  ["Southampton", "United Kingdom", 50.9097, -1.4044],
+  ["Auckland", "New Zealand", -36.8509, 174.7645],
+  ["Sydney", "Australia", -33.8688, 151.2093],
+  ["Nassau", "Bahamas", 25.0443, -77.3504],
+  ["Road Town", "British Virgin Islands", 18.4285, -64.6185],
+  ["Fort Lauderdale", "United States", 26.1224, -80.1373],
+  ["San Diego", "United States", 32.7157, -117.1611],
+  ["Annapolis", "United States", 38.9784, -76.4922],
+  ["Victoria", "Canada", 48.4284, -123.3656],
+  ["Cartagena", "Colombia", 10.391, -75.4794],
+] as const;
+
+const generatedBoatNamePrefixes = [
+  "Azure",
+  "Silver",
+  "Golden",
+  "Quiet",
+  "Wild",
+  "Ocean",
+  "Harbor",
+  "Island",
+  "Northern",
+  "Southern",
+] as const;
+
+const generatedBoatNameSuffixes = [
+  "Tide",
+  "Compass",
+  "Lark",
+  "Horizon",
+  "Dolphin",
+] as const;
+
+const generatedBoatTypes = [
+  "Sailing yacht",
+  "Catamaran",
+  "Motor yacht",
+  "Trawler",
+  "Houseboat",
+] as const;
+
+const generatedOwners = [
+  "Amelia & Noah",
+  "Sofia",
+  "Luca & Emma",
+  "Mila",
+  "Oliver & James",
+  "Ines",
+  "Theo & Anna",
+  "Nora",
+  "Mateo & Isla",
+  "Helena",
+] as const;
+
+const generatedOwnerLanguages = [
+  ["English", "French"],
+  ["English", "Spanish"],
+  ["Italian", "English"],
+  ["Croatian", "English"],
+  ["English", "German"],
+  ["Portuguese", "English"],
+  ["German", "English"],
+  ["Dutch", "English"],
+  ["Spanish", "English"],
+  ["Greek", "English"],
+] as const;
+
+function generatedDateDetails(index: number) {
+  const absoluteMonth = 7 + index;
+  const start = new Date(
+    Date.UTC(
+      2026 + Math.floor(absoluteMonth / 12),
+      absoluteMonth % 12,
+      4 + ((index * 7) % 21),
+    ),
+  );
+  const nights = 7 + ((index * 5) % 29);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + nights);
+  const displayDate = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+  return {
+    dateStart: start.toISOString().slice(0, 10),
+    dates: `${displayDate.format(start)} – ${displayDate.format(end)}`,
+    duration: `${nights} nights`,
+  };
+}
+
+const generatedBoats: Boat[] = Array.from({ length: 50 }, (_, index) => {
+  const [location, country, latitude, longitude] =
+    generatedDestinations[index % generatedDestinations.length];
+  const name = `${generatedBoatNamePrefixes[index % generatedBoatNamePrefixes.length]} ${
+    generatedBoatNameSuffixes[Math.floor(index / generatedBoatNamePrefixes.length)]
+  }`;
+  const type = generatedBoatTypes[index % generatedBoatTypes.length];
+  const image = uniqueCoverForVesselId(`generated-boat-${index + 1}`);
+  const owner = generatedOwners[index % generatedOwners.length];
+  const dateDetails = generatedDateDetails(index);
+  const hasEngine = type !== "Houseboat";
+
+  return {
+    id: `generated-sit-${index + 1}`,
+    boatId: `generated-boat-${index + 1}`,
+    name,
+    type,
+    length: feetToMetresString(30 + ((index * 3) % 35)),
+    location: `${location}, ${country}`,
+    country,
+    latitude,
+    longitude,
+    homePort: `${location}, ${country}`,
+    ...dateDetails,
+    image,
+    gallery: [{ url: secondaryGalleryForVesselId(`generated-boat-${index + 1}`) }],
+    owner,
+    ownerLanguages: [...generatedOwnerLanguages[index % generatedOwnerLanguages.length]],
+    ownerImage: `https://i.pravatar.cc/160?img=${(index % 60) + 1}`,
+    rating: 4.5 + (index % 6) / 10,
+    reviews: 3 + ((index * 7) % 38),
+    applicants: 1 + ((index * 3) % 16),
+    description: `${name} is a well-cared-for ${type.toLowerCase()} set up for comfortable stays aboard. The owners are looking for a dependable sitter to keep an eye on her while they are away.`,
+    home: "A comfortable cabin, equipped galley, reliable shore power and easy access to marina facilities.",
+    responsibilities: [
+      "Check lines, fenders and bilges each day",
+      "Monitor shore power and battery levels",
+      "Air the cabins and inspect for leaks",
+      "Send the owner a short weekly update",
+    ],
+    systems: hasEngine
+      ? ["Diesel engine", "Shore power", "Battery monitor", "Fresh-water system"]
+      : ["Shore power", "Battery monitor", "Holding tank", "Fresh-water connection"],
+    engineType: hasEngine ? "Inboard diesel" : "No engine",
+    voltageType: index % 4 === 0 ? "24 V DC" : "12 V DC",
+    stoveFuelType: index % 3 === 0 ? "Electric / induction" : "LPG / propane",
+    requirements: ["2+ years boating experience", "Basic systems knowledge", "Non-smoker"],
+    minYearsExperience: 2,
+    requiredExperience: ["Overnight stays aboard"],
+    requiredCertifications: index % 4 === 0 ? ["VHF / SRC"] : [],
+    requiredSkills: ["Line handling", "Basic maintenance"],
+    amenities: [
+      "Bathroom",
+      "Full kitchen",
+      "Wi-Fi",
+      "Shore power",
+      "On-site bathrooms & showers",
+      "Gated access",
+      ...(index % 2 === 0 ? ["On-site laundry", "Outdoor BBQ"] : ["TV", "Tender"]),
+    ],
+    pet: index % 8 === 0 ? "One friendly dog aboard" : undefined,
+    featured: index % 10 === 0,
+  };
+});
+
+boats.push(...generatedBoats);
+
+const wait = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function readLegacyBoats(): Boat[] {
+  const stored = localStorage.getItem("harbourly-boats");
+  if (!stored) return boats;
+  try {
+    return JSON.parse(stored) as Boat[];
+  } catch {
+    return boats;
+  }
+}
+
+function formatHomePort(location: string, country: string) {
+  const trimmedLocation = location.trim();
+  const trimmedCountry = country.trim();
+  if (!trimmedCountry || trimmedLocation.toLowerCase().includes(trimmedCountry.toLowerCase())) {
+    return trimmedLocation;
+  }
+  return `${trimmedLocation}, ${trimmedCountry}`;
+}
+
+function splitHomePort(homePort: string) {
+  const parts = homePort
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length < 2) return { location: homePort.trim(), country: "" };
+  return {
+    location: parts.slice(0, -1).join(", "),
+    country: parts.at(-1) ?? "",
+  };
+}
+
+function sitLocation(location: string, country: string) {
+  const suffix = `, ${country}`.toLowerCase();
+  return location.toLowerCase().endsWith(suffix) ? location.slice(0, -suffix.length) : location;
+}
+
+function languagesForOwner(owner: string) {
+  return boats.find((boat) => boat.owner === owner)?.ownerLanguages ?? ["English"];
+}
+
+const DEMO_SOLSTICE_PRIVATE_ACCESS: VesselPrivateAccess = {
+  wifiNetwork: "Solstice-Guest",
+  wifiPassword: "aegean-sun-42",
+  accessCodes:
+    "Marina pedestrian gate: 4821#\nLockbox on starboard winch: 3391\nCompanionway padlock: 2048",
+  otherNotes: "Spare ignition key with marina office under Maya Ellison.",
+};
+
+const toVessel = (boat: Boat): Vessel => ({
+  id: boat.boatId ?? boat.id,
+  name: boat.name,
+  type: boat.type,
+  length: normalizeLengthToMetres(boat.length),
+  homePort: boat.homePort ?? formatHomePort(boat.location, boat.country),
+  image: boat.image,
+  gallery: normalizeGallery(boat.gallery),
+  owner: boat.owner,
+  ownerLanguages: boat.ownerLanguages ?? languagesForOwner(boat.owner),
+  ownerImage: boat.ownerImage,
+  rating: boat.rating,
+  reviews: boat.reviews,
+  description: boat.description,
+  home: boat.home,
+  systems: boat.systems,
+  engineType: boat.engineType ?? "Not specified",
+  voltageType: boat.voltageType ?? "Not specified",
+  stoveFuelType: boat.stoveFuelType ?? "Not specified",
+  amenities: boat.amenities,
+  ...((boat.boatId ?? boat.id) === "solstice"
+    ? { privateAccess: DEMO_SOLSTICE_PRIVATE_ACCESS }
+    : {}),
+});
+
+export function isNonSmokerRequirementLabel(value: string) {
+  return /^non[-\s]?smoker$/i.test(value.trim());
+}
+
+export function withoutNonSmokerRequirementLabels(requirements: string[]) {
+  return requirements.filter((requirement) => !isNonSmokerRequirementLabel(requirement));
+}
+
+export function resolveNonSmokerRequired(sit: {
+  nonSmokerRequired?: boolean;
+  requirements?: string[];
+  requiredSkills?: string[];
+}) {
+  if (sit.nonSmokerRequired === true) return true;
+  if (sit.nonSmokerRequired === false) return false;
+  return (
+    (sit.requirements ?? []).some(isNonSmokerRequirementLabel) ||
+    (sit.requiredSkills ?? []).some(isNonSmokerRequirementLabel)
+  );
+}
+
+const toSit = (boat: Boat): Sit => ({
+  id: boat.id,
+  boatId: boat.boatId ?? boat.id,
+  dates: boat.dates,
+  dateStart: boat.dateStart,
+  duration: boat.duration,
+  location: sitLocation(boat.location, boat.country),
+  country: boat.country,
+  latitude: boat.latitude,
+  longitude: boat.longitude,
+  responsibilities: boat.responsibilities,
+  requirements: withoutNonSmokerRequirementLabels(boat.requirements),
+  minYearsExperience: Number.parseInt(
+    boat.requirements.find((requirement) => /\d+\+?\s+years?/i.test(requirement)) ?? "0",
+    10,
+  ),
+  requiredExperience: [],
+  requiredCertifications: [],
+  requiredSkills: withoutNonSmokerRequirementLabels(boat.requirements).filter(
+    (requirement) => !/\d+\+?\s+years?/i.test(requirement),
+  ),
+  maxGuests: boat.maxGuests ?? 2,
+  applicants: boat.applicants,
+  pet: boat.pet,
+  featured: boat.featured,
+  nonSmokerRequired: resolveNonSmokerRequired(boat),
+  applicationsOpen: boat.applicationsOpen,
+});
+
+const GENERATED_VESSELS_SEED_KEY = "boatstead-generated-vessels-v5";
+const GENERATED_SITS_SEED_KEY = "boatstead-generated-sits-v3";
+
+function mergeGeneratedVessels(current: Vessel[]) {
+  if (localStorage.getItem(GENERATED_VESSELS_SEED_KEY)) return current;
+  const generated = generatedBoats.map(toVessel);
+  const generatedIds = new Set(generated.map((vessel) => vessel.id));
+  const merged = [...current.filter((vessel) => !generatedIds.has(vessel.id)), ...generated];
+  localStorage.setItem("harbourly-vessels", JSON.stringify(merged));
+  localStorage.setItem(GENERATED_VESSELS_SEED_KEY, "complete");
+  return merged;
+}
+
+const SOLSTICE_PRIVATE_ACCESS_SEED_KEY = "boatstead-solstice-private-access-v1";
+
+function ensureSolsticePrivateAccess(current: Vessel[]) {
+  if (localStorage.getItem(SOLSTICE_PRIVATE_ACCESS_SEED_KEY)) return current;
+  localStorage.setItem(SOLSTICE_PRIVATE_ACCESS_SEED_KEY, "complete");
+  let changed = false;
+  const next = current.map((vessel) => {
+    if (vessel.id !== "solstice" || hasVesselPrivateAccess(vessel.privateAccess)) return vessel;
+    changed = true;
+    return { ...vessel, privateAccess: DEMO_SOLSTICE_PRIVATE_ACCESS };
+  });
+  if (changed) {
+    localStorage.setItem("harbourly-vessels", JSON.stringify(next));
+  }
+  return next;
+}
+
+function mergeGeneratedSits(current: Sit[]) {
+  if (localStorage.getItem(GENERATED_SITS_SEED_KEY)) return current;
+  const generated = generatedBoats.map(toSit);
+  const generatedIds = new Set(generated.map((sit) => sit.id));
+  const merged = [...current.filter((sit) => !generatedIds.has(sit.id)), ...generated];
+  localStorage.setItem("harbourly-sits", JSON.stringify(merged));
+  localStorage.setItem(GENERATED_SITS_SEED_KEY, "complete");
+  return merged;
+}
+
+function readVessels(): Vessel[] {
+  const stored = localStorage.getItem("harbourly-vessels");
+  if (stored) {
+    try {
+      const storedVessels = (
+        JSON.parse(stored) as Array<
+          Omit<
+            Vessel,
+            "engineType" | "voltageType" | "stoveFuelType" | "homePort" | "ownerLanguages"
+          > & {
+            engineType?: EngineType;
+            voltageType?: VoltageType;
+            stoveFuelType?: StoveFuelType;
+            homePort?: string;
+            ownerLanguages?: string[];
+            location?: string;
+            country?: string;
+          }
+        >
+      ).map((storedVessel) => {
+        const { country = "", location = "", ...vessel } = storedVessel;
+        return withDemoGallery({
+          ...vessel,
+          length: normalizeLengthToMetres(vessel.length),
+          image: ensureVesselCover(vessel),
+          gallery: normalizeGallery(vessel.gallery).map((photo) => ({
+            ...photo,
+            url: ensureBoatImage(photo.url),
+          })),
+          ownerLanguages: vessel.ownerLanguages ?? languagesForOwner(vessel.owner),
+          engineType: vessel.engineType ?? "Not specified",
+          voltageType: vessel.voltageType ?? "Not specified",
+          stoveFuelType: vessel.stoveFuelType ?? "Not specified",
+          homePort: vessel.homePort ?? formatHomePort(location, country),
+        });
+      });
+      return ensureSolsticePrivateAccess(mergeGeneratedVessels(storedVessels));
+    } catch {
+      // Fall through to the legacy seed.
+    }
+  }
+  const unique = new Map(
+    readLegacyBoats().map((boat) => [boat.boatId ?? boat.id, withDemoGallery(toVessel(boat))]),
+  );
+  return ensureSolsticePrivateAccess(mergeGeneratedVessels([...unique.values()]));
+}
+
+function readSits(): Sit[] {
+  const stored = localStorage.getItem("harbourly-sits");
+  if (stored) {
+    try {
+      const vessels = readVessels();
+      const storedSits = (
+        JSON.parse(stored) as Array<
+          Omit<
+            Sit,
+            "location" | "country" | "latitude" | "longitude" | "maxGuests"
+          > &
+            Partial<
+              Pick<Sit, "location" | "country" | "latitude" | "longitude" | "maxGuests">
+            >
+        >
+      ).map((sit) => {
+        const vessel = vessels.find((item) => item.id === sit.boatId);
+        const fallback = splitHomePort(vessel?.homePort ?? "");
+        const coordinates = coordinatesForLocation(
+          sit.location ?? fallback.location,
+          sit.country ?? fallback.country,
+        );
+        return {
+          ...sit,
+          requirements:
+            sit.id === "solstice"
+              ? sit.requirements.map((requirement) =>
+                  requirement === "Diesel basics" ? "Diesel troubleshooting" : requirement,
+                )
+              : sit.requirements,
+          requiredSkills:
+            sit.id === "solstice"
+              ? (sit.requiredSkills ?? []).map((skill) =>
+                  skill === "Diesel basics" ? "Diesel troubleshooting" : skill,
+                )
+              : sit.requiredSkills,
+          location: sit.location ?? fallback.location,
+          country: sit.country ?? fallback.country,
+          latitude: sit.latitude ?? coordinates.latitude,
+          longitude: sit.longitude ?? coordinates.longitude,
+          maxGuests: Math.max(1, Math.floor(sit.maxGuests ?? 2)),
+        };
+      });
+      return mergeGeneratedSits(storedSits);
+    } catch {
+      // Fall through to the legacy seed.
+    }
+  }
+  return mergeGeneratedSits(readLegacyBoats().map(toSit));
+}
+
+function acceptedSitIds() {
+  return new Set(
+    readApplications()
+      .filter((application) => application.status === "accepted")
+      .map((application) => application.sitId),
+  );
+}
+
+function publicVesselFields(vessel: Vessel): Omit<Vessel, "privateAccess"> {
+  const { privateAccess: _privateAccess, ...publicVessel } = vessel;
+  return publicVessel;
+}
+
+function joinSit(
+  sit: Sit | undefined,
+  vessels: Vessel[],
+  acceptedIds: Set<string> = acceptedSitIds(),
+): Boat | undefined {
+  if (!sit) return undefined;
+  const vessel = vessels.find((item) => item.id === sit.boatId);
+  if (!vessel) return undefined;
+  const accepted = acceptedIds.has(sit.id);
+  const applicationsOpen = sit.applicationsOpen !== false;
+  const nonSmokerRequired = resolveNonSmokerRequired(sit);
+  return {
+    ...publicVesselFields(vessel),
+    ...sit,
+    id: sit.id,
+    boatId: vessel.id,
+    accepted,
+    applicationsOpen,
+    nonSmokerRequired,
+    requirements: withoutNonSmokerRequirementLabels(sit.requirements),
+    requiredSkills: withoutNonSmokerRequirementLabels(sit.requiredSkills ?? []),
+    phase: getSitPhase({
+      ...sit,
+      accepted,
+      applicationsOpen,
+    }),
+  };
+}
+
+export function isAcceptingApplications(item: { applicationsOpen?: boolean }) {
+  return item.applicationsOpen !== false;
+}
+
+export async function getBoats(): Promise<Boat[]> {
+  await wait();
+  const vessels = readVessels();
+  const acceptedIds = acceptedSitIds();
+  return readSits()
+    .map((sit) => joinSit(sit, vessels, acceptedIds))
+    .filter((listing): listing is Boat => Boolean(listing));
+}
+
+export async function getBoat(id: string): Promise<Boat | undefined> {
+  await wait(220);
+  return joinSit(
+    readSits().find((sit) => sit.id === id),
+    readVessels(),
+  );
+}
+
+export async function getVessels(): Promise<Vessel[]> {
+  await wait(250);
+  return readVessels();
+}
+
+export async function getSits(): Promise<Sit[]> {
+  await wait(250);
+  const acceptedIds = acceptedSitIds();
+  return readSits().map((sit) => {
+    const accepted = acceptedIds.has(sit.id);
+    const applicationsOpen = sit.applicationsOpen !== false;
+    const nonSmokerRequired = resolveNonSmokerRequired(sit);
+    return {
+      ...sit,
+      accepted,
+      applicationsOpen,
+      nonSmokerRequired,
+      requirements: withoutNonSmokerRequirementLabels(sit.requirements),
+      requiredSkills: withoutNonSmokerRequirementLabels(sit.requiredSkills ?? []),
+      phase: getSitPhase({
+        ...sit,
+        accepted,
+        applicationsOpen,
+      }),
+    };
+  });
+}
+
+export async function saveVessel(vessel: Vessel): Promise<Vessel> {
+  await wait(500);
+  const privateAccess = normalizeVesselPrivateAccess(vessel.privateAccess);
+  const normalized: Vessel = {
+    ...vessel,
+    length: vessel.length ? normalizeLengthToMetres(vessel.length) : "",
+    gallery: normalizeGallery(vessel.gallery),
+    ...(privateAccess ? { privateAccess } : { privateAccess: undefined }),
+  };
+  if (!privateAccess) {
+    delete normalized.privateAccess;
+  }
+  const current = readVessels();
+  const exists = current.some((item) => item.id === normalized.id);
+  const next = exists
+    ? current.map((item) => (item.id === normalized.id ? normalized : item))
+    : [normalized, ...current];
+  localStorage.setItem("harbourly-vessels", JSON.stringify(next));
+  return normalized;
+}
+
+function canViewerSeeVesselPrivateAccess(vessel: Vessel, sitId: string, viewerName: string) {
+  if (vessel.owner === viewerName) return true;
+  return readApplications().some(
+    (application) =>
+      application.sitId === sitId &&
+      application.status === "accepted" &&
+      application.applicant.name === viewerName,
+  );
+}
+
+/** Private Wi-Fi / access codes for a sit; only owner or the accepted sitter. */
+export async function getSitPrivateAccessForViewer(
+  sitId: string,
+  viewerName: string,
+): Promise<VesselPrivateAccess | undefined> {
+  await wait(180);
+  const sit = readSits().find((item) => item.id === sitId);
+  if (!sit) return undefined;
+  const vessel = readVessels().find((item) => item.id === sit.boatId);
+  if (!vessel || !hasVesselPrivateAccess(vessel.privateAccess)) return undefined;
+  if (!canViewerSeeVesselPrivateAccess(vessel, sitId, viewerName)) return undefined;
+  return normalizeVesselPrivateAccess(vessel.privateAccess);
+}
+
+export async function deleteVessel(id: string): Promise<void> {
+  await wait(400);
+  if (readSits().some((sit) => sit.boatId === id)) {
+    throw new Error("VESSEL_HAS_SITS");
+  }
+  localStorage.setItem(
+    "harbourly-vessels",
+    JSON.stringify(readVessels().filter((vessel) => vessel.id !== id)),
+  );
+}
+
+export async function updateOwnerOnVessels(
+  previousName: string,
+  owner: { name: string; image: string; languages: string[] },
+): Promise<void> {
+  await wait(250);
+  localStorage.setItem(
+    "harbourly-vessels",
+    JSON.stringify(
+      readVessels().map((vessel) =>
+        vessel.owner === previousName
+          ? {
+              ...vessel,
+              owner: owner.name,
+              ownerImage: owner.image,
+              ownerLanguages: owner.languages,
+            }
+          : vessel,
+      ),
+    ),
+  );
+  writeApplications(
+    readApplications().map((application) => ({
+      ...application,
+      ownerName: application.ownerName === previousName ? owner.name : application.ownerName,
+      applicant:
+        application.applicant.name === previousName
+          ? {
+              ...application.applicant,
+              name: owner.name,
+              image: owner.image,
+              languages: owner.languages,
+            }
+          : application.applicant,
+      messages: application.messages.map((message) =>
+        message.senderName === previousName ? { ...message, senderName: owner.name } : message,
+      ),
+    })),
+  );
+}
+
+export async function saveSit(
+  sit: Sit,
+  options?: {
+    creator?: { name: string; email?: string; phoneNumber?: string };
+  },
+): Promise<Sit> {
+  await wait(500);
+  const normalized: Sit = {
+    ...sit,
+    nonSmokerRequired: Boolean(sit.nonSmokerRequired),
+    requirements: withoutNonSmokerRequirementLabels(sit.requirements),
+    requiredSkills: withoutNonSmokerRequirementLabels(sit.requiredSkills ?? []),
+  };
+  const current = readSits();
+  const exists = current.some((item) => item.id === normalized.id);
+  if (!exists) {
+    const creator = options?.creator;
+    if (!creator?.name) {
+      throw new Error("SIT_VERIFICATION_REQUIRED");
+    }
+    const { requireMemberVerified } = await import("@/verificationService");
+    await requireMemberVerified(
+      creator.name,
+      { email: creator.email, phoneNumber: creator.phoneNumber },
+      "SIT_VERIFICATION_REQUIRED",
+    );
+  }
+  const next = exists
+    ? current.map((item) => (item.id === normalized.id ? normalized : item))
+    : [normalized, ...current];
+  localStorage.setItem("harbourly-sits", JSON.stringify(next));
+  return normalized;
+}
+
+function pickRandom<T>(items: readonly T[]): T {
+  return items[Math.floor(Math.random() * items.length)]!;
+}
+
+/** Dev-only: insert a random vessel owned by the current member. */
+export async function createDevRandomVessel(owner: {
+  name: string;
+  image: string;
+  languages?: string[];
+}): Promise<Vessel> {
+  if (!import.meta.env.DEV) {
+    throw new Error("createDevRandomVessel is only available in development");
+  }
+  await wait(200);
+  const stamp = Date.now().toString(36);
+  const id = `dev-boat-${stamp}`;
+  const [location, country] = pickRandom(generatedDestinations);
+  const type = pickRandom(generatedBoatTypes);
+  const name = `${pickRandom(generatedBoatNamePrefixes)} ${pickRandom(generatedBoatNameSuffixes)}`;
+  const hasEngine = type !== "Houseboat";
+  const vessel: Vessel = {
+    id,
+    name,
+    type,
+    length: feetToMetresString(28 + Math.floor(Math.random() * 40)),
+    homePort: `${location}, ${country}`,
+    image: uniqueCoverForVesselId(id),
+    gallery: [{ url: secondaryGalleryForVesselId(id) }],
+    owner: owner.name,
+    ownerLanguages: owner.languages?.length ? [...owner.languages] : ["English"],
+    ownerImage: owner.image,
+    rating: 0,
+    reviews: 0,
+    description: `${name} is a freshly listed ${type.toLowerCase()} ready for trusted boat care.`,
+    home: "A practical layout with a usable galley, bunk space and easy marina access.",
+    systems: hasEngine
+      ? ["Diesel engine", "Shore power", "Battery monitor", "Fresh-water system"]
+      : ["Shore power", "Battery monitor", "Holding tank", "Fresh-water connection"],
+    engineType: hasEngine ? "Inboard diesel" : "No engine",
+    voltageType: Math.random() > 0.5 ? "12 V DC" : "24 V DC",
+    stoveFuelType: Math.random() > 0.5 ? "LPG / propane" : "Electric / induction",
+    amenities: ["Bathroom", "Full kitchen", "Wi-Fi", "Shore power", "Gated access"],
+  };
+  return saveVessel(vessel);
+}
+
+/** Dev-only: insert a random open sit for one of the owner's boats. */
+export async function createDevRandomSit(owner: {
+  name: string;
+  email?: string;
+  phoneNumber?: string;
+  boatId?: string;
+}): Promise<Sit> {
+  if (!import.meta.env.DEV) {
+    throw new Error("createDevRandomSit is only available in development");
+  }
+  await wait(200);
+  const vessels = readVessels().filter((vessel) => vessel.owner === owner.name);
+  const vessel = owner.boatId
+    ? vessels.find((item) => item.id === owner.boatId)
+    : pickRandom(vessels);
+  if (!vessel) {
+    throw new Error("NO_OWNER_BOAT");
+  }
+  const stamp = Date.now().toString(36);
+  const id = `dev-sit-${stamp}`;
+  const startOffsetDays = 14 + Math.floor(Math.random() * 120);
+  const nights = 7 + Math.floor(Math.random() * 21);
+  const start = new Date();
+  start.setUTCHours(0, 0, 0, 0);
+  start.setUTCDate(start.getUTCDate() + startOffsetDays);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + nights);
+  const displayDate = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+  const homePort = splitHomePort(vessel.homePort);
+  const location = homePort.location || "Harbor town";
+  const country = homePort.country || "Unknown";
+  const coordinates = coordinatesForLocation(location, country);
+  const sit: Sit = {
+    id,
+    boatId: vessel.id,
+    dateStart: start.toISOString().slice(0, 10),
+    dates: `${displayDate.format(start)} – ${displayDate.format(end)}`,
+    duration: `${nights} nights`,
+    location,
+    country,
+    latitude: coordinates.latitude,
+    longitude: coordinates.longitude,
+    approximateLocation: true,
+    sitType: Math.random() > 0.35 ? "liveaboard" : "daytimeChecks",
+    responsibilities: [
+      "Check lines, fenders and bilges each day",
+      "Monitor shore power and battery levels",
+      "Send the owner a short weekly update",
+    ],
+    requirements: [],
+    minYearsExperience: 0,
+    requiredExperience: [],
+    requiredCertifications: [],
+    requiredSkills: [],
+    maxGuests: 1 + Math.floor(Math.random() * 3),
+    applicants: 0,
+    nonSmokerRequired: Math.random() > 0.6,
+    applicationsOpen: true,
+  };
+  // Write directly so DEV seeding is not blocked by identity verification gates.
+  const current = readSits();
+  localStorage.setItem("harbourly-sits", JSON.stringify([sit, ...current]));
+  return sit;
+}
+
+export async function deleteSit(id: string): Promise<void> {
+  await wait(400);
+  const sit = readSits().find((item) => item.id === id);
+  if (!sit) return;
+
+  const accepted = acceptedSitIds().has(id);
+  const phase = getSitPhase({
+    dateStart: sit.dateStart,
+    duration: sit.duration,
+    applicationsOpen: sit.applicationsOpen,
+    accepted,
+    applicants: sit.applicants,
+  });
+  if (phase === "stayUnderway") {
+    throw new Error("SIT_IS_UNDERWAY");
+  }
+  if (phase === "stayCompleted") {
+    throw new Error("SIT_IS_COMPLETED");
+  }
+
+  localStorage.setItem("harbourly-sits", JSON.stringify(readSits().filter((item) => item.id !== id)));
+  writeApplications(readApplications().filter((application) => application.sitId !== id));
+}
+
+export type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined" | "withdrawn";
+export type MockNotification = {
+  actor?: string;
+  boatName?: string;
+  createdAt: string;
+  href: string;
+  id: string;
+  type:
+    | "applicationAccepted"
+    | "newApplication"
+    | "newMessage"
+    | "sitAccepted"
+    | "sitReminder"
+    | "welcome";
+};
 
 export type ApplicationApplicant = {
   name: string;
@@ -126,6 +1476,8 @@ export type ApplicationApplicant = {
   skills: string[];
   yearsExperience: number;
   certifications: string[];
+  memberSince: number;
+  completedSits: number;
 };
 
 export type ApplicationMessage = {
@@ -133,6 +1485,19 @@ export type ApplicationMessage = {
   senderName: string;
   text: string;
   createdAt: string;
+  kind?: "user" | "system";
+  systemKind?:
+    | "accepted"
+    | "declined"
+    | "applicantsClosed"
+    | "videoCallRequest"
+    | "videoCallCounter"
+    | "videoCallAccepted"
+    | "videoCallDeclined";
+  videoCall?: {
+    startsAt: string;
+    durationMinutes: number;
+  };
 };
 
 export type SitApplication = {
@@ -141,11 +1506,860 @@ export type SitApplication = {
   boatName: string;
   ownerName: string;
   applicant: ApplicationApplicant;
+  partySize: number;
   initialMessage: string;
   status: ApplicationStatus;
   createdAt: string;
   messages: ApplicationMessage[];
+  ownerPhone?: string;
 };
+
+const seededApplications: SitApplication[] = [
+  {
+    id: "application-alex-solstice",
+    sitId: "solstice",
+    boatName: "Solstice",
+    ownerName: "Maya & Finn",
+    applicant: {
+      name: "Alex Morgan",
+      image: "https://i.pravatar.cc/160?img=11",
+      location: "Brighton, United Kingdom",
+      bio: "Calm liveaboard sailor with practical diesel and electrical experience.",
+      languages: ["English", "French"],
+      preferredCountries: ["Greece", "Croatia", "Italy"],
+      skills: ["Diesel troubleshooting", "12V electrical", "Mooring & lines", "Pet care"],
+      yearsExperience: 7,
+      completedSits: 8,
+      certifications: ["RYA Day Skipper", "VHF / SRC", "First aid"],
+      memberSince: 2021,
+    },
+    partySize: 2,
+    initialMessage:
+      "Hi Maya and Finn, I would love to care for Solstice. I have seven years of liveaboard sailing experience and can confidently handle routine diesel, battery, bilge and line checks.",
+    status: "accepted",
+    createdAt: "2026-07-18T09:30:00.000Z",
+    messages: [
+      {
+        id: "message-alex-initial",
+        senderName: "Alex Morgan",
+        text: "Hi Maya and Finn, I would love to care for Solstice. I have seven years of liveaboard sailing experience and can confidently handle routine diesel, battery, bilge and line checks.",
+        createdAt: "2026-07-18T09:30:00.000Z",
+      },
+      {
+        id: "message-maya-reply",
+        senderName: "Maya & Finn",
+        text: "Thanks Alex. Your systems experience looks like a strong fit. Are you available for a video handover next week?",
+        createdAt: "2026-07-18T13:15:00.000Z",
+      },
+      {
+        id: "message-maya-accept",
+        senderName: "Maya & Finn",
+        text: "We would love to have you aboard Solstice. Looking forward to the handover.",
+        createdAt: "2026-07-19T10:00:00.000Z",
+      },
+      {
+        id: "message-system-accepted-alex-solstice",
+        senderName: "Boatstead",
+        text: "You were accepted for this sit",
+        createdAt: "2026-07-19T10:00:01.000Z",
+        kind: "system",
+        systemKind: "accepted",
+      },
+    ],
+  },
+  {
+    id: "application-samira-solstice",
+    sitId: "solstice",
+    boatName: "Solstice",
+    ownerName: "Maya & Finn",
+    applicant: {
+      name: "Samira Costa",
+      image: "https://i.pravatar.cc/160?img=45",
+      location: "Lisbon, Portugal",
+      bio: "Offshore crew member and experienced pet sitter who works remotely.",
+      languages: ["Portuguese", "English", "Spanish"],
+      preferredCountries: ["Portugal", "Spain", "Greece"],
+      skills: ["Mooring & lines", "Storm preparation", "Pet care", "Tender handling"],
+      yearsExperience: 4,
+      completedSits: 5,
+      certifications: ["ICC", "VHF / SRC", "First aid"],
+      memberSince: 2022,
+    },
+    partySize: 1,
+    initialMessage:
+      "Hello, Solstice looks wonderful. I have completed several Mediterranean passages and have cared for boats and pets in Portugal, Spain and Greece.",
+    status: "declined",
+    createdAt: "2026-07-19T16:45:00.000Z",
+    messages: [
+      {
+        id: "message-samira-initial",
+        senderName: "Samira Costa",
+        text: "Hello, Solstice looks wonderful. I have completed several Mediterranean passages and have cared for boats and pets in Portugal, Spain and Greece.",
+        createdAt: "2026-07-19T16:45:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "application-theo-solstice",
+    sitId: "solstice",
+    boatName: "Solstice",
+    ownerName: "Maya & Finn",
+    applicant: {
+      name: "Theo Janssen",
+      image: "https://i.pravatar.cc/160?img=15",
+      location: "Rotterdam, Netherlands",
+      bio: "Mechanical engineer building experience toward longer cruising trips.",
+      languages: ["Dutch", "English", "German"],
+      preferredCountries: ["Netherlands", "Germany", "Denmark"],
+      skills: ["Diesel troubleshooting", "12V electrical", "Solar / lithium"],
+      yearsExperience: 2,
+      completedSits: 1,
+      certifications: ["VHF / SRC"],
+      memberSince: 2024,
+    },
+    partySize: 1,
+    initialMessage:
+      "Hi, I am a mechanical engineer with two seasons of coastal sailing. I am very comfortable with engines and electrical systems and would be happy to follow a detailed care plan.",
+    status: "declined",
+    createdAt: "2026-07-20T11:20:00.000Z",
+    messages: [
+      {
+        id: "message-theo-initial",
+        senderName: "Theo Janssen",
+        text: "Hi, I am a mechanical engineer with two seasons of coastal sailing. I am very comfortable with engines and electrical systems and would be happy to follow a detailed care plan.",
+        createdAt: "2026-07-20T11:20:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "application-accepted-blue-hour",
+    sitId: "blue-hour",
+    boatName: "Blue Hour",
+    ownerName: "Jonas",
+    applicant: {
+      name: "Alex Morgan",
+      image: "https://i.pravatar.cc/160?img=11",
+      location: "Brighton, United Kingdom",
+      bio: "Calm liveaboard sailor with practical diesel and electrical experience.",
+      languages: ["English", "French"],
+      preferredCountries: ["Greece", "Croatia", "Italy"],
+      skills: ["Diesel troubleshooting", "12V electrical", "Mooring & lines", "Pet care"],
+      yearsExperience: 7,
+      completedSits: 8,
+      certifications: ["RYA Day Skipper", "VHF / SRC", "First aid"],
+      memberSince: 2021,
+    },
+    partySize: 2,
+    initialMessage: "Hi Jonas, I would be glad to look after Blue Hour during your trip away.",
+    status: "accepted",
+    createdAt: "2026-07-15T09:00:00.000Z",
+    messages: [
+      {
+        id: "message-blue-hour-initial",
+        senderName: "Alex Morgan",
+        text: "Hi Jonas, I would be glad to look after Blue Hour during your trip away.",
+        createdAt: "2026-07-15T09:00:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "application-accepted-mistral",
+    sitId: "mistral",
+    boatName: "Mistral",
+    ownerName: "Elena",
+    applicant: {
+      name: "Samira Costa",
+      image: "https://i.pravatar.cc/160?img=45",
+      location: "Lisbon, Portugal",
+      bio: "Offshore crew member and experienced pet sitter who works remotely.",
+      languages: ["Portuguese", "English", "Spanish"],
+      preferredCountries: ["Portugal", "Spain", "Greece"],
+      skills: ["Mooring & lines", "Storm preparation", "Pet care", "Tender handling"],
+      yearsExperience: 4,
+      completedSits: 5,
+      certifications: ["ICC", "VHF / SRC", "First aid"],
+      memberSince: 2022,
+    },
+    partySize: 1,
+    initialMessage: "Hello Elena, Mistral looks like a great winter sit and I am available.",
+    status: "accepted",
+    createdAt: "2026-07-12T12:00:00.000Z",
+    messages: [
+      {
+        id: "message-mistral-initial",
+        senderName: "Samira Costa",
+        text: "Hello Elena, Mistral looks like a great winter sit and I am available.",
+        createdAt: "2026-07-12T12:00:00.000Z",
+      },
+    ],
+  },
+  ...Array.from({ length: 6 }, (_, index) => {
+    const sitNumber = index * 5 + 2;
+    return {
+      id: `application-accepted-generated-${sitNumber}`,
+      sitId: `generated-sit-${sitNumber}`,
+      boatName: `Generated ${sitNumber}`,
+      ownerName: "Generated Owner",
+      applicant: {
+        name: "Alex Morgan",
+        image: "https://i.pravatar.cc/160?img=11",
+        location: "Brighton, United Kingdom",
+        bio: "Calm liveaboard sailor with practical diesel and electrical experience.",
+        languages: ["English", "French"],
+        preferredCountries: ["Greece", "Croatia", "Italy"],
+        skills: ["Diesel troubleshooting", "12V electrical", "Mooring & lines"],
+        yearsExperience: 7,
+        completedSits: 8,
+        certifications: ["RYA Day Skipper", "VHF / SRC"],
+        memberSince: 2021,
+      },
+      partySize: 1,
+      initialMessage: "Happy to take this sit if the dates still work.",
+      status: "accepted" as const,
+      createdAt: "2026-07-10T08:00:00.000Z",
+      messages: [
+        {
+          id: `message-accepted-generated-${sitNumber}`,
+          senderName: "Alex Morgan",
+          text: "Happy to take this sit if the dates still work.",
+          createdAt: "2026-07-10T08:00:00.000Z",
+        },
+      ],
+    };
+  }),
+];
+
+function fallbackMemberSince(name: string) {
+  return (
+    {
+      "Alex Morgan": 2021,
+      "Samira Costa": 2022,
+      "Theo Janssen": 2024,
+    }[name] ?? 2024
+  );
+}
+
+function fallbackCompletedSits(name: string) {
+  return (
+    {
+      "Alex Morgan": 8,
+      "Samira Costa": 5,
+      "Theo Janssen": 1,
+    }[name] ?? 0
+  );
+}
+
+const APPLICATIONS_SEED_KEY = "boatstead-applications-v3";
+
+function ensureAcceptedSystemMessage(application: SitApplication): SitApplication {
+  if (application.status !== "accepted") return application;
+  const hasAcceptedSystemMessage = application.messages.some(
+    (message) => message.kind === "system" && message.systemKind === "accepted",
+  );
+  if (hasAcceptedSystemMessage) return application;
+  return {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-system-accepted-${application.id}`,
+        senderName: "Boatstead",
+        text: "You were accepted for this sit",
+        createdAt: new Date().toISOString(),
+        kind: "system",
+        systemKind: "accepted",
+      },
+    ],
+  };
+}
+
+function appendSystemMessage(
+  application: SitApplication,
+  systemKind: NonNullable<ApplicationMessage["systemKind"]>,
+  text: string,
+): SitApplication {
+  if (
+    application.messages.some(
+      (message) => message.kind === "system" && message.systemKind === systemKind,
+    )
+  ) {
+    return application;
+  }
+  return {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-system-${systemKind}-${application.id}-${Date.now().toString(36)}`,
+        senderName: "Boatstead",
+        text,
+        createdAt: new Date().toISOString(),
+        kind: "system",
+        systemKind,
+      },
+    ],
+  };
+}
+
+function ensureDeclinedSystemMessage(application: SitApplication): SitApplication {
+  if (application.status !== "declined") return application;
+  return appendSystemMessage(
+    application,
+    "declined",
+    "You are no longer being considered for this sit",
+  );
+}
+
+function ensureApplicantsClosedSystemMessage(application: SitApplication): SitApplication {
+  return appendSystemMessage(
+    application,
+    "applicantsClosed",
+    "The owner is no longer considering applicants for this sit",
+  );
+}
+
+function readApplications(): SitApplication[] {
+  if (!localStorage.getItem(APPLICATIONS_SEED_KEY)) {
+    localStorage.removeItem("harbourly-applications");
+    localStorage.removeItem("boatstead-applications-v2");
+    localStorage.setItem(APPLICATIONS_SEED_KEY, "complete");
+  }
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem("harbourly-applications") ?? "[]",
+    ) as SitApplication[];
+    const storedIds = new Set(stored.map((application) => application.id));
+    return [
+      ...stored
+        .filter((application) => application.id && application.applicant)
+        .map((application) =>
+          ensureDeclinedSystemMessage(
+            ensureAcceptedSystemMessage({
+              ...application,
+              partySize: Math.max(1, Math.floor(application.partySize ?? 1)),
+              applicant: {
+                ...application.applicant,
+                memberSince:
+                  application.applicant.memberSince ??
+                  fallbackMemberSince(application.applicant.name),
+                completedSits:
+                  application.applicant.completedSits ??
+                  fallbackCompletedSits(application.applicant.name),
+              },
+            }),
+          ),
+        ),
+      ...seededApplications
+        .filter((application) => !storedIds.has(application.id))
+        .map((application) =>
+          ensureDeclinedSystemMessage(ensureAcceptedSystemMessage(application)),
+        ),
+    ];
+  } catch {
+    return seededApplications.map((application) =>
+      ensureDeclinedSystemMessage(ensureAcceptedSystemMessage(application)),
+    );
+  }
+}
+
+function writeApplications(applications: SitApplication[]) {
+  localStorage.setItem("harbourly-applications", JSON.stringify(applications));
+}
+
+export function containsOffPlatformContactDetails(message: string) {
+  const containsEmail = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(message);
+  const phoneCandidates = message.match(/(?:\+?\d[\d\s().-]{5,}\d)/g) ?? [];
+  const containsPhone = phoneCandidates.some((candidate) => {
+    const compact = candidate.trim();
+    const looksLikeDate =
+      /^\d{4}[-.\s]\d{1,2}[-.\s]\d{1,2}$/.test(compact) ||
+      /^\d{1,2}[-.\s]\d{1,2}[-.\s]\d{2,4}$/.test(compact);
+    return !looksLikeDate && compact.replaceAll(/\D/g, "").length >= 7;
+  });
+  return containsEmail || containsPhone;
+}
+
+export type ConfirmedSitDateConflict = {
+  sitId: string;
+  boatName: string;
+};
+
+/** Another accepted sit for this sitter whose dates overlap the target sit. */
+export function findConfirmedSitDateConflict(
+  applications: SitApplication[],
+  sits: Array<{ id: string; dateStart: string; duration: string }>,
+  applicantName: string,
+  target: { id: string; dateStart: string; duration: string },
+): ConfirmedSitDateConflict | undefined {
+  for (const application of applications) {
+    if (
+      application.applicant.name !== applicantName ||
+      application.status !== "accepted" ||
+      application.sitId === target.id
+    ) {
+      continue;
+    }
+    const sit = sits.find((item) => item.id === application.sitId);
+    if (!sit) continue;
+    if (sitDateRangesOverlap(sit, target)) {
+      return { sitId: sit.id, boatName: application.boatName };
+    }
+  }
+  return undefined;
+}
+
+export async function sendApplication(
+  sitId: string,
+  message: string,
+  partySize: number,
+  applicant: Omit<ApplicationApplicant, "yearsExperience" | "certifications" | "completedSits"> & {
+    yearsExperience?: number;
+    certifications?: string[];
+    completedSits?: number;
+    email?: string;
+    phoneNumber?: string;
+  },
+) {
+  if (containsOffPlatformContactDetails(message)) {
+    throw new Error("APPLICATION_CONTACT_DETAILS_NOT_ALLOWED");
+  }
+  const { requireApplicantVerified } = await import("@/verificationService");
+  await requireApplicantVerified(applicant.name, {
+    email: applicant.email,
+    phoneNumber: applicant.phoneNumber,
+  });
+  await wait(700);
+  const applications = readApplications();
+  const existing = applications.find(
+    (application) => application.sitId === sitId && application.applicant.name === applicant.name,
+  );
+  if (existing && existing.status !== "withdrawn") return existing;
+  const sit = readSits().find((item) => item.id === sitId);
+  if (!sit) throw new Error("APPLICATION_SIT_NOT_FOUND");
+  if (!isAcceptingApplications(sit)) {
+    throw new Error("APPLICATIONS_CLOSED");
+  }
+  const confirmedConflict = findConfirmedSitDateConflict(
+    applications,
+    readSits(),
+    applicant.name,
+    sit,
+  );
+  if (confirmedConflict) {
+    throw new Error("APPLICATION_CONFIRMED_SIT_CONFLICT");
+  }
+  const normalizedPartySize = Math.floor(partySize);
+  if (normalizedPartySize < 1 || normalizedPartySize > sit.maxGuests) {
+    throw new Error("APPLICATION_PARTY_SIZE_INVALID");
+  }
+  const listing = joinSit(sit, readVessels());
+  if (!listing) throw new Error("APPLICATION_SIT_NOT_FOUND");
+  const createdAt = new Date().toISOString();
+  if (existing?.status === "withdrawn") {
+    const reopened = {
+      ...existing,
+      partySize: normalizedPartySize,
+      initialMessage: message.trim(),
+      status: "new" as const,
+      createdAt,
+      ownerPhone: undefined,
+      messages: [
+        {
+          id: `message-${Date.now()}`,
+          senderName: applicant.name,
+          text: message.trim(),
+          createdAt,
+          kind: "user" as const,
+        },
+      ],
+    };
+    writeApplications(
+      applications.map((item) => (item.id === existing.id ? reopened : item)),
+    );
+    localStorage.setItem(
+      "harbourly-sits",
+      JSON.stringify(
+        readSits().map((item) =>
+          item.id === sitId ? { ...item, applicants: item.applicants + 1 } : item,
+        ),
+      ),
+    );
+    return reopened;
+  }
+  const application: SitApplication = {
+    id: `application-${sitId}-${Date.now()}`,
+    sitId,
+    boatName: listing.name,
+    ownerName: listing.owner,
+    partySize: normalizedPartySize,
+    applicant: {
+      name: applicant.name,
+      image: applicant.image,
+      location: applicant.location,
+      bio: applicant.bio,
+      languages: applicant.languages,
+      preferredCountries: applicant.preferredCountries,
+      skills: applicant.skills,
+      memberSince: applicant.memberSince,
+      yearsExperience: applicant.yearsExperience ?? 0,
+      certifications: applicant.certifications ?? [],
+      completedSits: applicant.completedSits ?? fallbackCompletedSits(applicant.name),
+    },
+    initialMessage: message.trim(),
+    status: "new",
+    createdAt,
+    messages: [
+      {
+        id: `message-${Date.now()}`,
+        senderName: applicant.name,
+        text: message.trim(),
+        createdAt,
+      },
+    ],
+  };
+  writeApplications([application, ...applications]);
+  const sits = readSits();
+  localStorage.setItem(
+    "harbourly-sits",
+    JSON.stringify(
+      sits.map((item) =>
+        item.id === sitId ? { ...item, applicants: item.applicants + 1 } : item,
+      ),
+    ),
+  );
+  return application;
+}
+
+export async function getApplicationsForSit(sitId: string): Promise<SitApplication[]> {
+  await wait(250);
+  return readApplications()
+    .filter((application) => application.sitId === sitId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function getApplicationsForUser(userName: string): Promise<SitApplication[]> {
+  await wait(250);
+  return readApplications()
+    .filter(
+      (application) =>
+        application.ownerName === userName || application.applicant.name === userName,
+    )
+    .sort((a, b) => b.messages.at(-1)!.createdAt.localeCompare(a.messages.at(-1)!.createdAt));
+}
+
+export async function updateApplicationStatus(
+  applicationId: string,
+  status: ApplicationStatus,
+  ownerPhone?: string,
+): Promise<SitApplication> {
+  await wait(350);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  const wasAccepted = application.status === "accepted";
+  let updated = ensureAcceptedSystemMessage({
+    ...application,
+    status,
+    ownerPhone: status === "accepted" ? ownerPhone : undefined,
+  });
+  if (status === "declined") {
+    updated = ensureDeclinedSystemMessage(updated);
+  }
+  let nextApplications = applications.map((item) =>
+    item.id === applicationId ? updated : item,
+  );
+  if (status === "accepted") {
+    nextApplications = nextApplications.map((item) => {
+      if (item.id === applicationId || item.sitId !== application.sitId) return item;
+      if (item.status !== "new" && item.status !== "shortlisted") return item;
+      return ensureApplicantsClosedSystemMessage(item);
+    });
+  }
+  writeApplications(nextApplications);
+  const sits = readSits();
+  const sit = sits.find((item) => item.id === application.sitId);
+  if (sit) {
+    if (status === "accepted" && sit.applicationsOpen !== false) {
+      localStorage.setItem(
+        "harbourly-sits",
+        JSON.stringify(
+          sits.map((item) =>
+            item.id === sit.id ? { ...item, applicationsOpen: false } : item,
+          ),
+        ),
+      );
+    } else if (wasAccepted && status !== "accepted") {
+      localStorage.setItem(
+        "harbourly-sits",
+        JSON.stringify(
+          sits.map((item) =>
+            item.id === sit.id ? { ...item, applicationsOpen: true } : item,
+          ),
+        ),
+      );
+    }
+  }
+  return updated;
+}
+
+export async function withdrawApplication(
+  applicationId: string,
+  applicantName: string,
+): Promise<SitApplication> {
+  await wait(350);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  if (application.applicant.name !== applicantName) {
+    throw new Error("WITHDRAW_NOT_ALLOWED");
+  }
+  if (application.status === "withdrawn" || application.status === "declined") {
+    throw new Error("WITHDRAW_NOT_ALLOWED");
+  }
+  const wasAccepted = application.status === "accepted";
+  const updated = {
+    ...application,
+    status: "withdrawn" as const,
+    ownerPhone: undefined,
+  };
+  writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
+  const sits = readSits();
+  const sit = sits.find((item) => item.id === application.sitId);
+  if (sit) {
+    localStorage.setItem(
+      "harbourly-sits",
+      JSON.stringify(
+        sits.map((item) =>
+          item.id === sit.id
+            ? {
+                ...item,
+                applicants: Math.max(0, item.applicants - 1),
+                ...(wasAccepted ? { applicationsOpen: true } : {}),
+              }
+            : item,
+        ),
+      ),
+    );
+  }
+  return updated;
+}
+
+export async function getNotificationsForUser(userName: string): Promise<MockNotification[]> {
+  await wait(250);
+  const minutesAgo = (minutes: number) =>
+    new Date(Date.now() - minutes * 60 * 1_000).toISOString();
+
+  if (userName === "Maya & Finn") {
+    return [
+      {
+        actor: "Theo Janssen",
+        boatName: "Solstice",
+        createdAt: minutesAgo(18),
+        href: "/owner/sits/solstice/applications",
+        id: "maya-sit-accepted",
+        type: "sitAccepted",
+      },
+      {
+        actor: "Samira Costa",
+        boatName: "Solstice",
+        createdAt: minutesAgo(74),
+        href: "/owner/sits/solstice/applications",
+        id: "maya-new-application",
+        type: "newApplication",
+      },
+      {
+        actor: "Alex Morgan",
+        boatName: "Solstice",
+        createdAt: minutesAgo(190),
+        href: "/messages",
+        id: "maya-new-message",
+        type: "newMessage",
+      },
+    ];
+  }
+
+  if (userName === "Alex Morgan") {
+    return [
+      {
+        actor: "Maya & Finn",
+        boatName: "Solstice",
+        createdAt: minutesAgo(9),
+        href: "/messages",
+        id: "alex-application-accepted",
+        type: "applicationAccepted",
+      },
+      {
+        actor: "Maya & Finn",
+        boatName: "Solstice",
+        createdAt: minutesAgo(42),
+        href: "/messages",
+        id: "alex-new-message",
+        type: "newMessage",
+      },
+      {
+        boatName: "Solstice",
+        createdAt: minutesAgo(1_440),
+        href: "/boats/solstice",
+        id: "alex-sit-reminder",
+        type: "sitReminder",
+      },
+    ];
+  }
+
+  return [
+    {
+      createdAt: minutesAgo(12),
+      href: "/members/me",
+      id: `welcome-${userName}`,
+      type: "welcome",
+    },
+  ];
+}
+
+export async function sendApplicationMessage(
+  applicationId: string,
+  senderName: string,
+  text: string,
+): Promise<SitApplication> {
+  await wait(350);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  const updated = {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-${Date.now()}`,
+        senderName,
+        text: text.trim(),
+        createdAt: new Date().toISOString(),
+      },
+    ],
+  };
+  writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
+  return updated;
+}
+
+export async function requestApplicationVideoCall(
+  applicationId: string,
+  senderName: string,
+  proposal: { startsAt: string; durationMinutes: number },
+  options?: { counter?: boolean },
+): Promise<SitApplication> {
+  await wait(350);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+
+  const startsAt = new Date(proposal.startsAt);
+  if (Number.isNaN(startsAt.getTime()) || startsAt.getTime() <= Date.now()) {
+    throw new Error("VIDEO_CALL_TIME_PAST");
+  }
+  const durationMinutes = Math.max(5, Math.round(proposal.durationMinutes));
+  const isCounter = Boolean(options?.counter);
+  const systemKind = isCounter ? ("videoCallCounter" as const) : ("videoCallRequest" as const);
+  const updated = {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-video-call-${Date.now()}`,
+        senderName,
+        text: isCounter
+          ? `${senderName} suggested a different video call time`
+          : `${senderName} proposed a video call`,
+        createdAt: new Date().toISOString(),
+        kind: "system" as const,
+        systemKind,
+        videoCall: {
+          startsAt: startsAt.toISOString(),
+          durationMinutes,
+        },
+      },
+    ],
+  };
+  writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
+  return updated;
+}
+
+export async function acceptApplicationVideoCall(
+  applicationId: string,
+  senderName: string,
+  messageId: string,
+): Promise<SitApplication> {
+  await wait(320);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  const proposal = application.messages.find((message) => message.id === messageId);
+  if (
+    !proposal?.videoCall ||
+    (proposal.systemKind !== "videoCallRequest" && proposal.systemKind !== "videoCallCounter")
+  ) {
+    throw new Error("VIDEO_CALL_PROPOSAL_NOT_FOUND");
+  }
+  if (proposal.senderName === senderName) {
+    throw new Error("VIDEO_CALL_CANNOT_ACCEPT_OWN");
+  }
+
+  const updated = {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-video-call-accepted-${Date.now()}`,
+        senderName,
+        text: `${senderName} accepted the video call time`,
+        createdAt: new Date().toISOString(),
+        kind: "system" as const,
+        systemKind: "videoCallAccepted" as const,
+        videoCall: { ...proposal.videoCall },
+      },
+    ],
+  };
+  writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
+  return updated;
+}
+
+export async function declineApplicationVideoCall(
+  applicationId: string,
+  senderName: string,
+  messageId: string,
+): Promise<SitApplication> {
+  await wait(320);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  const proposal = application.messages.find((message) => message.id === messageId);
+  if (
+    !proposal?.videoCall ||
+    (proposal.systemKind !== "videoCallRequest" && proposal.systemKind !== "videoCallCounter")
+  ) {
+    throw new Error("VIDEO_CALL_PROPOSAL_NOT_FOUND");
+  }
+  if (proposal.senderName === senderName) {
+    throw new Error("VIDEO_CALL_CANNOT_DECLINE_OWN");
+  }
+
+  const updated = {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-video-call-declined-${Date.now()}`,
+        senderName,
+        text: `${senderName} declined the video call proposal`,
+        createdAt: new Date().toISOString(),
+        kind: "system" as const,
+        systemKind: "videoCallDeclined" as const,
+        videoCall: { ...proposal.videoCall },
+      },
+    ],
+  };
+  writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
+  return updated;
+}
 
 export type SupportRequest = {
   topic: string;
@@ -155,209 +2369,271 @@ export type SupportRequest = {
   createdAt: string;
 };
 
-// ---------------------------------------------------------------------------
-// Geo helper (kept client-side; the API also returns coordinates when known)
-// ---------------------------------------------------------------------------
-
-// Whangarei isn't in the destinations list but is used by seed data, so keep a
-// couple of extras alongside the shared table.
-const EXTRA_COORDINATES: Record<string, [number, number]> = {
-  whangarei: [-35.7251, 174.3237],
-  "st. george's": [12.0561, -61.7488],
-};
-
-export function coordinatesForLocation(location: string, country: string) {
-  const key = location.trim().toLowerCase().replace(/’/g, "'");
-  const extra = EXTRA_COORDINATES[key];
-  if (extra) return { latitude: extra[0], longitude: extra[1] };
-
-  const hit = lookupCoordinates(location, country);
-  // Fall back to [0, 0] (Gulf of Guinea) only when truly unknown — still wrong,
-  // but at least deterministic and obvious, unlike the old [20, 0].
-  return hit ?? { latitude: 0, longitude: 0 };
-}
-
-// ---------------------------------------------------------------------------
-// Fetch helper
-// ---------------------------------------------------------------------------
-
-const BASE = "/api";
-
-async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: init?.body ? { "Content-Type": "application/json" } : undefined,
-    ...init,
-  });
-  const text = await res.text();
-  const body = text ? JSON.parse(text) : {};
-  if (!res.ok) {
-    // Preserve the backend's error code so callers can branch on it
-    // (e.g. VESSEL_HAS_SITS, APPLICATION_SIT_NOT_FOUND).
-    throw new Error(body?.error ?? `Request failed: ${res.status}`);
-  }
-  return (body.data ?? body) as T;
-}
-
-/** Fill nullable coordinate/optional fields so results satisfy the app types. */
-function normalizeBoat(raw: Record<string, unknown>): Boat {
-  const location = String(raw.location ?? "");
-  const country = String(raw.country ?? "");
-  const coords =
-    raw.latitude != null && raw.longitude != null
-      ? { latitude: Number(raw.latitude), longitude: Number(raw.longitude) }
-      : coordinatesForLocation(location, country);
-  return {
-    ...(raw as Boat),
-    latitude: coords.latitude,
-    longitude: coords.longitude,
-    pet: (raw.pet as string | null) ?? undefined,
-    minYearsExperience: (raw.minYearsExperience as number | null) ?? undefined,
-    featured: Boolean(raw.featured),
-  };
-}
-
-function normalizeSit(raw: Record<string, unknown>): Sit {
-  const coords =
-    raw.latitude != null && raw.longitude != null
-      ? { latitude: Number(raw.latitude), longitude: Number(raw.longitude) }
-      : coordinatesForLocation(String(raw.location ?? ""), String(raw.country ?? ""));
-  return {
-    ...(raw as Sit),
-    latitude: coords.latitude,
-    longitude: coords.longitude,
-    pet: (raw.pet as string | null) ?? undefined,
-    minYearsExperience: (raw.minYearsExperience as number | null) ?? undefined,
-    featured: Boolean(raw.featured),
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Listings
-// ---------------------------------------------------------------------------
-
-export async function getBoats(): Promise<Boat[]> {
-  const rows = await api<Record<string, unknown>[]>("/boats");
-  return rows.map(normalizeBoat);
-}
-
-export async function getBoat(id: string): Promise<Boat | undefined> {
-  try {
-    const row = await api<Record<string, unknown>>(`/boats/${encodeURIComponent(id)}`);
-    return normalizeBoat(row);
-  } catch {
-    return undefined;
-  }
-}
-
-export async function getVessels(): Promise<Vessel[]> {
-  return api<Vessel[]>("/vessels");
-}
-
-export async function getSits(): Promise<Sit[]> {
-  const rows = await api<Record<string, unknown>[]>("/sits");
-  return rows.map(normalizeSit);
-}
-
-export async function saveVessel(vessel: Vessel): Promise<Vessel> {
-  return api<Vessel>(`/vessels/${encodeURIComponent(vessel.id)}`, {
-    method: "PUT",
-    body: JSON.stringify(vessel),
-  });
-}
-
-export async function deleteVessel(id: string): Promise<void> {
-  await api<unknown>(`/vessels/${encodeURIComponent(id)}`, { method: "DELETE" });
-}
-
-export async function updateOwnerOnVessels(
-  previousName: string,
-  owner: { name: string; image: string },
-): Promise<void> {
-  // Propagate an owner profile rename across their vessels. This is a
-  // mock-auth-era nicety; once identity is a stable user id (see AUTH.md) the
-  // owner name/image will be derived, not duplicated, and this can be removed.
-  const vessels = await api<Vessel[]>(`/vessels?owner=${encodeURIComponent(previousName)}`);
-  await Promise.all(
-    vessels.map((vessel) => saveVessel({ ...vessel, owner: owner.name, ownerImage: owner.image })),
-  );
-}
-
-export async function saveSit(sit: Sit): Promise<Sit> {
-  const saved = await api<Record<string, unknown>>(`/sits/${encodeURIComponent(sit.id)}`, {
-    method: "PUT",
-    body: JSON.stringify(sit),
-  });
-  return normalizeSit(saved);
-}
-
-export async function deleteSit(id: string): Promise<void> {
-  await api<unknown>(`/sits/${encodeURIComponent(id)}`, { method: "DELETE" });
-}
-
-// ---------------------------------------------------------------------------
-// Applications
-// ---------------------------------------------------------------------------
-
-export async function sendApplication(
-  sitId: string,
-  message: string,
-  applicant: Omit<ApplicationApplicant, "yearsExperience" | "certifications"> & {
-    yearsExperience?: number;
-    certifications?: string[];
-  },
-): Promise<SitApplication> {
-  return api<SitApplication>("/applications", {
-    method: "POST",
-    body: JSON.stringify({
-      sitId,
-      message,
-      applicant: {
-        ...applicant,
-        yearsExperience: applicant.yearsExperience ?? 0,
-        certifications: applicant.certifications ?? [],
-      },
-    }),
-  });
-}
-
-export async function getApplicationsForSit(sitId: string): Promise<SitApplication[]> {
-  return api<SitApplication[]>(`/applications?sitId=${encodeURIComponent(sitId)}`);
-}
-
-export async function getApplicationsForUser(userName: string): Promise<SitApplication[]> {
-  return api<SitApplication[]>(`/applications?user=${encodeURIComponent(userName)}`);
-}
-
-export async function updateApplicationStatus(
-  applicationId: string,
-  status: ApplicationStatus,
-): Promise<SitApplication> {
-  return api<SitApplication>(`/applications/${encodeURIComponent(applicationId)}`, {
-    method: "PATCH",
-    body: JSON.stringify({ status }),
-  });
-}
-
-export async function sendApplicationMessage(
-  applicationId: string,
-  senderName: string,
-  text: string,
-): Promise<SitApplication> {
-  return api<SitApplication>(`/applications/${encodeURIComponent(applicationId)}/messages`, {
-    method: "POST",
-    body: JSON.stringify({ senderName, text }),
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Support
-// ---------------------------------------------------------------------------
-
 export async function submitSupportRequest(
   request: Omit<SupportRequest, "createdAt">,
 ): Promise<SupportRequest> {
-  return api<SupportRequest>("/support", {
-    method: "POST",
-    body: JSON.stringify(request),
-  });
+  await wait(650);
+  const submission = { ...request, createdAt: new Date().toISOString() };
+  const existing = JSON.parse(localStorage.getItem("harbourly-support-requests") ?? "[]");
+  localStorage.setItem("harbourly-support-requests", JSON.stringify([...existing, submission]));
+  return submission;
+}
+
+export type SitReviewResponse = {
+  text: string;
+  createdAt: string;
+};
+
+export type SitReview = {
+  id: string;
+  sitId: string;
+  boatName: string;
+  applicationId: string;
+  sitterName: string;
+  ownerName: string;
+  ownerImage: string;
+  rating: number;
+  text: string;
+  createdAt: string;
+  location: string;
+  response?: SitReviewResponse;
+};
+
+export type PublicMemberProfile = {
+  name: string;
+  image: string;
+  coverImage?: string;
+  location: string;
+  bio: string;
+  languages: string[];
+  preferredCountries: string[];
+  skills: string[];
+  yearsExperience: number;
+  certifications: string[];
+  memberSince: number;
+  completedSits: number;
+};
+
+export type SitterRatingSummary = {
+  average: number;
+  count: number;
+};
+
+const REVIEWS_SEED_KEY = "boatstead-reviews-v1";
+
+const seededReviews: SitReview[] = [
+  {
+    id: "review-juniper-alex",
+    sitId: "juniper-historic",
+    boatName: "Juniper",
+    applicationId: "application-alex-juniper",
+    sitterName: "Alex Morgan",
+    ownerName: "Sarah & Tom",
+    ownerImage: "https://i.pravatar.cc/100?img=14",
+    rating: 5,
+    text: "Alex was exactly who you want looking after a boat: methodical, communicative and calm when a windy front came through. The handover back was immaculate.",
+    createdAt: "2026-06-12T10:00:00.000Z",
+    location: "Preveza, Greece",
+    response: {
+      text: "Thank you Sarah and Tom. Juniper was a joy to care for and I appreciated the clear handover notes.",
+      createdAt: "2026-06-13T09:20:00.000Z",
+    },
+  },
+  {
+    id: "review-kindred-alex",
+    sitId: "kindred-historic",
+    boatName: "Kindred",
+    applicationId: "application-alex-kindred",
+    sitterName: "Alex Morgan",
+    ownerName: "Marcus",
+    ownerImage: "https://i.pravatar.cc/100?img=53",
+    rating: 5,
+    text: "A genuinely capable sitter. Alex spotted a small freshwater pump leak early, sent clear photos and coordinated the fix with our engineer. Highly recommended.",
+    createdAt: "2026-02-20T14:30:00.000Z",
+    location: "Lisbon, Portugal",
+  },
+  {
+    id: "review-tern-alex",
+    sitId: "tern-historic",
+    boatName: "Tern",
+    applicationId: "application-alex-tern",
+    sitterName: "Alex Morgan",
+    ownerName: "Jo & Ellie",
+    ownerImage: "https://i.pravatar.cc/100?img=23",
+    rating: 5,
+    text: "Our first time using a boat sitter and we could not have felt more reassured. Great with the systems, our dog, and the marina team.",
+    createdAt: "2025-10-08T11:15:00.000Z",
+    location: "Brighton, United Kingdom",
+  },
+  {
+    id: "review-harbour-samira",
+    sitId: "harbour-light-historic",
+    boatName: "Harbour Light",
+    applicationId: "application-samira-harbour",
+    sitterName: "Samira Costa",
+    ownerName: "Elena Rossi",
+    ownerImage: "https://i.pravatar.cc/100?img=32",
+    rating: 4,
+    text: "Samira was reliable with lines, pets and weekly updates. A small delay reporting a shore-power trip, but otherwise excellent care.",
+    createdAt: "2026-04-02T16:00:00.000Z",
+    location: "Cascais, Portugal",
+  },
+  {
+    id: "review-north-theo",
+    sitId: "north-channel-historic",
+    boatName: "North Channel",
+    applicationId: "application-theo-north",
+    sitterName: "Theo Janssen",
+    ownerName: "Ingrid Berg",
+    ownerImage: "https://i.pravatar.cc/100?img=41",
+    rating: 4,
+    text: "Theo handled engine checks confidently and kept the boat tidy. Would welcome him back for a longer sit.",
+    createdAt: "2026-03-18T09:45:00.000Z",
+    location: "Amsterdam, Netherlands",
+  },
+];
+
+function readReviews(): SitReview[] {
+  if (!localStorage.getItem(REVIEWS_SEED_KEY)) {
+    localStorage.removeItem("harbourly-reviews");
+    localStorage.setItem(REVIEWS_SEED_KEY, "complete");
+  }
+  try {
+    const stored = JSON.parse(localStorage.getItem("harbourly-reviews") ?? "[]") as SitReview[];
+    const storedIds = new Set(stored.map((review) => review.id));
+    return [
+      ...stored.filter((review) => review.id && review.sitterName && review.rating),
+      ...seededReviews.filter((review) => !storedIds.has(review.id)),
+    ];
+  } catch {
+    return seededReviews;
+  }
+}
+
+function writeReviews(reviews: SitReview[]) {
+  localStorage.setItem("harbourly-reviews", JSON.stringify(reviews));
+}
+
+function sortReviewsNewest(reviews: SitReview[]) {
+  return [...reviews].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function summarizeSitterRating(reviews: SitReview[]): SitterRatingSummary {
+  if (!reviews.length) return { average: 0, count: 0 };
+  const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+  return {
+    average: Math.round((total / reviews.length) * 10) / 10,
+    count: reviews.length,
+  };
+}
+
+export async function getReviewsForSitter(sitterName: string): Promise<SitReview[]> {
+  await wait(200);
+  return sortReviewsNewest(readReviews().filter((review) => review.sitterName === sitterName));
+}
+
+export async function getSitterRatingSummary(sitterName: string): Promise<SitterRatingSummary> {
+  const reviews = await getReviewsForSitter(sitterName);
+  return summarizeSitterRating(reviews);
+}
+
+export async function getReviewForApplication(
+  applicationId: string,
+): Promise<SitReview | null> {
+  await wait(150);
+  return readReviews().find((review) => review.applicationId === applicationId) ?? null;
+}
+
+export async function getPublicMemberProfile(
+  name: string,
+): Promise<PublicMemberProfile | null> {
+  await wait(200);
+  const fromApplication = readApplications().find(
+    (application) => application.applicant.name === name,
+  )?.applicant;
+  if (fromApplication) {
+    return {
+      name: fromApplication.name,
+      image: fromApplication.image,
+      location: fromApplication.location,
+      bio: fromApplication.bio,
+      languages: fromApplication.languages,
+      preferredCountries: fromApplication.preferredCountries,
+      skills: fromApplication.skills,
+      yearsExperience: fromApplication.yearsExperience,
+      certifications: fromApplication.certifications,
+      memberSince: fromApplication.memberSince,
+      completedSits: fromApplication.completedSits,
+    };
+  }
+  return null;
+}
+
+export async function createReview(input: {
+  applicationId: string;
+  rating: number;
+  text: string;
+  ownerName: string;
+}): Promise<SitReview> {
+  await wait(500);
+  const rating = Math.round(input.rating);
+  if (rating < 1 || rating > 5) throw new Error("REVIEW_INVALID_RATING");
+  const text = input.text.trim();
+  if (text.length < 20) throw new Error("REVIEW_TEXT_TOO_SHORT");
+  const application = readApplications().find((item) => item.id === input.applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  if (application.status !== "accepted") throw new Error("REVIEW_APPLICATION_NOT_ACCEPTED");
+  if (application.ownerName !== input.ownerName) throw new Error("REVIEW_OWNER_ONLY");
+  const sit = readSits().find((item) => item.id === application.sitId);
+  const acceptedIds = acceptedSitIds();
+  const listing = joinSit(sit, readVessels(), acceptedIds);
+  if (!listing || !canLeaveReview(listing)) {
+    if (!listing || !isSitCompletedForReview(listing)) {
+      throw new Error("REVIEW_SIT_NOT_COMPLETED");
+    }
+    throw new Error("REVIEW_WINDOW_CLOSED");
+  }
+  const reviews = readReviews();
+  if (reviews.some((review) => review.applicationId === input.applicationId)) {
+    throw new Error("REVIEW_ALREADY_EXISTS");
+  }
+  const review: SitReview = {
+    id: `review-${Date.now()}`,
+    sitId: application.sitId,
+    boatName: application.boatName,
+    applicationId: application.id,
+    sitterName: application.applicant.name,
+    ownerName: application.ownerName,
+    ownerImage: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(application.ownerName)}`,
+    rating,
+    text,
+    createdAt: new Date().toISOString(),
+    location: listing ? `${listing.location}, ${listing.country}` : application.boatName,
+  };
+  writeReviews([review, ...reviews]);
+  return review;
+}
+
+export async function respondToReview(input: {
+  reviewId: string;
+  sitterName: string;
+  text: string;
+}): Promise<SitReview> {
+  await wait(400);
+  const text = input.text.trim();
+  if (text.length < 8) throw new Error("REVIEW_RESPONSE_TOO_SHORT");
+  const reviews = readReviews();
+  const existing = reviews.find((review) => review.id === input.reviewId);
+  if (!existing) throw new Error("REVIEW_NOT_FOUND");
+  if (existing.sitterName !== input.sitterName) throw new Error("REVIEW_SITTER_ONLY");
+  if (existing.response) throw new Error("REVIEW_RESPONSE_EXISTS");
+  const updated: SitReview = {
+    ...existing,
+    response: {
+      text,
+      createdAt: new Date().toISOString(),
+    },
+  };
+  writeReviews(reviews.map((review) => (review.id === input.reviewId ? updated : review)));
+  return updated;
 }

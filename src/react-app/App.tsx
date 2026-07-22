@@ -1,14 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   Anchor,
+  Archive,
+  ArchiveRestore,
   ArrowLeft,
   ArrowRight,
   BatteryCharging,
   CalendarDays,
   Check,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CircleCheck,
   Compass,
   Droplets,
@@ -16,7 +19,10 @@ import {
   Fuel,
   Gauge,
   Heart,
+  Home,
   ImagePlus,
+  Info,
+  Languages,
   LifeBuoy,
   List,
   LogOut,
@@ -33,54 +39,144 @@ import {
   ShipWheel,
   Sparkles,
   Star,
+  Sun,
+  TriangleAlert,
   Trash2,
+  Video,
+  KeyRound,
+  Flag,
   Waves,
   Wrench,
   X,
   Zap,
+  Users,
 } from "lucide-react";
-import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { CommandPalette } from "@/components/command/CommandPalette";
-import { ConversationPanel } from "@/components/applications/ConversationPanel";
+import {
+  AutoTranslationAttribution,
+  useAutoTranslatedOwnerContent,
+} from "@/components/listing/AutoTranslatedOwnerContent";
 import { BoatMap } from "@/components/maps/BoatMap";
+import { BoatsPageLoadingSkeleton, BoatCardSkeleton } from "@/components/ui/BoatCardSkeleton";
+import {
+  OwnerBoatsLoadingSkeleton,
+  OwnerSitsLoadingSkeleton,
+} from "@/components/ui/OwnerDashboardSkeleton";
+import { EditorLivePreview } from "@/components/ui/EditorLivePreview";
+import { VesselPreviewCard } from "@/components/listing/VesselPreviewCard";
+import { ResultsPagination } from "@/components/ui/ResultsPagination";
+import { SitDetailSkeleton } from "@/components/ui/SitDetailSkeleton";
+import { MessagesPageSkeleton } from "@/components/ui/MessagesPageSkeleton";
 import { FeatureIcon } from "@/components/ui/FeatureIcon";
 import { IconTooltip } from "@/components/ui/IconTooltip";
+import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
+import { Select } from "@/components/ui/Select";
+import { VesselPicker } from "@/components/ui/VesselPicker";
 import { DestinationAutocomplete } from "@/components/search/DestinationAutocomplete";
 import { AuthModal } from "@/components/forms/AuthModal";
+import { ConversationPanel } from "@/components/applications/ConversationPanel";
+import { formatApplicationSystemMessage } from "@/components/applications/formatApplicationSystemMessage";
+import { CloseApplicationsRequestsDialog } from "@/components/applications/CloseApplicationsRequestsDialog";
+import { AdminPage } from "@/components/admin/AdminPage";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { isAdminUser } from "@/adminAccess";
 import { DateRangePicker } from "@/components/forms/DateRangePicker";
 import { ImageUploadControl } from "@/components/forms/ImageUploadControl";
+import { PhoneCountryCodeSelect } from "@/components/forms/PhoneCountryCodeSelect";
+import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
+import {
+  ChangeEmailModal,
+  ChangePasswordModal,
+} from "@/components/forms/ChangeCredentialsModals";
+import { UserSafetyActions, BlockedUserBanner } from "@/components/moderation/UserSafetyActions";
 import { getIntlLocale, normalizeLanguageCode, SUPPORTED_LANGUAGES } from "@/i18n";
-import { isHappeningSoon } from "@/dateUtils";
+import { isHappeningSoon, getSitPhase, canLeaveReview, reviewDaysRemaining, parseSitDate, startOfLocalDay, SIT_PHASES, type SitPhase } from "@/dateUtils";
 import { deleteMockAccount } from "@/mockAuth";
 import { LanguageSelect } from "@/components/layout/LanguageSelect";
 import { NotificationsMenu } from "@/components/layout/NotificationsMenu";
 import {
+  containsOffPlatformContactDetails,
   deleteSit,
   deleteVessel,
   coordinatesForLocation,
+  findConfirmedSitDateConflict,
   getBoat,
   getBoats,
   getApplicationsForSit,
   getApplicationsForUser,
+  getPublicMemberProfile,
+  getReviewsForSitter,
   getSits,
+  getSitPrivateAccessForViewer,
   getVessels,
   saveSit,
   saveVessel,
   sendApplication,
   sendApplicationMessage,
+  requestApplicationVideoCall,
+  acceptApplicationVideoCall,
+  declineApplicationVideoCall,
   submitSupportRequest,
+  summarizeSitterRating,
   updateApplicationStatus,
+  withdrawApplication,
   updateOwnerOnVessels,
+  isAcceptingApplications,
+  isNonSmokerRequirementLabel,
+  resolveNonSmokerRequired,
+  withoutNonSmokerRequirementLabels,
   type Boat,
   type EngineType,
   type VoltageType,
   type StoveFuelType,
   type ApplicationStatus,
+  type BoatPhoto,
   type Sit,
+  type SitApplication,
   type Vessel,
 } from "@/mockApi";
-import { useAppStore } from "@/store";
-import { getVerificationStatus, startVerification } from "@/verificationService";
+import { VesselPrivateAccessCard } from "@/components/listing/VesselPrivateAccessCard";
+import {
+  convertBoatLength,
+  formatBoatLength,
+  normalizeLengthToMetres,
+  parseBoatLength,
+  type LengthUnit,
+} from "@/lengthUtils";
+import { coverPhotoClassName, coverPhotoStyle, optimizePhotoUrl } from "@/photoUtils";
+import { useFeatureFlag } from "@/featureFlags";
+import { setOwnerDashboardTab } from "@/ownerDashboardDev";
+import {
+  LeaveReviewForm,
+  SitterRatingBadge,
+  SitterReviewsSection,
+} from "@/components/reviews/SitterReviews";
+import {
+  DEFAULT_EMAIL_NOTIFICATIONS,
+  DEFAULT_SIT_CREATION_DEFAULTS,
+  detectMeasurementSystem,
+  useAppStore,
+  type EmailNotificationPrefs,
+} from "@/store";
+import {
+  getVerificationStatus,
+  getMemberVerificationChecks,
+  isFullyVerified,
+  startVerification,
+} from "@/verificationService";
+import {
+  IdentityVerificationBadge,
+  IdentityVerificationCard,
+} from "@/components/verification/IdentityVerificationCard";
 
 const fallbackImage =
   "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=85";
@@ -88,6 +184,59 @@ const fallbackImage =
 const MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024;
 const MAX_STORED_IMAGE_BYTES = 1_500_000;
 const DELETE_ACCOUNT_CONFIRMATION_TERM = "DELETE";
+const CONVERSATIONS_PER_PAGE = 10;
+const SPOKEN_LANGUAGE_OPTIONS = [
+  ["English", "spokenLanguages.english"],
+  ["French", "spokenLanguages.french"],
+  ["Spanish", "spokenLanguages.spanish"],
+  ["Italian", "spokenLanguages.italian"],
+  ["German", "spokenLanguages.german"],
+  ["Dutch", "spokenLanguages.dutch"],
+  ["Portuguese", "spokenLanguages.portuguese"],
+  ["Greek", "spokenLanguages.greek"],
+  ["Croatian", "spokenLanguages.croatian"],
+  ["Turkish", "spokenLanguages.turkish"],
+  ["Swedish", "spokenLanguages.swedish"],
+  ["Norwegian", "spokenLanguages.norwegian"],
+  ["Danish", "spokenLanguages.danish"],
+  ["Finnish", "spokenLanguages.finnish"],
+  ["Japanese", "spokenLanguages.japanese"],
+  ["Polish", "spokenLanguages.polish"],
+  ["Arabic", "spokenLanguages.arabic"],
+] as const;
+const LEGACY_SPOKEN_LANGUAGES: Record<string, string> = {
+  "English (US)": "English",
+  "English (UK)": "English",
+  "Français (Monaco)": "French",
+  Français: "French",
+  Español: "Spanish",
+  Italiano: "Italian",
+  Deutsch: "German",
+  Nederlands: "Dutch",
+  Português: "Portuguese",
+  Ελληνικά: "Greek",
+  Hrvatski: "Croatian",
+  Türkçe: "Turkish",
+};
+
+function normalizeSpokenLanguage(language: string) {
+  return LEGACY_SPOKEN_LANGUAGES[language] ?? language;
+}
+
+function findConversationWithUser(
+  applications: SitApplication[],
+  currentUserName: string,
+  otherUserName: string,
+) {
+  return applications.find(
+    (application) =>
+      application.messages.length > 0 &&
+      ((application.ownerName === currentUserName &&
+        application.applicant.name === otherUserName) ||
+        (application.applicant.name === currentUserName &&
+          application.ownerName === otherUserName)),
+  );
+}
 
 function openAuth(mode: "login" | "signup") {
   window.dispatchEvent(new CustomEvent("open-auth", { detail: mode }));
@@ -302,8 +451,45 @@ function formatSitDates(language: string, dateStart: string, duration: string) {
 }
 
 function Logo() {
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTriggeredRef = useRef(false);
+
+  useEffect(
+    () => () => {
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    },
+    [],
+  );
+
+  function clearLongPressTimer() {
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+  }
+
   return (
-    <Link className="flex items-center gap-2.5" to="/">
+    <Link
+      className="flex items-center gap-2.5"
+      onClick={(event) => {
+        if (!longPressTriggeredRef.current) return;
+        event.preventDefault();
+        longPressTriggeredRef.current = false;
+      }}
+      onContextMenu={(event) => {
+        if (import.meta.env.DEV) event.preventDefault();
+      }}
+      onPointerCancel={clearLongPressTimer}
+      onPointerDown={() => {
+        if (!import.meta.env.DEV) return;
+        longPressTriggeredRef.current = false;
+        clearLongPressTimer();
+        longPressTimerRef.current = setTimeout(() => {
+          longPressTriggeredRef.current = true;
+          window.dispatchEvent(new CustomEvent("open-command-palette"));
+        }, 650);
+      }}
+      onPointerUp={clearLongPressTimer}
+      to="/"
+    >
       <span className="grid size-9 place-items-center rounded-full bg-coral text-white">
         <Anchor size={19} strokeWidth={2.5} />
       </span>
@@ -320,6 +506,7 @@ function Header() {
   const [confirmingLogout, setConfirmingLogout] = useState(false);
   const user = useAppStore((state) => state.user);
   const logout = useAppStore((state) => state.logout);
+  const showAdmin = isAdminUser(user);
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `transition-colors hover:text-navy ${isActive ? "font-semibold text-navy" : "text-slate"}`;
 
@@ -335,12 +522,13 @@ function Header() {
             <NavLink className={navClass} to="/how-it-works">
               {t("nav.how")}
             </NavLink>
-            <NavLink className={navClass} to="/saved">
-              {t("nav.saved")}
-            </NavLink>
+            {user ? (
+              <NavLink className={navClass} to="/saved">
+                {t("nav.saved")}
+              </NavLink>
+            ) : null}
           </nav>
           <div className="hidden items-center gap-3 md:flex">
-            {user && <NotificationsMenu />}
             {user ? (
               <>
                 <Link
@@ -356,6 +544,27 @@ function Header() {
                   <img className="size-8 rounded-full object-cover" src={user.image} alt="" />
                   {user.name}
                 </Link>
+                <NotificationsMenu />
+                <IconTooltip label={t("nav.messages")}>
+                  <Link
+                    aria-label={t("nav.messages")}
+                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                    to="/messages"
+                  >
+                    <MessageCircle size={19} />
+                  </Link>
+                </IconTooltip>
+                {showAdmin ? (
+                  <IconTooltip label={t("nav.admin")}>
+                    <Link
+                      aria-label={t("nav.admin")}
+                      className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                      to="/admin"
+                    >
+                      <ShieldCheck size={18} />
+                    </Link>
+                  </IconTooltip>
+                ) : null}
                 <IconTooltip label={t("settings.title")}>
                   <Link
                     aria-label={t("settings.title")}
@@ -395,7 +604,42 @@ function Header() {
               </>
             )}
           </div>
-          <div className="ml-auto md:hidden">{user && <NotificationsMenu />}</div>
+          <div className="ml-auto flex items-center gap-1 md:hidden">
+            {user && (
+              <>
+                <NotificationsMenu />
+                <IconTooltip label={t("nav.messages")}>
+                  <Link
+                    aria-label={t("nav.messages")}
+                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                    to="/messages"
+                  >
+                    <MessageCircle size={19} />
+                  </Link>
+                </IconTooltip>
+                {showAdmin ? (
+                  <IconTooltip label={t("nav.admin")}>
+                    <Link
+                      aria-label={t("nav.admin")}
+                      className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                      to="/admin"
+                    >
+                      <ShieldCheck size={18} />
+                    </Link>
+                  </IconTooltip>
+                ) : null}
+                <IconTooltip label={t("settings.title")}>
+                  <Link
+                    aria-label={t("settings.title")}
+                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                    to="/settings"
+                  >
+                    <Settings size={18} />
+                  </Link>
+                </IconTooltip>
+              </>
+            )}
+          </div>
           <button
             aria-expanded={open}
             aria-label={open ? t("common.close") : t("nav.menu")}
@@ -415,11 +659,21 @@ function Header() {
               <Link onClick={() => setOpen(false)} to="/how-it-works">
                 {t("nav.how")}
               </Link>
-              <Link onClick={() => setOpen(false)} to="/saved">
-                {t("nav.saved")}
-              </Link>
+              {user ? (
+                <Link onClick={() => setOpen(false)} to="/saved">
+                  {t("nav.saved")}
+                </Link>
+              ) : null}
               {user && (
                 <>
+                  <Link onClick={() => setOpen(false)} to="/messages">
+                    {t("nav.messages")}
+                  </Link>
+                  {showAdmin ? (
+                    <Link onClick={() => setOpen(false)} to="/admin">
+                      {t("nav.admin")}
+                    </Link>
+                  ) : null}
                   <Link onClick={() => setOpen(false)} to="/settings">
                     {t("settings.title")}
                   </Link>
@@ -526,10 +780,10 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
           <span className="block text-[11px] font-bold uppercase tracking-[0.13em] text-slate">
             {t("search.vessel")}
           </span>
-          <select
-            className="w-full appearance-none bg-transparent text-sm font-medium outline-none"
+          <Select
             onChange={(event) => setType(event.target.value)}
             value={type}
+            variant="inline"
           >
             <option value="">{t("search.anyVessel")}</option>
             {VESSEL_TYPES.map((vesselType) => (
@@ -537,9 +791,8 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
                 {displayLabel(t, vesselType)}
               </option>
             ))}
-          </select>
+          </Select>
         </span>
-        <ChevronDown className="text-slate" size={16} />
       </label>
       <button
         className="m-2 flex items-center justify-center gap-2 rounded-xl bg-coral px-7 py-3 font-bold text-white transition hover:bg-coral-dark"
@@ -573,72 +826,129 @@ function TrustItem({
   );
 }
 
-function BoatCard({ boat }: { boat: Boat }) {
+function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) {
   const { i18n, t } = useTranslation();
+  const user = useAppStore((state) => state.user);
   const saved = useAppStore((state) => state.saved);
   const toggleSaved = useAppStore((state) => state.toggleSaved);
-  const isSaved = saved.includes(boat.id);
+  const measurementSystem =
+    useAppStore((state) => state.user?.measurementSystem) ?? detectMeasurementSystem();
+  const isSaved = Boolean(user) && saved.includes(boat.id);
+  const image = (
+    <img
+      alt={t("boat.imageAlt", { name: boat.name, type: displayLabel(t, boat.type) })}
+      className={coverPhotoClassName(
+        preview ? "" : "transition duration-500 group-hover:scale-[1.03]",
+      )}
+      onError={(event) => {
+        event.currentTarget.src = fallbackImage;
+      }}
+      src={optimizePhotoUrl(boat.image || fallbackImage, 900)}
+    />
+  );
 
   return (
-    <article className="group">
+    <article className={preview ? "pointer-events-none select-none" : "group"}>
       <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-seafoam">
-        <Link to={`/boats/${boat.id}`}>
-          <img
-            alt={t("boat.imageAlt", { name: boat.name, type: displayLabel(t, boat.type) })}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-            onError={(event) => {
-              event.currentTarget.src = fallbackImage;
-            }}
-            src={boat.image}
-          />
-        </Link>
+        {preview ? image : <Link to={`/boats/${boat.id}`}>{image}</Link>}
         <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
           {boat.featured && (
             <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-navy shadow-sm">
               {t("boat.topMatch")}
             </span>
           )}
-          {isHappeningSoon(boat.dateStart) && (
-            <span className="rounded-full bg-coral px-3 py-1.5 text-xs font-bold text-white shadow-sm">
-              {t("boat.happeningSoon")}
-            </span>
+          {boat.phase && boat.phase !== "acceptingApplicants" && (
+            <SitPhaseBadge phase={boat.phase} size="md" />
           )}
+          {boat.phase === "acceptingApplicants" &&
+            boat.dateStart &&
+            isHappeningSoon(boat.dateStart) && (
+              <span className="rounded-full bg-coral px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                {t("boat.happeningSoon")}
+              </span>
+            )}
+          <span className="rounded-full bg-white/95 shadow-sm">
+            <SitTypeBadge sitType={boat.sitType} size="md" />
+          </span>
         </div>
-        <button
-          aria-label={isSaved ? t("boat.removeSaved") : t("boat.save")}
-          className="absolute top-3 right-3 grid size-9 place-items-center rounded-full bg-white/90 text-navy shadow-sm transition hover:scale-105"
-          onClick={() => toggleSaved(boat.id)}
-          type="button"
-        >
-          <Heart className={isSaved ? "fill-coral text-coral" : ""} size={19} />
-        </button>
+        {!preview && (
+          <button
+            aria-label={isSaved ? t("boat.removeSaved") : t("boat.save")}
+            className="absolute top-3 right-3 grid size-9 place-items-center rounded-full bg-white/90 text-navy shadow-sm transition hover:scale-105"
+            onClick={() => {
+              if (!user) {
+                openAuth("signup");
+                return;
+              }
+              toggleSaved(boat.id);
+            }}
+            type="button"
+          >
+            <Heart className={isSaved ? "fill-coral text-coral" : ""} size={19} />
+          </button>
+        )}
       </div>
-      <Link className="block pt-4" to={`/boats/${boat.id}`}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
-              {displayLabel(t, boat.type)} · {boat.length}
-            </p>
-            <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
-              {boat.name}
-            </h3>
+      {preview ? (
+        <div className="block pt-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
+                {displayLabel(t, boat.type)} · {formatBoatLength(boat.length, measurementSystem)}
+              </p>
+              <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
+                {boat.name}
+              </h3>
+            </div>
+            <span className="flex items-center gap-1 text-sm font-semibold">
+              <Star className="fill-sun text-sun" size={15} /> {boat.rating}
+            </span>
           </div>
-          <span className="flex items-center gap-1 text-sm font-semibold">
-            <Star className="fill-sun text-sun" size={15} /> {boat.rating}
-          </span>
+          <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
+            <MapPin size={15} /> {formatSitLocation(boat.location, boat.country)}
+          </p>
+          <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
+            {boat.dateStart ? (
+              <>
+                <span className="font-semibold text-navy">
+                  {formatSitDates(i18n.language, boat.dateStart, boat.duration)}
+                </span>
+                <span className="text-slate">
+                  {t("duration.nights", { count: Number.parseInt(boat.duration, 10) || 0 })}
+                </span>
+              </>
+            ) : (
+              <span className="text-slate">{t("editorPreview.datesPending")}</span>
+            )}
+          </div>
         </div>
-        <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
-          <MapPin size={15} /> {formatSitLocation(boat.location, boat.country)}
-        </p>
-        <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
-          <span className="font-semibold text-navy">
-            {formatSitDates(i18n.language, boat.dateStart, boat.duration)}
-          </span>
-          <span className="text-slate">
-            {t("duration.nights", { count: Number.parseInt(boat.duration, 10) })}
-          </span>
-        </div>
-      </Link>
+      ) : (
+        <Link className="block pt-4" to={`/boats/${boat.id}`}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
+                {displayLabel(t, boat.type)} · {formatBoatLength(boat.length, measurementSystem)}
+              </p>
+              <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
+                {boat.name}
+              </h3>
+            </div>
+            <span className="flex items-center gap-1 text-sm font-semibold">
+              <Star className="fill-sun text-sun" size={15} /> {boat.rating}
+            </span>
+          </div>
+          <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
+            <MapPin size={15} /> {formatSitLocation(boat.location, boat.country)}
+          </p>
+          <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
+            <span className="font-semibold text-navy">
+              {formatSitDates(i18n.language, boat.dateStart, boat.duration)}
+            </span>
+            <span className="text-slate">
+              {t("duration.nights", { count: Number.parseInt(boat.duration, 10) })}
+            </span>
+          </div>
+        </Link>
+      )}
     </article>
   );
 }
@@ -647,9 +957,9 @@ function FeaturedBoats() {
   const { data: boats = [], isLoading } = useQuery({ queryKey: ["boats"], queryFn: getBoats });
   if (isLoading) {
     return (
-      <div className="grid gap-6 md:grid-cols-3">
-        {[1, 2, 3].map((item) => (
-          <div className="h-96 animate-pulse rounded-2xl bg-seafoam" key={item} />
+      <div className="grid gap-x-6 gap-y-10 md:grid-cols-3">
+        {[0, 1, 2].map((item) => (
+          <BoatCardSkeleton key={item} showBadge={item === 0} />
         ))}
       </div>
     );
@@ -787,8 +1097,83 @@ function HomePage() {
   );
 }
 
+const BOATS_PER_PAGE = 9;
+
+function recommendedSitScore(
+  boat: Boat,
+  user: {
+    preferredCountries?: string[];
+    skills?: string[];
+  } | null,
+  savedIds: string[],
+  now = new Date(),
+) {
+  let score = 0;
+  const open =
+    isAcceptingApplications(boat) &&
+    !boat.accepted &&
+    (boat.phase === "acceptingApplicants" || !boat.phase);
+
+  if (open) score += 1000;
+  else if (!boat.accepted) score += 200;
+  else score -= 600;
+
+  if (boat.featured) score += 220;
+  if (isHappeningSoon(boat.dateStart, now)) score += 160;
+  if (savedIds.includes(boat.id)) score += 80;
+
+  if (user?.preferredCountries?.length) {
+    const country = boat.country.trim().toLowerCase();
+    const preferred = user.preferredCountries.some((item) => {
+      const value = item.trim().toLowerCase();
+      return Boolean(value) && (country === value || country.includes(value) || value.includes(country));
+    });
+    if (preferred) score += 320;
+  }
+
+  if (user?.skills?.length) {
+    const required = [
+      ...(boat.requiredSkills ?? []),
+      ...(boat.requiredCertifications ?? []),
+      ...(boat.requiredExperience ?? []),
+      ...boat.requirements,
+    ];
+    const skillSet = user.skills.map((skill) => skill.trim().toLowerCase()).filter(Boolean);
+    let matches = 0;
+    for (const requirement of required) {
+      const needle = requirement.trim().toLowerCase();
+      if (!needle) continue;
+      if (
+        skillSet.some(
+          (skill) => skill === needle || skill.includes(needle) || needle.includes(skill),
+        )
+      ) {
+        matches += 1;
+      }
+    }
+    score += matches * 45;
+  }
+
+  score += boat.rating * 18;
+  score += Math.min(boat.reviews, 25) * 2;
+
+  const start = parseSitDate(boat.dateStart);
+  if (start) {
+    const today = startOfLocalDay(now);
+    const days = Math.round((start.getTime() - today.getTime()) / 86_400_000);
+    if (days < 0) score -= 250;
+    else score += Math.max(0, 140 - days);
+  }
+
+  if (open) score -= Math.min(boat.applicants, 20) * 4;
+
+  return score;
+}
+
 function BoatsPage() {
   const { t } = useTranslation();
+  const user = useAppStore((state) => state.user);
+  const saved = useAppStore((state) => state.saved);
   const { data: boats = [], isLoading } = useQuery({ queryKey: ["boats"], queryFn: getBoats });
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get("q") ?? "");
@@ -798,10 +1183,13 @@ function BoatsPage() {
     endDate: params.get("to") ?? "",
   });
   const [petOnly, setPetOnly] = useState(false);
+  const [availability, setAvailability] = useState<"all" | "open" | "accepted">("all");
   const [view, setView] = useState<"list" | "map">("list");
-  const [sort, setSort] = useState<"soonest" | "latest" | "shortest" | "longest" | "popular">(
-    "soonest",
-  );
+  const [sort, setSort] = useState<
+    "recommended" | "soonest" | "latest" | "shortest" | "longest" | "popular"
+  >("recommended");
+  const [page, setPage] = useState(0);
+  const resultsTopRef = useRef<HTMLDivElement>(null);
 
   function updateLocationQuery(value: string) {
     setQuery(value);
@@ -824,7 +1212,7 @@ function BoatsPage() {
           .map((value) => value.trim().toLowerCase())
           .filter(Boolean);
         const searchable =
-          `${boat.location} ${boat.country} ${boat.region} ${boat.name}`.toLowerCase();
+          `${boat.location} ${boat.country} ${boat.name}`.toLowerCase();
         const matchesQuery =
           searchValues.length === 0 || searchValues.some((value) => searchable.includes(value));
         const matchesType = type === "All vessels" || boat.type === type;
@@ -838,13 +1226,28 @@ function BoatsPage() {
         const matchesDates =
           (!requestedStart || boatEnd >= requestedStart) &&
           (!requestedEnd || boatStart <= requestedEnd);
-        return matchesQuery && matchesType && matchesDates && (!petOnly || Boolean(boat.pet));
+        const matchesAvailability =
+          availability === "all" ||
+          (availability === "accepted" ? Boolean(boat.accepted) : !boat.accepted);
+        return (
+          matchesQuery &&
+          matchesType &&
+          matchesDates &&
+          matchesAvailability &&
+          (!petOnly || Boolean(boat.pet))
+        );
       }),
-    [boats, dates.endDate, dates.startDate, petOnly, query, type],
+    [availability, boats, dates.endDate, dates.startDate, petOnly, query, type],
   );
   const sorted = useMemo(
     () =>
       [...filtered].sort((a, b) => {
+        if (sort === "recommended") {
+          return (
+            recommendedSitScore(b, user, saved) - recommendedSitScore(a, user, saved) ||
+            a.dateStart.localeCompare(b.dateStart)
+          );
+        }
         if (sort === "latest") return b.dateStart.localeCompare(a.dateStart);
         if (sort === "shortest") {
           return Number.parseInt(a.duration, 10) - Number.parseInt(b.duration, 10);
@@ -862,8 +1265,46 @@ function BoatsPage() {
         }
         return a.dateStart.localeCompare(b.dateStart);
       }),
-    [filtered, sort],
+    [filtered, saved, sort, user],
   );
+  const totalPages = Math.max(1, Math.ceil(sorted.length / BOATS_PER_PAGE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const pageStart = currentPage * BOATS_PER_PAGE;
+  const pageEnd = Math.min(pageStart + BOATS_PER_PAGE, sorted.length);
+  const pagedBoats = useMemo(
+    () => sorted.slice(pageStart, pageEnd),
+    [pageEnd, pageStart, sorted],
+  );
+
+  useEffect(() => {
+    setPage(0);
+  }, [availability, dates.endDate, dates.startDate, petOnly, query, sort, type]);
+
+  useEffect(() => {
+    if (page > totalPages - 1) setPage(Math.max(0, totalPages - 1));
+  }, [page, totalPages]);
+
+  function goToPage(nextPage: number) {
+    setPage(nextPage);
+    resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function resetFilters() {
+    setQuery("");
+    setType("All vessels");
+    setDates({ startDate: "", endDate: "" });
+    setPetOnly(false);
+    setAvailability("all");
+    window.history.replaceState(null, "", window.location.pathname);
+  }
+
+  const filtersActive =
+    Boolean(query) ||
+    type !== "All vessels" ||
+    Boolean(dates.startDate) ||
+    Boolean(dates.endDate) ||
+    petOnly ||
+    availability !== "all";
 
   return (
     <main className="px-5 py-10 lg:px-8">
@@ -881,18 +1322,14 @@ function BoatsPage() {
             startDate={dates.startDate}
             variant="browse"
           />
-          <select
-            className="rounded-xl border border-line bg-white px-4 py-3 text-sm font-semibold outline-none"
-            onChange={(event) => setType(event.target.value)}
-            value={type}
-          >
+          <Select onChange={(event) => setType(event.target.value)} value={type}>
             <option value="All vessels">{t("search.anyVessel")}</option>
             {VESSEL_TYPES.map((option) => (
               <option key={option} value={option}>
                 {displayLabel(t, option)}
               </option>
             ))}
-          </select>
+          </Select>
           <label
             className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${petOnly ? "border-teal bg-seafoam text-teal" : "border-line text-slate"}`}
           >
@@ -906,77 +1343,116 @@ function BoatsPage() {
               {t("boats.pets")}
             </span>
           </label>
-        </div>
-        <div className="mt-9 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-slate">{t("boats.results", { count: filtered.length })}</p>
-          <div className="flex items-center gap-2">
-            <div
-              aria-label={t("map.viewLabel")}
-              className="flex rounded-xl border border-line bg-white p-1"
-              role="group"
-            >
-              <button
-                aria-pressed={view === "list"}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold ${
-                  view === "list" ? "bg-seafoam text-teal" : "text-slate"
-                }`}
-                onClick={() => setView("list")}
-                type="button"
-              >
-                <List size={16} /> {t("map.listView")}
-              </button>
-              <button
-                aria-pressed={view === "map"}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold ${
-                  view === "map" ? "bg-seafoam text-teal" : "text-slate"
-                }`}
-                onClick={() => setView("map")}
-                type="button"
-              >
-                <Map size={16} /> {t("map.mapView")}
-              </button>
-            </div>
-            {view === "list" && (
-              <label className="flex items-center gap-2 text-sm text-slate">
-                <span className="sr-only">{t("boats.sortLabel")}</span>
-                <select
-                  aria-label={t("boats.sortLabel")}
-                  className="rounded-xl border border-line bg-white px-3 py-2 text-sm font-semibold text-navy outline-none focus:border-teal"
-                  onChange={(event) => setSort(event.target.value as typeof sort)}
-                  value={sort}
-                >
-                  <option value="soonest">{t("boats.sortSoonest")}</option>
-                  <option value="latest">{t("boats.sortLatest")}</option>
-                  <option value="shortest">{t("boats.sortShortest")}</option>
-                  <option value="longest">{t("boats.sortLongest")}</option>
-                  <option value="popular">{t("boats.sortPopular")}</option>
-                </select>
-              </label>
-            )}
-          </div>
+          <Select
+            aria-label={t("boats.availabilityLabel")}
+            onChange={(event) =>
+              setAvailability(event.target.value as "all" | "open" | "accepted")
+            }
+            value={availability}
+          >
+            <option value="all">{t("boats.availabilityAll")}</option>
+            <option value="open">{t("boats.availabilityOpen")}</option>
+            <option value="accepted">{t("boats.availabilityAccepted")}</option>
+          </Select>
         </div>
         {isLoading ? (
-          <div className="mt-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div className="h-96 animate-pulse rounded-2xl bg-seafoam" key={item} />
-            ))}
-          </div>
-        ) : filtered.length && view === "map" ? (
-          <div className="mt-6">
-            <BoatMap boats={sorted} />
-          </div>
-        ) : filtered.length ? (
-          <div className="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-            {sorted.map((boat) => (
-              <BoatCard boat={boat} key={boat.id} />
-            ))}
-          </div>
+          <BoatsPageLoadingSkeleton />
         ) : (
-          <div className="mt-16 rounded-2xl border border-line bg-white py-16 text-center">
-            <LifeBuoy className="mx-auto text-teal" size={36} />
-            <h2 className="mt-4 font-display text-xl font-bold text-navy">{t("boats.empty")}</h2>
-            <p className="mt-2 text-sm text-slate">{t("boats.emptyHint")}</p>
-          </div>
+          <>
+            <div className="mt-9 flex flex-wrap items-center justify-between gap-3" ref={resultsTopRef}>
+              <p className="text-sm text-slate">{t("boats.results", { count: filtered.length })}</p>
+              <div className="flex items-center gap-2">
+                <div
+                  aria-disabled={filtered.length === 0}
+                  aria-label={t("map.viewLabel")}
+                  className={`flex rounded-xl border border-line bg-white p-1 ${
+                    filtered.length === 0 ? "opacity-50" : ""
+                  }`}
+                  role="group"
+                >
+                  <button
+                    aria-pressed={view === "list"}
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold disabled:cursor-not-allowed ${
+                      view === "list" ? "bg-seafoam text-teal" : "text-slate"
+                    }`}
+                    disabled={filtered.length === 0}
+                    onClick={() => setView("list")}
+                    type="button"
+                  >
+                    <List size={16} /> {t("map.listView")}
+                  </button>
+                  <button
+                    aria-pressed={view === "map"}
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold disabled:cursor-not-allowed ${
+                      view === "map" ? "bg-seafoam text-teal" : "text-slate"
+                    }`}
+                    disabled={filtered.length === 0}
+                    onClick={() => setView("map")}
+                    type="button"
+                  >
+                    <Map size={16} /> {t("map.mapView")}
+                  </button>
+                </div>
+                {view === "list" && (
+                  <label
+                    className={`flex items-center gap-2 text-sm text-slate ${
+                      filtered.length === 0 ? "opacity-50" : ""
+                    }`}
+                  >
+                    <span className="sr-only">{t("boats.sortLabel")}</span>
+                    <Select
+                      aria-label={t("boats.sortLabel")}
+                      disabled={filtered.length === 0}
+                      onChange={(event) => setSort(event.target.value as typeof sort)}
+                      value={sort}
+                      variant="sort"
+                    >
+                      <option value="recommended">{t("boats.sortRecommended")}</option>
+                      <option value="soonest">{t("boats.sortSoonest")}</option>
+                      <option value="latest">{t("boats.sortLatest")}</option>
+                      <option value="shortest">{t("boats.sortShortest")}</option>
+                      <option value="longest">{t("boats.sortLongest")}</option>
+                      <option value="popular">{t("boats.sortPopular")}</option>
+                    </Select>
+                  </label>
+                )}
+              </div>
+            </div>
+            {filtered.length && view === "map" ? (
+              <div className="mt-6">
+                <BoatMap boats={sorted} />
+              </div>
+            ) : filtered.length ? (
+              <>
+                <div className="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+                  {pagedBoats.map((boat) => (
+                    <BoatCard boat={boat} key={boat.id} />
+                  ))}
+                </div>
+                <ResultsPagination
+                  currentPage={currentPage}
+                  onPageChange={goToPage}
+                  pageSize={BOATS_PER_PAGE}
+                  totalItems={sorted.length}
+                />
+              </>
+            ) : (
+              <div className="mt-16 rounded-2xl border border-line bg-white py-16 text-center">
+                <LifeBuoy className="mx-auto text-teal" size={36} />
+                <h2 className="mt-4 font-display text-xl font-bold text-navy">{t("boats.empty")}</h2>
+                <p className="mt-2 text-sm text-slate">{t("boats.emptyHint")}</p>
+                {filtersActive && (
+                  <button
+                    className="mt-6 rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink"
+                    onClick={resetFilters}
+                    type="button"
+                  >
+                    {t("boats.resetFilters")}
+                  </button>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>
@@ -984,23 +1460,6 @@ function BoatsPage() {
 }
 
 const systemIcons = [Gauge, BatteryCharging, Droplets, Zap];
-
-type LengthUnit = "m" | "ft";
-
-function parseBoatLength(length: string, fallbackUnit: LengthUnit) {
-  const match = length.trim().match(/^(\d+(?:[.,]\d+)?)\s*(m|ft)?$/i);
-  return {
-    value: match?.[1]?.replace(",", ".") ?? "",
-    unit: (match?.[2]?.toLowerCase() as LengthUnit | undefined) ?? fallbackUnit,
-  };
-}
-
-function convertBoatLength(value: string, from: LengthUnit, to: LengthUnit) {
-  const amount = Number.parseFloat(value);
-  if (!Number.isFinite(amount) || from === to) return value;
-  const converted = from === "ft" ? amount * 0.3048 : amount / 0.3048;
-  return String(Math.round(converted * 10) / 10);
-}
 
 function splitHomePort(homePort: string) {
   const parts = homePort
@@ -1161,16 +1620,59 @@ const SITTER_SKILLS = [
   "Tender handling",
 ];
 
-function ApplyModal({ boat, close }: { boat: Boat; close: () => void }) {
+function ApplyModal({
+  boat,
+  close,
+  confirmedSitConflict,
+}: {
+  boat: Boat;
+  close: () => void;
+  confirmedSitConflict?: { sitId: string; boatName: string };
+}) {
   const { t } = useTranslation();
   const user = useAppStore((state) => state.user)!;
+  const identityVerificationEnabled = useFeatureFlag("identityVerification");
   const queryClient = useQueryClient();
   const [message, setMessage] = useState(
     t("apply.defaultMessage", { owner: boat.owner, boat: boat.name }),
   );
+  const [partySize, setPartySize] = useState(1);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState("");
+  const maxGuests = boat.maxGuests ?? 2;
+  const hasSharedLanguage = user.languages.some((language) =>
+    boat.ownerLanguages.some(
+      (ownerLanguage) => ownerLanguage.toLocaleLowerCase() === language.toLocaleLowerCase(),
+    ),
+  );
+  const hasBlockedContactDetails = containsOffPlatformContactDetails(message);
+  const { data: verificationChecks, isLoading: verificationLoading } = useQuery({
+    queryKey: ["verification-checks", user.name, user.email, user.phoneNumber],
+    queryFn: () =>
+      getMemberVerificationChecks(user.name, {
+        isSelf: true,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      }),
+  });
+  const canApply = identityVerificationEnabled
+    ? verificationChecks
+      ? isFullyVerified(verificationChecks)
+      : false
+    : true;
+  const acceptingApplications = isAcceptingApplications(boat);
+  const verifyMutation = useMutation({
+    mutationFn: () => startVerification(user.name),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["verification-checks", user.name],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["verification", user.name] });
+    },
+  });
   const mutation = useMutation({
     mutationFn: () =>
-      sendApplication(boat.id, message, {
+      sendApplication(boat.id, message, partySize, {
         name: user.name,
         image: user.image,
         location: user.location,
@@ -1178,15 +1680,38 @@ function ApplyModal({ boat, close }: { boat: Boat; close: () => void }) {
         languages: user.languages,
         preferredCountries: user.preferredCountries,
         skills: user.skills,
+        memberSince: user.memberSince,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
   });
+  const verificationBlocked =
+    mutation.error instanceof Error &&
+    mutation.error.message === "APPLICATION_VERIFICATION_REQUIRED";
+  const applicationsClosedError =
+    mutation.error instanceof Error && mutation.error.message === "APPLICATIONS_CLOSED";
+  const confirmedSitConflictError =
+    mutation.error instanceof Error &&
+    mutation.error.message === "APPLICATION_CONFIRMED_SIT_CONFLICT";
+  const conflictBoatName = confirmedSitConflict?.boatName;
+
+  function submitApplication() {
+    if (!acceptingApplications || !canApply || confirmedSitConflict) return;
+    if (!acceptedTerms) {
+      setTermsError(t("apply.termsRequired"));
+      return;
+    }
+    if (containsOffPlatformContactDetails(message)) return;
+    setTermsError("");
+    mutation.mutate();
+  }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-float md:p-8">
+    <div className="fixed inset-0 z-2000 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-float md:p-8">
         {mutation.isSuccess ? (
           <div className="py-8 text-center">
             <span className="mx-auto grid size-16 place-items-center rounded-full bg-seafoam text-teal">
@@ -1198,8 +1723,15 @@ function ApplyModal({ boat, close }: { boat: Boat; close: () => void }) {
             <p className="mt-2 text-slate">
               {t("apply.successText", { owner: boat.owner, boat: boat.name })}
             </p>
+            <Link
+              className="mt-6 inline-flex rounded-full bg-teal px-6 py-3 font-bold text-white hover:bg-teal/90"
+              onClick={close}
+              to="/owner/boats"
+            >
+              {t("apply.viewInSits")}
+            </Link>
             <button
-              className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
+              className="mt-3 block w-full text-sm font-semibold text-slate hover:text-navy"
               onClick={close}
               type="button"
             >
@@ -1224,22 +1756,168 @@ function ApplyModal({ boat, close }: { boat: Boat; close: () => void }) {
                 <X size={20} />
               </button>
             </div>
-            <p className="mt-4 text-sm leading-6 text-slate">
-              {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
-            </p>
-            <textarea
-              className="mt-5 min-h-40 w-full resize-none rounded-xl border border-line bg-cream p-4 text-sm leading-6 outline-none focus:border-teal"
-              onChange={(event) => setMessage(event.target.value)}
-              value={message}
-            />
-            <button
-              className="mt-4 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark disabled:opacity-60"
-              disabled={mutation.isPending || !message.trim()}
-              onClick={() => mutation.mutate()}
-              type="button"
-            >
-              {mutation.isPending ? t("apply.sending") : t("apply.send")}
-            </button>
+            {!acceptingApplications ? (
+              <div
+                className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+                role="alert"
+              >
+                <p className="font-semibold">{t("detail.applicationsClosed")}</p>
+                <p className="mt-1">{t("apply.applicationsClosed")}</p>
+                <button
+                  className="mt-4 w-full rounded-xl bg-navy py-3.5 font-bold text-white"
+                  onClick={close}
+                  type="button"
+                >
+                  {t("common.done")}
+                </button>
+              </div>
+            ) : confirmedSitConflict ? (
+              <div
+                className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+                role="alert"
+              >
+                <p className="font-semibold">{t("apply.confirmedSitConflictTitle")}</p>
+                <p className="mt-1">
+                  {t("apply.confirmedSitConflict", { boat: confirmedSitConflict.boatName })}
+                </p>
+                <Link
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
+                  onClick={close}
+                  to={`/boats/${confirmedSitConflict.sitId}`}
+                >
+                  {t("apply.viewConfirmedSit")}
+                </Link>
+                <button
+                  className="mt-3 block w-full text-sm font-semibold text-slate hover:text-navy"
+                  onClick={close}
+                  type="button"
+                >
+                  {t("common.done")}
+                </button>
+              </div>
+            ) : verificationLoading ? (
+              <p className="mt-6 text-sm text-slate">{t("apply.verificationChecking")}</p>
+            ) : !canApply && verificationChecks ? (
+              <div className="mt-5 space-y-5">
+                <div
+                  className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+                  role="alert"
+                >
+                  <ShieldCheck className="mt-0.5 shrink-0" size={18} />
+                  <div>
+                    <p className="font-semibold">{t("apply.verificationRequiredTitle")}</p>
+                    <p className="mt-1">{t("apply.verificationRequiredText")}</p>
+                  </div>
+                </div>
+                <IdentityVerificationCard
+                  checks={verificationChecks}
+                  isSelf
+                  onStartVerification={() => verifyMutation.mutate()}
+                  verifying={verifyMutation.isPending}
+                />
+                <Link
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
+                  onClick={close}
+                  to="/members/me"
+                >
+                  {t("apply.verificationRequiredCta")}
+                </Link>
+              </div>
+            ) : (
+              <>
+                <p className="mt-4 text-sm leading-6 text-slate">
+                  {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
+                </p>
+                {!hasSharedLanguage && (
+                  <div className="mt-5 flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+                    <Languages className="mt-0.5 shrink-0" size={18} />
+                    <p>{t("apply.noSharedLanguage", { owner: boat.owner })}</p>
+                  </div>
+                )}
+                <label className="mt-5 block">
+                  <span className="form-label">{t("apply.partySize")}</span>
+                  <Select variant="form" onChange={(event) => setPartySize(Number(event.target.value))}
+                    value={partySize}
+                  >
+                    {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
+                      <option key={count} value={count}>
+                        {count}
+                      </option>
+                    ))}
+                  </Select>
+                  <span className="mt-1.5 block text-xs leading-5 text-slate">
+                    {t("apply.partySizeHint", { count: maxGuests })}
+                  </span>
+                </label>
+                <textarea
+                  aria-invalid={hasBlockedContactDetails}
+                  className={`mt-5 min-h-40 w-full resize-none rounded-xl border bg-cream p-4 text-sm leading-6 outline-none ${
+                    hasBlockedContactDetails
+                      ? "border-red-400 focus:border-red-500"
+                      : "border-line focus:border-teal"
+                  }`}
+                  onChange={(event) => setMessage(event.target.value)}
+                  value={message}
+                />
+                {hasBlockedContactDetails && (
+                  <div
+                    className="mt-3 flex gap-3 rounded-xl border border-red-300 bg-red-50 p-4 text-sm leading-6 text-red-900"
+                    role="alert"
+                  >
+                    <TriangleAlert className="mt-0.5 shrink-0" size={18} />
+                    <div>
+                      <p className="font-semibold">{t("apply.contactDetailsTerms")}</p>
+                      <p className="mt-1">{t("apply.contactDetailsBlocked")}</p>
+                      <Link
+                        className="mt-2 inline-flex font-bold underline underline-offset-2"
+                        to="/terms"
+                      >
+                        {t("footer.terms")}
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                <div className="mt-4">
+                  <TermsAgreementCheckbox
+                    checked={acceptedTerms}
+                    i18nKey="apply.termsAgreement"
+                    onChange={(checked) => {
+                      setAcceptedTerms(checked);
+                      if (checked) setTermsError("");
+                    }}
+                  />
+                </div>
+                {termsError && (
+                  <p className="mt-3 text-sm font-semibold text-coral" role="alert">
+                    {termsError}
+                  </p>
+                )}
+                {(verificationBlocked ||
+                  applicationsClosedError ||
+                  confirmedSitConflictError ||
+                  mutation.isError) && (
+                  <p className="mt-3 text-sm font-semibold text-coral" role="alert">
+                    {applicationsClosedError
+                      ? t("apply.applicationsClosed")
+                      : confirmedSitConflictError
+                        ? t("apply.confirmedSitConflict", {
+                            boat: conflictBoatName ?? boat.name,
+                          })
+                        : verificationBlocked
+                          ? t("apply.verificationRequiredText")
+                          : t("apply.sendFailed")}
+                  </p>
+                )}
+                <button
+                  className="mt-4 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark disabled:opacity-60"
+                  disabled={mutation.isPending || !message.trim() || hasBlockedContactDetails}
+                  onClick={submitApplication}
+                  type="button"
+                >
+                  {mutation.isPending ? t("apply.sending") : t("apply.send")}
+                </button>
+              </>
+            )}
           </>
         )}
       </div>
@@ -1253,24 +1931,97 @@ function DetailPage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const saved = useAppStore((state) => state.saved);
   const toggleSaved = useAppStore((state) => state.toggleSaved);
   const { data: boat, isLoading } = useQuery({
     queryKey: ["boat", id],
     queryFn: () => getBoat(id),
   });
+  const { data: userApplications = [] } = useQuery({
+    queryKey: ["applications", "user", user?.name],
+    queryFn: () => getApplicationsForUser(user!.name),
+    enabled: Boolean(user),
+  });
+  const { data: sits = [] } = useQuery({
+    queryKey: ["sits"],
+    queryFn: getSits,
+    enabled: Boolean(user),
+  });
+  const existingApplication = userApplications.find((application) => application.sitId === id);
+  const activeApplication =
+    existingApplication && existingApplication.status !== "withdrawn"
+      ? existingApplication
+      : undefined;
+  const confirmedSitConflict =
+    user && boat
+      ? findConfirmedSitDateConflict(userApplications, sits, user.name, boat)
+      : undefined;
+  const canSeePrivateAccess =
+    Boolean(user) &&
+    (user?.name === boat?.owner || activeApplication?.status === "accepted");
+  const { data: privateAccess } = useQuery({
+    queryKey: ["sit-private-access", id, user?.name],
+    queryFn: () => getSitPrivateAccessForViewer(id, user!.name),
+    enabled: Boolean(boat && user && canSeePrivateAccess),
+  });
+  const { data: applicantVerification } = useQuery({
+    queryKey: [
+      "verification-checks",
+      user?.name,
+      user?.email,
+      user?.phoneNumber,
+      "apply-gate",
+    ],
+    enabled: Boolean(user && boat && user.name !== boat.owner),
+    queryFn: () =>
+      getMemberVerificationChecks(user!.name, {
+        isSelf: true,
+        email: user!.email,
+        phoneNumber: user!.phoneNumber,
+      }),
+  });
+  const applicantNeedsVerification =
+    Boolean(user && boat && user.name !== boat.owner) &&
+    applicantVerification !== undefined &&
+    !isFullyVerified(applicantVerification);
+  const { data: ownerVerification } = useQuery({
+    queryKey: ["verification-checks", boat?.owner],
+    queryFn: () => getMemberVerificationChecks(boat!.owner),
+    enabled: Boolean(boat?.owner),
+  });
+  const ownerContentTexts = useMemo(() => {
+    if (!boat) return {};
+    return {
+      description: boat.description,
+      home: boat.home,
+      ...(boat.pet ? { pet: boat.pet } : {}),
+      ...Object.fromEntries(
+        boat.responsibilities.map((item, index) => [`resp-${index}`, item]),
+      ),
+    };
+  }, [boat]);
+  const ownerTranslation = useAutoTranslatedOwnerContent(
+    boat?.ownerLanguages ?? ["English"],
+    ownerContentTexts,
+  );
 
-  if (isLoading)
-    return <div className="mx-auto my-20 h-96 max-w-6xl animate-pulse rounded-3xl bg-seafoam" />;
+  if (isLoading) return <SitDetailSkeleton />;
   if (!boat) return <NotFound />;
+  const photos = [{ url: boat.image }, ...boat.gallery].filter(
+    (photo, index, allPhotos) => allPhotos.findIndex((item) => item.url === photo.url) === index,
+  );
   const experienceRequirements = [
     ...(boat.minYearsExperience
       ? [t("experience.minimumYears", { count: boat.minYearsExperience })]
       : []),
     ...(boat.requiredExperience ?? []),
     ...(boat.requiredCertifications ?? []),
-    ...(boat.requiredSkills ?? []),
-    ...boat.requirements,
+    ...(boat.requiredSkills ?? []).filter(
+      (skill) => !isNonSmokerRequirementLabel(skill),
+    ),
+    ...(resolveNonSmokerRequired(boat) ? [t("requirement.nonSmoker")] : []),
+    ...withoutNonSmokerRequirementLabels(boat.requirements),
   ].filter((item, index, all) => all.indexOf(item) === index);
 
   return (
@@ -1283,32 +2034,100 @@ function DetailPage() {
         >
           <ArrowLeft size={17} /> {t("detail.back")}
         </button>
-        <div className="grid h-136 gap-2 overflow-hidden rounded-3xl md:grid-cols-[1.5fr_0.8fr]">
-          <img alt={boat.name} className="h-full w-full object-cover" src={boat.image} />
-          <div className="hidden grid-rows-2 gap-2 md:grid">
-            <img
-              alt={t("detail.surroundingsAlt", { boat: boat.name })}
-              className="h-full w-full object-cover"
-              src={boat.gallery[0] ?? fallbackImage}
-            />
-            <div className="relative overflow-hidden">
+        <div className="relative">
+          <div
+            className={`grid h-136 gap-2 overflow-hidden rounded-3xl ${
+              photos.length === 1
+                ? "grid-cols-1"
+                : photos.length === 2
+                  ? "grid-cols-2"
+                  : "md:grid-cols-[1.5fr_0.8fr]"
+            }`}
+          >
+            <button
+              aria-label={t("lightbox.viewPhoto", { number: 1 })}
+              className="min-h-0 h-full w-full overflow-hidden"
+              onClick={() => setLightboxIndex(0)}
+              type="button"
+            >
               <img
-                alt={t("detail.lifeAboardAlt")}
-                className="h-full w-full object-cover"
-                src={boat.gallery[1] ?? fallbackImage}
+                alt={boat.name}
+                className={coverPhotoClassName()}
+                onError={(event) => {
+                  event.currentTarget.src = fallbackImage;
+                }}
+                src={optimizePhotoUrl(photos[0].url)}
+                style={coverPhotoStyle(photos[0])}
               />
-              <span className="absolute right-4 bottom-4 rounded-full bg-white px-4 py-2 text-sm font-bold text-navy">
-                {t("detail.viewPhotos")}
-              </span>
-            </div>
+            </button>
+            {photos.length >= 3 && (
+              <div className="hidden min-h-0 grid-rows-2 gap-2 md:grid">
+                {[1, 2].map((photoIndex) => {
+                  const photo = photos[photoIndex];
+                  return (
+                    <button
+                      aria-label={t("lightbox.viewPhoto", { number: photoIndex + 1 })}
+                      className="min-h-0 h-full w-full overflow-hidden"
+                      key={photo.url}
+                      onClick={() => setLightboxIndex(photoIndex)}
+                      type="button"
+                    >
+                      <img
+                        alt={
+                          photo.caption?.trim() ||
+                          (photoIndex === 1
+                            ? t("detail.surroundingsAlt", { boat: boat.name })
+                            : t("detail.lifeAboardAlt"))
+                        }
+                        className={coverPhotoClassName()}
+                        onError={(event) => {
+                          event.currentTarget.src = fallbackImage;
+                        }}
+                        src={optimizePhotoUrl(photo.url)}
+                        style={coverPhotoStyle(photo)}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {photos.length === 2 && (
+              <button
+                aria-label={t("lightbox.viewPhoto", { number: 2 })}
+                className="min-h-0 h-full w-full overflow-hidden"
+                onClick={() => setLightboxIndex(1)}
+                type="button"
+              >
+                <img
+                  alt={photos[1].caption?.trim() || t("detail.surroundingsAlt", { boat: boat.name })}
+                  className={coverPhotoClassName()}
+                  onError={(event) => {
+                    event.currentTarget.src = fallbackImage;
+                  }}
+                  src={optimizePhotoUrl(photos[1].url)}
+                  style={coverPhotoStyle(photos[1])}
+                />
+              </button>
+            )}
           </div>
+          <button
+            className="absolute right-4 bottom-4 z-10 rounded-full bg-white px-4 py-2 text-sm font-bold text-navy shadow-lg transition hover:bg-seafoam"
+            onClick={() => setLightboxIndex(0)}
+            type="button"
+          >
+            {t("detail.viewPhotos")}
+          </button>
         </div>
         <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_22rem]">
           <div>
             <div className="flex items-start justify-between gap-5 border-b border-line pb-8">
               <div>
                 <p className="eyebrow">
-                  {displayLabel(t, boat.type)} · {boat.length}
+                  {displayLabel(t, boat.type)} ·{" "}
+                  {formatBoatLength(
+                    boat.length,
+                    user?.measurementSystem ?? detectMeasurementSystem(),
+                  )}
                 </p>
                 <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy md:text-5xl">
                   {boat.name}
@@ -1318,13 +2137,23 @@ function DetailPage() {
                 </p>
               </div>
               <button
-                aria-label={saved.includes(boat.id) ? t("boat.removeSaved") : t("boat.save")}
+                aria-label={
+                  user && saved.includes(boat.id) ? t("boat.removeSaved") : t("boat.save")
+                }
                 className="grid size-11 place-items-center rounded-full border border-line bg-white"
-                onClick={() => toggleSaved(boat.id)}
+                onClick={() => {
+                  if (!user) {
+                    openAuth("signup");
+                    return;
+                  }
+                  toggleSaved(boat.id);
+                }}
                 type="button"
               >
                 <Heart
-                  className={saved.includes(boat.id) ? "fill-coral text-coral" : ""}
+                  className={
+                    user && saved.includes(boat.id) ? "fill-coral text-coral" : ""
+                  }
                   size={20}
                 />
               </button>
@@ -1348,11 +2177,17 @@ function DetailPage() {
                     <Star className="fill-sun text-sun" size={15} /> {boat.rating} ·{" "}
                     {t("detail.ownerReviews", { count: boat.reviews })}
                   </p>
+                  <p className="mt-1 flex items-center gap-2 text-xs font-semibold text-teal">
+                    <MessageCircle aria-hidden="true" size={14} />
+                    {t("detail.respondsWithinDay")}
+                  </p>
                 </div>
-                <span className="ml-auto hidden items-center gap-1.5 rounded-full bg-seafoam px-3 py-2 text-xs font-bold text-teal sm:flex">
-                  <ShieldCheck size={15} /> {t("detail.idVerified")}
-                </span>
               </Link>
+              {ownerVerification && (
+                <div className="mt-5">
+                  <IdentityVerificationCard checks={ownerVerification} />
+                </div>
+              )}
             </section>
 
             <section className="border-b border-line py-8">
@@ -1362,15 +2197,50 @@ function DetailPage() {
                   <Anchor size={16} /> {t("detail.homePort", { homePort: boat.homePort })}
                 </p>
               )}
-              <p className="mt-4 leading-7 text-slate">{boat.description}</p>
-              <p className="mt-4 leading-7 text-slate">{boat.home}</p>
+              <p
+                className={`mt-4 leading-7 text-slate ${
+                  ownerTranslation.pending && ownerTranslation.shouldTranslate
+                    ? "animate-pulse"
+                    : ""
+                }`}
+              >
+                {ownerTranslation.display("description", boat.description)}
+              </p>
+              <p
+                className={`mt-4 leading-7 text-slate ${
+                  ownerTranslation.pending && ownerTranslation.shouldTranslate
+                    ? "animate-pulse"
+                    : ""
+                }`}
+              >
+                {ownerTranslation.display("home", boat.home)}
+              </p>
               {boat.pet && (
                 <div className="mt-5 inline-flex items-center gap-2 rounded-xl bg-sun/15 px-4 py-3 text-sm font-semibold text-navy">
                   <Sparkles className="text-coral" size={17} />{" "}
-                  {t("detail.alsoAboard", { pet: boat.pet })}
+                  {t("detail.alsoAboard", {
+                    pet: ownerTranslation.display("pet", boat.pet),
+                  })}
                 </div>
               )}
+              <AutoTranslationAttribution
+                failed={ownerTranslation.failed}
+                hasTranslations={ownerTranslation.hasTranslations}
+                onToggle={() => ownerTranslation.setShowOriginal((current) => !current)}
+                pending={ownerTranslation.pending}
+                shouldTranslate={ownerTranslation.shouldTranslate}
+                showOriginal={ownerTranslation.showOriginal}
+              />
             </section>
+
+            {privateAccess && (
+              <section className="border-b border-line py-8">
+                <VesselPrivateAccessCard
+                  details={privateAccess}
+                  variant={user?.name === boat.owner ? "owner" : "sitter"}
+                />
+              </section>
+            )}
 
             <section className="border-b border-line py-8">
               <h2 className="detail-title">{t("detail.brief")}</h2>
@@ -1431,9 +2301,17 @@ function DetailPage() {
             <section className="border-b border-line py-8">
               <h2 className="detail-title">{t("detail.responsibilities")}</h2>
               <ul className="mt-5 space-y-3">
-                {boat.responsibilities.map((item) => (
-                  <li className="flex gap-3 text-slate" key={item}>
-                    <Check className="mt-0.5 shrink-0 text-teal" size={18} /> {item}
+                {boat.responsibilities.map((item, index) => (
+                  <li
+                    className={`flex gap-3 text-slate ${
+                      ownerTranslation.pending && ownerTranslation.shouldTranslate
+                        ? "animate-pulse"
+                        : ""
+                    }`}
+                    key={item}
+                  >
+                    <Check className="mt-0.5 shrink-0 text-teal" size={18} />{" "}
+                    {ownerTranslation.display(`resp-${index}`, item)}
                   </li>
                 ))}
               </ul>
@@ -1467,11 +2345,15 @@ function DetailPage() {
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
                 {t("detail.availableDates")}
               </p>
-              {isHappeningSoon(boat.dateStart) && (
-                <span className="mt-2 inline-flex rounded-full bg-coral px-3 py-1.5 text-xs font-bold text-white">
-                  {t("boat.happeningSoon")}
-                </span>
-              )}
+              <div className="mt-2 flex flex-wrap gap-2">
+                <SitTypeBadge sitType={boat.sitType} size="md" />
+                {boat.phase && <SitPhaseBadge phase={boat.phase} size="md" />}
+                {boat.phase === "acceptingApplicants" && isHappeningSoon(boat.dateStart) && (
+                  <span className="inline-flex rounded-full bg-coral px-3 py-1.5 text-xs font-bold text-white">
+                    {t("boat.happeningSoon")}
+                  </span>
+                )}
+              </div>
               <p className="mt-2 font-display text-xl font-bold text-navy">
                 {formatSitDates(i18n.language, boat.dateStart, boat.duration)}
               </p>
@@ -1493,15 +2375,81 @@ function DetailPage() {
                 <p className="flex items-center gap-3">
                   <ShieldCheck className="text-coral" size={18} /> {t("detail.contactsVerified")}
                 </p>
+                <p className="flex items-center gap-3">
+                  <Users className="text-coral" size={18} />{" "}
+                  {t("detail.maxGuests", { count: boat.maxGuests ?? 2 })}
+                </p>
               </div>
               <button
-                className="mt-6 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark"
-                disabled={user?.name === boat.owner}
-                onClick={() => (user ? setApplying(true) : openAuth("login"))}
+                className="mt-6 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark disabled:opacity-60"
+                disabled={
+                  user?.name === boat.owner ||
+                  !isAcceptingApplications(boat) ||
+                  Boolean(activeApplication) ||
+                  Boolean(confirmedSitConflict)
+                }
+                onClick={() => {
+                  if (
+                    !isAcceptingApplications(boat) ||
+                    activeApplication ||
+                    confirmedSitConflict
+                  ) {
+                    return;
+                  }
+                  if (user) setApplying(true);
+                  else openAuth("login");
+                }}
                 type="button"
               >
-                {user?.name === boat.owner ? t("detail.ownSit") : t("detail.apply")}
+                {user?.name === boat.owner
+                  ? t("detail.ownSit")
+                  : activeApplication
+                    ? t("detail.requestedSit")
+                    : confirmedSitConflict
+                      ? t("detail.confirmedSitConflict")
+                      : isAcceptingApplications(boat)
+                        ? t("detail.apply")
+                        : t("detail.applicationsClosed")}
               </button>
+              {activeApplication && user?.name !== boat.owner && (
+                <div className="mt-4 space-y-3">
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <ApplicationStatusBadge status={activeApplication.status} />
+                  </div>
+                  <Link
+                    className="flex w-full items-center justify-center rounded-xl border border-line py-3 text-sm font-bold text-navy hover:border-teal"
+                    to="/owner/boats"
+                  >
+                    {t("detail.viewInSits")}
+                  </Link>
+                  <Link
+                    className="flex w-full items-center justify-center rounded-xl border border-teal bg-seafoam py-3 text-sm font-bold text-teal hover:border-teal"
+                    to={`/messages?application=${encodeURIComponent(activeApplication.id)}`}
+                  >
+                    {t("nav.messages")}
+                  </Link>
+                </div>
+              )}
+              {!isAcceptingApplications(boat) && user?.name !== boat.owner && (
+                <p className="mt-3 text-center text-xs leading-5 text-slate">
+                  {t("detail.applicationsClosedHint")}
+                </p>
+              )}
+              {confirmedSitConflict &&
+                !activeApplication &&
+                user?.name !== boat.owner &&
+                isAcceptingApplications(boat) && (
+                  <p className="mt-3 text-center text-xs leading-5 text-amber-800">
+                    {t("detail.confirmedSitConflictHint", { boat: confirmedSitConflict.boatName })}
+                  </p>
+                )}
+              {applicantNeedsVerification &&
+                isAcceptingApplications(boat) &&
+                !confirmedSitConflict && (
+                <p className="mt-3 text-center text-xs leading-5 text-amber-800">
+                  {t("apply.verificationRequiredText")}
+                </p>
+              )}
               <p className="mt-3 text-center text-xs text-slate">
                 {t("detail.applicants", { count: boat.applicants })}
               </p>
@@ -1521,25 +2469,138 @@ function DetailPage() {
           </div>
         </section>
       </div>
-      {applying && <ApplyModal boat={boat} close={() => setApplying(false)} />}
+      {applying && (
+        <ApplyModal
+          boat={boat}
+          close={() => setApplying(false)}
+          confirmedSitConflict={confirmedSitConflict}
+        />
+      )}
+      {lightboxIndex !== null && (
+        <PhotoLightbox
+          boatName={boat.name}
+          photos={photos}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+        />
+      )}
     </main>
   );
 }
 
 function SavedPage() {
   const { t } = useTranslation();
+  const user = useAppStore((state) => state.user);
   const saved = useAppStore((state) => state.saved);
-  const { data: boats = [] } = useQuery({ queryKey: ["boats"], queryFn: getBoats });
+  const [showAll, setShowAll] = useState(false);
+  const [page, setPage] = useState(0);
+  const resultsTopRef = useRef<HTMLDivElement>(null);
+  const { data: boats = [], isLoading } = useQuery({
+    queryKey: ["boats"],
+    queryFn: getBoats,
+    enabled: Boolean(user),
+  });
   const savedBoats = boats.filter((boat) => saved.includes(boat.id));
+  const visibleBoats = showAll
+    ? savedBoats
+    : savedBoats.filter((boat) => !boat.accepted);
+  const totalPages = Math.max(1, Math.ceil(visibleBoats.length / BOATS_PER_PAGE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const pageStart = currentPage * BOATS_PER_PAGE;
+  const pageEnd = Math.min(pageStart + BOATS_PER_PAGE, visibleBoats.length);
+  const pagedBoats = visibleBoats.slice(pageStart, pageEnd);
+
+  useEffect(() => {
+    setPage(0);
+  }, [showAll, saved]);
+
+  useEffect(() => {
+    if (page > totalPages - 1) setPage(Math.max(0, totalPages - 1));
+  }, [page, totalPages]);
+
+  function goToPage(nextPage: number) {
+    setPage(nextPage);
+    resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-24 text-center">
+        <Heart className="mx-auto text-coral" size={42} />
+        <h1 className="mt-5 font-display text-3xl font-extrabold text-navy">
+          {t("saved.signInTitle")}
+        </h1>
+        <p className="mt-3 text-slate">{t("saved.signInText")}</p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button
+            className="rounded-full border border-line bg-white px-6 py-3 font-bold text-navy hover:border-teal"
+            onClick={() => openAuth("login")}
+            type="button"
+          >
+            {t("nav.login")}
+          </button>
+          <button
+            className="rounded-full bg-navy px-6 py-3 font-bold text-white hover:bg-coral"
+            onClick={() => openAuth("signup")}
+            type="button"
+          >
+            {t("nav.join")}
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
       <p className="eyebrow">{t("saved.kicker")}</p>
       <h1 className="section-title">{t("saved.title")}</h1>
-      {savedBoats.length ? (
-        <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {savedBoats.map((boat) => (
-            <BoatCard boat={boat} key={boat.id} />
+      <label
+        className={`mt-6 flex w-fit cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition ${
+          showAll ? "border-teal bg-seafoam text-teal" : "border-line text-slate"
+        }`}
+      >
+        <input
+          checked={showAll}
+          className="size-4 accent-teal"
+          onChange={(event) => setShowAll(event.target.checked)}
+          type="checkbox"
+        />
+        {t("saved.showAll")}
+      </label>
+      <div ref={resultsTopRef} />
+      {isLoading ? (
+        <div
+          aria-busy="true"
+          aria-live="polite"
+          className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+        >
+          {Array.from({ length: 3 }, (_, index) => (
+            <BoatCardSkeleton key={index} showBadge={index === 0} />
           ))}
+        </div>
+      ) : visibleBoats.length ? (
+        <>
+          <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {pagedBoats.map((boat) => (
+              <BoatCard boat={boat} key={boat.id} />
+            ))}
+          </div>
+          <ResultsPagination
+            currentPage={currentPage}
+            onPageChange={goToPage}
+            pageSize={BOATS_PER_PAGE}
+            totalItems={visibleBoats.length}
+          />
+        </>
+      ) : savedBoats.length ? (
+        <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
+          <Heart className="mx-auto text-coral" size={38} />
+          <h2 className="mt-5 font-display text-2xl font-bold text-navy">
+            {t("saved.emptyFiltered")}
+          </h2>
+          <p className="mt-2 text-slate">{t("saved.emptyFilteredHint")}</p>
         </div>
       ) : (
         <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
@@ -1560,6 +2621,16 @@ function SavedPage() {
 
 function HowItWorksPage() {
   const { t } = useTranslation();
+  const unattendedRisks = [
+    "bilge",
+    "engine",
+    "power",
+    "mooring",
+    "leaks",
+    "ventilation",
+    "weather",
+    "security",
+  ] as const;
   const steps = [
     {
       icon: <Compass />,
@@ -1617,6 +2688,17 @@ function HowItWorksPage() {
         </p>
       </section>
       <section className="mx-auto max-w-6xl px-5 py-20">
+        <aside className="mb-14 flex flex-col gap-5 rounded-3xl border border-coral/30 bg-coral/10 p-7 sm:flex-row sm:items-start md:p-9">
+          <span className="grid size-12 shrink-0 place-items-center rounded-full bg-coral text-white">
+            <Anchor size={22} />
+          </span>
+          <div>
+            <h2 className="font-display text-2xl font-bold text-navy">
+              {t("how.liveaboardTitle")}
+            </h2>
+            <p className="mt-2 max-w-3xl leading-7 text-slate">{t("how.liveaboardText")}</p>
+          </div>
+        </aside>
         <div className="grid gap-8 md:grid-cols-2">
           {steps.map((step, index) => (
             <div className="rounded-2xl border border-line bg-white p-7" key={step.title}>
@@ -1655,6 +2737,24 @@ function HowItWorksPage() {
             </ul>
           </div>
         </div>
+        <section className="mt-20">
+          <div className="max-w-3xl">
+            <p className="eyebrow">{t("how.risksKicker")}</p>
+            <h2 className="section-title">{t("how.risksTitle")}</h2>
+            <p className="mt-4 leading-7 text-slate">{t("how.risksText")}</p>
+          </div>
+          <ul className="mt-8 grid gap-4 md:grid-cols-2">
+            {unattendedRisks.map((risk) => (
+              <li
+                className="flex gap-3 rounded-2xl border border-line bg-white p-5 leading-6 text-slate"
+                key={risk}
+              >
+                <TriangleAlert className="mt-0.5 shrink-0 text-coral" size={19} />
+                <span>{t(`how.risks.${risk}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
         <div className="mt-20">
           <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">{t("how.storiesKicker")}</p>
@@ -1792,46 +2892,21 @@ const memberDetails: Record<
   },
 };
 
-const sitterReviews = [
-  {
-    boat: "Juniper",
-    owner: "Sarah & Tom",
-    location: "Preveza, Greece",
-    date: "June 2026",
-    text: "Alex was exactly who you want looking after a boat: methodical, communicative and calm when a windy front came through. The handover back was immaculate.",
-    image: "https://i.pravatar.cc/100?img=14",
-  },
-  {
-    boat: "Kindred",
-    owner: "Marcus",
-    location: "Lisbon, Portugal",
-    date: "February 2026",
-    text: "A genuinely capable sitter. Alex spotted a small freshwater pump leak early, sent clear photos and coordinated the fix with our engineer. Highly recommended.",
-    image: "https://i.pravatar.cc/100?img=53",
-  },
-  {
-    boat: "Tern",
-    owner: "Jo & Ellie",
-    location: "Brighton, United Kingdom",
-    date: "October 2025",
-    text: "Our first time using a boat sitter and we could not have felt more reassured. Great with the systems, our dog, and the marina team.",
-    image: "https://i.pravatar.cc/100?img=23",
-  },
-];
-
 function ProfileEditor({ close }: { close: () => void }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const user = useAppStore((state) => state.user)!;
   const updateProfile = useAppStore((state) => state.updateProfile);
   const [form, setForm] = useState({
+    legalName: user.legalName ?? user.name,
     name: user.name,
     image: user.image,
+    coverImage: user.coverImage ?? "",
     bio:
       user.bio ??
       "Practical, calm and happiest near the water, with hands-on coastal sailing experience.",
     location: user.location ?? "Brighton, United Kingdom",
-    languages: user.languages ?? ["English"],
+    languages: [...new Set((user.languages ?? ["English"]).map(normalizeSpokenLanguage))],
     preferredCountries: user.preferredCountries ?? [],
     skills: (
       user.skills ?? ["RYA Day Skipper", "Diesel basics", "12V systems", "Pet friendly"]
@@ -1841,6 +2916,8 @@ function ProfileEditor({ close }: { close: () => void }) {
   const [saved, setSaved] = useState(false);
   const [imageError, setImageError] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const [coverError, setCoverError] = useState("");
+  const [coverUploading, setCoverUploading] = useState(false);
 
   async function uploadImage(file?: File) {
     if (!file) return;
@@ -1856,6 +2933,20 @@ function ProfileEditor({ close }: { close: () => void }) {
     }
   }
 
+  async function uploadCoverImage(file?: File) {
+    if (!file) return;
+    setCoverError("");
+    setCoverUploading(true);
+    try {
+      const coverImage = await prepareImageUpload(file);
+      setForm((current) => ({ ...current, coverImage }));
+    } catch (error) {
+      setCoverError(t(error instanceof Error ? error.message : "upload.failed"));
+    } finally {
+      setCoverUploading(false);
+    }
+  }
+
   function toggleLanguage(language: string) {
     setForm((current) => ({
       ...current,
@@ -1868,14 +2959,25 @@ function ProfileEditor({ close }: { close: () => void }) {
   async function save() {
     setSaving(true);
     const name = form.name.trim();
-    if (name !== user.name || form.image !== user.image) {
-      await updateOwnerOnVessels(user.name, { name, image: form.image });
+    if (
+      name !== user.name ||
+      form.image !== user.image ||
+      form.languages.some((language) => !user.languages.includes(language)) ||
+      user.languages.some((language) => !form.languages.includes(language))
+    ) {
+      await updateOwnerOnVessels(user.name, {
+        name,
+        image: form.image,
+        languages: form.languages,
+      });
       await queryClient.invalidateQueries({ queryKey: ["vessels"] });
       await queryClient.invalidateQueries({ queryKey: ["boats"] });
     }
     updateProfile({
       ...form,
+      legalName: form.legalName.trim() || name,
       name,
+      coverImage: form.coverImage || undefined,
       bio: form.bio.trim(),
       location: form.location.trim(),
       skills: form.skills
@@ -1908,6 +3010,54 @@ function ProfileEditor({ close }: { close: () => void }) {
         </div>
 
         <section className="mt-7">
+          <span className="form-label">{t("profile.coverImage")}</span>
+          <p className="mb-3 text-sm text-slate">{t("profile.coverHint")}</p>
+          <div className="grid gap-3 rounded-2xl border border-line bg-cream/50 p-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(13rem,0.7fr)]">
+            <div className="aspect-[5/2] overflow-hidden rounded-xl bg-navy">
+              {form.coverImage ? (
+                <img
+                  alt={t("profile.coverPreviewAlt")}
+                  className="size-full object-cover"
+                  src={form.coverImage}
+                />
+              ) : (
+                <div className="relative grid size-full place-items-center">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_100%,#80d7d0,transparent_35%),radial-gradient(circle_at_80%_0%,#ef7057,transparent_30%)] opacity-40" />
+                  <div className="relative text-center text-white/80">
+                    <ImagePlus className="mx-auto mb-2" size={28} />
+                    <p className="text-sm font-semibold">{t("profile.noCover")}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <ImageUploadControl
+                hasImage={Boolean(form.coverImage)}
+                onFile={(file) => void uploadCoverImage(file)}
+                pending={coverUploading}
+              />
+              {form.coverImage && (
+                <button
+                  className="self-start text-xs font-bold text-coral"
+                  onClick={() => {
+                    setForm({ ...form, coverImage: "" });
+                    setCoverError("");
+                  }}
+                  type="button"
+                >
+                  {t("upload.remove")}
+                </button>
+              )}
+            </div>
+          </div>
+          {coverError && (
+            <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+              {coverError}
+            </p>
+          )}
+        </section>
+
+        <section className="mt-7">
           <span className="form-label">{t("profile.photo")}</span>
           <div className="flex flex-wrap items-center gap-4">
             <img
@@ -1932,6 +3082,14 @@ function ProfileEditor({ close }: { close: () => void }) {
         </section>
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          <label>
+            <span className="form-label">{t("settings.legalName")}</span>
+            <input
+              className="form-input"
+              onChange={(event) => setForm({ ...form, legalName: event.target.value })}
+              value={form.legalName}
+            />
+          </label>
           <label>
             <span className="form-label">{t("profile.displayName")}</span>
             <input
@@ -1975,18 +3133,18 @@ function ProfileEditor({ close }: { close: () => void }) {
         <section className="mt-6">
           <span className="form-label">{t("profile.spokenLanguages")}</span>
           <div className="flex flex-wrap gap-2">
-            {SUPPORTED_LANGUAGES.map((language) => (
+            {SPOKEN_LANGUAGE_OPTIONS.map(([language, labelKey]) => (
               <button
                 className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
-                  form.languages.includes(language.label)
+                  form.languages.includes(language)
                     ? "border-teal bg-seafoam text-teal"
                     : "border-line text-slate hover:border-teal"
                 }`}
-                key={language.code}
-                onClick={() => toggleLanguage(language.label)}
+                key={language}
+                onClick={() => toggleLanguage(language)}
                 type="button"
               >
-                {language.flag} {language.label}
+                {t(labelKey)}
               </button>
             ))}
           </div>
@@ -2040,35 +3198,120 @@ function MemberPage() {
   const { id = "" } = useParams();
   const currentUser = useAppStore((state) => state.user);
   const isMe = id === "me";
+  const memberKey = decodeURIComponent(id);
   const [editing, setEditing] = useState(false);
+  const identityVerificationEnabled = useFeatureFlag("identityVerification");
   const queryClient = useQueryClient();
-  const { data: boat, isLoading } = useQuery({
+  const { data: boat, isLoading: boatLoading, isFetched: boatFetched } = useQuery({
     queryKey: ["boat", id],
-    queryFn: () => getBoat(id),
-    enabled: !isMe,
+    queryFn: async () => (await getBoat(id)) ?? null,
+    enabled: Boolean(currentUser) && !isMe,
+    retry: false,
+  });
+  const isBoatOwnerProfile = !isMe && Boolean(boat);
+  const isSitterNameProfile = !isMe && boatFetched && !boat;
+  const profileName = isMe
+    ? (currentUser?.name ?? "")
+    : isBoatOwnerProfile
+      ? boat!.owner
+      : memberKey;
+  const { data: namedMember, isLoading: namedLoading } = useQuery({
+    queryKey: ["member-profile", memberKey],
+    queryFn: () => getPublicMemberProfile(memberKey),
+    enabled: Boolean(currentUser) && isSitterNameProfile,
+  });
+  const { data: sitterReviews = [] } = useQuery({
+    queryKey: ["reviews", "sitter", profileName],
+    queryFn: () => getReviewsForSitter(profileName),
+    enabled: Boolean(currentUser) && Boolean(profileName) && (isMe || isSitterNameProfile),
+  });
+  const { data: applications = [] } = useQuery({
+    queryKey: ["applications", "user", currentUser?.name],
+    queryFn: () => getApplicationsForUser(currentUser!.name),
+    enabled: Boolean(currentUser),
   });
   const { data: verification } = useQuery({
     queryKey: ["verification", currentUser?.name],
     queryFn: () => getVerificationStatus(currentUser!.name),
     enabled: isMe && Boolean(currentUser),
   });
+  const { data: verificationChecks } = useQuery({
+    queryKey: [
+      "verification-checks",
+      profileName,
+      isMe,
+      isMe ? currentUser?.email : "",
+      isMe ? currentUser?.phoneNumber : "",
+      verification?.status,
+    ],
+    queryFn: () =>
+      getMemberVerificationChecks(profileName, {
+        isSelf: isMe,
+        email: currentUser?.email,
+        phoneNumber: currentUser?.phoneNumber,
+      }),
+    enabled: Boolean(currentUser) && Boolean(profileName) && (isMe || isSitterNameProfile || isBoatOwnerProfile),
+  });
   const verifyMutation = useMutation({
     mutationFn: () => startVerification(currentUser!.name),
-    onSuccess: (record) => queryClient.setQueryData(["verification", currentUser?.name], record),
+    onSuccess: async (record) => {
+      queryClient.setQueryData(["verification", currentUser?.name], record);
+      await queryClient.invalidateQueries({ queryKey: ["verification-checks"] });
+    },
   });
 
-  if (isMe && !currentUser) return <NotFound />;
-  if (!isMe && isLoading)
-    return <div className="mx-auto my-20 h-96 max-w-5xl animate-pulse rounded-3xl bg-seafoam" />;
-  if (!isMe && !boat) return <NotFound />;
+  const pendingReviewApplication = applications.find(
+    (application) =>
+      application.status === "accepted" &&
+      application.ownerName === currentUser?.name &&
+      application.applicant.name === profileName,
+  );
+  const { data: pendingReviewSit } = useQuery({
+    queryKey: ["boat", pendingReviewApplication?.sitId],
+    queryFn: () => getBoat(pendingReviewApplication!.sitId),
+    enabled: Boolean(pendingReviewApplication),
+  });
+  const existingConversation =
+    !isMe && currentUser
+      ? findConversationWithUser(applications, currentUser.name, profileName)
+      : undefined;
 
+  if (!currentUser) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-24 text-center">
+        <Users className="mx-auto text-teal" size={42} />
+        <h1 className="mt-5 font-display text-3xl font-extrabold text-navy">
+          {t("member.signInTitle")}
+        </h1>
+        <p className="mt-3 text-slate">{t("member.signInText")}</p>
+        <button
+          className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
+          onClick={() => openAuth("login")}
+          type="button"
+        >
+          {t("nav.login")}
+        </button>
+      </main>
+    );
+  }
+
+  if (!isMe && boatLoading) {
+    return <div className="mx-auto my-20 h-96 max-w-5xl animate-pulse rounded-3xl bg-seafoam" />;
+  }
+  if (isSitterNameProfile && namedLoading) {
+    return <div className="mx-auto my-20 h-96 max-w-5xl animate-pulse rounded-3xl bg-seafoam" />;
+  }
+  if (!isMe && !boat && !namedMember) return <NotFound />;
+
+  const ratingSummary = summarizeSitterRating(sitterReviews);
   const profile = isMe
     ? {
         name: currentUser!.name,
         image: currentUser!.image,
+        coverImage: currentUser!.coverImage,
         activity: t("member.member"),
         location: currentUser!.location ?? "Brighton, United Kingdom",
-        since: "2024",
+        since: currentUser!.memberSince,
         about:
           currentUser!.bio ??
           "Practical, calm and happiest near the water, with hands-on coastal sailing experience.",
@@ -2079,48 +3322,89 @@ function MemberPage() {
           "Pet friendly",
         ],
         ownerSits: currentUser!.name === "Maya & Finn" ? 14 : 0,
-        sitterSits: currentUser!.name === "Alex Morgan" ? 8 : 0,
-        rating: 5,
-        reviews: 12,
+        sitterSits:
+          currentUser!.name === "Alex Morgan"
+            ? Math.max(8, ratingSummary.count)
+            : applications.filter(
+                (application) =>
+                  application.applicant.name === currentUser!.name &&
+                  application.status === "accepted",
+              ).length,
+        rating: ratingSummary.count ? ratingSummary.average : 0,
+        reviews: ratingSummary.count,
+        showSitterReviews: true,
       }
-    : {
-        name: boat!.owner,
-        image: boat!.ownerImage,
-        activity: t("member.member"),
-        location: memberDetails[id]?.location ?? formatSitLocation(boat!.location, boat!.country),
-        since: memberDetails[id]?.since ?? "2022",
-        about: memberDetails[id]?.about ?? boat!.description,
-        badges: memberDetails[id]?.badges ?? ["Verified owner", "Fast responder"],
-        ownerSits: memberDetails[id]?.ownerSits ?? boat!.reviews,
-        sitterSits: 0,
-        rating: boat!.rating,
-        reviews: boat!.reviews,
-      };
+    : isBoatOwnerProfile
+      ? {
+          name: boat!.owner,
+          image: boat!.ownerImage,
+          coverImage:
+            currentUser?.name === boat!.owner ? currentUser.coverImage : undefined,
+          activity: t("member.member"),
+          location: memberDetails[id]?.location ?? formatSitLocation(boat!.location, boat!.country),
+          since: memberDetails[id]?.since ?? "2022",
+          about: memberDetails[id]?.about ?? boat!.description,
+          badges: memberDetails[id]?.badges ?? ["Verified owner", "Fast responder"],
+          ownerSits: memberDetails[id]?.ownerSits ?? boat!.reviews,
+          sitterSits: 0,
+          rating: boat!.rating,
+          reviews: boat!.reviews,
+          showSitterReviews: false,
+        }
+      : {
+          name: namedMember!.name,
+          image: namedMember!.image,
+          coverImage: namedMember!.coverImage,
+          activity: t("member.member"),
+          location: namedMember!.location,
+          since: String(namedMember!.memberSince),
+          about: namedMember!.bio,
+          badges: [...namedMember!.certifications, ...namedMember!.skills.slice(0, 3)],
+          ownerSits: 0,
+          sitterSits: namedMember!.completedSits,
+          rating: ratingSummary.count ? ratingSummary.average : 0,
+          reviews: ratingSummary.count,
+          showSitterReviews: true,
+        };
 
   return (
     <main className="px-5 py-12 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="overflow-hidden rounded-3xl border border-line bg-white shadow-card">
-          <div className="h-40 bg-navy">
-            <div className="h-full bg-[radial-gradient(circle_at_20%_100%,#80d7d0,transparent_35%),radial-gradient(circle_at_80%_0%,#ef7057,transparent_30%)] opacity-40" />
-          </div>
-          <div className="px-6 pb-8 sm:px-10">
-            <div className="-mt-16 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
-              <img
-                alt={profile.name}
-                className="size-32 rounded-full border-4 border-white bg-white object-cover shadow-card"
-                src={profile.image}
-              />
-              <div className="flex gap-3 pb-1">
+          <div className="relative isolate">
+            <div className="h-40 bg-navy">
+              {profile.coverImage ? (
+                <img
+                  alt=""
+                  className="size-full object-cover"
+                  src={profile.coverImage}
+                />
+              ) : (
+                <div className="pointer-events-none h-full bg-[radial-gradient(circle_at_20%_100%,#80d7d0,transparent_35%),radial-gradient(circle_at_80%_0%,#ef7057,transparent_30%)] opacity-40" />
+              )}
+            </div>
+            <div className="relative px-6 pb-8 sm:px-10">
+              <div className="relative -mt-16 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
+                <img
+                  alt={profile.name}
+                  className="relative z-20 size-32 shrink-0 rounded-full border-4 border-white bg-white object-cover shadow-card"
+                  src={profile.image}
+                />
+                <div className="relative z-10 flex w-full flex-wrap gap-3 sm:ml-auto sm:w-auto sm:max-w-[calc(100%-9.5rem)] sm:justify-end sm:pb-1">
                 {!isMe && (
-                  <button
-                    className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                    type="button"
-                  >
-                    <span className="flex items-center gap-2">
-                      <MessageCircle size={17} /> {t("member.message")}
-                    </span>
-                  </button>
+                  <>
+                    {existingConversation && (
+                      <Link
+                        className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                        to={`/messages?application=${encodeURIComponent(existingConversation.id)}`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <MessageCircle size={17} /> {t("member.message")}
+                        </span>
+                      </Link>
+                    )}
+                    <UserSafetyActions image={profile.image} name={profile.name} />
+                  </>
                 )}
                 {isMe && (
                   <>
@@ -2139,20 +3423,17 @@ function MemberPage() {
                     </Link>
                   </>
                 )}
-                <span
-                  className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold ${
-                    !isMe || verification?.status === "verified"
-                      ? "bg-seafoam text-teal"
-                      : "bg-cream text-slate"
-                  }`}
-                >
-                  <ShieldCheck size={17} />{" "}
-                  {!isMe || verification?.status === "verified"
-                    ? t("member.identityVerified")
-                    : t("member.verificationNeeded")}
-                </span>
+                {identityVerificationEnabled &&
+                  (verificationChecks ? (
+                    <IdentityVerificationBadge checks={verificationChecks} />
+                  ) : (
+                    <span className="flex items-center gap-2 rounded-full bg-cream px-4 py-2.5 text-sm font-bold text-slate">
+                      <ShieldCheck size={17} /> {t("member.verificationNeeded")}
+                    </span>
+                  ))}
               </div>
             </div>
+            {!isMe && <BlockedUserBanner name={profile.name} />}
             <div className="mt-5">
               <p className="eyebrow">{profile.activity}</p>
               <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy">
@@ -2162,13 +3443,25 @@ function MemberPage() {
                 <span className="flex items-center gap-1.5">
                   <MapPin size={16} /> {profile.location}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Star className="fill-sun text-sun" size={16} /> {profile.rating} ·{" "}
-                  {t("member.reviews", { count: profile.reviews })}
-                </span>
+                {profile.showSitterReviews ? (
+                  profile.reviews > 0 ? (
+                    <span className="flex items-center gap-1.5 font-bold text-navy">
+                      <Star className="fill-sun text-sun" size={16} /> {profile.rating.toFixed(1)} ·{" "}
+                      {t("member.reviews", { count: profile.reviews })}
+                    </span>
+                  ) : (
+                    <span>{t("reviews.noRatingYet")}</span>
+                  )
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <Star className="fill-sun text-sun" size={16} /> {profile.rating} ·{" "}
+                    {t("member.reviews", { count: profile.reviews })}
+                  </span>
+                )}
                 <span>{t("member.since", { year: profile.since })}</span>
               </p>
             </div>
+          </div>
           </div>
         </div>
 
@@ -2221,43 +3514,21 @@ function MemberPage() {
                 </>
               )}
             </div>
-            {isMe && profile.sitterSits > 0 && (
-              <section className="rounded-2xl border border-line bg-white p-7">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="eyebrow">{t("member.fromOwners")}</p>
-                    <h2 className="detail-title">{t("member.historicReviews")}</h2>
-                  </div>
-                  <span className="flex items-center gap-1 text-sm font-bold text-navy">
-                    <Star className="fill-sun text-sun" size={16} /> 5.0
-                  </span>
-                </div>
-                <div className="mt-6 divide-y divide-line">
-                  {sitterReviews.map((review) => (
-                    <article className="py-6 first:pt-0 last:pb-0" key={review.boat}>
-                      <div className="flex items-center gap-3">
-                        <img
-                          alt=""
-                          className="size-10 rounded-full object-cover"
-                          src={review.image}
-                        />
-                        <div>
-                          <p className="text-sm font-bold text-navy">{review.owner}</p>
-                          <p className="text-xs text-slate">
-                            {review.boat} · {review.location} · {review.date}
-                          </p>
-                        </div>
-                        <div className="ml-auto flex text-sun">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star className="fill-current" key={star} size={12} />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="mt-3 text-sm leading-6 text-slate">“{review.text}”</p>
-                    </article>
-                  ))}
-                </div>
-              </section>
+            {pendingReviewApplication &&
+              currentUser &&
+              pendingReviewSit &&
+              canLeaveReview(pendingReviewSit) && (
+              <LeaveReviewForm
+                application={pendingReviewApplication}
+                ownerName={currentUser.name}
+              />
+            )}
+            {profile.showSitterReviews && (
+              <SitterReviewsSection
+                currentUserName={currentUser?.name}
+                showEmpty
+                sitterName={profile.name}
+              />
             )}
           </div>
           <aside className="space-y-4">
@@ -2275,23 +3546,13 @@ function MemberPage() {
                 </p>
               </div>
             </div>
-            {isMe && verification?.status !== "verified" && (
-              <div className="rounded-2xl border border-coral/30 bg-white p-6">
-                <ShieldCheck className="text-coral" size={28} />
-                <h2 className="mt-3 font-display font-bold text-navy">{t("member.verifyTitle")}</h2>
-                <p className="mt-2 text-sm leading-5 text-slate">{t("member.verifyText")}</p>
-                <button
-                  className="mt-4 w-full rounded-xl bg-navy py-3 text-sm font-bold text-white disabled:opacity-60"
-                  disabled={verifyMutation.isPending}
-                  onClick={() => verifyMutation.mutate()}
-                  type="button"
-                >
-                  {verifyMutation.isPending ? t("member.checking") : t("member.startVerification")}
-                </button>
-                <p className="mt-2 text-center text-[11px] text-slate">
-                  {t("member.providerDemo")}
-                </p>
-              </div>
+            {identityVerificationEnabled && verificationChecks && (
+              <IdentityVerificationCard
+                checks={verificationChecks}
+                isSelf={isMe}
+                onStartVerification={() => verifyMutation.mutate()}
+                verifying={verifyMutation.isPending}
+              />
             )}
             {!isMe && boat && (
               <Link
@@ -2322,11 +3583,19 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   const user = useAppStore((state) => state.user)!;
   const queryClient = useQueryClient();
   const preferredLengthUnit: LengthUnit = user.measurementSystem === "imperial" ? "ft" : "m";
-  const initialLength = parseBoatLength(boat?.length ?? "", preferredLengthUnit);
+  const initialParsed = parseBoatLength(boat?.length ?? "", "m");
+  const initialLengthValue = initialParsed.value
+    ? convertBoatLength(initialParsed.value, initialParsed.unit, preferredLengthUnit)
+    : "";
   const [imageError, setImageError] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
-  const [lengthValue, setLengthValue] = useState(initialLength.value);
-  const [lengthUnit, setLengthUnit] = useState<LengthUnit>(initialLength.unit);
+  const [galleryError, setGalleryError] = useState("");
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [gallery, setGallery] = useState<BoatPhoto[]>(() =>
+    (boat?.gallery ?? []).map((photo) => ({ ...photo })),
+  );
+  const [lengthValue, setLengthValue] = useState(initialLengthValue);
+  const [lengthUnit, setLengthUnit] = useState<LengthUnit>(preferredLengthUnit);
   const [form, setForm] = useState({
     name: boat?.name ?? "",
     type: boat?.type ?? "Sailing yacht",
@@ -2341,6 +3610,10 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     amenities: boat?.amenities.filter((item) => ALL_BOAT_FEATURES.includes(item)) ?? [],
     customAmenities:
       boat?.amenities.filter((item) => !ALL_BOAT_FEATURES.includes(item)).join("\n") ?? "",
+    wifiNetwork: boat?.privateAccess?.wifiNetwork ?? "",
+    wifiPassword: boat?.privateAccess?.wifiPassword ?? "",
+    accessCodes: boat?.privateAccess?.accessCodes ?? "",
+    otherPrivateNotes: boat?.privateAccess?.otherNotes ?? "",
   });
 
   async function uploadImage(file?: File) {
@@ -2357,6 +3630,38 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     }
   }
 
+  async function uploadGalleryImages(files: File[]) {
+    if (files.length === 0) return;
+    setGalleryError("");
+    setGalleryUploading(true);
+    try {
+      const uploaded: BoatPhoto[] = [];
+      for (const file of files) {
+        uploaded.push({ url: await prepareImageUpload(file) });
+      }
+      setGallery((current) => [...current, ...uploaded]);
+    } catch (error) {
+      setGalleryError(t(error instanceof Error ? error.message : "upload.failed"));
+    } finally {
+      setGalleryUploading(false);
+    }
+  }
+
+  function updateGalleryCaption(index: number, caption: string) {
+    setGallery((current) =>
+      current.map((photo, photoIndex) =>
+        photoIndex === index
+          ? { url: photo.url, ...(caption.trim() ? { caption: caption.slice(0, 160) } : {}) }
+          : photo,
+      ),
+    );
+  }
+
+  function removeGalleryPhoto(index: number) {
+    setGallery((current) => current.filter((_, photoIndex) => photoIndex !== index));
+    setGalleryError("");
+  }
+
   const mutation = useMutation({
     mutationFn: () => {
       const id =
@@ -2367,11 +3672,22 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
           .replaceAll(/^-|-$/g, "")}-${Date.now().toString().slice(-5)}`;
       return saveVessel({
         id,
-        ...form,
-        length: lengthValue ? `${lengthValue} ${lengthUnit}` : "",
+        name: form.name,
+        type: form.type,
+        engineType: form.engineType,
+        voltageType: form.voltageType,
+        stoveFuelType: form.stoveFuelType,
+        homePort: form.homePort,
+        description: form.description,
+        home: form.home,
+        length: lengthValue ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`) : "",
         image: form.image || fallbackImage,
-        gallery: boat?.gallery ?? [],
+        gallery: gallery.map((photo) => ({
+          url: photo.url,
+          ...(photo.caption?.trim() ? { caption: photo.caption.trim() } : {}),
+        })),
         owner: user.name,
+        ownerLanguages: user.languages,
         ownerImage: user.image,
         rating: boat?.rating ?? 0,
         reviews: boat?.reviews ?? 0,
@@ -2383,6 +3699,12 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             .map((item) => item.trim())
             .filter(Boolean),
         ],
+        privateAccess: {
+          wifiNetwork: form.wifiNetwork,
+          wifiPassword: form.wifiPassword,
+          accessCodes: form.accessCodes,
+          otherNotes: form.otherPrivateNotes,
+        },
       });
     },
     onSuccess: async () => {
@@ -2402,8 +3724,9 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   ];
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10 lg:px-8 lg:py-14">
-      <div className="rounded-3xl border border-line bg-white p-6 shadow-card md:p-8">
+    <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-14">
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="order-2 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
         <div className="flex items-start justify-between">
           <div>
             <p className="eyebrow">{t("owner.tools")}</p>
@@ -2422,9 +3745,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label>
             <span className="form-label">{t("vesselEditor.type")}</span>
-            <select
-              className="form-input"
-              onChange={(event) => setForm({ ...form, type: event.target.value })}
+            <Select variant="form" onChange={(event) => setForm({ ...form, type: event.target.value })}
               value={form.type}
             >
               {VESSEL_TYPES.map((type) => (
@@ -2432,13 +3753,11 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   {displayLabel(t, type)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span className="form-label">{t("vesselEditor.engineType")}</span>
-            <select
-              className="form-input"
-              onChange={(event) =>
+            <Select variant="form" onChange={(event) =>
                 setForm({ ...form, engineType: event.target.value as EngineType })
               }
               value={form.engineType}
@@ -2448,13 +3767,11 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   {displayLabel(t, engineType)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span className="form-label">{t("vesselEditor.voltageType")}</span>
-            <select
-              className="form-input"
-              onChange={(event) =>
+            <Select variant="form" onChange={(event) =>
                 setForm({ ...form, voltageType: event.target.value as VoltageType })
               }
               value={form.voltageType}
@@ -2464,13 +3781,11 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   {displayLabel(t, voltageType)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span className="form-label">{t("vesselEditor.stoveFuelType")}</span>
-            <select
-              className="form-input"
-              onChange={(event) =>
+            <Select variant="form" onChange={(event) =>
                 setForm({ ...form, stoveFuelType: event.target.value as StoveFuelType })
               }
               value={form.stoveFuelType}
@@ -2480,7 +3795,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   {displayLabel(t, stoveFuelType)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span className="form-label">{t("vesselEditor.length")}</span>
@@ -2495,9 +3810,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 type="number"
                 value={lengthValue}
               />
-              <select
-                aria-label={t("vesselEditor.lengthUnit")}
-                className="form-input"
+              <Select variant="form" aria-label={t("vesselEditor.lengthUnit")}
                 onChange={(event) => {
                   const nextUnit = event.target.value as LengthUnit;
                   setLengthValue((current) => convertBoatLength(current, lengthUnit, nextUnit));
@@ -2507,7 +3820,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               >
                 <option value="m">{t("units.meters")}</option>
                 <option value="ft">{t("units.feet")}</option>
-              </select>
+              </Select>
             </span>
           </label>
           {fields.map((field) => (
@@ -2577,6 +3890,63 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               </p>
             )}
           </section>
+          <section className="sm:col-span-2">
+            <span className="form-label">{t("vesselEditor.gallery")}</span>
+            <p className="mb-3 text-sm text-slate">{t("vesselEditor.galleryHint")}</p>
+            <div className="rounded-2xl border border-line bg-cream/50 p-3">
+              {gallery.length === 0 ? (
+                <p className="mb-3 text-sm font-semibold text-slate">{t("vesselEditor.galleryEmpty")}</p>
+              ) : (
+                <ul className="mb-3 grid gap-3 sm:grid-cols-2">
+                  {gallery.map((photo, index) => (
+                    <li
+                      className="overflow-hidden rounded-xl border border-line bg-white"
+                      key={`${photo.url}-${index}`}
+                    >
+                      <div className="aspect-video overflow-hidden bg-seafoam">
+                        <img
+                          alt={t("vesselEditor.galleryPhotoAlt", { number: index + 1 })}
+                          className="size-full object-cover"
+                          src={photo.url}
+                        />
+                      </div>
+                      <div className="space-y-2 p-3">
+                        <label>
+                          <span className="form-label">{t("vesselEditor.galleryCaption")}</span>
+                          <input
+                            className="form-input"
+                            maxLength={160}
+                            onChange={(event) => updateGalleryCaption(index, event.target.value)}
+                            placeholder={t("vesselEditor.galleryCaptionPlaceholder")}
+                            value={photo.caption ?? ""}
+                          />
+                        </label>
+                        <button
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-coral"
+                          onClick={() => removeGalleryPhoto(index)}
+                          type="button"
+                        >
+                          <Trash2 size={14} />
+                          {t("vesselEditor.removeGalleryPhoto")}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <ImageUploadControl
+                hasImage={gallery.length > 0}
+                multiple
+                onFiles={(files) => void uploadGalleryImages(files)}
+                pending={galleryUploading}
+              />
+            </div>
+            {galleryError && (
+              <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                {galleryError}
+              </p>
+            )}
+          </section>
           {[
             ["description", t("vesselEditor.about"), t("vesselEditor.aboutPlaceholder")],
             ["home", t("vesselEditor.lifeAboard"), t("vesselEditor.lifePlaceholder")],
@@ -2589,10 +3959,65 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 className="form-input min-h-24 resize-y"
                 onChange={(event) => setForm({ ...form, [key]: event.target.value })}
                 placeholder={placeholder}
-                value={form[key as keyof typeof form]}
+                value={form[key as keyof typeof form] as string}
               />
             </label>
           ))}
+          <section className="sm:col-span-2 rounded-2xl border border-teal/30 bg-seafoam/40 p-4 md:p-5">
+            <div className="flex items-start gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white text-teal">
+                <KeyRound aria-hidden="true" size={18} />
+              </span>
+              <div className="min-w-0">
+                <h2 className="font-display text-lg font-bold text-navy">
+                  {t("vesselEditor.privateAccessTitle")}
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate">
+                  {t("vesselEditor.privateAccessHint")}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className="form-label">{t("vesselEditor.wifiNetwork")}</span>
+                <input
+                  autoComplete="off"
+                  className="form-input"
+                  onChange={(event) => setForm({ ...form, wifiNetwork: event.target.value })}
+                  placeholder={t("vesselEditor.wifiNetworkPlaceholder")}
+                  value={form.wifiNetwork}
+                />
+              </label>
+              <label>
+                <span className="form-label">{t("vesselEditor.wifiPassword")}</span>
+                <input
+                  autoComplete="off"
+                  className="form-input"
+                  onChange={(event) => setForm({ ...form, wifiPassword: event.target.value })}
+                  placeholder={t("vesselEditor.wifiPasswordPlaceholder")}
+                  value={form.wifiPassword}
+                />
+              </label>
+              <label className="sm:col-span-2">
+                <span className="form-label">{t("vesselEditor.accessCodes")}</span>
+                <textarea
+                  className="form-input min-h-24 resize-y"
+                  onChange={(event) => setForm({ ...form, accessCodes: event.target.value })}
+                  placeholder={t("vesselEditor.accessCodesPlaceholder")}
+                  value={form.accessCodes}
+                />
+              </label>
+              <label className="sm:col-span-2">
+                <span className="form-label">{t("vesselEditor.otherPrivateNotes")}</span>
+                <textarea
+                  className="form-input min-h-24 resize-y"
+                  onChange={(event) => setForm({ ...form, otherPrivateNotes: event.target.value })}
+                  placeholder={t("vesselEditor.otherPrivateNotesPlaceholder")}
+                  value={form.otherPrivateNotes}
+                />
+              </label>
+            </div>
+          </section>
         </div>
         <section className="mt-7">
           <p className="eyebrow">{t("vesselEditor.featuresKicker")}</p>
@@ -2660,6 +4085,25 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 : t("vesselEditor.publish")}
           </button>
         </div>
+      </div>
+      <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
+        <EditorLivePreview hint={t("editorPreview.vesselHint")}>
+          <VesselPreviewCard
+            vessel={{
+              name: form.name,
+              type: form.type,
+              length: lengthValue
+                ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`)
+                : "",
+              homePort: form.homePort,
+              image: form.image,
+              engineType: form.engineType,
+              voltageType: form.voltageType,
+              stoveFuelType: form.stoveFuelType,
+            }}
+          />
+        </EditorLivePreview>
+      </div>
       </div>
     </main>
   );
@@ -2729,10 +4173,32 @@ function VesselEditorPage({ mode }: { mode: "new" | "edit" }) {
   return <VesselEditor boat={boat} close={() => navigate("/owner/boats")} />;
 }
 
-function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; close: () => void }) {
+function SitEditor({
+  sit,
+  vessels,
+  close,
+  locked = false,
+  preferredBoatId,
+}: {
+  sit?: Sit;
+  vessels: Vessel[];
+  close: () => void;
+  locked?: boolean;
+  preferredBoatId?: string;
+}) {
   const { i18n, t } = useTranslation();
   const queryClient = useQueryClient();
-  const initialBoatId = sit?.boatId ?? vessels[0]?.id ?? "";
+  const user = useAppStore((state) => state.user);
+  const sitDefaults = {
+    ...DEFAULT_SIT_CREATION_DEFAULTS,
+    ...user?.sitDefaults,
+  };
+  const initialBoatId =
+    sit?.boatId ??
+    (preferredBoatId && vessels.some((vessel) => vessel.id === preferredBoatId)
+      ? preferredBoatId
+      : vessels[0]?.id) ??
+    "";
   const initialVessel = vessels.find((vessel) => vessel.id === initialBoatId);
   const initialHomePort = splitHomePort(initialVessel?.homePort ?? "");
   const existingEnd = useMemo(() => {
@@ -2748,22 +4214,58 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
     boatId: initialBoatId,
     location: sit?.location ?? initialHomePort.location,
     country: sit?.country ?? initialHomePort.country,
-    region: sit?.region ?? "",
     startDate: sit?.dateStart ?? "",
     endDate: existingEnd,
+    sitType: sit?.sitType ?? "liveaboard",
     responsibilities: sit?.responsibilities.join("\n") ?? "",
-    requirements:
-      sit?.requirements
-        .filter((requirement) => !(sit.requiredSkills ?? []).includes(requirement))
-        .join("\n") ?? "",
+    requirements: withoutNonSmokerRequirementLabels(
+      sit?.requirements.filter(
+        (requirement) => !(sit.requiredSkills ?? []).includes(requirement),
+      ) ?? [],
+    ).join("\n"),
     minYearsExperience: String(sit?.minYearsExperience ?? 0),
     requiredExperience: sit?.requiredExperience ?? [],
     requiredCertifications: sit?.requiredCertifications ?? [],
     requiredSkills: sit?.requiredSkills ?? [],
+    maxGuests: String(sit?.maxGuests ?? 2),
     pet: sit?.pet ?? "",
+    nonSmokerRequired: sit
+      ? resolveNonSmokerRequired(sit)
+      : sitDefaults.nonSmokerRequired,
+  });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState("");
+  const identityVerificationEnabled = useFeatureFlag("identityVerification");
+  const isCreating = !sit;
+  const { data: verificationChecks, isLoading: verificationLoading } = useQuery({
+    queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "sit-create"],
+    queryFn: () =>
+      getMemberVerificationChecks(user!.name, {
+        isSelf: true,
+        email: user!.email,
+        phoneNumber: user!.phoneNumber,
+      }),
+    enabled: Boolean(isCreating && identityVerificationEnabled && user),
+  });
+  const canCreateSit = identityVerificationEnabled
+    ? verificationChecks
+      ? isFullyVerified(verificationChecks)
+      : false
+    : true;
+  const verifyMutation = useMutation({
+    mutationFn: () => startVerification(user!.name),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["verification-checks", user?.name] });
+      await queryClient.invalidateQueries({ queryKey: ["verification", user?.name] });
+    },
   });
   const mutation = useMutation({
     mutationFn: () => {
+      if (locked) throw new Error("sitEditor.lockedBanner");
+      if (!acceptedTerms) throw new Error("sitEditor.termsRequired");
+      if (isCreating && identityVerificationEnabled && !canCreateSit) {
+        throw new Error("SIT_VERIFICATION_REQUIRED");
+      }
       const selectedVessel = vessels.find((vessel) => vessel.id === form.boatId);
       const homePort = splitHomePort(selectedVessel?.homePort ?? "");
       const start = new Date(`${form.startDate}T00:00:00`);
@@ -2776,27 +4278,44 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
       const location = sameAsHomePort ? homePort.location : form.location.trim();
       const country = sameAsHomePort ? homePort.country : form.country.trim();
       const coordinates = coordinatesForLocation(location, country);
-      return saveSit({
-        id: sit?.id ?? `sit-${form.boatId}-${Date.now().toString().slice(-6)}`,
-        boatId: form.boatId,
-        dateStart: form.startDate,
-        dates: `${formatter.format(start)} – ${formatter.format(end)}`,
-        duration: t("duration.nights", { count: nights }),
-        location,
-        country,
-        region: form.region.trim(),
-        latitude: coordinates.latitude,
-        longitude: coordinates.longitude,
-        responsibilities: form.responsibilities.split("\n").filter(Boolean),
-        requirements: form.requirements.split("\n").filter(Boolean),
-        minYearsExperience: Number(form.minYearsExperience),
-        requiredExperience: form.requiredExperience,
-        requiredCertifications: form.requiredCertifications,
-        requiredSkills: form.requiredSkills,
-        applicants: sit?.applicants ?? 0,
-        pet: form.pet || undefined,
-        featured: sit?.featured,
-      });
+      return saveSit(
+        {
+          id: sit?.id ?? `sit-${form.boatId}-${Date.now().toString().slice(-6)}`,
+          boatId: form.boatId,
+          dateStart: form.startDate,
+          dates: `${formatter.format(start)} – ${formatter.format(end)}`,
+          duration: t("duration.nights", { count: nights }),
+          location,
+          country,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+          approximateLocation: true,
+          sitType: form.sitType as "liveaboard" | "daytimeChecks",
+          responsibilities: form.responsibilities.split("\n").filter(Boolean),
+          requirements: withoutNonSmokerRequirementLabels(
+            form.requirements.split("\n").filter(Boolean),
+          ),
+          minYearsExperience: Number(form.minYearsExperience),
+          requiredExperience: form.requiredExperience,
+          requiredCertifications: form.requiredCertifications,
+          requiredSkills: form.requiredSkills,
+          maxGuests: Math.max(1, Number(form.maxGuests)),
+          applicants: sit?.applicants ?? 0,
+          pet: form.pet || undefined,
+          featured: sit?.featured,
+          nonSmokerRequired: form.nonSmokerRequired,
+          applicationsOpen: sit ? sit.applicationsOpen !== false : true,
+        },
+        isCreating && user
+          ? {
+              creator: {
+                name: user.name,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+              },
+            }
+          : undefined,
+      );
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["boats"] });
@@ -2809,6 +4328,7 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
     field: "requiredExperience" | "requiredCertifications" | "requiredSkills",
     option: string,
   ) {
+    if (locked) return;
     setForm((current) => ({
       ...current,
       [field]: current[field].includes(option)
@@ -2817,53 +4337,215 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
     }));
   }
 
+  const selectedVessel = vessels.find((vessel) => vessel.id === form.boatId);
+  const previewBoat = useMemo((): Boat | null => {
+    if (!selectedVessel) return null;
+    const home = splitHomePort(selectedVessel.homePort);
+    const location = (sameAsHomePort ? home.location : form.location.trim()) || home.location;
+    const country = (sameAsHomePort ? home.country : form.country.trim()) || home.country;
+    let nights = 0;
+    if (form.startDate && form.endDate) {
+      const start = new Date(`${form.startDate}T00:00:00`);
+      const end = new Date(`${form.endDate}T00:00:00`);
+      nights = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86_400_000));
+    }
+    return {
+      id: sit?.id ?? "preview-sit",
+      boatId: selectedVessel.id,
+      name: selectedVessel.name,
+      type: selectedVessel.type,
+      length: selectedVessel.length,
+      location,
+      country,
+      latitude: coordinatesForLocation(location, country).latitude,
+      longitude: coordinatesForLocation(location, country).longitude,
+      approximateLocation: true,
+      homePort: selectedVessel.homePort,
+      dates: "",
+      dateStart: form.startDate,
+      duration: nights ? String(nights) : "0",
+      image: selectedVessel.image,
+      gallery: selectedVessel.gallery,
+      owner: selectedVessel.owner,
+      ownerLanguages: selectedVessel.ownerLanguages,
+      ownerImage: selectedVessel.ownerImage,
+      rating: selectedVessel.rating,
+      reviews: selectedVessel.reviews,
+      maxGuests: Math.max(1, Number(form.maxGuests) || 1),
+      applicants: sit?.applicants ?? 0,
+      description: selectedVessel.description,
+      home: selectedVessel.home,
+      responsibilities: form.responsibilities.split("\n").filter(Boolean),
+      sitType: form.sitType as "liveaboard" | "daytimeChecks",
+      systems: selectedVessel.systems,
+      engineType: selectedVessel.engineType,
+      voltageType: selectedVessel.voltageType,
+      stoveFuelType: selectedVessel.stoveFuelType,
+      requirements: form.requirements.split("\n").filter(Boolean),
+      minYearsExperience: Number(form.minYearsExperience) || 0,
+      requiredExperience: form.requiredExperience,
+      requiredCertifications: form.requiredCertifications,
+      requiredSkills: form.requiredSkills,
+      amenities: selectedVessel.amenities,
+      pet: form.pet || undefined,
+      nonSmokerRequired: form.nonSmokerRequired,
+      accepted: false,
+      applicationsOpen: true,
+      phase: "acceptingApplicants",
+    };
+  }, [
+    form.boatId,
+    form.country,
+    form.endDate,
+    form.location,
+    form.maxGuests,
+    form.minYearsExperience,
+    form.nonSmokerRequired,
+    form.pet,
+    form.requiredCertifications,
+    form.requiredExperience,
+    form.requiredSkills,
+    form.requirements,
+    form.responsibilities,
+    form.sitType,
+    form.startDate,
+    sameAsHomePort,
+    selectedVessel,
+    sit?.applicants,
+    sit?.id,
+  ]);
+
+  const publishBlockedReasons = useMemo(() => {
+    const reasons: string[] = [];
+    if (!form.boatId) reasons.push(t("sitEditor.boat"));
+    if (!form.startDate || !form.endDate) reasons.push(t("sitEditor.dates"));
+    if (!sameAsHomePort && !form.location.trim()) reasons.push(t("sitEditor.location"));
+    if (!sameAsHomePort && !form.country.trim()) reasons.push(t("sitEditor.country"));
+    const guests = Number(form.maxGuests);
+    if (!Number.isFinite(guests) || guests < 1 || guests > 12) {
+      reasons.push(t("sitEditor.maxGuests"));
+    }
+    return reasons;
+  }, [
+    form.boatId,
+    form.country,
+    form.endDate,
+    form.location,
+    form.maxGuests,
+    form.startDate,
+    sameAsHomePort,
+    t,
+  ]);
+
+  const publishDisabled = mutation.isPending || publishBlockedReasons.length > 0;
+  const publishBlockedTooltip =
+    publishBlockedReasons.length > 0
+      ? t("sitEditor.publishBlocked", {
+          items: new Intl.ListFormat(getIntlLocale(i18n.language), {
+            style: "long",
+            type: "conjunction",
+          }).format(publishBlockedReasons),
+        })
+      : "";
+
   return (
-    <div className="fixed inset-0 z-60 overflow-y-auto bg-navy/60 p-4 backdrop-blur-sm">
-      <div className="mx-auto my-10 max-w-2xl rounded-3xl bg-white p-6 shadow-float md:p-8">
-        <div className="flex items-start justify-between">
+    <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-14">
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="order-2 min-w-0 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{t("sitEditor.kicker")}</p>
-            <h2 className="font-display text-2xl font-bold text-navy">
+            <h1 className="font-display text-3xl font-bold text-navy">
               {sit ? t("sitEditor.editTitle") : t("sitEditor.createTitle")}
-            </h2>
+            </h1>
             <p className="mt-2 text-sm text-slate">{t("sitEditor.hint")}</p>
           </div>
           <button
-            aria-label={t("common.close")}
-            className="rounded-full p-2 hover:bg-cream"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
             onClick={close}
             type="button"
           >
-            <X size={20} />
+            <ArrowLeft size={16} /> {t("common.back")}
           </button>
         </div>
-        <div className="mt-6 space-y-5">
-          <label>
-            <span className="form-label">{t("sitEditor.boat")}</span>
-            <select
-              className="form-input"
-              disabled={Boolean(sit)}
-              onChange={(event) => {
-                const boatId = event.target.value;
-                const vessel = vessels.find((item) => item.id === boatId);
-                const homePort = splitHomePort(vessel?.homePort ?? "");
-                setForm({
-                  ...form,
-                  boatId,
-                  ...(sameAsHomePort
-                    ? { location: homePort.location, country: homePort.country, region: "" }
-                    : {}),
-                });
-              }}
-              value={form.boatId}
+        {!sit && (
+          <div
+            className="flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-5 py-4 text-sm leading-6 text-navy"
+            role="note"
+          >
+            <Info className="mt-0.5 shrink-0 text-teal" size={20} />
+            <div>
+              <p className="font-bold">{t("sitEditor.createEditLimitTitle")}</p>
+              <p className="mt-1 text-slate">{t("sitEditor.createEditLimit")}</p>
+            </div>
+          </div>
+        )}
+        {isCreating && identityVerificationEnabled && verificationLoading ? (
+          <p className="mt-6 text-sm text-slate">{t("sitEditor.verificationChecking")}</p>
+        ) : isCreating && identityVerificationEnabled && !canCreateSit && verificationChecks ? (
+          <div className="mt-6 space-y-5">
+            <div
+              className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+              role="alert"
             >
-              {vessels.map((vessel) => (
-                <option key={vessel.id} value={vessel.id}>
-                  {vessel.name} · {vessel.homePort}
-                </option>
-              ))}
-            </select>
-          </label>
+              <ShieldCheck className="mt-0.5 shrink-0" size={18} />
+              <div>
+                <p className="font-semibold">{t("sitEditor.verificationRequiredTitle")}</p>
+                <p className="mt-1">{t("sitEditor.verificationRequiredText")}</p>
+              </div>
+            </div>
+            <IdentityVerificationCard
+              checks={verificationChecks}
+              isSelf
+              onStartVerification={() => verifyMutation.mutate()}
+              verifying={verifyMutation.isPending}
+            />
+            <Link
+              className="inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
+              onClick={close}
+              to="/members/me"
+            >
+              {t("sitEditor.verificationRequiredCta")}
+            </Link>
+            <button
+              className="block w-full text-sm font-semibold text-slate hover:text-navy"
+              onClick={close}
+              type="button"
+            >
+              {t("common.cancel")}
+            </button>
+          </div>
+        ) : (
+          <>
+        {locked && (
+          <div
+            className="mt-5 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+            role="status"
+          >
+            <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+            <div>
+              <p className="font-bold">{t("sitEditor.lockedBannerTitle")}</p>
+              <p className="mt-1">{t("sitEditor.lockedBanner")}</p>
+            </div>
+          </div>
+        )}
+        <fieldset className="mt-6 space-y-5 disabled:opacity-70" disabled={locked}>
+          <VesselPicker
+            disabled={Boolean(sit) || locked}
+            onChange={(boatId) => {
+              const vessel = vessels.find((item) => item.id === boatId);
+              const homePort = splitHomePort(vessel?.homePort ?? "");
+              setForm({
+                ...form,
+                boatId,
+                ...(sameAsHomePort
+                  ? { location: homePort.location, country: homePort.country }
+                  : {}),
+              });
+            }}
+            value={form.boatId}
+            vessels={vessels}
+          />
           <section className="rounded-2xl border border-line bg-cream/60 p-4">
             <label className="flex cursor-pointer items-start gap-3">
               <input
@@ -2879,7 +4561,6 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
                       ...form,
                       location: homePort.location,
                       country: homePort.country,
-                      region: "",
                     });
                   }
                 }}
@@ -2911,28 +4592,21 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
                       country: destination.detail,
                     })
                   }
+                  placeholder={t("sitEditor.locationPlaceholder")}
                   value={form.location}
                   variant="profile"
                 />
               </div>
-              <label>
+              <div>
                 <span className="form-label">{t("sitEditor.country")}</span>
-                <input
-                  className="form-input"
-                  onChange={(event) => setForm({ ...form, country: event.target.value })}
+                <DestinationAutocomplete
+                  countryOnly
+                  onChange={(country) => setForm({ ...form, country })}
                   placeholder={t("sitEditor.countryPlaceholder")}
                   value={form.country}
+                  variant="profile"
                 />
-              </label>
-              <label className="sm:col-span-2">
-                <span className="form-label">{t("sitEditor.region")}</span>
-                <input
-                  className="form-input"
-                  onChange={(event) => setForm({ ...form, region: event.target.value })}
-                  placeholder={t("sitEditor.regionPlaceholder")}
-                  value={form.region}
-                />
-              </label>
+              </div>
             </section>
           )}
           <div>
@@ -2944,6 +4618,74 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
               variant="browse"
             />
           </div>
+          <fieldset>
+            <legend className="form-label">{t("sitEditor.sitType")}</legend>
+            <div className="mt-2 grid gap-3 sm:grid-cols-2">
+              <label
+                className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                  form.sitType === "liveaboard"
+                    ? "border-teal bg-seafoam"
+                    : "border-line hover:border-teal/50"
+                }`}
+              >
+                <input
+                  checked={form.sitType === "liveaboard"}
+                  className="mt-1 size-4 accent-teal"
+                  name="sitType"
+                  onChange={() => setForm({ ...form, sitType: "liveaboard" })}
+                  type="radio"
+                  value="liveaboard"
+                />
+                <span>
+                  <span className="block text-sm font-bold text-navy">
+                    {t("sitType.liveaboard")}
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-slate">
+                    {t("sitType.liveaboardHint")}
+                  </span>
+                </span>
+              </label>
+              <label
+                className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                  form.sitType === "daytimeChecks"
+                    ? "border-teal bg-seafoam"
+                    : "border-line hover:border-teal/50"
+                }`}
+              >
+                <input
+                  checked={form.sitType === "daytimeChecks"}
+                  className="mt-1 size-4 accent-teal"
+                  name="sitType"
+                  onChange={() => setForm({ ...form, sitType: "daytimeChecks" })}
+                  type="radio"
+                  value="daytimeChecks"
+                />
+                <span>
+                  <span className="block text-sm font-bold text-navy">
+                    {t("sitType.daytimeChecks")}
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-slate">
+                    {t("sitType.daytimeChecksHint")}
+                  </span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+          <label>
+            <span className="form-label">{t("sitEditor.maxGuests")}</span>
+            <input
+              className="form-input"
+              max="12"
+              min="1"
+              onChange={(event) => setForm({ ...form, maxGuests: event.target.value })}
+              required
+              type="number"
+              value={form.maxGuests}
+            />
+            <span className="mt-1.5 block text-xs leading-5 text-slate">
+              {t("sitEditor.maxGuestsHint")}
+            </span>
+          </label>
           <label>
             <span className="form-label">{t("sitEditor.responsibilities")}</span>
             <textarea
@@ -2960,9 +4702,7 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
             </h3>
             <label className="mt-5 block">
               <span className="form-label">{t("sitEditor.minimumYears")}</span>
-              <select
-                className="form-input"
-                onChange={(event) => setForm({ ...form, minYearsExperience: event.target.value })}
+              <Select variant="form" onChange={(event) => setForm({ ...form, minYearsExperience: event.target.value })}
                 value={form.minYearsExperience}
               >
                 <option value="0">{t("sitEditor.noMinimum")}</option>
@@ -2971,7 +4711,7 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
                     {t("sitEditor.yearsPlus", { count: years })}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             {[
               {
@@ -3014,6 +4754,24 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
                 </div>
               </div>
             ))}
+            <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-white px-4 py-3">
+              <input
+                checked={form.nonSmokerRequired}
+                className="mt-1 size-4 accent-teal"
+                onChange={(event) =>
+                  setForm({ ...form, nonSmokerRequired: event.target.checked })
+                }
+                type="checkbox"
+              />
+              <span>
+                <span className="block text-sm font-bold text-navy">
+                  {t("sitEditor.nonSmoker")}
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-slate">
+                  {t("sitEditor.nonSmokerHint")}
+                </span>
+              </span>
+            </label>
           </section>
           <label>
             <span className="form-label">{t("sitEditor.additional")}</span>
@@ -3033,46 +4791,93 @@ function SitEditor({ sit, vessels, close }: { sit?: Sit; vessels: Vessel[]; clos
               value={form.pet}
             />
           </label>
-        </div>
+          {!locked && (
+            <TermsAgreementCheckbox
+              checked={acceptedTerms}
+              i18nKey="sitEditor.termsAgreement"
+              onChange={(checked) => {
+                setAcceptedTerms(checked);
+                if (checked) setTermsError("");
+              }}
+            />
+          )}
+          {termsError && (
+            <p className="text-sm font-semibold text-coral" role="alert">
+              {termsError}
+            </p>
+          )}
+        </fieldset>
         <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
           <button
             className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
             onClick={close}
             type="button"
           >
-            {t("common.cancel")}
+            {locked ? t("common.close") : t("common.cancel")}
           </button>
-          <button
-            className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
-            disabled={
-              mutation.isPending ||
-              !form.boatId ||
-              !form.startDate ||
-              !form.endDate ||
-              (!sameAsHomePort && (!form.location.trim() || !form.country.trim()))
-            }
-            onClick={() => mutation.mutate()}
-            type="button"
-          >
-            {mutation.isPending
-              ? t("common.saving")
-              : sit
-                ? t("sitEditor.save")
-                : t("sitEditor.publish")}
-          </button>
+          {!locked && (
+            <IconTooltip
+              hidden={!publishBlockedTooltip || mutation.isPending}
+              label={publishBlockedTooltip}
+              side="top"
+              wrap
+            >
+              <button
+                className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
+                disabled={publishDisabled}
+                onClick={() => {
+                  if (!acceptedTerms) {
+                    setTermsError(t("sitEditor.termsRequired"));
+                    return;
+                  }
+                  setTermsError("");
+                  mutation.mutate();
+                }}
+                title={
+                  publishBlockedTooltip && !mutation.isPending
+                    ? publishBlockedTooltip
+                    : undefined
+                }
+                type="button"
+              >
+                {mutation.isPending
+                  ? t("common.saving")
+                  : sit
+                    ? t("sitEditor.save")
+                    : t("sitEditor.publish")}
+              </button>
+            </IconTooltip>
+          )}
+        </div>
+          </>
+        )}
+        </div>
+        <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
+          <EditorLivePreview hint={t("editorPreview.sitHint")}>
+            {previewBoat ? (
+              <BoatCard boat={previewBoat} preview />
+            ) : (
+              <p className="text-sm text-slate">{t("editorPreview.selectBoat")}</p>
+            )}
+          </EditorLivePreview>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
-function OwnerBoatsPage() {
-  const { i18n, t } = useTranslation();
+function SitEditorPage({ mode }: { mode: "new" | "edit" }) {
+  const { t } = useTranslation();
   const user = useAppStore((state) => state.user);
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"boats" | "sits">("sits");
-  const [editingSit, setEditingSit] = useState<Sit | "new" | null>(null);
+  const { sitId } = useParams();
+  const [searchParams] = useSearchParams();
+  const preferredBoatId = searchParams.get("boatId") ?? undefined;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
   const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
     queryKey: ["vessels"],
     queryFn: getVessels,
@@ -3086,6 +4891,162 @@ function OwnerBoatsPage() {
     queryFn: () => getApplicationsForUser(user!.name),
     enabled: Boolean(user),
   });
+
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-24 text-center">
+        <Anchor className="mx-auto text-coral" size={42} />
+        <h1 className="mt-5 font-display text-3xl font-extrabold text-navy">
+          {t("owner.signInRequired")}
+        </h1>
+        <p className="mt-3 text-slate">{t("owner.accessDashboardHint")}</p>
+        <button
+          className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
+          onClick={() => openAuth("login")}
+          type="button"
+        >
+          {t("owner.chooseAccount")}
+        </button>
+      </main>
+    );
+  }
+
+  if (vesselsLoading || (mode === "edit" && sitsLoading)) {
+    return (
+      <main className="mx-auto max-w-6xl px-5 py-12 lg:px-8">
+        <div className="h-136 animate-pulse rounded-3xl bg-seafoam" />
+      </main>
+    );
+  }
+
+  const ownedBoats = vessels.filter((boat) => boat.owner === user.name);
+  if (mode === "new" && ownedBoats.length === 0) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-24 text-center">
+        <ShipWheel className="mx-auto text-teal" size={42} />
+        <h1 className="mt-5 font-display text-3xl font-extrabold text-navy">
+          {t("owner.firstBoat")}
+        </h1>
+        <p className="mt-3 text-slate">{t("owner.sitsEmptyHintNoBoats")}</p>
+        <button
+          className="mt-6 rounded-full bg-coral px-6 py-3 font-bold text-white"
+          onClick={() => navigate("/owner/boats/new")}
+          type="button"
+        >
+          {t("vesselEditor.addTitle")}
+        </button>
+      </main>
+    );
+  }
+
+  const sit = mode === "edit" ? sits.find((item) => item.id === sitId) : undefined;
+  const sitBoat = sit ? ownedBoats.find((boat) => boat.id === sit.boatId) : undefined;
+  if (mode === "edit" && (!sit || !sitBoat)) {
+    return (
+      <main className="mx-auto max-w-3xl px-5 py-24 text-center">
+        <ShipWheel className="mx-auto text-teal" size={42} />
+        <h1 className="mt-5 font-display text-3xl font-extrabold text-navy">
+          {t("owner.sitNotFound")}
+        </h1>
+        <p className="mt-3 text-slate">{t("owner.sitUnavailable")}</p>
+        <button
+          className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
+          onClick={() => navigate("/owner/boats")}
+          type="button"
+        >
+          {t("owner.backToBoats")}
+        </button>
+      </main>
+    );
+  }
+
+  const locked =
+    mode === "edit" &&
+    Boolean(sit) &&
+    (sit!.applicants > 0 ||
+      ownerApplications.some((application) => application.sitId === sit!.id));
+
+  return (
+    <SitEditor
+      close={() => navigate("/owner/boats")}
+      locked={locked}
+      preferredBoatId={preferredBoatId}
+      sit={sit}
+      vessels={ownedBoats}
+    />
+  );
+}
+
+function OwnerBoatsPage() {
+  const { i18n, t } = useTranslation();
+  const user = useAppStore((state) => state.user);
+  const archivedSits = useAppStore((state) => state.archivedSits);
+  const archiveSit = useAppStore((state) => state.archiveSit);
+  const unarchiveSit = useAppStore((state) => state.unarchiveSit);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const identityVerificationEnabled = useFeatureFlag("identityVerification");
+  const [activeTab, setActiveTab] = useState<"boats" | "sits">("sits");
+  const [sitPhaseFilter, setSitPhaseFilter] = useState<"all" | SitPhase | "archived">("all");
+  const [flaggingSit, setFlaggingSit] = useState<Sit | null>(null);
+  const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState<Sit | null>(null);
+  const [withdrawConfirm, setWithdrawConfirm] = useState<SitApplication | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<
+    | { type: "boat"; id: string; name: string }
+    | {
+        type: "sit";
+        id: string;
+        boatName: string;
+        dates: string;
+        applicantCount: number;
+        hasAccepted: boolean;
+      }
+    | { type: "archiveSit"; id: string; boatName: string; dates: string }
+    | null
+  >(null);
+
+  useEffect(() => {
+    setOwnerDashboardTab(activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const onOpenCreateSit = () => {
+      setActiveTab("sits");
+      navigate("/owner/sits/new");
+    };
+    window.addEventListener("open-create-sit", onOpenCreateSit);
+    return () => window.removeEventListener("open-create-sit", onOpenCreateSit);
+  }, [navigate]);
+
+  const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
+    queryKey: ["vessels"],
+    queryFn: getVessels,
+  });
+  const { data: sits = [], isLoading: sitsLoading } = useQuery({
+    queryKey: ["sits"],
+    queryFn: getSits,
+  });
+  const { data: ownerApplications = [] } = useQuery({
+    queryKey: ["applications", "user", user?.name],
+    queryFn: () => getApplicationsForUser(user!.name),
+    enabled: Boolean(user),
+  });
+  const { data: ownerVerificationChecks, isLoading: ownerVerificationLoading } = useQuery({
+    queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "owner-create-sit"],
+    queryFn: () =>
+      getMemberVerificationChecks(user!.name, {
+        isSelf: true,
+        email: user!.email,
+        phoneNumber: user!.phoneNumber,
+      }),
+    enabled: Boolean(identityVerificationEnabled && user),
+  });
+  const canCreateSit = identityVerificationEnabled
+    ? ownerVerificationChecks
+      ? isFullyVerified(ownerVerificationChecks)
+      : false
+    : true;
   const removeVesselMutation = useMutation({
     mutationFn: deleteVessel,
     onSuccess: async () => {
@@ -3099,6 +5060,28 @@ function OwnerBoatsPage() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["sits"] });
       await queryClient.invalidateQueries({ queryKey: ["boats"] });
+    },
+  });
+  const toggleApplicationsMutation = useMutation({
+    mutationFn: (sit: Sit) => {
+      const { accepted: _accepted, phase: _phase, ...persistable } = sit;
+      return saveSit({
+        ...persistable,
+        applicationsOpen: !isAcceptingApplications(sit),
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["sits"] });
+      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+    },
+  });
+  const withdrawMutation = useMutation({
+    mutationFn: (applicationId: string) => withdrawApplication(applicationId, user!.name),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: ["sits"] });
+      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      setWithdrawConfirm(null);
     },
   });
 
@@ -3123,8 +5106,236 @@ function OwnerBoatsPage() {
 
   const ownedBoats = vessels.filter((boat) => boat.owner === user.name);
   const ownedBoatIds = new Set(ownedBoats.map((boat) => boat.id));
-  const ownedSits = sits.filter((sit) => ownedBoatIds.has(sit.boatId));
+  const allOwnedSits = sits.filter((sit) => ownedBoatIds.has(sit.boatId));
+  const ownedSits = allOwnedSits.filter((sit) => !archivedSits.includes(sit.id));
+  const archivedOwnedSits = allOwnedSits
+    .filter((sit) => archivedSits.includes(sit.id))
+    .sort((a, b) => b.dateStart.localeCompare(a.dateStart));
+  const sitterApplications = ownerApplications.filter(
+    (application) => application.applicant.name === user.name,
+  );
+  const ownedSitsByPhase = SIT_PHASES.reduce(
+    (groups, phase) => {
+      groups[phase] = ownedSits
+        .filter((sit) => resolveSitPhase(sit) === phase)
+        .sort((a, b) => a.dateStart.localeCompare(b.dateStart));
+      return groups;
+    },
+    {} as Record<SitPhase, Sit[]>,
+  );
+  const visibleOwnedPhases =
+    sitPhaseFilter === "archived"
+      ? []
+      : sitPhaseFilter === "all"
+        ? SIT_PHASES.filter((phase) => ownedSitsByPhase[phase].length > 0)
+        : ownedSitsByPhase[sitPhaseFilter].length > 0
+          ? [sitPhaseFilter]
+          : [];
+  const showArchivedSection =
+    archivedOwnedSits.length > 0 &&
+    (sitPhaseFilter === "all" || sitPhaseFilter === "archived");
+  const filteredSitterApplications =
+    sitPhaseFilter === "all"
+      ? sitterApplications
+      : sitPhaseFilter === "archived"
+        ? []
+        : sitterApplications.filter((application) => {
+            const sit = sits.find((item) => item.id === application.sitId);
+            return sit ? resolveSitPhase(sit) === sitPhaseFilter : false;
+          });
+  const sitsTabCount = ownedSits.length + archivedOwnedSits.length + sitterApplications.length;
   const isLoading = vesselsLoading || sitsLoading;
+  const sitCreateBlockedByBoat = activeTab === "sits" && ownedBoats.length === 0;
+  const sitCreateBlockedByVerification =
+    activeTab === "sits" &&
+    ownedBoats.length > 0 &&
+    identityVerificationEnabled &&
+    (ownerVerificationLoading || !canCreateSit);
+  const sitCreateMuted = sitCreateBlockedByBoat || sitCreateBlockedByVerification;
+
+  function renderOwnedSitCard(sit: Sit, options?: { archived?: boolean }) {
+    const boat = ownedBoats.find((item) => item.id === sit.boatId)!;
+    const applicationCount = ownerApplications.filter(
+      (application) => application.sitId === sit.id,
+    ).length;
+    const applicantCount = Math.max(applicationCount, sit.applicants);
+    const editLocked = applicationCount > 0 || sit.applicants > 0;
+    const phase = resolveSitPhase(sit);
+    const isArchived = Boolean(options?.archived);
+    const sitDates = formatSitDates(i18n.language, sit.dateStart, sit.duration);
+    return (
+      <article
+        className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center"
+        key={sit.id}
+      >
+        <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-seafoam text-teal">
+          <CalendarDays size={24} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-teal">
+            {boat.name} · {formatSitLocation(sit.location, sit.country)}
+          </p>
+          <Link
+            className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
+            to={`/boats/${sit.id}`}
+          >
+            {sitDates}
+          </Link>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <SitParticipationBadge role="owner" />
+            <SitPhaseBadge
+              phase={
+                sit.phase ??
+                getSitPhase({
+                  dateStart: sit.dateStart,
+                  duration: sit.duration,
+                  applicationsOpen: sit.applicationsOpen,
+                  accepted: sit.accepted,
+                  applicants: sit.applicants,
+                })
+              }
+            />
+            {!isAcceptingApplications(sit) &&
+              (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
+                <span className="inline-flex rounded-full bg-cream px-2.5 py-1 text-[11px] font-bold text-slate">
+                  {t("owner.applicationsClosed")}
+                </span>
+              )}
+          </div>
+          <p className="mt-1 text-sm text-slate">
+            {t("owner.sitSummary", {
+              duration: sit.duration,
+              applicants: applicantCount,
+              tasks: sit.responsibilities.length,
+            })}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {!isArchived && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted ? (
+            <button
+              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold disabled:opacity-60 ${
+                isAcceptingApplications(sit)
+                  ? "border-line text-navy hover:border-teal"
+                  : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
+              }`}
+              disabled={toggleApplicationsMutation.isPending}
+              onClick={() => {
+                if (isAcceptingApplications(sit)) {
+                  setCloseApplicationsConfirm(sit);
+                  return;
+                }
+                toggleApplicationsMutation.mutate(sit);
+              }}
+              type="button"
+            >
+              {isAcceptingApplications(sit)
+                ? t("owner.closeRequests")
+                : t("owner.openRequests")}
+            </button>
+          ) : null}
+          {!isArchived && resolveSitPhase(sit) === "stayUnderway" && (
+            <button
+              className="flex items-center gap-2 rounded-xl border border-coral/40 bg-coral/10 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral"
+              onClick={() => setFlaggingSit(sit)}
+              type="button"
+            >
+              <Flag size={16} /> {t("sitIssue.flagButton")}
+            </button>
+          )}
+          <button
+            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+            onClick={() => navigate(`/owner/sits/${sit.id}/applications`)}
+            type="button"
+          >
+            <MessageCircle size={16} />{" "}
+            {t("applications.reviewCount", {
+              count: ownerApplications.filter((application) => application.sitId === sit.id)
+                .length,
+            })}
+          </button>
+          {!isArchived &&
+            (editLocked ? (
+              <IconTooltip label={t("owner.sitEditLocked")} wrap>
+                <button
+                  className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy opacity-50"
+                  disabled
+                  type="button"
+                >
+                  <Pencil size={16} /> {t("common.edit")}
+                </button>
+              </IconTooltip>
+            ) : (
+              <button
+                className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                onClick={() => navigate(`/owner/sits/${sit.id}/edit`)}
+                type="button"
+              >
+                <Pencil size={16} /> {t("common.edit")}
+              </button>
+            ))}
+          {isArchived ? (
+            <IconTooltip label={t("owner.unarchiveSit")} wrap>
+              <button
+                aria-label={t("owner.unarchiveSitLabel", { boat: boat.name })}
+                className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
+                onClick={() => unarchiveSit(sit.id)}
+                type="button"
+              >
+                <ArchiveRestore aria-hidden="true" size={17} />
+              </button>
+            </IconTooltip>
+          ) : phase === "stayUnderway" ? (
+            <IconTooltip label={t("owner.sitDeleteUnderway")} wrap>
+              <button
+                aria-label={t("owner.sitDeleteUnderway")}
+                className="rounded-xl border border-line p-2.5 text-slate opacity-50"
+                disabled
+                type="button"
+              >
+                <Trash2 size={17} />
+              </button>
+            </IconTooltip>
+          ) : phase === "stayCompleted" ? (
+            <IconTooltip label={t("owner.archiveSitLabel", { boat: boat.name })} wrap>
+              <button
+                aria-label={t("owner.archiveSitLabel", { boat: boat.name })}
+                className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
+                onClick={() => {
+                  setDeleteConfirm({
+                    type: "archiveSit",
+                    id: sit.id,
+                    boatName: boat.name,
+                    dates: sitDates,
+                  });
+                }}
+                type="button"
+              >
+                <Archive aria-hidden="true" size={17} />
+              </button>
+            </IconTooltip>
+          ) : (
+            <button
+              aria-label={t("owner.deleteSitLabel", { boat: boat.name })}
+              className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral"
+              onClick={() => {
+                setDeleteConfirm({
+                  type: "sit",
+                  id: sit.id,
+                  boatName: boat.name,
+                  dates: sitDates,
+                  applicantCount,
+                  hasAccepted: Boolean(sit.accepted),
+                });
+              }}
+              type="button"
+            >
+              <Trash2 size={17} />
+            </button>
+          )}
+        </div>
+      </article>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-12 lg:px-8">
@@ -3137,12 +5348,14 @@ function OwnerBoatsPage() {
         <div className="group relative">
           <button
             aria-describedby={
-              activeTab === "sits" && ownedBoats.length === 0
+              sitCreateBlockedByBoat
                 ? "sit-requires-boat-tooltip"
-                : undefined
+                : sitCreateBlockedByVerification
+                  ? "sit-requires-verification-tooltip"
+                  : undefined
             }
             className={`flex items-center justify-center gap-2 rounded-full px-5 py-3 font-bold transition ${
-              activeTab === "sits" && ownedBoats.length === 0
+              sitCreateMuted
                 ? "bg-slate/25 text-slate hover:bg-slate/35"
                 : "bg-coral text-white hover:bg-coral-dark"
             }`}
@@ -3150,7 +5363,7 @@ function OwnerBoatsPage() {
               if (activeTab === "boats" || ownedBoats.length === 0) {
                 navigate("/owner/boats/new");
               } else {
-                setEditingSit("new");
+                navigate("/owner/sits/new");
               }
             }}
             type="button"
@@ -3158,13 +5371,22 @@ function OwnerBoatsPage() {
             <Plus size={18} />{" "}
             {activeTab === "boats" ? t("vesselEditor.addTitle") : t("sitEditor.createShort")}
           </button>
-          {activeTab === "sits" && ownedBoats.length === 0 && (
+          {sitCreateBlockedByBoat && (
             <span
               className="pointer-events-none absolute top-[calc(100%+0.5rem)] right-0 z-20 hidden w-64 rounded-xl bg-navy px-3 py-2 text-sm font-medium text-white shadow-float group-focus-within:block group-hover:block"
               id="sit-requires-boat-tooltip"
               role="tooltip"
             >
               {t("owner.sitRequiresBoatTooltip")}
+            </span>
+          )}
+          {sitCreateBlockedByVerification && (
+            <span
+              className="pointer-events-none absolute top-[calc(100%+0.5rem)] right-0 z-20 hidden w-64 rounded-xl bg-navy px-3 py-2 text-sm font-medium text-white shadow-float group-focus-within:block group-hover:block"
+              id="sit-requires-verification-tooltip"
+              role="tooltip"
+            >
+              {t("owner.sitRequiresVerificationTooltip")}
             </span>
           )}
         </div>
@@ -3181,7 +5403,7 @@ function OwnerBoatsPage() {
           >
             {t(`owner.tab.${tab}`)}{" "}
             <span className="ml-1 text-xs text-slate">
-              {tab === "boats" ? ownedBoats.length : ownedSits.length}
+              {tab === "boats" ? ownedBoats.length : sitsTabCount}
             </span>
           </button>
         ))}
@@ -3197,11 +5419,48 @@ function OwnerBoatsPage() {
             : t("owner.deleteError")}
         </p>
       )}
+      {removeSitMutation.isError && (
+        <p
+          className="mt-5 rounded-xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral"
+          role="alert"
+        >
+          {removeSitMutation.error instanceof Error &&
+          removeSitMutation.error.message === "SIT_IS_UNDERWAY"
+            ? t("owner.sitDeleteUnderway")
+            : removeSitMutation.error instanceof Error &&
+                removeSitMutation.error.message === "SIT_IS_COMPLETED"
+              ? t("owner.deleteSitCompletedError")
+              : t("owner.deleteSitError")}
+        </p>
+      )}
       {isLoading ? (
-        <div className="mt-10 h-56 animate-pulse rounded-2xl bg-seafoam" />
+        activeTab === "boats" ? (
+          <OwnerBoatsLoadingSkeleton />
+        ) : (
+          <OwnerSitsLoadingSkeleton />
+        )
       ) : activeTab === "boats" && ownedBoats.length ? (
         <div className="mt-10 space-y-4">
-          {ownedBoats.map((boat) => (
+          {ownedBoats.map((boat) => {
+            const hasSits = ownedSits.some((sit) => sit.boatId === boat.id);
+            const deleteButton = (
+              <button
+                aria-label={
+                  hasSits
+                    ? t("owner.deleteBlocked")
+                    : t("owner.deleteBoatLabel", { boat: boat.name })
+                }
+                className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-line disabled:hover:text-slate"
+                disabled={hasSits}
+                onClick={() => {
+                  setDeleteConfirm({ type: "boat", id: boat.id, name: boat.name });
+                }}
+                type="button"
+              >
+                <Trash2 size={17} />
+              </button>
+            );
+            return (
             <article
               className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-4 shadow-card sm:flex-row sm:items-center"
               key={boat.id}
@@ -3213,7 +5472,11 @@ function OwnerBoatsPage() {
               />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                  {displayLabel(t, boat.type)} · {boat.length}
+                  {displayLabel(t, boat.type)} ·{" "}
+                  {formatBoatLength(
+                    boat.length,
+                    user?.measurementSystem ?? detectMeasurementSystem(),
+                  )}
                 </p>
                 <p className="mt-1 font-display text-xl font-bold text-navy">{boat.name}</p>
                 <p className="mt-1 text-sm text-slate">
@@ -3242,145 +5505,424 @@ function OwnerBoatsPage() {
                 >
                   <Pencil size={16} /> {t("common.edit")}
                 </button>
-                <button
-                  aria-label={
-                    ownedSits.some((sit) => sit.boatId === boat.id)
-                      ? t("owner.deleteBlocked")
-                      : t("owner.deleteBoatLabel", { boat: boat.name })
-                  }
-                  className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-line disabled:hover:text-slate"
-                  disabled={ownedSits.some((sit) => sit.boatId === boat.id)}
-                  onClick={() => {
-                    if (window.confirm(t("owner.deleteBoatConfirm", { boat: boat.name }))) {
-                      removeVesselMutation.mutate(boat.id);
-                    }
-                  }}
-                  title={
-                    ownedSits.some((sit) => sit.boatId === boat.id)
-                      ? t("owner.deleteBlocked")
-                      : undefined
-                  }
-                  type="button"
-                >
-                  <Trash2 size={17} />
-                </button>
+                {hasSits ? (
+                  <IconTooltip label={t("owner.deleteBlocked")} wrap>
+                    {deleteButton}
+                  </IconTooltip>
+                ) : (
+                  deleteButton
+                )}
               </div>
             </article>
-          ))}
-        </div>
-      ) : activeTab === "sits" && ownedSits.length ? (
-        <div className="mt-10 space-y-4">
-          {ownedSits.map((sit) => {
-            const boat = ownedBoats.find((item) => item.id === sit.boatId)!;
-            return (
-              <article
-                className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center"
-                key={sit.id}
-              >
-                <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-seafoam text-teal">
-                  <CalendarDays size={24} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                    {boat.name} · {formatSitLocation(sit.location, sit.country)}
-                  </p>
-                  <Link
-                    className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
-                    to={`/boats/${sit.id}`}
-                  >
-                    {formatSitDates(i18n.language, sit.dateStart, sit.duration)}
-                  </Link>
-                  {isHappeningSoon(sit.dateStart) && (
-                    <span className="mt-2 inline-flex rounded-full bg-coral px-2.5 py-1 text-[11px] font-bold text-white">
-                      {t("boat.happeningSoon")}
-                    </span>
-                  )}
-                  <p className="mt-1 text-sm text-slate">
-                    {t("owner.sitSummary", {
-                      duration: sit.duration,
-                      applicants: sit.applicants,
-                      tasks: sit.responsibilities.length,
-                    })}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                    onClick={() => navigate(`/owner/sits/${sit.id}/applications`)}
-                    type="button"
-                  >
-                    <MessageCircle size={16} />{" "}
-                    {t("applications.reviewCount", {
-                      count: ownerApplications.filter((application) => application.sitId === sit.id)
-                        .length,
-                    })}
-                  </button>
-                  <button
-                    className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                    onClick={() => setEditingSit(sit)}
-                    type="button"
-                  >
-                    <Pencil size={16} /> {t("common.edit")}
-                  </button>
-                  <button
-                    aria-label={t("owner.deleteSitLabel", { boat: boat.name })}
-                    className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          t("owner.deleteSitConfirm", {
-                            dates: formatSitDates(i18n.language, sit.dateStart, sit.duration),
-                            boat: boat.name,
-                          }),
-                        )
-                      ) {
-                        removeSitMutation.mutate(sit.id);
-                      }
-                    }}
-                    type="button"
-                  >
-                    <Trash2 size={17} />
-                  </button>
-                </div>
-              </article>
             );
           })}
+        </div>
+      ) : activeTab === "sits" &&
+        (ownedSits.length || archivedOwnedSits.length || sitterApplications.length) ? (
+        <div className="mt-10 space-y-8">
+          {(ownedSits.length > 0 || archivedOwnedSits.length > 0) && (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              {sitterApplications.length > 0 ? (
+                <h2 className="font-display text-lg font-bold text-navy">
+                  {t("sits.hostingHeading")}
+                </h2>
+              ) : (
+                <p className="text-sm text-slate">
+                  {t("owner.sitPhaseFilterHint")}
+                </p>
+              )}
+              <label className="flex items-center gap-2 text-sm text-slate sm:ml-auto">
+                <span className="sr-only">{t("owner.sitPhaseFilter")}</span>
+                <Select
+                  aria-label={t("owner.sitPhaseFilter")}
+                  onChange={(event) =>
+                    setSitPhaseFilter(event.target.value as "all" | SitPhase | "archived")
+                  }
+                  value={sitPhaseFilter}
+                  variant="sort"
+                >
+                  <option value="all">{t("owner.sitPhaseFilterAll")}</option>
+                  {SIT_PHASES.map((phase) => (
+                    <option key={phase} value={phase}>
+                      {t(`sitPhase.${phase}`)}
+                      {ownedSitsByPhase[phase].length
+                        ? ` (${ownedSitsByPhase[phase].length})`
+                        : ""}
+                    </option>
+                  ))}
+                  <option value="archived">
+                    {t("owner.sitPhaseFilterArchived")}
+                    {archivedOwnedSits.length ? ` (${archivedOwnedSits.length})` : ""}
+                  </option>
+                </Select>
+              </label>
+            </div>
+          )}
+          {ownedSits.length > 0 &&
+            visibleOwnedPhases.length === 0 &&
+            sitPhaseFilter !== "archived" && (
+            <div className="rounded-2xl border border-dashed border-line bg-white py-12 text-center">
+              <p className="font-display text-lg font-bold text-navy">
+                {t("owner.sitPhaseEmpty")}
+              </p>
+              <button
+                className="mt-4 text-sm font-bold text-teal hover:underline"
+                onClick={() => setSitPhaseFilter("all")}
+                type="button"
+              >
+                {t("owner.sitPhaseFilterAll")}
+              </button>
+            </div>
+          )}
+          {visibleOwnedPhases.map((phase) => (
+            <section className="space-y-4" key={phase}>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-display text-lg font-bold text-navy">
+                  {t(`sitPhase.${phase}`)}
+                </h2>
+                <span className="rounded-full bg-cream px-2.5 py-1 text-xs font-bold text-slate">
+                  {t("owner.sitPhaseCount", {
+                    count: ownedSitsByPhase[phase].length,
+                  })}
+                </span>
+              </div>
+              {ownedSitsByPhase[phase].map((sit) => renderOwnedSitCard(sit))}
+            </section>
+          ))}
+          {showArchivedSection && (
+            <section className="space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-display text-lg font-bold text-navy">
+                  {t("owner.archivedSitsHeading")}
+                </h2>
+                <span className="rounded-full bg-cream px-2.5 py-1 text-xs font-bold text-slate">
+                  {t("owner.archivedSitsCount", { count: archivedOwnedSits.length })}
+                </span>
+              </div>
+              {archivedOwnedSits.map((sit) => renderOwnedSitCard(sit, { archived: true }))}
+            </section>
+          )}
+          {sitPhaseFilter === "archived" && archivedOwnedSits.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-line bg-white py-12 text-center">
+              <Archive className="mx-auto text-teal" size={36} />
+              <p className="mt-4 font-display text-lg font-bold text-navy">
+                {t("owner.emptyArchivedSits")}
+              </p>
+              <button
+                className="mt-4 text-sm font-bold text-teal hover:underline"
+                onClick={() => setSitPhaseFilter("all")}
+                type="button"
+              >
+                {t("owner.sitPhaseFilterAll")}
+              </button>
+            </div>
+          )}
+          {filteredSitterApplications.length > 0 && (
+            <section className="space-y-4">
+              <h2 className="font-display text-lg font-bold text-navy">
+                {t("sits.requestedHeading")}
+              </h2>
+              {filteredSitterApplications.map((application) => {
+                const sit = sits.find((item) => item.id === application.sitId);
+                return (
+                  <article
+                    className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center"
+                    key={application.id}
+                  >
+                    <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-cream text-navy">
+                      <Anchor size={24} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                        {application.boatName}
+                      </p>
+                      <Link
+                        className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
+                        to={`/boats/${application.sitId}`}
+                      >
+                        {sit
+                          ? formatSitDates(i18n.language, sit.dateStart, sit.duration)
+                          : application.boatName}
+                      </Link>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <SitParticipationBadge role="sitter" />
+                        <ApplicationStatusBadge status={application.status} />
+                        {sit && (
+                          <SitPhaseBadge
+                            phase={
+                              sit.phase ??
+                              getSitPhase({
+                                dateStart: sit.dateStart,
+                                duration: sit.duration,
+                                applicationsOpen: sit.applicationsOpen,
+                                accepted: sit.accepted,
+                                applicants: sit.applicants,
+                              })
+                            }
+                          />
+                        )}
+                      </div>
+                      <p className="mt-1 text-sm text-slate">
+                        {t("sits.withOwner", { owner: application.ownerName })}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                        to={`/boats/${application.sitId}`}
+                      >
+                        <Anchor size={16} /> {t("sits.viewListing")}
+                      </Link>
+                      <Link
+                        className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                        to={`/messages?application=${encodeURIComponent(application.id)}`}
+                      >
+                        <MessageCircle size={16} /> {t("nav.messages")}
+                      </Link>
+                      {application.status !== "withdrawn" &&
+                        application.status !== "declined" && (
+                          <button
+                            className="flex items-center gap-2 rounded-xl border border-coral/40 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-60"
+                            disabled={withdrawMutation.isPending}
+                            onClick={() => setWithdrawConfirm(application)}
+                            type="button"
+                          >
+                            {t("sits.withdrawInterest")}
+                          </button>
+                        )}
+                    </div>
+                  </article>
+                );
+              })}
+            </section>
+          )}
         </div>
       ) : (
         <div className="mt-10 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
           <ShipWheel className="mx-auto text-teal" size={36} />
           <h2 className="mt-4 font-display text-xl font-bold text-navy">
-            {activeTab === "boats" ? t("owner.firstBoat") : t("owner.firstSit")}
+            {activeTab === "boats" ? t("owner.firstBoat") : t("owner.sitsEmptyTitle")}
           </h2>
-          <p className="mt-2 text-sm text-slate">
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate">
             {activeTab === "boats"
               ? t("owner.firstBoatHint")
               : ownedBoats.length
-                ? t("owner.firstSitHint")
-                : t("owner.boatBeforeSit")}
+                ? t("owner.sitsEmptyHintWithBoats")
+                : t("owner.sitsEmptyHintNoBoats")}
           </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {activeTab === "boats" || ownedBoats.length === 0 ? (
+              <button
+                className="inline-flex items-center gap-2 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white hover:bg-coral-dark"
+                onClick={() => navigate("/owner/boats/new")}
+                type="button"
+              >
+                <Plus size={16} />
+                {t("owner.firstBoat")}
+              </button>
+            ) : (
+              <div className="group relative">
+                <button
+                  aria-describedby={
+                    identityVerificationEnabled && (ownerVerificationLoading || !canCreateSit)
+                      ? "sit-empty-requires-verification-tooltip"
+                      : undefined
+                  }
+                  className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition ${
+                    identityVerificationEnabled && (ownerVerificationLoading || !canCreateSit)
+                      ? "bg-slate/25 text-slate hover:bg-slate/35"
+                      : "bg-coral text-white hover:bg-coral-dark"
+                  }`}
+                  onClick={() => navigate("/owner/sits/new")}
+                  type="button"
+                >
+                  <Plus size={16} />
+                  {t("owner.firstSit")}
+                </button>
+                {identityVerificationEnabled && (ownerVerificationLoading || !canCreateSit) && (
+                  <span
+                    className="pointer-events-none absolute top-[calc(100%+0.5rem)] left-1/2 z-20 hidden w-64 -translate-x-1/2 rounded-xl bg-navy px-3 py-2 text-sm font-medium text-white shadow-float group-focus-within:block group-hover:block"
+                    id="sit-empty-requires-verification-tooltip"
+                    role="tooltip"
+                  >
+                    {t("owner.sitRequiresVerificationTooltip")}
+                  </span>
+                )}
+              </div>
+            )}
+            {activeTab === "sits" && (
+              <Link
+                className="inline-flex rounded-full border border-line px-5 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                to="/boats"
+              >
+                {t("owner.browseOpenSits")}
+              </Link>
+            )}
+          </div>
         </div>
       )}
-      {editingSit && ownedBoats.length > 0 && (
-        <SitEditor
-          close={() => setEditingSit(null)}
-          sit={editingSit === "new" ? undefined : editingSit}
-          vessels={ownedBoats}
+      {flaggingSit && (
+        <FlagSitIssueModal
+          boatName={
+            ownedBoats.find((boat) => boat.id === flaggingSit.boatId)?.name ?? flaggingSit.boatId
+          }
+          close={() => setFlaggingSit(null)}
+          sitLabel={formatSitDates(i18n.language, flaggingSit.dateStart, flaggingSit.duration)}
+        />
+      )}
+      {closeApplicationsConfirm && (
+        <CloseApplicationsRequestsDialog
+          pending={toggleApplicationsMutation.isPending}
+          onCancel={() => setCloseApplicationsConfirm(null)}
+          onConfirm={() => {
+            toggleApplicationsMutation.mutate(closeApplicationsConfirm, {
+              onSuccess: () => setCloseApplicationsConfirm(null),
+            });
+          }}
+        />
+      )}
+      {withdrawConfirm && (
+        <ConfirmDialog
+          confirmLabel={t("sits.withdrawConfirmAction")}
+          onCancel={() => setWithdrawConfirm(null)}
+          onConfirm={() => withdrawMutation.mutate(withdrawConfirm.id)}
+          pending={withdrawMutation.isPending}
+          text={
+            withdrawConfirm.status === "accepted"
+              ? t("sits.withdrawAcceptedConfirmText", { boat: withdrawConfirm.boatName })
+              : t("sits.withdrawConfirmText", { boat: withdrawConfirm.boatName })
+          }
+          title={t("sits.withdrawConfirmTitle")}
+          titleId="withdraw-interest-confirm-title"
+          tone="danger"
+        />
+      )}
+      {deleteConfirm?.type === "boat" && (
+        <ConfirmDialog
+          confirmLabel={t("owner.deleteConfirmAction")}
+          onCancel={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            removeVesselMutation.mutate(deleteConfirm.id, {
+              onSuccess: () => setDeleteConfirm(null),
+            });
+          }}
+          pending={removeVesselMutation.isPending}
+          text={t("owner.deleteBoatConfirm", { boat: deleteConfirm.name })}
+          title={t("owner.deleteBoatTitle", { boat: deleteConfirm.name })}
+          titleId="delete-boat-confirm-title"
+          tone="danger"
+        />
+      )}
+      {deleteConfirm?.type === "sit" && (
+        <ConfirmDialog
+          confirmLabel={t("owner.deleteConfirmAction")}
+          onCancel={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            removeSitMutation.mutate(deleteConfirm.id, {
+              onSuccess: () => setDeleteConfirm(null),
+            });
+          }}
+          pending={removeSitMutation.isPending}
+          text={t("owner.deleteSitConfirm", {
+            dates: deleteConfirm.dates,
+            boat: deleteConfirm.boatName,
+          })}
+          title={t("owner.deleteSitTitle", { boat: deleteConfirm.boatName })}
+          titleId="delete-sit-confirm-title"
+          tone="danger"
+        >
+          {deleteConfirm.hasAccepted ? (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 font-medium text-amber-950">
+              {t("owner.deleteSitAcceptedWarning")}
+            </p>
+          ) : deleteConfirm.applicantCount > 0 ? (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 font-medium text-amber-950">
+              {t("owner.deleteSitApplicantsWarning", {
+                count: deleteConfirm.applicantCount,
+              })}
+            </p>
+          ) : null}
+        </ConfirmDialog>
+      )}
+      {deleteConfirm?.type === "archiveSit" && (
+        <ConfirmDialog
+          confirmLabel={t("owner.archiveSitAction")}
+          onCancel={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            archiveSit(deleteConfirm.id);
+            setDeleteConfirm(null);
+          }}
+          text={t("owner.archiveSitConfirm", {
+            dates: deleteConfirm.dates,
+            boat: deleteConfirm.boatName,
+          })}
+          title={t("owner.archiveSitTitle", { boat: deleteConfirm.boatName })}
+          titleId="archive-sit-confirm-title"
+          tone="default"
         />
       )}
     </main>
   );
 }
 
+const EMAIL_NOTIFICATION_KEYS = [
+  "newApplications",
+  "applicationUpdates",
+  "messages",
+  "sitReminders",
+  "productUpdates",
+] as const satisfies ReadonlyArray<keyof EmailNotificationPrefs>;
+
 function SettingsPage() {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const user = useAppStore((state) => state.user);
   const updateProfile = useAppStore((state) => state.updateProfile);
   const deleteAccount = useAppStore((state) => state.deleteAccount);
+  const blockedUsers = useAppStore((state) => state.blockedUsers);
+  const unblockUser = useAppStore((state) => state.unblockUser);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [accountFlash, setAccountFlash] = useState("");
+  const [personalStatus, setPersonalStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [personalForm, setPersonalForm] = useState({
+    legalName: user?.legalName ?? user?.name ?? "",
+    location: user?.location ?? "",
+    phoneCountryCode: user?.phoneCountryCode ?? "+1",
+    phoneNumber: user?.phoneNumber ?? "",
+  });
+  const accountTabs = [
+    "personal",
+    "security",
+    "notifications",
+    "localization",
+    "preferences",
+    "privacy",
+  ] as const;
+  type AccountTab = (typeof accountTabs)[number];
+  const requestedTab = searchParams.get("tab");
+  const activeTab: AccountTab = accountTabs.includes(requestedTab as AccountTab)
+    ? (requestedTab as AccountTab)
+    : "personal";
+
+  useEffect(() => {
+    if (!user) return;
+    setPersonalForm({
+      legalName: user.legalName ?? user.name,
+      location: user.location,
+      phoneCountryCode: user.phoneCountryCode,
+      phoneNumber: user.phoneNumber,
+    });
+  }, [user]);
+
+  function setActiveTab(tab: AccountTab) {
+    setSearchParams(tab === "personal" ? {} : { tab }, { replace: true });
+  }
+
   if (!user) {
     return (
       <main className="mx-auto max-w-3xl px-5 py-24 text-center">
@@ -3399,69 +5941,372 @@ function SettingsPage() {
       </main>
     );
   }
+
+  const member = user;
+
+  function submitPersonalDetails(event: React.FormEvent) {
+    event.preventDefault();
+    setPersonalStatus("saving");
+    const legalName = personalForm.legalName.trim();
+    if (legalName.length < 2) {
+      setPersonalStatus("idle");
+      return;
+    }
+    updateProfile({
+      legalName,
+      location: personalForm.location.trim(),
+      phoneCountryCode: personalForm.phoneCountryCode,
+      phoneNumber: personalForm.phoneNumber.trim(),
+    });
+    setPersonalStatus("saved");
+    window.setTimeout(() => setPersonalStatus("idle"), 2000);
+  }
+
+  function flashAccountMessage(message: string) {
+    setAccountFlash(message);
+    window.setTimeout(() => setAccountFlash(""), 2500);
+  }
+
+  const emailNotifications = {
+    ...DEFAULT_EMAIL_NOTIFICATIONS,
+    ...member.emailNotifications,
+  };
+  const sitDefaults = {
+    ...DEFAULT_SIT_CREATION_DEFAULTS,
+    ...member.sitDefaults,
+  };
+
   return (
     <>
       <main className="mx-auto max-w-3xl px-5 py-14 lg:px-8">
         <p className="eyebrow">{t("settings.kicker")}</p>
         <h1 className="section-title">{t("settings.title")}</h1>
         <p className="mt-3 text-slate">{t("settings.subtitle")}</p>
-        <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-          <label>
-            <span className="form-label">{t("settings.language")}</span>
-            <select
-              className="form-input"
-              onChange={(event) => {
-                void i18n.changeLanguage(event.target.value);
-                updateProfile({ preferredLanguage: event.target.value });
-              }}
-              value={normalizeLanguageCode(i18n.resolvedLanguage ?? i18n.language)}
-            >
-              {SUPPORTED_LANGUAGES.map((language) => (
-                <option key={language.code} value={language.code}>
-                  {language.flag} {language.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p className="mt-3 text-sm leading-6 text-slate">{t("settings.languageHint")}</p>
-          <div className="my-6 border-t border-line" />
-          <label>
-            <span className="form-label">{t("settings.measurementSystem")}</span>
-            <select
-              className="form-input"
-              onChange={(event) =>
-                updateProfile({
-                  measurementSystem: event.target.value as "metric" | "imperial",
-                })
-              }
-              value={user.measurementSystem}
-            >
-              <option value="metric">{t("settings.metric")}</option>
-              <option value="imperial">{t("settings.imperial")}</option>
-            </select>
-          </label>
-          <p className="mt-3 text-sm leading-6 text-slate">{t("settings.measurementHint")}</p>
-        </section>
 
-        <section className="mt-8 rounded-2xl border border-red-300 bg-red-50 p-6">
-          <h2 className="font-display text-xl font-bold text-red-800">
-            {t("settings.dangerZone")}
-          </h2>
-          <p className="mt-2 leading-6 text-red-800/75">{t("settings.deleteAccountHint")}</p>
-          <button
-            className="mt-5 w-full rounded-xl bg-red-600 px-6 py-4 text-base font-extrabold text-white shadow-sm transition hover:bg-red-700 sm:w-auto"
-            onClick={() => {
-              setDeleteConfirmation("");
-              setConfirmingDelete(true);
-            }}
-            type="button"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <Trash2 size={19} /> {t("settings.deleteAccount")}
-            </span>
-          </button>
-        </section>
+        <div className="mt-8 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:overflow-visible sm:px-0">
+          <div className="flex w-max gap-1 rounded-xl bg-seafoam p-1 sm:w-fit sm:flex-wrap">
+            {accountTabs.map((tab) => (
+              <button
+                className={`rounded-lg px-4 py-2.5 text-sm font-bold whitespace-nowrap transition ${
+                  activeTab === tab ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
+                }`}
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                type="button"
+              >
+                {t(`settings.tab.${tab}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {accountFlash ? (
+          <p className="mt-5 text-sm font-semibold text-teal" role="status">
+            {accountFlash}
+          </p>
+        ) : null}
+
+        {activeTab === "personal" && (
+          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
+            <h2 className="font-display text-xl font-bold text-navy">{t("settings.personalTitle")}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.personalHint")}</p>
+            <form className="mt-6 space-y-5" onSubmit={submitPersonalDetails}>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label>
+                  <span className="form-label">{t("settings.legalName")}</span>
+                  <input
+                    autoComplete="name"
+                    className="form-input"
+                    onChange={(event) =>
+                      setPersonalForm((current) => ({ ...current, legalName: event.target.value }))
+                    }
+                    required
+                    value={personalForm.legalName}
+                  />
+                  <p className="mt-2 text-sm leading-6 text-slate">{t("settings.legalNameHint")}</p>
+                </label>
+                <div>
+                  <span className="form-label">{t("profile.location")}</span>
+                  <DestinationAutocomplete
+                    cityOnly
+                    includeCountry
+                    onChange={(location) => setPersonalForm((current) => ({ ...current, location }))}
+                    value={personalForm.location}
+                    variant="profile"
+                  />
+                </div>
+              </div>
+              <div>
+                <span className="form-label">{t("profile.phoneNumber")}</span>
+                <div className="grid grid-cols-[minmax(9.5rem,10.5rem)_minmax(0,1fr)] gap-3">
+                  <div>
+                    <span className="sr-only">{t("profile.callingCode")}</span>
+                    <PhoneCountryCodeSelect
+                      onChange={(phoneCountryCode) =>
+                        setPersonalForm((current) => ({ ...current, phoneCountryCode }))
+                      }
+                      value={personalForm.phoneCountryCode}
+                    />
+                  </div>
+                  <label>
+                    <span className="sr-only">{t("profile.phoneNumber")}</span>
+                    <input
+                      autoComplete="tel-national"
+                      className="form-input"
+                      inputMode="tel"
+                      onChange={(event) =>
+                        setPersonalForm((current) => ({
+                          ...current,
+                          phoneNumber: event.target.value,
+                        }))
+                      }
+                      placeholder={t("profile.phonePlaceholder")}
+                      type="tel"
+                      value={personalForm.phoneNumber}
+                    />
+                  </label>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-slate">{t("profile.phoneHint")}</p>
+              </div>
+              <button
+                className="rounded-xl bg-navy px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                disabled={personalStatus === "saving"}
+                type="submit"
+              >
+                {personalStatus === "saved"
+                  ? t("settings.personalSaved")
+                  : personalStatus === "saving"
+                    ? t("common.saving")
+                    : t("settings.savePersonal")}
+              </button>
+            </form>
+          </section>
+        )}
+
+        {activeTab === "security" && (
+          <div className="mt-8 space-y-8">
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-xl font-bold text-navy">{t("settings.securityTitle")}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate">{t("settings.accountHint")}</p>
+
+              <div className="mt-6">
+                <span className="form-label">{t("auth.email")}</span>
+                <p className="mt-1 wrap-break-word text-base font-semibold text-navy">{user.email}</p>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  className="rounded-xl border border-line px-5 py-3 text-sm font-bold text-navy hover:border-teal"
+                  onClick={() => setEmailModalOpen(true)}
+                  type="button"
+                >
+                  {t("settings.changeEmail")}
+                </button>
+                <button
+                  className="rounded-xl border border-line px-5 py-3 text-sm font-bold text-navy hover:border-teal"
+                  onClick={() => setPasswordModalOpen(true)}
+                  type="button"
+                >
+                  {t("settings.changePassword")}
+                </button>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-red-300 bg-red-50 p-6">
+              <h2 className="font-display text-xl font-bold text-red-800">
+                {t("settings.dangerZone")}
+              </h2>
+              <p className="mt-2 leading-6 text-red-800/75">{t("settings.deleteAccountHint")}</p>
+              <button
+                className="mt-5 w-full rounded-xl bg-red-600 px-6 py-4 text-base font-extrabold text-white shadow-sm transition hover:bg-red-700 sm:w-auto"
+                onClick={() => {
+                  setDeleteConfirmation("");
+                  setConfirmingDelete(true);
+                }}
+                type="button"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <Trash2 size={19} /> {t("settings.deleteAccount")}
+                </span>
+              </button>
+            </section>
+          </div>
+        )}
+
+        {activeTab === "notifications" && (
+          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
+            <h2 className="font-display text-xl font-bold text-navy">{t("settings.emailsTitle")}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.emailsHint")}</p>
+            <div className="mt-5 space-y-3">
+              {EMAIL_NOTIFICATION_KEYS.map((key) => (
+                <label
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream/60 px-4 py-3"
+                  key={key}
+                >
+                  <input
+                    checked={emailNotifications[key]}
+                    className="mt-0.5 size-4 shrink-0 accent-teal"
+                    onChange={(event) =>
+                      updateProfile({
+                        emailNotifications: {
+                          ...emailNotifications,
+                          [key]: event.target.checked,
+                        },
+                      })
+                    }
+                    type="checkbox"
+                  />
+                  <span className="text-sm leading-6 font-medium text-navy">
+                    {t(`settings.email.${key}`)}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {activeTab === "localization" && (
+          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
+            <h2 className="font-display text-xl font-bold text-navy">
+              {t("settings.localizationTitle")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.localizationHint")}</p>
+            <label className="mt-6 block">
+              <span className="form-label">{t("settings.language")}</span>
+              <Select
+                variant="form"
+                onChange={(event) => {
+                  void i18n.changeLanguage(event.target.value);
+                  updateProfile({ preferredLanguage: event.target.value });
+                }}
+                value={normalizeLanguageCode(i18n.resolvedLanguage ?? i18n.language)}
+              >
+                {SUPPORTED_LANGUAGES.map((language) => (
+                  <option key={language.code} value={language.code}>
+                    {language.flag} {language.label}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <p className="mt-3 text-sm leading-6 text-slate">{t("settings.languageHint")}</p>
+            <div className="my-6 border-t border-line" />
+            <label className="block">
+              <span className="form-label">{t("settings.measurementSystem")}</span>
+              <Select
+                variant="form"
+                onChange={(event) =>
+                  updateProfile({
+                    measurementSystem: event.target.value as "metric" | "imperial",
+                  })
+                }
+                value={user.measurementSystem}
+              >
+                <option value="metric">{t("settings.metric")}</option>
+                <option value="imperial">{t("settings.imperial")}</option>
+              </Select>
+            </label>
+            <p className="mt-3 text-sm leading-6 text-slate">{t("settings.measurementHint")}</p>
+          </section>
+        )}
+
+        {activeTab === "preferences" && (
+          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
+            <h2 className="font-display text-xl font-bold text-navy">
+              {t("settings.sitDefaultsTitle")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.sitDefaultsHint")}</p>
+            <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-cream/50 px-4 py-3">
+              <input
+                checked={sitDefaults.nonSmokerRequired}
+                className="mt-1 size-4 accent-teal"
+                onChange={(event) =>
+                  updateProfile({
+                    sitDefaults: {
+                      ...sitDefaults,
+                      nonSmokerRequired: event.target.checked,
+                    },
+                  })
+                }
+                type="checkbox"
+              />
+              <span>
+                <span className="block text-sm font-bold text-navy">
+                  {t("settings.sitDefaults.nonSmoker")}
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-slate">
+                  {t("settings.sitDefaults.nonSmokerHint")}
+                </span>
+              </span>
+            </label>
+          </section>
+        )}
+
+        {activeTab === "privacy" && (
+          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
+            <h2 className="font-display text-xl font-bold text-navy">
+              {t("settings.blockedUsersTitle")}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.blockedUsersHint")}</p>
+            {blockedUsers.length === 0 ? (
+              <p className="mt-5 rounded-xl bg-cream px-4 py-4 text-sm text-slate">
+                {t("settings.blockedUsersEmpty")}
+              </p>
+            ) : (
+              <ul className="mt-5 space-y-3">
+                {blockedUsers.map((blocked) => (
+                  <li
+                    className="flex flex-col gap-3 rounded-xl border border-line px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                    key={blocked.name}
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <img
+                        alt=""
+                        className="size-11 shrink-0 rounded-full object-cover"
+                        src={blocked.image}
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate font-bold text-navy">{blocked.name}</p>
+                        <p className="text-xs text-slate">
+                          {t("settings.blockedOn", {
+                            date: new Intl.DateTimeFormat(getIntlLocale(i18n.language), {
+                              dateStyle: "medium",
+                            }).format(new Date(blocked.blockedAt)),
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      className="rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                      onClick={() => unblockUser(blocked.name)}
+                      type="button"
+                    >
+                      {t("safetyActions.unblock")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
       </main>
+
+      {emailModalOpen && (
+        <ChangeEmailModal
+          currentEmail={member.email}
+          onClose={() => setEmailModalOpen(false)}
+          onSuccess={(email) => {
+            updateProfile({ email });
+            flashAccountMessage(t("settings.emailUpdated"));
+          }}
+        />
+      )}
+      {passwordModalOpen && (
+        <ChangePasswordModal
+          email={member.email}
+          onClose={() => setPasswordModalOpen(false)}
+          onSuccess={() => flashAccountMessage(t("settings.passwordUpdated"))}
+        />
+      )}
 
       {confirmingDelete && (
         <div
@@ -3566,6 +6411,12 @@ function SafetyPage() {
         </div>
       </section>
       <div className="mx-auto grid max-w-4xl gap-5 px-5 py-12">
+        <section className="rounded-2xl border border-coral/30 bg-coral/10 p-6">
+          <h2 className="font-display text-xl font-bold text-navy">
+            {t("how.liveaboardTitle")}
+          </h2>
+          <p className="mt-2 leading-7 text-slate">{t("how.liveaboardText")}</p>
+        </section>
         {SAFETY_SECTIONS.map((section) => (
           <section className="rounded-2xl border border-line bg-white p-6" key={section}>
             <h2 className="font-display text-xl font-bold text-navy">
@@ -3586,24 +6437,45 @@ function SafetyPage() {
 function SupportPage() {
   const { t } = useTranslation();
   const user = useAppStore((state) => state.user);
-  const [form, setForm] = useState({ topic: "", name: user?.name ?? "", email: "", message: "" });
+  const [form, setForm] = useState({
+    topic: "",
+    name: user?.name ?? "",
+    email: user?.email ?? "",
+    message: "",
+  });
   const [status, setStatus] = useState<"idle" | "pending" | "success">("idle");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    setForm((current) => ({
+      ...current,
+      name: user.name,
+      email: user.email,
+    }));
+  }, [user]);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
-    if (!form.topic || !form.name.trim() || !form.message.trim()) {
+    const name = user?.name ?? form.name;
+    const email = user?.email ?? form.email;
+    if (!form.topic || !name.trim() || !form.message.trim()) {
       setError(t("support.requiredError"));
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError(t("support.emailError"));
       return;
     }
     setStatus("pending");
     try {
-      await submitSupportRequest(form);
+      await submitSupportRequest({
+        topic: form.topic,
+        name: name.trim(),
+        email: email.trim(),
+        message: form.message.trim(),
+      });
       setStatus("success");
     } catch {
       setStatus("idle");
@@ -3638,9 +6510,7 @@ function SupportPage() {
             <form className="mt-5 space-y-4" onSubmit={(event) => void submit(event)}>
               <label className="block">
                 <span className="form-label">{t("support.topic")}</span>
-                <select
-                  className="form-input"
-                  onChange={(event) => setForm({ ...form, topic: event.target.value })}
+                <Select variant="form" onChange={(event) => setForm({ ...form, topic: event.target.value })}
                   required
                   value={form.topic}
                 >
@@ -3650,23 +6520,50 @@ function SupportPage() {
                       {t(`support.topic.${topic}`)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
-              {[
-                ["name", t("support.name"), "text"],
-                ["email", t("support.email"), "email"],
-              ].map(([key, label, type]) => (
-                <label className="block" key={key}>
-                  <span className="form-label">{label}</span>
-                  <input
-                    className="form-input"
-                    onChange={(event) => setForm({ ...form, [key]: event.target.value })}
-                    required
-                    type={type}
-                    value={form[key as "name" | "email"]}
-                  />
-                </label>
-              ))}
+              {user ? (
+                <aside className="rounded-2xl border border-line bg-cream/70 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                    {t("support.accountDetails")}
+                  </p>
+                  <div className="mt-3 flex items-center gap-3">
+                    <img
+                      alt=""
+                      className="size-12 rounded-full object-cover"
+                      src={user.image}
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate font-bold text-navy">{user.name}</p>
+                      <p className="mt-0.5 truncate text-sm text-slate">{user.email}</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-slate">{t("support.accountDetailsHint")}</p>
+                </aside>
+              ) : (
+                <>
+                  <label className="block">
+                    <span className="form-label">{t("support.name")}</span>
+                    <input
+                      className="form-input"
+                      onChange={(event) => setForm({ ...form, name: event.target.value })}
+                      required
+                      type="text"
+                      value={form.name}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="form-label">{t("support.email")}</span>
+                    <input
+                      className="form-input"
+                      onChange={(event) => setForm({ ...form, email: event.target.value })}
+                      required
+                      type="email"
+                      value={form.email}
+                    />
+                  </label>
+                </>
+              )}
               <label className="block">
                 <span className="form-label">{t("support.message")}</span>
                 <textarea
@@ -3701,6 +6598,7 @@ const TERMS_SECTIONS = [
   "accounts",
   "platform",
   "listings",
+  "liveaboard",
   "responsibilities",
   "verification",
   "prohibited",
@@ -3749,7 +6647,8 @@ function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
     new: "bg-aqua/20 text-teal",
     shortlisted: "bg-sun/25 text-navy",
     accepted: "bg-seafoam text-teal",
-    declined: "bg-slate/10 text-slate",
+    declined: "bg-red-100 text-red-700",
+    withdrawn: "bg-slate/15 text-slate",
   };
   return (
     <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${colors[status]}`}>
@@ -3758,8 +6657,254 @@ function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
   );
 }
 
-function ApplicationReviewPage() {
+function sitParticipationRole(application: SitApplication, userName: string) {
+  return application.ownerName === userName ? "owner" : "sitter";
+}
+
+function SitParticipationBadge({ role }: { role: "owner" | "sitter" }) {
   const { t } = useTranslation();
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold ${
+        role === "owner" ? "bg-seafoam text-teal" : "bg-cream text-slate"
+      }`}
+    >
+      {role === "owner" ? t("role.ownerShort") : t("role.sitterShort")}
+    </span>
+  );
+}
+
+function SitTypeBadge({
+  sitType,
+  size = "sm",
+}: {
+  sitType: "liveaboard" | "daytimeChecks" | undefined;
+  size?: "sm" | "md";
+}) {
+  const { t } = useTranslation();
+  const type = sitType ?? "liveaboard";
+  const isLiveaboard = type === "liveaboard";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full font-bold ${
+        isLiveaboard ? "bg-teal/10 text-teal" : "bg-sun/20 text-amber-700"
+      } ${size === "md" ? "px-3 py-1.5 text-xs" : "px-2.5 py-1 text-[11px]"}`}
+    >
+      {isLiveaboard ? <Home size={size === "md" ? 14 : 12} /> : <Sun size={size === "md" ? 14 : 12} />}
+      {t(`sitType.${type}Short`)}
+    </span>
+  );
+}
+
+function SitPhaseBadge({
+  phase,
+  size = "sm",
+}: {
+  phase: SitPhase;
+  size?: "sm" | "md";
+}) {
+  const { t } = useTranslation();
+  const colors: Record<SitPhase, string> = {
+    acceptingApplicants: "bg-aqua/20 text-teal",
+    applicantChosen: "bg-seafoam text-teal",
+    stayUnderway: "bg-coral/15 text-coral",
+    stayCompleted: "bg-navy/10 text-navy",
+  };
+  return (
+    <span
+      className={`inline-flex items-center rounded-full font-bold ${colors[phase]} ${
+        size === "md" ? "px-3 py-1.5 text-xs" : "px-2.5 py-1 text-[11px]"
+      }`}
+    >
+      {t(`sitPhase.${phase}`)}
+    </span>
+  );
+}
+
+function SitPhaseStepper({ phase }: { phase: SitPhase }) {
+  const { t } = useTranslation();
+  const currentIndex = SIT_PHASES.indexOf(phase);
+  return (
+    <ol className="grid gap-2 sm:grid-cols-4">
+      {SIT_PHASES.map((step, index) => {
+        const done = index < currentIndex;
+        const current = index === currentIndex;
+        return (
+          <li
+            className={`rounded-xl border px-3 py-2.5 text-center ${
+              current
+                ? "border-teal bg-seafoam text-teal"
+                : done
+                  ? "border-line bg-white text-navy"
+                  : "border-line bg-cream/70 text-slate"
+            }`}
+            key={step}
+          >
+            <span className="block text-[10px] font-bold uppercase tracking-wider opacity-70">
+              {t("sitPhase.step", { number: index + 1 })}
+            </span>
+            <span className="mt-1 block text-xs font-bold leading-4">
+              {t(`sitPhase.${step}`)}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function resolveSitPhase(sit: Sit): SitPhase {
+  return (
+    sit.phase ??
+    getSitPhase({
+      dateStart: sit.dateStart,
+      duration: sit.duration,
+      applicationsOpen: sit.applicationsOpen,
+      accepted: sit.accepted,
+      applicants: sit.applicants,
+    })
+  );
+}
+
+function FlagSitIssueModal({
+  boatName,
+  sitLabel,
+  close,
+}: {
+  boatName: string;
+  sitLabel: string;
+  close: () => void;
+}) {
+  const { t } = useTranslation();
+  const user = useAppStore((state) => state.user)!;
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const mutation = useMutation({
+    mutationFn: () =>
+      submitSupportRequest({
+        topic: "safety",
+        name: user.name,
+        email: user.email,
+        message: t("sitIssue.messagePrefix", {
+          boat: boatName,
+          sit: sitLabel,
+          details: message.trim(),
+        }),
+      }),
+    onSuccess: () => {
+      setError("");
+    },
+  });
+
+  function submit() {
+    if (message.trim().length < 20) {
+      setError(t("sitIssue.messageTooShort"));
+      return;
+    }
+    setError("");
+    mutation.mutate();
+  }
+
+  return (
+    <div className="fixed inset-0 z-2000 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-float md:p-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">{t("sitIssue.kicker")}</p>
+            <h2 className="font-display text-2xl font-bold text-navy">{t("sitIssue.title")}</h2>
+          </div>
+          <button
+            aria-label={t("common.close")}
+            className="rounded-full p-2 hover:bg-cream"
+            onClick={close}
+            type="button"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        {mutation.isSuccess ? (
+          <div className="mt-6 text-center">
+            <span className="mx-auto grid size-14 place-items-center rounded-full bg-seafoam text-teal">
+              <Check size={28} />
+            </span>
+            <p className="mt-4 font-bold text-navy">{t("sitIssue.success")}</p>
+            <p className="mt-2 text-sm leading-6 text-slate">{t("sitIssue.successHint")}</p>
+            <button
+              className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
+              onClick={close}
+              type="button"
+            >
+              {t("common.done")}
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="mt-4 text-sm leading-6 text-slate">
+              {t("sitIssue.hint", { boat: boatName })}
+            </p>
+            <label className="mt-5 block">
+              <span className="form-label">{t("sitIssue.messageLabel")}</span>
+              <textarea
+                className="form-input mt-1.5 min-h-36 resize-y"
+                onChange={(event) => setMessage(event.target.value)}
+                placeholder={t("sitIssue.messagePlaceholder")}
+                value={message}
+              />
+            </label>
+            {error && (
+              <p className="mt-3 text-sm font-semibold text-coral" role="alert">
+                {error}
+              </p>
+            )}
+            {mutation.isError && (
+              <p className="mt-3 text-sm font-semibold text-coral" role="alert">
+                {t("sitIssue.submitError")}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
+                onClick={close}
+                type="button"
+              >
+                {t("common.cancel")}
+              </button>
+              <button
+                className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
+                disabled={mutation.isPending || !message.trim()}
+                onClick={submit}
+                type="button"
+              >
+                {mutation.isPending ? t("sitIssue.sending") : t("sitIssue.submit")}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function applicationRequirementMatch(
+  application: SitApplication,
+  sit: Sit | undefined,
+) {
+  const requiredSkills = sit?.requiredSkills ?? [];
+  const requiredCertifications = sit?.requiredCertifications ?? [];
+  const minimumYears = sit?.minYearsExperience ?? 0;
+  const matchTotal =
+    requiredSkills.length + requiredCertifications.length + (minimumYears > 0 ? 1 : 0);
+  const matchCount =
+    requiredSkills.filter((skill) => application.applicant.skills.includes(skill)).length +
+    requiredCertifications.filter((certification) =>
+      application.applicant.certifications.includes(certification),
+    ).length +
+    (minimumYears > 0 && application.applicant.yearsExperience >= minimumYears ? 1 : 0);
+  return { matchCount, matchTotal };
+}
+
+function ApplicationReviewPage() {
+  const { i18n, t } = useTranslation();
   const { sitId = "" } = useParams();
   const navigate = useNavigate();
   const user = useAppStore((state) => state.user);
@@ -3777,31 +6922,159 @@ function ApplicationReviewPage() {
     queryFn: getVessels,
   });
   const [selectedId, setSelectedId] = useState("");
-  const [confirmingStatus, setConfirmingStatus] = useState<"accepted" | "declined" | null>(null);
-
-  useEffect(() => {
-    if (!applications.length) return;
-    if (!applications.some((application) => application.id === selectedId)) {
-      setSelectedId(applications[0].id);
-    }
-  }, [applications, selectedId]);
+  const [flaggingIssue, setFlaggingIssue] = useState(false);
+  const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState(false);
+  const [confirmingStatus, setConfirmingStatus] = useState<
+    "accepted" | "declined" | "unaccept" | null
+  >(null);
+  const [sharePhone, setSharePhone] = useState(false);
+  const [sort, setSort] = useState<"newest" | "experience" | "skillMatch" | "priorSits">(
+    "newest",
+  );
+  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>("all");
+  const [experienceFilter, setExperienceFilter] = useState<
+    "any" | "meetsMin" | "fivePlus" | "tenPlus"
+  >("any");
 
   const sit = sits.find((item) => item.id === sitId);
   const vessel = vessels.find((item) => item.id === sit?.boatId);
-  const selected = applications.find((application) => application.id === selectedId);
   const allowed = Boolean(user && vessel && vessel.owner === user.name);
   const pageLoading = isLoading || sitsLoading || vesselsLoading;
+  const minimumYears = sit?.minYearsExperience ?? 0;
+
+  const acceptedApplications = useMemo(
+    () =>
+      applications
+        .filter((application) => application.status === "accepted")
+        .filter((application) => {
+          const years = application.applicant.yearsExperience;
+          return (
+            experienceFilter === "any" ||
+            (experienceFilter === "meetsMin" &&
+              (minimumYears <= 0 || years >= minimumYears)) ||
+            (experienceFilter === "fivePlus" && years >= 5) ||
+            (experienceFilter === "tenPlus" && years >= 10)
+          );
+        })
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [applications, experienceFilter, minimumYears],
+  );
+
+  const visibleApplications = useMemo(() => {
+    const filtered = applications.filter((application) => {
+      if (application.status === "accepted") return false;
+      const matchesStatus =
+        statusFilter === "all" || application.status === statusFilter;
+      const years = application.applicant.yearsExperience;
+      const matchesExperience =
+        experienceFilter === "any" ||
+        (experienceFilter === "meetsMin" &&
+          (minimumYears <= 0 || years >= minimumYears)) ||
+        (experienceFilter === "fivePlus" && years >= 5) ||
+        (experienceFilter === "tenPlus" && years >= 10);
+      return matchesStatus && matchesExperience;
+    });
+    return [...filtered].sort((a, b) => {
+      if (sort === "experience") {
+        return (
+          b.applicant.yearsExperience - a.applicant.yearsExperience ||
+          b.createdAt.localeCompare(a.createdAt)
+        );
+      }
+      if (sort === "skillMatch") {
+        const aMatch = applicationRequirementMatch(a, sit).matchCount;
+        const bMatch = applicationRequirementMatch(b, sit).matchCount;
+        return bMatch - aMatch || b.applicant.yearsExperience - a.applicant.yearsExperience;
+      }
+      if (sort === "priorSits") {
+        return (
+          b.applicant.completedSits - a.applicant.completedSits ||
+          b.applicant.yearsExperience - a.applicant.yearsExperience
+        );
+      }
+      return b.createdAt.localeCompare(a.createdAt);
+    });
+  }, [applications, experienceFilter, minimumYears, sit, sort, statusFilter]);
+
+  const selectableApplications = useMemo(() => {
+    if (statusFilter === "accepted") return acceptedApplications;
+    if (statusFilter !== "all") return visibleApplications;
+    return [...acceptedApplications, ...visibleApplications];
+  }, [acceptedApplications, statusFilter, visibleApplications]);
+
+  useEffect(() => {
+    if (!selectableApplications.length) {
+      setSelectedId("");
+      return;
+    }
+    if (!selectableApplications.some((application) => application.id === selectedId)) {
+      setSelectedId(selectableApplications[0].id);
+    }
+  }, [selectableApplications, selectedId]);
+
+  const selected = applications.find((application) => application.id === selectedId);
 
   const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: ApplicationStatus }) =>
-      updateApplicationStatus(id, status),
+    mutationFn: ({
+      id,
+      ownerPhone,
+      status,
+    }: {
+      id: string;
+      ownerPhone?: string;
+      status: ApplicationStatus;
+    }) => updateApplicationStatus(id, status, ownerPhone),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: ["sits"] });
+    },
+  });
+  const toggleApplicationsMutation = useMutation({
+    mutationFn: () => {
+      if (!sit) throw new Error("APPLICATION_SIT_NOT_FOUND");
+      const { accepted: _accepted, phase: _phase, ...persistable } = sit;
+      return saveSit({
+        ...persistable,
+        applicationsOpen: !isAcceptingApplications(sit),
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["sits"] });
+      await queryClient.invalidateQueries({ queryKey: ["boats"] });
     },
   });
   const messageMutation = useMutation({
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       sendApplicationMessage(id, user!.name, text),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+  const videoCallMutation = useMutation({
+    mutationFn: ({
+      id,
+      proposal,
+      counter,
+    }: {
+      id: string;
+      proposal: { startsAt: string; durationMinutes: number };
+      counter?: boolean;
+    }) => requestApplicationVideoCall(id, user!.name, proposal, { counter }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+  const videoCallAcceptMutation = useMutation({
+    mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
+      acceptApplicationVideoCall(id, user!.name, messageId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+  const videoCallDeclineMutation = useMutation({
+    mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
+      declineApplicationVideoCall(id, user!.name, messageId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
@@ -3826,19 +7099,18 @@ function ApplicationReviewPage() {
   }
 
   const requiredSkills = sit?.requiredSkills ?? [];
-  const requiredCertifications = sit?.requiredCertifications ?? [];
-  const minimumYears = sit?.minYearsExperience ?? 0;
-  const matchTotal =
-    requiredSkills.length + requiredCertifications.length + (minimumYears > 0 ? 1 : 0);
-  const matchCount = selected
-    ? requiredSkills.filter((skill) => selected.applicant.skills.includes(skill)).length +
-      requiredCertifications.filter((certification) =>
-        selected.applicant.certifications.includes(certification),
-      ).length +
-      (minimumYears > 0 && selected.applicant.yearsExperience >= minimumYears ? 1 : 0)
-    : 0;
+  const ownerPhone = user?.phoneNumber.trim()
+    ? `${user.phoneCountryCode} ${user.phoneNumber.trim()}`
+    : "";
+  const selectedMatch = selected
+    ? applicationRequirementMatch(selected, sit)
+    : { matchCount: 0, matchTotal: 0 };
+  const { matchCount, matchTotal } = selectedMatch;
+  const primaryAcceptedApplication = acceptedApplications[0];
+  const anotherApplicantAccepted = Boolean(
+    primaryAcceptedApplication && selected && selected.status !== "accepted",
+  );
   const actionClasses = {
-    shortlisted: "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100",
     accepted: "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
     declined: "border-red-300 bg-red-50 text-red-700 hover:bg-red-100",
   } as const;
@@ -3853,43 +7125,367 @@ function ApplicationReviewPage() {
         <ArrowLeft size={17} /> {t("applications.backToSits")}
       </button>
       <p className="eyebrow">{t("applications.kicker")}</p>
-      <h1 className="section-title">{t("applications.title", { boat: vessel?.name ?? "" })}</h1>
-      <p className="mt-3 text-slate">
-        {t("applications.subtitle", { count: applications.length })}
-      </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="section-title">{t("applications.title", { boat: vessel?.name ?? "" })}</h1>
+          <p className="mt-3 text-slate">
+            {t("applications.subtitle", { count: applications.length })}
+          </p>
+          {sit && (
+            <div className="mt-3">
+              <SitPhaseBadge
+                phase={
+                  sit.phase ??
+                  getSitPhase({
+                    dateStart: sit.dateStart,
+                    duration: sit.duration,
+                    applicationsOpen: sit.applicationsOpen,
+                    accepted: sit.accepted,
+                    applicants: sit.applicants,
+                  })
+                }
+                size="md"
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
+              <button
+                className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
+                  isAcceptingApplications(sit)
+                    ? "border-line bg-white text-navy hover:border-teal"
+                    : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
+                }`}
+                disabled={toggleApplicationsMutation.isPending}
+                onClick={() => {
+                  if (isAcceptingApplications(sit)) {
+                    setCloseApplicationsConfirm(true);
+                    return;
+                  }
+                  toggleApplicationsMutation.mutate();
+                }}
+                type="button"
+              >
+                {isAcceptingApplications(sit)
+                  ? t("applications.closeRequests")
+                  : t("applications.openRequests")}
+              </button>
+            )}
+          {sit && resolveSitPhase(sit) === "stayUnderway" && (
+            <button
+              className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
+              onClick={() => setFlaggingIssue(true)}
+              type="button"
+            >
+              <Flag size={16} /> {t("sitIssue.flagButton")}
+            </button>
+          )}
+        </div>
+      </div>
+      {sit && (
+        <div className="mt-6">
+          <SitPhaseStepper
+            phase={
+              sit.phase ??
+              getSitPhase({
+                dateStart: sit.dateStart,
+                duration: sit.duration,
+                applicationsOpen: sit.applicationsOpen,
+                accepted: sit.accepted,
+                applicants: sit.applicants,
+              })
+            }
+          />
+        </div>
+      )}
+      {sit &&
+        !isAcceptingApplications(sit) &&
+        (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
+        <div
+          className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
+          role="status"
+        >
+          {t("applications.requestsClosedNotice")}
+        </div>
+      )}
+      {sit &&
+        resolveSitPhase(sit) === "acceptingApplicants" &&
+        !sit.accepted &&
+        applications.length > 0 && (
+          <div
+            className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+            role="status"
+          >
+            <Video className="mt-0.5 shrink-0 text-coral" size={22} />
+            <div>
+              <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
+              <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
+            </div>
+          </div>
+        )}
 
       {pageLoading ? (
         <div className="mt-8 h-80 animate-pulse rounded-2xl bg-seafoam" />
-      ) : applications.length && selected ? (
-        <div className="mt-8 grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-          <aside className="h-fit rounded-2xl border border-line bg-white p-2 shadow-card">
-            {applications.map((application) => (
-              <button
-                className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
-                  application.id === selected.id ? "bg-seafoam" : "hover:bg-cream"
-                }`}
-                key={application.id}
-                onClick={() => setSelectedId(application.id)}
-                type="button"
-              >
-                <img
-                  alt=""
-                  className="size-11 rounded-full object-cover"
-                  src={application.applicant.image}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-bold text-navy">
-                    {application.applicant.name}
-                  </span>
-                  <span className="mt-1 block">
-                    <ApplicationStatusBadge status={application.status} />
-                  </span>
+      ) : applications.length ? (
+        <div className="mt-8 space-y-6">
+          {acceptedApplications.length > 0 &&
+            (statusFilter === "all" || statusFilter === "accepted") && (
+            <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
+                  <h2 className="mt-1 font-display text-2xl font-bold text-navy">
+                    {acceptedApplications.length === 1
+                      ? t("applications.acceptedTitle")
+                      : t("applications.acceptedTitlePlural", {
+                          count: acceptedApplications.length,
+                        })}
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
+                    {t("applications.acceptedHint")}
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
+                  <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
                 </span>
-              </button>
-            ))}
+              </div>
+              {sit && resolveSitPhase(sit) === "applicantChosen" && (
+                <div
+                  className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                  role="status"
+                >
+                  <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
+                  <div>
+                    <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
+                    <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
+                  </div>
+                </div>
+              )}
+              {sit && resolveSitPhase(sit) === "stayUnderway" && (
+                <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                  <div className="flex gap-3">
+                    <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
+                    <div>
+                      <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
+                      <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
+                    </div>
+                  </div>
+                  <button
+                    className="shrink-0 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
+                    onClick={() => setFlaggingIssue(true)}
+                    type="button"
+                  >
+                    {t("sitIssue.flagButton")}
+                  </button>
+                </div>
+              )}
+              {sit && canLeaveReview(sit) && (
+                <div
+                  className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                  role="status"
+                >
+                  {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
+                </div>
+              )}
+              <div className="mt-5 grid gap-3">
+                {acceptedApplications.map((application) => {
+                  const isSelected = application.id === selected?.id;
+                  return (
+                    <button
+                      className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
+                        isSelected
+                          ? "border-teal shadow-card ring-2 ring-teal/25"
+                          : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
+                      }`}
+                      key={application.id}
+                      onClick={() => {
+                        setSelectedId(application.id);
+                        window.requestAnimationFrame(() => {
+                          document
+                            .getElementById("application-detail-panel")
+                            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        });
+                      }}
+                      type="button"
+                    >
+                      <img
+                        alt=""
+                        className="size-16 rounded-full object-cover"
+                        src={application.applicant.image}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-2">
+                          <span className="font-display text-xl font-bold text-navy">
+                            {application.applicant.name}
+                          </span>
+                          <ApplicationStatusBadge status={application.status} />
+                        </span>
+                        <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                          <span className="flex items-center gap-1.5">
+                            <MapPin size={14} /> {application.applicant.location}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Users size={14} />{" "}
+                            {t("applications.partySize")}: {application.partySize}
+                          </span>
+                          <SitterRatingBadge sitterName={application.applicant.name} />
+                        </span>
+                      </span>
+                      <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
+                        {isSelected ? (
+                          <>
+                            <Check size={16} />
+                            {t("applications.acceptedViewing")}
+                          </>
+                        ) : (
+                          <>
+                            <ArrowLeft size={16} className="rotate-180" />
+                            {t("applications.acceptedView")}
+                          </>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+          <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
+            <div className="space-y-2 border-b border-line pb-3">
+              <label className="block">
+                <span className="sr-only">{t("applications.sortLabel")}</span>
+                <Select variant="form" aria-label={t("applications.sortLabel")}
+                  onChange={(event) =>
+                    setSort(event.target.value as typeof sort)
+                  }
+                  value={sort}
+                >
+                  <option value="newest">{t("applications.sortNewest")}</option>
+                  <option value="experience">{t("applications.sortExperience")}</option>
+                  <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
+                  <option value="priorSits">{t("applications.sortPriorSits")}</option>
+                </Select>
+              </label>
+              <label className="block">
+                <span className="sr-only">{t("applications.filterStatusLabel")}</span>
+                <Select variant="form" aria-label={t("applications.filterStatusLabel")}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as typeof statusFilter)
+                  }
+                  value={statusFilter}
+                >
+                  <option value="all">{t("applications.filterStatusAll")}</option>
+                  {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map((status) => (
+                    <option key={status} value={status}>
+                      {t(`applications.status.${status}`)}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+              <label className="block">
+                <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
+                <Select variant="form" aria-label={t("applications.filterExperienceLabel")}
+                  onChange={(event) =>
+                    setExperienceFilter(event.target.value as typeof experienceFilter)
+                  }
+                  value={experienceFilter}
+                >
+                  <option value="any">{t("applications.filterExperienceAny")}</option>
+                  <option value="meetsMin">{t("applications.filterExperienceMeetsMin")}</option>
+                  <option value="fivePlus">{t("applications.filterExperienceFivePlus")}</option>
+                  <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
+                </Select>
+              </label>
+              <p className="px-1 text-xs font-semibold text-slate">
+                {t("applications.filteredCount", {
+                  count:
+                    statusFilter === "accepted"
+                      ? acceptedApplications.length
+                      : visibleApplications.length,
+                  total:
+                    statusFilter === "accepted"
+                      ? applications.filter((application) => application.status === "accepted")
+                          .length
+                      : applications.filter((application) => application.status !== "accepted")
+                          .length,
+                })}
+              </p>
+            </div>
+            <div className="mt-2 space-y-1">
+              {statusFilter === "accepted" ? (
+                <p className="px-3 py-6 text-center text-sm text-slate">
+                  {acceptedApplications.length
+                    ? t("applications.acceptedListHint")
+                    : t("applications.filterEmpty")}
+                </p>
+              ) : visibleApplications.length ? (
+                visibleApplications.map((application) => {
+                  const match = applicationRequirementMatch(application, sit);
+                  return (
+                    <button
+                      className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
+                        application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
+                      }`}
+                      key={application.id}
+                      onClick={() => setSelectedId(application.id)}
+                      type="button"
+                    >
+                      <img
+                        alt=""
+                        className="size-11 rounded-full object-cover"
+                        src={application.applicant.image}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-bold text-navy">
+                          {application.applicant.name}
+                        </span>
+                        <span className="mt-1 block text-[11px] font-semibold text-slate">
+                          {t("applications.listMeta", {
+                            years: application.applicant.yearsExperience,
+                            matches: match.matchCount,
+                            total: match.matchTotal || 0,
+                            sits: application.applicant.completedSits,
+                          })}
+                        </span>
+                        <span className="mt-1 block">
+                          <ApplicationStatusBadge status={application.status} />
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="px-3 py-6 text-center text-sm text-slate">
+                  {t("applications.filterEmpty")}
+                </p>
+              )}
+            </div>
           </aside>
 
-          <div className="space-y-6">
+          {selected ? (
+          <div className="space-y-6" id="application-detail-panel">
+            {selected.status !== "accepted" && primaryAcceptedApplication ? (
+              <button
+                className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
+                onClick={() => {
+                  setSelectedId(primaryAcceptedApplication.id);
+                  window.requestAnimationFrame(() => {
+                    document
+                      .getElementById("application-detail-panel")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
+                }}
+                type="button"
+              >
+                <ArrowLeft size={16} />
+                {t("applications.returnToAccepted", {
+                  name: primaryAcceptedApplication.applicant.name,
+                })}
+              </button>
+            ) : null}
             <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
                 <img
@@ -3904,14 +7500,34 @@ function ApplicationReviewPage() {
                     </h2>
                     <ApplicationStatusBadge status={selected.status} />
                   </div>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm text-slate">
-                    <MapPin size={14} /> {selected.applicant.location}
-                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                    <p className="flex items-center gap-1.5">
+                      <MapPin size={14} /> {selected.applicant.location}
+                    </p>
+                    <p className="flex items-center gap-1.5">
+                      <CalendarDays size={14} />{" "}
+                      {t("member.since", { year: selected.applicant.memberSince })}
+                    </p>
+                    <SitterRatingBadge sitterName={selected.applicant.name} />
+                  </div>
                   <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <Link
+                      className="text-sm font-bold text-teal hover:text-navy"
+                      to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                    >
+                      {t("reviews.viewProfile")}
+                    </Link>
+                    <UserSafetyActions
+                      image={selected.applicant.image}
+                      name={selected.applicant.name}
+                    />
+                  </div>
+                  <BlockedUserBanner name={selected.applicant.name} />
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="rounded-xl bg-cream p-4">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate">
                     {t("applications.experience")}
@@ -3932,25 +7548,84 @@ function ApplicationReviewPage() {
                       : t("applications.noSpecificRequirements")}
                   </p>
                 </div>
+                <div className="rounded-xl bg-cream p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                    {t("applications.priorSits")}
+                  </p>
+                  <p className="mt-2 font-bold text-navy">
+                    {t("applications.priorSitsCount", {
+                      count: selected.applicant.completedSits,
+                    })}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-cream p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                    {t("applications.partySize")}
+                  </p>
+                  <p className="mt-2 flex items-center gap-2 font-bold text-navy">
+                    <Users size={17} /> {selected.partySize}
+                  </p>
+                </div>
               </div>
 
+              <div className="mt-6">
+                <SitterReviewsSection
+                  limit={3}
+                  profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                  showEmpty={false}
+                  sitterName={selected.applicant.name}
+                />
+              </div>
+
+              {selected.status === "accepted" && sit && canLeaveReview(sit) && (
+                <div className="mt-6">
+                  <LeaveReviewForm application={selected} ownerName={user.name} />
+                </div>
+              )}
+
               {[
-                [t("applications.certifications"), selected.applicant.certifications],
-                [t("applications.skills"), selected.applicant.skills],
-                [t("applications.languages"), selected.applicant.languages],
-                [t("profile.preferredCountries"), selected.applicant.preferredCountries ?? []],
-              ].map(([label, values]) => (
-                <div className="mt-5" key={label as string}>
+                {
+                  label: t("applications.certifications"),
+                  values: selected.applicant.certifications,
+                  highlighted: [] as string[],
+                },
+                {
+                  label: t("applications.skills"),
+                  values: selected.applicant.skills,
+                  highlighted: requiredSkills,
+                },
+                {
+                  label: t("applications.languages"),
+                  values: selected.applicant.languages,
+                  highlighted: user.languages,
+                },
+                {
+                  label: t("profile.preferredCountries"),
+                  values: selected.applicant.preferredCountries ?? [],
+                  highlighted: [] as string[],
+                },
+              ].map(({ highlighted, label, values }) => (
+                <div className="mt-5" key={label}>
                   <p className="text-xs font-bold uppercase tracking-wider text-slate">{label}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {(values as string[]).map((value) => (
-                      <span
-                        className="rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-navy"
-                        key={value}
-                      >
-                        {value}
-                      </span>
-                    ))}
+                    {values.map((value) => {
+                      const isHighlighted = highlighted.some(
+                        (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
+                      );
+                      return (
+                        <span
+                          className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                            isHighlighted
+                              ? "border-teal/40 bg-seafoam text-teal"
+                              : "border-line bg-white text-navy"
+                          }`}
+                          key={value}
+                        >
+                          {isHighlighted && <Check aria-hidden="true" size={13} />}
+                          {value}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -3964,36 +7639,118 @@ function ApplicationReviewPage() {
                 </p>
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-2">
-                {(["shortlisted", "accepted", "declined"] as const).map((status) => (
+              {anotherApplicantAccepted ? (
+                <div
+                  className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                  role="status"
+                >
+                  <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                  <div>
+                    <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
+                    <p className="mt-1">
+                      {t("applications.anotherAcceptedBanner", {
+                        name: primaryAcceptedApplication.applicant.name,
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ) : selected.status === "accepted" ? (
+                <div className="mt-6">
                   <button
-                    className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
-                      selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
-                    }`}
+                    className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
                     disabled={statusMutation.isPending}
-                    key={status}
                     onClick={() => {
-                      if (status === "shortlisted") {
-                        statusMutation.mutate({ id: selected.id, status });
-                      } else {
-                        setConfirmingStatus(status);
-                      }
+                      setSharePhone(false);
+                      setConfirmingStatus("unaccept");
                     }}
                     type="button"
                   >
-                    {t(`applications.action.${status}`)}
+                    {t("applications.action.unaccept")}
                   </button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <label
+                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
+                      selected.status === "shortlisted"
+                        ? "border-amber-400 bg-amber-100 text-amber-900"
+                        : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                    }`}
+                  >
+                    <input
+                      checked={selected.status === "shortlisted"}
+                      className="size-4 accent-amber-600"
+                      disabled={statusMutation.isPending}
+                      onChange={(event) =>
+                        statusMutation.mutate({
+                          id: selected.id,
+                          status: event.target.checked ? "shortlisted" : "new",
+                        })
+                      }
+                      type="checkbox"
+                    />
+                    {t("applications.action.shortlisted")}
+                  </label>
+                  {(["accepted", "declined"] as const).map((status) => (
+                    <button
+                      className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
+                        selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
+                      }`}
+                      disabled={statusMutation.isPending}
+                      key={status}
+                      onClick={() => {
+                        setSharePhone(false);
+                        setConfirmingStatus(status);
+                      }}
+                      type="button"
+                    >
+                      {t(`applications.action.${status}`)}
+                    </button>
+                  ))}
+                </div>
+              )}
             </section>
 
             <ConversationPanel
               application={selected}
               currentUser={user.name}
+              onRequestVideoCall={(proposal) =>
+                videoCallMutation.mutate({ id: selected.id, proposal })
+              }
+              onRespondToVideoCall={({ action, messageId, proposal }) => {
+                if (action === "accept") {
+                  videoCallAcceptMutation.mutate({ id: selected.id, messageId });
+                  return;
+                }
+                if (action === "decline") {
+                  videoCallDeclineMutation.mutate({ id: selected.id, messageId });
+                  return;
+                }
+                if (proposal) {
+                  videoCallMutation.mutate({
+                    id: selected.id,
+                    proposal,
+                    counter: true,
+                  });
+                }
+              }}
               onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
-              pending={messageMutation.isPending}
+              pending={
+                messageMutation.isPending ||
+                videoCallMutation.isPending ||
+                videoCallAcceptMutation.isPending ||
+                videoCallDeclineMutation.isPending
+              }
+              translationLanguage={user.preferredLanguage}
             />
           </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
+              <MessageCircle className="mx-auto text-teal" size={38} />
+              <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
+            </div>
+          )}
+        </div>
         </div>
       ) : (
         <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
@@ -4020,10 +7777,18 @@ function ApplicationReviewPage() {
               className={`grid size-12 place-items-center rounded-full ${
                 confirmingStatus === "accepted"
                   ? "bg-emerald-100 text-emerald-700"
-                  : "bg-red-100 text-red-700"
+                  : confirmingStatus === "unaccept"
+                    ? "bg-amber-100 text-amber-800"
+                    : "bg-red-100 text-red-700"
               }`}
             >
-              {confirmingStatus === "accepted" ? <Check size={24} /> : <X size={24} />}
+              {confirmingStatus === "accepted" ? (
+                <Check size={24} />
+              ) : confirmingStatus === "unaccept" ? (
+                <TriangleAlert size={24} />
+              ) : (
+                <X size={24} />
+              )}
             </span>
             <h2
               className="mt-5 font-display text-2xl font-bold text-navy"
@@ -4038,6 +7803,36 @@ function ApplicationReviewPage() {
                 name: selected.applicant.name,
               })}
             </p>
+            {confirmingStatus === "accepted" && (
+              <>
+                <div
+                  className="mt-4 flex gap-3 rounded-xl border border-coral/25 bg-coral/10 px-4 py-3 text-sm leading-6 text-navy"
+                  role="note"
+                >
+                  <Video className="mt-0.5 shrink-0 text-coral" size={18} />
+                  <p>{t("applications.confirm.acceptedVideoCallNote")}</p>
+                </div>
+                <div className="mt-5 rounded-xl border border-line bg-cream p-4">
+                  <label className="flex items-start gap-3">
+                    <input
+                      checked={sharePhone}
+                      className="mt-1 size-4 accent-teal"
+                      disabled={!ownerPhone}
+                      onChange={(event) => setSharePhone(event.target.checked)}
+                      type="checkbox"
+                    />
+                    <span className="text-sm font-semibold leading-6 text-navy">
+                      {t("applications.sharePhone", { name: selected.applicant.name })}
+                    </span>
+                  </label>
+                  {!ownerPhone && (
+                    <p className="mt-2 pl-7 text-sm leading-6 text-slate">
+                      {t("applications.sharePhoneUnavailable")}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
             <div className="mt-7 grid gap-3 sm:grid-cols-2">
               <button
                 className="rounded-xl border border-line px-5 py-3 font-bold text-navy"
@@ -4051,11 +7846,18 @@ function ApplicationReviewPage() {
                 className={`rounded-xl px-5 py-3 font-bold text-white disabled:opacity-60 ${
                   confirmingStatus === "accepted"
                     ? "bg-emerald-600 hover:bg-emerald-700"
-                    : "bg-red-600 hover:bg-red-700"
+                    : confirmingStatus === "unaccept"
+                      ? "bg-amber-700 hover:bg-amber-800"
+                      : "bg-red-600 hover:bg-red-700"
                 }`}
                 disabled={statusMutation.isPending}
                 onClick={() => {
-                  statusMutation.mutate({ id: selected.id, status: confirmingStatus });
+                  statusMutation.mutate({
+                    id: selected.id,
+                    ownerPhone:
+                      confirmingStatus === "accepted" && sharePhone ? ownerPhone : undefined,
+                    status: confirmingStatus === "unaccept" ? "new" : confirmingStatus,
+                  });
                   setConfirmingStatus(null);
                 }}
                 type="button"
@@ -4066,6 +7868,24 @@ function ApplicationReviewPage() {
           </section>
         </div>
       )}
+      {flaggingIssue && sit && (
+        <FlagSitIssueModal
+          boatName={vessel?.name ?? sit.boatId}
+          close={() => setFlaggingIssue(false)}
+          sitLabel={formatSitDates(i18n.language, sit.dateStart, sit.duration)}
+        />
+      )}
+      {closeApplicationsConfirm && sit && (
+        <CloseApplicationsRequestsDialog
+          pending={toggleApplicationsMutation.isPending}
+          onCancel={() => setCloseApplicationsConfirm(false)}
+          onConfirm={() => {
+            toggleApplicationsMutation.mutate(undefined, {
+              onSuccess: () => setCloseApplicationsConfirm(false),
+            });
+          }}
+        />
+      )}
     </main>
   );
 }
@@ -4073,22 +7893,96 @@ function ApplicationReviewPage() {
 function MessagesPage() {
   const { t } = useTranslation();
   const user = useAppStore((state) => state.user);
+  const archivedConversations = useAppStore((state) => state.archivedConversations);
+  const archiveConversation = useAppStore((state) => state.archiveConversation);
+  const unarchiveConversation = useAppStore((state) => state.unarchiveConversation);
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const requestedApplicationId = searchParams.get("application");
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ["applications", "user", user?.name],
     queryFn: () => getApplicationsForUser(user!.name),
     enabled: Boolean(user),
   });
+  const { data: sits = [] } = useQuery({
+    queryKey: ["sits"],
+    queryFn: getSits,
+    enabled: Boolean(user),
+  });
+  const [messagesTab, setMessagesTab] = useState<"inbox" | "archived">("inbox");
   const [selectedId, setSelectedId] = useState("");
+  const [conversationPage, setConversationPage] = useState(0);
+
+  const inboxApplications = useMemo(
+    () => applications.filter((application) => !archivedConversations.includes(application.id)),
+    [applications, archivedConversations],
+  );
+  const archivedApplications = useMemo(
+    () => applications.filter((application) => archivedConversations.includes(application.id)),
+    [applications, archivedConversations],
+  );
+  const tabApplications = messagesTab === "inbox" ? inboxApplications : archivedApplications;
 
   useEffect(() => {
-    if (!applications.length) return;
-    if (!applications.some((application) => application.id === selectedId)) {
-      setSelectedId(applications[0].id);
+    if (
+      requestedApplicationId &&
+      archivedConversations.includes(requestedApplicationId) &&
+      applications.some((application) => application.id === requestedApplicationId)
+    ) {
+      setMessagesTab("archived");
     }
-  }, [applications, selectedId]);
+  }, [requestedApplicationId, archivedConversations, applications]);
 
-  const selected = applications.find((application) => application.id === selectedId);
+  useEffect(() => {
+    if (!tabApplications.length) {
+      setSelectedId("");
+      return;
+    }
+    if (
+      requestedApplicationId &&
+      tabApplications.some((application) => application.id === requestedApplicationId)
+    ) {
+      setSelectedId(requestedApplicationId);
+      return;
+    }
+    if (!tabApplications.some((application) => application.id === selectedId)) {
+      setSelectedId(tabApplications[0].id);
+    }
+  }, [tabApplications, requestedApplicationId, selectedId]);
+
+  const totalConversationPages = Math.max(
+    1,
+    Math.ceil(tabApplications.length / CONVERSATIONS_PER_PAGE),
+  );
+  const conversationPageStart = conversationPage * CONVERSATIONS_PER_PAGE;
+  const visibleApplications = tabApplications.slice(
+    conversationPageStart,
+    conversationPageStart + CONVERSATIONS_PER_PAGE,
+  );
+  const conversationRangeStart =
+    tabApplications.length === 0 ? 0 : conversationPageStart + 1;
+  const conversationRangeEnd = Math.min(
+    conversationPageStart + CONVERSATIONS_PER_PAGE,
+    tabApplications.length,
+  );
+
+  useEffect(() => {
+    const index = tabApplications.findIndex((application) => application.id === selectedId);
+    if (index >= 0) {
+      setConversationPage(Math.floor(index / CONVERSATIONS_PER_PAGE));
+    }
+  }, [selectedId, tabApplications]);
+
+  useEffect(() => {
+    setConversationPage((current) => Math.min(current, totalConversationPages - 1));
+  }, [totalConversationPages]);
+
+  useEffect(() => {
+    setConversationPage(0);
+  }, [messagesTab]);
+
+  const selected = tabApplications.find((application) => application.id === selectedId);
+  const selectedSit = sits.find((sit) => sit.id === selected?.sitId);
   const messageMutation = useMutation({
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       sendApplicationMessage(id, user!.name, text),
@@ -4096,6 +7990,51 @@ function MessagesPage() {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
   });
+  const videoCallMutation = useMutation({
+    mutationFn: ({
+      id,
+      proposal,
+      counter,
+    }: {
+      id: string;
+      proposal: { startsAt: string; durationMinutes: number };
+      counter?: boolean;
+    }) => requestApplicationVideoCall(id, user!.name, proposal, { counter }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+  const videoCallAcceptMutation = useMutation({
+    mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
+      acceptApplicationVideoCall(id, user!.name, messageId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+  const videoCallDeclineMutation = useMutation({
+    mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
+      declineApplicationVideoCall(id, user!.name, messageId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+
+  function handleArchiveSelected() {
+    if (!selected) return;
+    const currentId = selected.id;
+    const remaining = inboxApplications.filter((application) => application.id !== currentId);
+    archiveConversation(currentId);
+    setSelectedId(remaining[0]?.id ?? "");
+    setMessagesTab("inbox");
+  }
+
+  function handleUnarchiveSelected() {
+    if (!selected) return;
+    const currentId = selected.id;
+    unarchiveConversation(currentId);
+    setMessagesTab("inbox");
+    setSelectedId(currentId);
+  }
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-14 lg:px-8">
@@ -4106,64 +8045,241 @@ function MessagesPage() {
           <MessageCircle className="mx-auto text-teal" size={38} />
           <p className="mt-4 font-bold text-navy">{t("messages.signIn")}</p>
         </div>
-      ) : isLoading ? (
-        <div className="mt-8 h-80 animate-pulse rounded-2xl bg-seafoam" />
-      ) : applications.length && selected ? (
-        <div className="mt-8 grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-          <aside className="h-fit rounded-2xl border border-line bg-white p-2 shadow-card">
-            {applications.map((application) => {
-              const otherName =
-                application.ownerName === user.name
-                  ? application.applicant.name
-                  : application.ownerName;
-              return (
-                <button
-                  className={`w-full rounded-xl p-3 text-left transition ${
-                    application.id === selected.id ? "bg-seafoam" : "hover:bg-cream"
-                  }`}
-                  key={application.id}
-                  onClick={() => setSelectedId(application.id)}
-                  type="button"
-                >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="truncate font-bold text-navy">{otherName}</span>
-                    <ApplicationStatusBadge status={application.status} />
-                  </span>
-                  <span className="mt-1 block truncate text-xs text-slate">
-                    {application.boatName}
-                  </span>
-                  <span className="mt-2 block truncate text-sm text-slate">
-                    {application.messages.at(-1)?.text}
-                  </span>
-                </button>
-              );
-            })}
-          </aside>
-          <div>
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="font-display text-xl font-bold text-navy">
-                  {selected.ownerName === user.name ? selected.applicant.name : selected.ownerName}
-                </h2>
-                <p className="text-sm text-slate">
-                  {t("messages.aboutBoat", { boat: selected.boatName })}
-                </p>
-              </div>
-              <ApplicationStatusBadge status={selected.status} />
-            </div>
-            <ConversationPanel
-              application={selected}
-              currentUser={user.name}
-              onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
-              pending={messageMutation.isPending}
-            />
-          </div>
-        </div>
       ) : (
-        <div className="mt-8 rounded-2xl border border-line bg-white py-16 text-center">
-          <MessageCircle className="mx-auto text-teal" size={38} />
-          <p className="mt-4 font-bold text-navy">{t("messages.empty")}</p>
-        </div>
+        <>
+          <div className="mt-8 flex gap-1 rounded-xl bg-seafoam p-1 sm:w-fit">
+            {(["inbox", "archived"] as const).map((tab) => (
+              <button
+                aria-pressed={messagesTab === tab}
+                className={`flex-1 rounded-lg px-6 py-2.5 text-sm font-bold transition sm:flex-none ${
+                  messagesTab === tab ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
+                }`}
+                key={tab}
+                onClick={() => setMessagesTab(tab)}
+                type="button"
+              >
+                {t(`messages.tab.${tab}`)}{" "}
+                <span className="ml-1 text-xs text-slate">
+                  {tab === "inbox" ? inboxApplications.length : archivedApplications.length}
+                </span>
+              </button>
+            ))}
+          </div>
+          {isLoading ? (
+            <MessagesPageSkeleton />
+          ) : tabApplications.length && selected ? (
+            <div className="mt-8 grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+              <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-2 shadow-card">
+                {visibleApplications.map((application) => {
+                  const otherName =
+                    application.ownerName === user.name
+                      ? application.applicant.name
+                      : application.ownerName;
+                  const participationRole = sitParticipationRole(application, user.name);
+                  return (
+                    <button
+                      className={`w-full rounded-xl p-3 text-left transition ${
+                        application.id === selected.id ? "bg-seafoam" : "hover:bg-cream"
+                      }`}
+                      key={application.id}
+                      onClick={() => setSelectedId(application.id)}
+                      type="button"
+                    >
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="truncate font-bold text-navy">{otherName}</span>
+                        <ApplicationStatusBadge status={application.status} />
+                      </span>
+                      <span className="mt-1 flex items-center gap-2 text-xs text-slate">
+                        <SitParticipationBadge role={participationRole} />
+                        <span className="truncate">{application.boatName}</span>
+                      </span>
+                      <span className="mt-2 block truncate text-sm text-slate">
+                        {(() => {
+                          const last = application.messages.at(-1);
+                          if (!last) return "";
+                          return last.kind === "system"
+                            ? formatApplicationSystemMessage(t, last, application, user.name)
+                            : last.text;
+                        })()}
+                      </span>
+                    </button>
+                  );
+                })}
+                {tabApplications.length > CONVERSATIONS_PER_PAGE && (
+                  <div className="mt-2 flex items-center justify-between gap-2 border-t border-line px-1 pt-2">
+                    <button
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-navy hover:bg-cream disabled:opacity-40"
+                      disabled={conversationPage === 0}
+                      onClick={() => setConversationPage((current) => Math.max(0, current - 1))}
+                      type="button"
+                    >
+                      <ChevronLeft aria-hidden="true" size={14} />
+                      {t("messages.newerConversations")}
+                    </button>
+                    <p className="text-center text-[11px] font-semibold text-slate">
+                      {t("messages.conversationsRange", {
+                        start: conversationRangeStart,
+                        end: conversationRangeEnd,
+                        total: tabApplications.length,
+                      })}
+                    </p>
+                    <button
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-navy hover:bg-cream disabled:opacity-40"
+                      disabled={conversationPage >= totalConversationPages - 1}
+                      onClick={() =>
+                        setConversationPage((current) =>
+                          Math.min(totalConversationPages - 1, current + 1),
+                        )
+                      }
+                      type="button"
+                    >
+                      {t("messages.olderConversations")}
+                      <ChevronRight aria-hidden="true" size={14} />
+                    </button>
+                  </div>
+                )}
+              </aside>
+              <div className="min-w-0">
+                {(() => {
+                  const otherName =
+                    selected.ownerName === user.name
+                      ? selected.applicant.name
+                      : selected.ownerName;
+                  const otherImage =
+                    selected.ownerName === user.name
+                      ? selected.applicant.image
+                      : `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(otherName)}`;
+                  const otherProfilePath =
+                    selected.ownerName === user.name
+                      ? `/members/${encodeURIComponent(selected.applicant.name)}`
+                      : `/members/${selected.sitId}`;
+                  const isArchived = archivedConversations.includes(selected.id);
+                  return (
+                    <>
+                      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-start gap-3">
+                          <Link
+                            aria-label={t("messages.viewProfile")}
+                            className="shrink-0 rounded-full ring-2 ring-transparent transition hover:ring-aqua"
+                            to={otherProfilePath}
+                          >
+                            <img
+                              alt=""
+                              className="size-12 rounded-full object-cover"
+                              src={otherImage}
+                            />
+                          </Link>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Link
+                                className="font-display text-xl font-bold text-navy hover:text-teal"
+                                to={otherProfilePath}
+                              >
+                                {otherName}
+                              </Link>
+                              <SitParticipationBadge
+                                role={sitParticipationRole(selected, user.name)}
+                              />
+                            </div>
+                            <p className="text-sm text-slate">
+                              {t("messages.aboutBoat", { boat: selected.boatName })}
+                            </p>
+                            <Link
+                              className="mt-1 inline-flex text-sm font-bold text-teal hover:text-navy"
+                              to={otherProfilePath}
+                            >
+                              {t("messages.viewProfile")}
+                            </Link>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <ApplicationStatusBadge status={selected.status} />
+                          <IconTooltip
+                            label={
+                              isArchived ? t("messages.unarchive") : t("messages.archive")
+                            }
+                          >
+                            <button
+                              aria-label={
+                                isArchived ? t("messages.unarchive") : t("messages.archive")
+                              }
+                              className="inline-flex size-10 items-center justify-center rounded-xl border border-line bg-white text-navy transition hover:border-teal hover:text-teal"
+                              onClick={isArchived ? handleUnarchiveSelected : handleArchiveSelected}
+                              type="button"
+                            >
+                              {isArchived ? (
+                                <ArchiveRestore aria-hidden="true" size={18} />
+                              ) : (
+                                <Archive aria-hidden="true" size={18} />
+                              )}
+                            </button>
+                          </IconTooltip>
+                          <UserSafetyActions image={otherImage} name={otherName} />
+                        </div>
+                      </div>
+                      <BlockedUserBanner name={otherName} />
+                      {selected.status === "accepted" &&
+                        selected.ownerName === user.name &&
+                        selectedSit &&
+                        canLeaveReview(selectedSit) && (
+                          <div className="mb-4">
+                            <LeaveReviewForm application={selected} ownerName={user.name} />
+                          </div>
+                        )}
+                    </>
+                  );
+                })()}
+                <ConversationPanel
+                  application={selected}
+                  currentUser={user.name}
+                  onRequestVideoCall={(proposal) =>
+                    videoCallMutation.mutate({ id: selected.id, proposal })
+                  }
+                  onRespondToVideoCall={({ action, messageId, proposal }) => {
+                    if (action === "accept") {
+                      videoCallAcceptMutation.mutate({ id: selected.id, messageId });
+                      return;
+                    }
+                    if (action === "decline") {
+                      videoCallDeclineMutation.mutate({ id: selected.id, messageId });
+                      return;
+                    }
+                    if (proposal) {
+                      videoCallMutation.mutate({
+                        id: selected.id,
+                        proposal,
+                        counter: true,
+                      });
+                    }
+                  }}
+                  onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
+                  pending={
+                    messageMutation.isPending ||
+                    videoCallMutation.isPending ||
+                    videoCallAcceptMutation.isPending ||
+                    videoCallDeclineMutation.isPending
+                  }
+                  translationLanguage={user.preferredLanguage}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="mt-8 rounded-2xl border border-line bg-white py-16 text-center">
+              {messagesTab === "archived" ? (
+                <Archive className="mx-auto text-teal" size={38} />
+              ) : (
+                <MessageCircle className="mx-auto text-teal" size={38} />
+              )}
+              <p className="mt-4 font-bold text-navy">
+                {messagesTab === "archived"
+                  ? t("messages.emptyArchived")
+                  : applications.length > 0
+                    ? t("messages.emptyInbox")
+                    : t("messages.empty")}
+              </p>
+            </div>
+          )}
+        </>
       )}
     </main>
   );
@@ -4171,6 +8287,8 @@ function MessagesPage() {
 
 function Footer() {
   const { t } = useTranslation();
+  const user = useAppStore((state) => state.user);
+  const showAdmin = isAdminUser(user);
   return (
     <footer className="border-t border-line bg-white px-5 py-10 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
@@ -4187,6 +8305,11 @@ function Footer() {
             <Link className="hover:text-navy" to="/terms">
               {t("footer.terms")}
             </Link>
+            {showAdmin ? (
+              <Link className="hover:text-navy" to="/admin">
+                {t("footer.admin")}
+              </Link>
+            ) : null}
           </div>
           <LanguageSelect />
         </div>
@@ -4215,6 +8338,8 @@ export default function App() {
         <Route path="/owner/boats" element={<OwnerBoatsPage />} />
         <Route path="/owner/boats/new" element={<VesselEditorPage mode="new" />} />
         <Route path="/owner/boats/:boatId/edit" element={<VesselEditorPage mode="edit" />} />
+        <Route path="/owner/sits/new" element={<SitEditorPage mode="new" />} />
+        <Route path="/owner/sits/:sitId/edit" element={<SitEditorPage mode="edit" />} />
         <Route path="/owner/sits/:sitId/applications" element={<ApplicationReviewPage />} />
         <Route path="/members/:id" element={<MemberPage />} />
         <Route path="/saved" element={<SavedPage />} />
@@ -4222,6 +8347,7 @@ export default function App() {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/safety" element={<SafetyPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="*" element={<NotFound />} />

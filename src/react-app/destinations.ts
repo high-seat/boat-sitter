@@ -66,6 +66,7 @@ const cityRows = [
   "Sydney|Australia",
   "Tallinn|Estonia",
   "Tampa|United States",
+  "Tokyo|Japan",
   "Trogir|Croatia",
   "Valencia|Spain",
   "Valletta|Malta",

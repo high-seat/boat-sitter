@@ -1,0 +1,102 @@
+import type { Page } from "@playwright/test";
+
+export const MAYA_OWNER = {
+  name: "Maya & Finn",
+  email: "maya.finn@boatstead.mock",
+  image: "https://i.pravatar.cc/160?img=5",
+  phoneNumber: "6912345678",
+} as const;
+
+type OwnerSeed = {
+  name: string;
+  email: string;
+  image: string;
+  phoneNumber: string;
+  verified: boolean;
+  role: "member" | "admin";
+};
+
+/** Seeds a logged-in owner session before the app boots. */
+export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>) {
+  const owner: OwnerSeed = {
+    ...MAYA_OWNER,
+    verified: true,
+    role: "member",
+    ...options,
+  };
+  const verificationKey = `harbourly-verification-${owner.name
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, "-")}`;
+
+  await page.addInitScript(
+    ({ ownerState, verificationKey }) => {
+      localStorage.clear();
+      localStorage.setItem("i18nextLng", "en-US");
+      localStorage.setItem(
+        "harbourly",
+        JSON.stringify({
+          state: {
+            saved: [],
+            archivedConversations: [],
+            archivedSits: [],
+            blockedUsers: [],
+            userReports: [],
+            user: {
+              name: ownerState.name,
+              email: ownerState.email,
+              legalName: ownerState.name,
+              image: ownerState.image,
+              bio: "Owner of Solstice",
+              location: "Lefkada, Greece",
+              languages: ["English"],
+              preferredCountries: ["Greece"],
+              skills: [],
+              preferredLanguage: "en-US",
+              measurementSystem: "metric",
+              emailNotifications: {
+                newApplications: true,
+                applicationUpdates: true,
+                messages: true,
+                sitReminders: true,
+                productUpdates: false,
+              },
+              sitDefaults: { nonSmokerRequired: false },
+              memberSince: 2021,
+              phoneCountryCode: "+30",
+              phoneNumber: ownerState.phoneNumber,
+              role: ownerState.role,
+            },
+          },
+          version: 14,
+        }),
+      );
+      if (ownerState.verified) {
+        localStorage.setItem(
+          verificationKey,
+          JSON.stringify({
+            status: "verified",
+            provider: "harbourly-mock",
+            verifiedAt: "2026-07-01T00:00:00.000Z",
+            reference: "mock_e2e_verified",
+          }),
+        );
+      }
+      localStorage.setItem(
+        "boatstead-feature-flags",
+        JSON.stringify({
+          state: { overrides: { identityVerification: true } },
+          version: 1,
+        }),
+      );
+    },
+    { ownerState: owner, verificationKey },
+  );
+}
+
+export async function seedVerifiedOwner(page: Page) {
+  await seedOwnerSession(page, { verified: true });
+}
+
+export async function seedUnverifiedOwner(page: Page) {
+  await seedOwnerSession(page, { verified: false });
+}

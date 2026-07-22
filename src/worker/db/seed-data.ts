@@ -157,7 +157,6 @@ export const seedSits: NewSit[] = [
     duration: "22 nights",
     location: "Lefkada",
     country: "Greece",
-    region: "Mediterranean",
     latitude: 38.7066,
     longitude: 20.7019,
     responsibilities: [
@@ -184,7 +183,6 @@ export const seedSits: NewSit[] = [
     duration: "28 nights",
     location: "St. George's",
     country: "Grenada",
-    region: "Caribbean",
     latitude: 12.0561,
     longitude: -61.7488,
     responsibilities: [
@@ -211,7 +209,6 @@ export const seedSits: NewSit[] = [
     duration: "28 nights",
     location: "Bergen",
     country: "Norway",
-    region: "Northern Europe",
     latitude: 60.3913,
     longitude: 5.3221,
     responsibilities: [
@@ -238,7 +235,6 @@ export const seedSits: NewSit[] = [
     duration: "30 nights",
     location: "Whangarei",
     country: "New Zealand",
-    region: "South Pacific",
     latitude: -35.7251,
     longitude: 174.3237,
     responsibilities: [
@@ -265,7 +261,6 @@ export const seedSits: NewSit[] = [
     duration: "14 nights",
     location: "Falmouth",
     country: "United Kingdom",
-    region: "Northern Europe",
     latitude: 50.1533,
     longitude: -5.0656,
     responsibilities: [

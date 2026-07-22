@@ -1,10 +1,16 @@
 import { useEffect, useMemo } from "react";
 import { divIcon, latLngBounds } from "leaflet";
+import { ExternalLink, MapPin } from "lucide-react";
 import { MapContainer, Marker, Popup, TileLayer, useMap, ZoomControl } from "react-leaflet";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "leaflet/dist/leaflet.css";
 import type { Boat } from "@/mockApi";
+import {
+  formatMapLocationLabel,
+  isApproximateMapPin,
+  mapsSearchUrl,
+} from "@/mapUtils";
 
 const markerIcon = divIcon({
   className: "boatstead-map-marker",
@@ -32,6 +38,33 @@ function MapViewport({ boats }: { boats: Boat[] }) {
   return null;
 }
 
+function SitMapFooter({ boat }: { boat: Boat }) {
+  const { t } = useTranslation();
+  const locationLabel = formatMapLocationLabel(boat.location, boat.country);
+  const mapsUrl = mapsSearchUrl(boat.latitude, boat.longitude, locationLabel);
+
+  return (
+    <div className="mt-3 flex flex-col gap-2.5">
+      <a
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-teal hover:text-coral"
+        href={mapsUrl}
+        rel="noopener noreferrer"
+        target="_blank"
+        aria-label={t("map.openInMapsAriaLabel", { location: locationLabel })}
+      >
+        <ExternalLink aria-hidden="true" size={15} strokeWidth={2.25} />
+        {t("map.openInMaps")}
+      </a>
+      {isApproximateMapPin(boat) && (
+        <p className="flex items-start gap-2 text-xs leading-relaxed text-slate">
+          <MapPin aria-hidden="true" className="mt-0.5 shrink-0" size={14} strokeWidth={2.25} />
+          <span>{t("map.approximateLocationNote")}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: boolean }) {
   const { t } = useTranslation();
   const center = useMemo<[number, number]>(
@@ -40,12 +73,13 @@ export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: b
   );
 
   return (
-    <section
-      aria-label={compact ? t("map.sitLocation") : t("map.searchResults")}
-      className={`overflow-hidden rounded-3xl border border-line bg-seafoam shadow-card ${
-        compact ? "h-96" : "h-[min(68vh,44rem)] min-h-112"
-      }`}
-    >
+    <div>
+      <section
+        aria-label={compact ? t("map.sitLocation") : t("map.searchResults")}
+        className={`relative isolate z-0 overflow-hidden rounded-3xl border border-line bg-seafoam shadow-card ${
+          compact ? "h-96" : "h-[min(68vh,44rem)] min-h-112"
+        }`}
+      >
       <MapContainer
         center={center}
         className="h-full w-full"
@@ -83,7 +117,7 @@ export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: b
                   {boat.country && !boat.location.includes(boat.country) ? `, ${boat.country}` : ""}
                 </p>
                 <Link
-                  className="mt-3 block rounded-lg bg-coral px-3 py-2 text-center text-xs font-bold text-white"
+                  className="boatstead-map-popup-link mt-3 block rounded-lg bg-coral px-3 py-2 text-center text-xs font-bold text-white no-underline hover:bg-coral-dark hover:text-white"
                   to={`/boats/${boat.id}`}
                 >
                   {t("map.viewSit")}
@@ -93,6 +127,8 @@ export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: b
           </Marker>
         ))}
       </MapContainer>
-    </section>
+      </section>
+      {compact && boats.length === 1 ? <SitMapFooter boat={boats[0]} /> : null}
+    </div>
   );
 }

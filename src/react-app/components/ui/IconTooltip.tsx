@@ -4,17 +4,28 @@ export function IconTooltip({
   children,
   label,
   hidden = false,
+  wrap = false,
+  side = "bottom",
 }: {
   children: ReactNode;
   label: string;
   hidden?: boolean;
+  wrap?: boolean;
+  side?: "top" | "bottom";
 }) {
+  const positionClass =
+    side === "top"
+      ? "bottom-[calc(100%+0.4rem)] top-auto"
+      : "top-[calc(100%+0.4rem)]";
+
   return (
     <span className="group relative inline-flex">
       {children}
       {!hidden && (
         <span
-          className="pointer-events-none absolute top-[calc(100%+0.4rem)] left-1/2 z-70 -translate-x-1/2 whitespace-nowrap rounded-lg bg-navy px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-card transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+          className={`pointer-events-none absolute left-1/2 z-70 w-max max-w-[min(18rem,calc(100vw-2rem))] -translate-x-1/2 rounded-lg bg-navy px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-card transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 ${positionClass} ${
+            wrap ? "whitespace-normal text-center" : "whitespace-nowrap"
+          }`}
           role="tooltip"
         >
           {label}

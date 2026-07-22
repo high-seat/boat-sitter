@@ -1,6 +1,6 @@
 import { useMemo, useState, type MouseEvent } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { de, el, enGB, enUS, es, fr, hr, it, nl, pt, tr } from "date-fns/locale";
+import { da, de, el, enGB, enUS, es, fi, fr, hr, it, ja, nb, nl, pt, ptBR, sv, tr } from "date-fns/locale";
 import { CalendarDays, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DayPicker, type DateRange } from "react-day-picker";
@@ -19,7 +19,26 @@ const fromIso = (value: string) => {
   return new Date(year, month - 1, day);
 };
 
-const locales = { "en-US": enUS, "en-GB": enGB, fr, es, it, de, nl, pt, el, hr, tr };
+const locales = {
+  "en-US": enUS,
+  "en-GB": enGB,
+  fr,
+  "es-ES": es,
+  "es-419": es,
+  it,
+  de,
+  nl,
+  "pt-BR": ptBR,
+  "pt-PT": pt,
+  el,
+  hr,
+  tr,
+  sv,
+  nb,
+  da,
+  fi,
+  ja,
+};
 
 export function DateRangePicker({
   startDate,
@@ -119,6 +138,7 @@ export function DateRangePicker({
               defaultMonth={selected?.from ?? today}
               disabled={{ before: today }}
               locale={locales[language]}
+              min={1}
               mode="range"
               numberOfMonths={1}
               onSelect={(range) => {
@@ -126,7 +146,13 @@ export function DateRangePicker({
                   startDate: range?.from ? toIso(range.from) : "",
                   endDate: range?.to ? toIso(range.to) : "",
                 });
-                if (range?.from && range?.to) setOpen(false);
+                if (
+                  range?.from &&
+                  range?.to &&
+                  toIso(range.from) !== toIso(range.to)
+                ) {
+                  setOpen(false);
+                }
               }}
               selected={selected}
               showOutsideDays

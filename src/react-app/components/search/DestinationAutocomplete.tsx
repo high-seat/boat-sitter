@@ -66,24 +66,27 @@ export function DestinationAutocomplete({
         ? destinations.filter((destination) => destination.kind === "City")
         : destinations;
     const query = (multiple ? draft : value).trim().toLowerCase();
+    const popularNames = countryOnly
+      ? ["Greece", "Spain", "United Kingdom", "Croatia", "Italy", "France", "Sweden", "Norway"]
+      : ["Greece", "Spain", "United Kingdom", "Grenada", "Canada", "United States"];
     const matches = query
       ? source
-          .filter(
-            (destination) =>
-              destination.name.toLowerCase().includes(query) ||
-              destination.detail.toLowerCase().includes(query) ||
-              `${destination.name}, ${destination.detail}`.toLowerCase().includes(query),
-          )
+          .filter((destination) => {
+            const name = destination.name.toLowerCase();
+            if (name.includes(query)) return true;
+            if (destination.kind === "Country") return false;
+            const detail = destination.detail.toLowerCase();
+            return (
+              detail.includes(query) ||
+              `${destination.name}, ${destination.detail}`.toLowerCase().includes(query)
+            );
+          })
           .sort((a, b) => {
             const aStarts = a.name.toLowerCase().startsWith(query) ? 0 : 1;
             const bStarts = b.name.toLowerCase().startsWith(query) ? 0 : 1;
             return aStarts - bStarts || a.name.localeCompare(b.name);
           })
-      : source.filter((destination) =>
-          ["Greece", "Spain", "United Kingdom", "Grenada", "Canada", "United States"].includes(
-            destination.name,
-          ),
-        );
+      : source.filter((destination) => popularNames.includes(destination.name));
     return matches
       .filter((destination) => {
         const selection =
@@ -116,6 +119,12 @@ export function DestinationAutocomplete({
   function removeSelection(selection: string) {
     onChange(selectedDestinations.filter((destination) => destination !== selection).join("|"));
     inputRef.current?.focus();
+  }
+
+  function suggestionCountryCode(destination: Destination) {
+    if (destination.kind === "City") return countryCode(destination.detail);
+    if (destination.kind === "Country") return countryCode(destination.name);
+    return undefined;
   }
 
   return (
@@ -227,45 +236,44 @@ export function DestinationAutocomplete({
           className="absolute top-[calc(100%+0.5rem)] right-0 left-0 z-50 overflow-hidden rounded-xl border border-line bg-white p-1.5 shadow-float"
           role="listbox"
         >
-          {suggestions.map((destination, index) => (
-            <button
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left ${
-                activeIndex === index ? "bg-seafoam" : "hover:bg-cream"
-              }`}
-              key={`${destination.kind}-${destination.name}`}
-              onMouseDown={(event) => event.preventDefault()}
-              onMouseEnter={() => setActiveIndex(index)}
-              onClick={() => choose(destination)}
-              role="option"
-              type="button"
-            >
-              <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-lg bg-cream text-teal">
-                {countryCode(
-                  destination.kind === "City" ? destination.detail : destination.name,
-                ) ? (
-                  <img
-                    alt=""
-                    className="h-full w-full rounded-lg object-cover"
-                    src={`https://flagcdn.com/${countryCode(
-                      destination.kind === "City" ? destination.detail : destination.name,
-                    )!.toLowerCase()}.svg`}
-                  />
-                ) : destination.kind === "City" ? (
-                  <MapPin size={16} />
-                ) : (
-                  <Compass size={16} />
-                )}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold text-navy">
-                  {destination.name}
+          {suggestions.map((destination, index) => {
+            const code = suggestionCountryCode(destination);
+            return (
+              <button
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left ${
+                  activeIndex === index ? "bg-seafoam" : "hover:bg-cream"
+                }`}
+                key={`${destination.kind}-${destination.name}`}
+                onMouseDown={(event) => event.preventDefault()}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => choose(destination)}
+                role="option"
+                type="button"
+              >
+                <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-lg bg-cream text-teal">
+                  {code ? (
+                    <img
+                      alt=""
+                      className="h-full w-full rounded-lg object-cover"
+                      src={`https://flagcdn.com/${code.toLowerCase()}.svg`}
+                    />
+                  ) : destination.kind === "City" ? (
+                    <MapPin size={16} />
+                  ) : (
+                    <Compass size={16} />
+                  )}
                 </span>
-                {destination.kind === "City" && (
-                  <span className="block truncate text-xs text-slate">{destination.detail}</span>
-                )}
-              </span>
-            </button>
-          ))}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-navy">
+                    {destination.name}
+                  </span>
+                  {(destination.kind === "City") && (
+                    <span className="block truncate text-xs text-slate">{destination.detail}</span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
