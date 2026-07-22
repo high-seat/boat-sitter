@@ -42,7 +42,7 @@ INSERT INTO sits (
   duration,
   location,
   country,
-  region,
+  full_address,
   latitude,
   longitude,
   responsibilities,
@@ -56,11 +56,11 @@ INSERT INTO sits (
   featured,
   published
 ) VALUES
-  ('solstice', 'solstice-boat', '12 Sep – 4 Oct', '2026-09-12', '22 nights', 'Lefkada', 'Greece', 'Mediterranean', 38.7066, 20.7019, '["Check bilges and battery monitor each morning","Run engine and watermaker weekly","Adjust lines and fenders after strong weather","Flush heads and air cabins regularly"]', '["5+ years sailing","Diesel basics","Liveaboard experience"]', 5, '["Liveaboard"]', '[]', '["Diesel troubleshooting","Mooring & lines"]', 6, 'Pip, a sea-loving terrier', 1, 1),
-  ('blue-hour', 'blue-hour-boat', '3 Nov – 1 Dec', '2026-11-03', '28 nights', 'St. George''s', 'Grenada', 'Caribbean', 12.0561, -61.7488, '["Daily mooring and chafe inspection","Monitor solar, batteries and fridge","Start both engines weekly","Secure deck before squalls"]', '["Catamaran experience","Dinghy handling","Storm awareness"]', 3, '["Catamaran","Tropical weather"]', '[]', '["Tender handling","Storm preparation"]', 9, NULL, 0, 1),
-  ('northern-light', 'northern-light-boat', '5 Jan – 2 Feb', '2027-01-05', '28 nights', 'Bergen', 'Norway', 'Northern Europe', 60.3913, 5.3221, '["Verify shore power and heater daily","Check for ice around the hull","Run dehumidifier and log readings","Clear snow from decks and covers"]', '["Cold weather experience","Comfortable alone","Basic electrics"]', 2, '["Cold-weather boating"]', '[]', '["Shore power"]', 3, NULL, 0, 1),
-  ('kingfisher', 'kingfisher-boat', '18 Feb – 20 Mar', '2027-02-18', '30 nights', 'Whangarei', 'New Zealand', 'South Pacific', -35.7251, 174.3237, '["Check mooring bridle for chafe weekly","Monitor forecast for cyclone activity","Run engine and charge batteries","Ventilate to keep damp down"]', '["Anchoring experience","Weather routing","Dinghy handling"]', 4, '["Bluewater / offshore"]', '[]', '["Tender handling","Storm preparation"]', 12, 'Two cats, Rigging and Halyard', 1, 1),
-  ('saltwood', 'saltwood-boat', '1 Apr – 15 Apr', '2027-04-01', '14 nights', 'Falmouth', 'United Kingdom', 'Northern Europe', 50.1533, -5.0656, '["Check bilge twice daily — she takes up slowly","Inspect topside seams after dry spells","Tend lines on spring tides","Keep her covered and aired"]', '["Wooden boat experience preferred","Tidal berth awareness"]', 0, '[]', '[]', '["Mooring & lines"]', 2, NULL, 0, 1);
+  ('solstice', 'solstice-boat', '12 Sep – 4 Oct', '2026-09-12', '22 nights', 'Lefkada', 'Greece', 'Berth B12, Lefkas Marina, Lefkada 311 00, Greece', 38.7066, 20.7019, '["Check bilges and battery monitor each morning","Run engine and watermaker weekly","Adjust lines and fenders after strong weather","Flush heads and air cabins regularly"]', '["5+ years sailing","Diesel basics","Liveaboard experience"]', 5, '["Liveaboard"]', '[]', '["Diesel troubleshooting","Mooring & lines"]', 6, 'Pip, a sea-loving terrier', 1, 1),
+  ('blue-hour', 'blue-hour-boat', '3 Nov – 1 Dec', '2026-11-03', '28 nights', 'St. George''s', 'Grenada', NULL, 12.0561, -61.7488, '["Daily mooring and chafe inspection","Monitor solar, batteries and fridge","Start both engines weekly","Secure deck before squalls"]', '["Catamaran experience","Dinghy handling","Storm awareness"]', 3, '["Catamaran","Tropical weather"]', '[]', '["Tender handling","Storm preparation"]', 9, NULL, 0, 1),
+  ('northern-light', 'northern-light-boat', '5 Jan – 2 Feb', '2027-01-05', '28 nights', 'Bergen', 'Norway', NULL, 60.3913, 5.3221, '["Verify shore power and heater daily","Check for ice around the hull","Run dehumidifier and log readings","Clear snow from decks and covers"]', '["Cold weather experience","Comfortable alone","Basic electrics"]', 2, '["Cold-weather boating"]', '[]', '["Shore power"]', 3, NULL, 0, 1),
+  ('kingfisher', 'kingfisher-boat', '18 Feb – 20 Mar', '2027-02-18', '30 nights', 'Whangarei', 'New Zealand', NULL, -35.7251, 174.3237, '["Check mooring bridle for chafe weekly","Monitor forecast for cyclone activity","Run engine and charge batteries","Ventilate to keep damp down"]', '["Anchoring experience","Weather routing","Dinghy handling"]', 4, '["Bluewater / offshore"]', '[]', '["Tender handling","Storm preparation"]', 12, 'Two cats, Rigging and Halyard', 1, 1),
+  ('saltwood', 'saltwood-boat', '1 Apr – 15 Apr', '2027-04-01', '14 nights', 'Falmouth', 'United Kingdom', NULL, 50.1533, -5.0656, '["Check bilge twice daily — she takes up slowly","Inspect topside seams after dry spells","Tend lines on spring tides","Keep her covered and aired"]', '["Wooden boat experience preferred","Tidal berth awareness"]', 0, '[]', '[]', '["Mooring & lines"]', 2, NULL, 0, 1);
 
 INSERT INTO applications (
   id,

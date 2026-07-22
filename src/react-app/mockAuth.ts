@@ -2,6 +2,7 @@ export type SocialProvider = "apple" | "facebook" | "google";
 
 export type MockAccount = {
   email: string;
+  emailConfirmed?: boolean;
   hashAlgorithm?: "fnv1a" | "sha256";
   name: string;
   image: string;
@@ -85,9 +86,15 @@ function createSalt() {
   return bytesToHex(bytes);
 }
 
+function isEmailConfirmed(account: MockAccount) {
+  if (typeof account.emailConfirmed === "boolean") return account.emailConfirmed;
+  return account.provider !== undefined && account.provider !== "password";
+}
+
 function publicAccount(account: MockAccount) {
   return {
     email: account.email,
+    emailConfirmed: isEmailConfirmed(account),
     image: account.image,
     name: account.name,
   };
@@ -108,6 +115,7 @@ export async function signUpMockAccount(input: {
   const salt = createSalt();
   const account: MockAccount = {
     email,
+    emailConfirmed: false,
     hashAlgorithm,
     name: input.name.trim(),
     image: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(input.name)}`,
@@ -135,6 +143,7 @@ export async function continueWithSocialProvider(
   const salt = createSalt();
   const account: MockAccount = {
     email: profile.email,
+    emailConfirmed: true,
     hashAlgorithm,
     name: profile.name,
     image: profile.image,
@@ -200,12 +209,22 @@ export async function changeMockAccountEmail(input: {
   if (existing.some((candidate) => candidate.email === newEmail)) {
     throw new Error("auth.emailExists");
   }
+  const updated = { ...account, email: newEmail, emailConfirmed: false };
   saveAccounts(
     existing.map((candidate) =>
-      candidate.email === currentEmail ? { ...candidate, email: newEmail } : candidate,
+      candidate.email === currentEmail ? updated : candidate,
     ),
   );
-  return publicAccount({ ...account, email: newEmail });
+  return publicAccount(updated);
+}
+
+export async function resendMockEmailConfirmation(emailInput: string) {
+  await new Promise((resolve) => window.setTimeout(resolve, 500));
+  const email = emailInput.trim().toLowerCase();
+  if (!email) throw new Error("settings.confirmationResendFailed");
+  const account = accounts().find((candidate) => candidate.email === email);
+  if (account && isEmailConfirmed(account)) throw new Error("settings.emailAlreadyConfirmed");
+  return { sent: true as const };
 }
 
 export async function changeMockAccountPassword(input: {

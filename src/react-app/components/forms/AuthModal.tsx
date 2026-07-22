@@ -64,7 +64,12 @@ export function AuthModal() {
     };
   }, []);
 
-  function finishLogin(account: { email?: string; image: string; name: string }) {
+  function finishLogin(account: {
+    email?: string;
+    emailConfirmed?: boolean;
+    image: string;
+    name: string;
+  }) {
     loginAs(account);
     setOpen(false);
     setForm({ email: "", name: "", password: "" });

@@ -13,6 +13,7 @@ type OwnerSeed = {
   image: string;
   phoneNumber: string;
   verified: boolean;
+  emailConfirmed: boolean;
   role: "member" | "admin";
 };
 
@@ -21,6 +22,7 @@ export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>)
   const owner: OwnerSeed = {
     ...MAYA_OWNER,
     verified: true,
+    emailConfirmed: true,
     role: "member",
     ...options,
   };
@@ -44,6 +46,7 @@ export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>)
             user: {
               name: ownerState.name,
               email: ownerState.email,
+              emailConfirmed: ownerState.emailConfirmed,
               legalName: ownerState.name,
               image: ownerState.image,
               bio: "Owner of Solstice",
@@ -67,7 +70,7 @@ export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>)
               role: ownerState.role,
             },
           },
-          version: 14,
+          version: 15,
         }),
       );
       if (ownerState.verified) {

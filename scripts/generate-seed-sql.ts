@@ -56,6 +56,7 @@ const sitCols = [
   ["duration", "duration"],
   ["location", "location"],
   ["country", "country"],
+  ["fullAddress", "full_address"],
   ["latitude", "latitude"],
   ["longitude", "longitude"],
   ["responsibilities", "responsibilities"],
