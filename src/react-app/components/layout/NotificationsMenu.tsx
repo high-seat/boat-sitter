@@ -9,11 +9,17 @@ import {
   XCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { IconTooltip } from "@/components/ui/IconTooltip";
+import { ShimmerBlock } from "@/components/ui/Shimmer";
 import { getIntlLocale } from "@/i18n";
-import { getNotificationsForUser, type MockNotification } from "@/mockApi";
+import {
+  getNotificationsForUser,
+  markAllNotificationsRead,
+  markNotificationRead,
+  type MockNotification,
+} from "@/mockApi";
 import { useAppStore } from "@/store";
 
 function NotificationIcon({ type }: { type: MockNotification["type"] }) {
@@ -26,38 +32,73 @@ function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   return <CheckCircle2 className={className} />;
 }
 
+function NotificationsMenuSkeleton() {
+  return (
+    <div aria-busy="true" aria-live="polite" className="space-y-2 p-4">
+      {[0, 1, 2].map((index) => (
+        <div className="flex gap-3 rounded-xl px-1 py-2" key={index}>
+          <ShimmerBlock className="size-8 shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <ShimmerBlock className={`h-4 ${index === 1 ? "w-[88%]" : "w-[72%]"}`} />
+            <ShimmerBlock className="h-3 w-20" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function NotificationsMenu() {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user)!;
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [seenIds, setSeenIds] = useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(`boatstead-seen-notifications:${user.name}`) ?? "[]");
-    } catch {
-      return [];
-    }
-  });
   const containerRef = useRef<HTMLDivElement>(null);
+  const queryKey = ["notifications", user.name] as const;
   const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ["notifications", user.name],
+    queryKey,
     queryFn: () => getNotificationsForUser(user.name),
   });
-  const unreadCount = notifications.filter(
-    (notification) => !seenIds.includes(notification.id),
-  ).length;
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
   const relativeTime = new Intl.RelativeTimeFormat(getIntlLocale(i18n.language), {
     numeric: "auto",
   });
 
-  useEffect(() => {
-    try {
-      setSeenIds(
-        JSON.parse(localStorage.getItem(`boatstead-seen-notifications:${user.name}`) ?? "[]"),
+  const markOne = useMutation({
+    mutationFn: (id: string) => markNotificationRead(id, user.name),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<MockNotification[]>(queryKey);
+      queryClient.setQueryData<MockNotification[]>(queryKey, (current = []) =>
+        current.map((item) => (item.id === id ? { ...item, read: true } : item)),
       );
-    } catch {
-      setSeenIds([]);
-    }
-  }, [user.name]);
+      return { previous };
+    },
+    onError: (_error, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
+  const markAll = useMutation({
+    mutationFn: () => markAllNotificationsRead(user.name),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<MockNotification[]>(queryKey);
+      queryClient.setQueryData<MockNotification[]>(queryKey, (current = []) =>
+        current.map((item) => ({ ...item, read: true })),
+      );
+      return { previous };
+    },
+    onError: (_error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey });
+    },
+  });
 
   function formatRelativeTime(createdAt: string) {
     const minutes = Math.round((new Date(createdAt).getTime() - Date.now()) / 60_000);
@@ -65,22 +106,6 @@ export function NotificationsMenu() {
     const hours = Math.round(minutes / 60);
     if (Math.abs(hours) < 24) return relativeTime.format(hours, "hour");
     return relativeTime.format(Math.round(hours / 24), "day");
-  }
-
-  function markSeen(id: string) {
-    if (seenIds.includes(id)) return;
-    const nextSeenIds = [...seenIds, id];
-    setSeenIds(nextSeenIds);
-    localStorage.setItem(`boatstead-seen-notifications:${user.name}`, JSON.stringify(nextSeenIds));
-  }
-
-  function markAllSeen() {
-    if (!notifications.length) return;
-    const nextSeenIds = [
-      ...new Set([...seenIds, ...notifications.map((notification) => notification.id)]),
-    ];
-    setSeenIds(nextSeenIds);
-    localStorage.setItem(`boatstead-seen-notifications:${user.name}`, JSON.stringify(nextSeenIds));
   }
 
   useEffect(() => {
@@ -130,12 +155,7 @@ export function NotificationsMenu() {
           <p className="border-b border-line px-4 py-3 font-display text-sm font-bold text-navy">
             {t("notifications.heading")}
           </p>
-          {isLoading ? (
-            <div className="space-y-2 p-4" aria-hidden="true">
-              <div className="h-16 animate-pulse rounded-xl bg-cream" />
-              <div className="h-16 animate-pulse rounded-xl bg-cream" />
-            </div>
-          ) : null}
+          {isLoading ? <NotificationsMenuSkeleton /> : null}
           {!isLoading && notifications.length ? (
             <>
               <div className="max-h-96 overflow-y-auto p-2">
@@ -144,7 +164,7 @@ export function NotificationsMenu() {
                     className="relative flex gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-cream"
                     key={notification.id}
                     onClick={() => {
-                      markSeen(notification.id);
+                      if (!notification.read) markOne.mutate(notification.id);
                       setOpen(false);
                     }}
                     role="menuitem"
@@ -164,7 +184,7 @@ export function NotificationsMenu() {
                         {formatRelativeTime(notification.createdAt)}
                       </span>
                     </span>
-                    {!seenIds.includes(notification.id) && (
+                    {!notification.read && (
                       <span
                         aria-hidden="true"
                         className="absolute top-4 right-3 size-2 rounded-full bg-coral"
@@ -176,8 +196,8 @@ export function NotificationsMenu() {
               <div className="border-t border-line p-2">
                 <button
                   className="w-full rounded-xl px-3 py-2.5 text-sm font-bold text-teal transition hover:bg-cream disabled:cursor-default disabled:text-slate disabled:hover:bg-transparent"
-                  disabled={unreadCount === 0}
-                  onClick={markAllSeen}
+                  disabled={unreadCount === 0 || markAll.isPending}
+                  onClick={() => markAll.mutate()}
                   type="button"
                 >
                   {t("notifications.markAllRead")}

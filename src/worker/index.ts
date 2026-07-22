@@ -9,9 +9,11 @@ import { boatsRouter } from "./routes/boats";
 import { devRouter } from "./routes/dev";
 import { meRouter, profilesRouter } from "./routes/me";
 import { notificationsRouter } from "./routes/notifications";
+import { prefsRouter } from "./routes/prefs";
 import { reviewsRouter } from "./routes/reviews";
 import { sitsRouter } from "./routes/sits";
 import { supportRouter } from "./routes/support";
+import { filesRouter, uploadsRouter } from "./routes/uploads";
 import { vesselsRouter } from "./routes/vessels";
 
 const app = new Hono<AppEnv>();
@@ -72,6 +74,9 @@ app.route("/api/vessels", vesselsRouter);
 app.route("/api/sits", sitsRouter);
 app.route("/api/applications", applicationsRouter);
 app.route("/api/support", supportRouter);
+app.route("/api/prefs", prefsRouter);
+app.route("/api/uploads", uploadsRouter);
+app.route("/api/files", filesRouter);
 app.route("/api/dev", devRouter);
 
 app.notFound((c) =>

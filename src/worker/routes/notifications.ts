@@ -1,4 +1,4 @@
-import { desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, isNull, or } from "drizzle-orm";
 import { Hono } from "hono";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
@@ -7,13 +7,29 @@ import { requireUser } from "../middleware/auth";
 
 export const notificationsRouter = new Hono<AppEnv>();
 
+function shape(row: typeof notifications.$inferSelect) {
+  return {
+    id: row.id,
+    type: row.type,
+    actor: row.actor ?? undefined,
+    boatName: row.boatName ?? undefined,
+    href: row.href,
+    createdAt: row.createdAt,
+    read: Boolean(row.readAt),
+  };
+}
+
+function forUser(user: { id: string; name: string }) {
+  return or(eq(notifications.userId, user.id), eq(notifications.userName, user.name));
+}
+
 notificationsRouter.get("/", requireUser, async (c) => {
   const db = getDb(c.env);
   const user = c.get("user")!;
   const rows = await db
     .select()
     .from(notifications)
-    .where(or(eq(notifications.userId, user.id), eq(notifications.userName, user.name)))
+    .where(forUser(user))
     .orderBy(desc(notifications.createdAt))
     .limit(50);
 
@@ -29,30 +45,50 @@ notificationsRouter.get("/", requireUser, async (c) => {
         type: "welcome",
         href: "/boats",
         createdAt,
+        readAt: null,
       })
       .returning();
-    return c.json({
-      data: [
-        {
-          id: welcome.id,
-          type: welcome.type,
-          actor: welcome.actor ?? undefined,
-          boatName: welcome.boatName ?? undefined,
-          href: welcome.href,
-          createdAt: welcome.createdAt,
-        },
-      ],
-    });
+    return c.json({ data: [shape(welcome)] });
   }
 
-  return c.json({
-    data: rows.map((row) => ({
-      id: row.id,
-      type: row.type,
-      actor: row.actor ?? undefined,
-      boatName: row.boatName ?? undefined,
-      href: row.href,
-      createdAt: row.createdAt,
-    })),
+  return c.json({ data: rows.map(shape) });
+});
+
+notificationsRouter.post("/read-all", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const readAt = new Date().toISOString();
+  await db
+    .update(notifications)
+    .set({ readAt })
+    .where(and(forUser(user), isNull(notifications.readAt)));
+
+  const rows = await db
+    .select()
+    .from(notifications)
+    .where(forUser(user))
+    .orderBy(desc(notifications.createdAt))
+    .limit(50);
+  return c.json({ data: rows.map(shape) });
+});
+
+notificationsRouter.post("/:id/read", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const id = c.req.param("id");
+  const existing = await db.query.notifications.findFirst({
+    where: and(eq(notifications.id, id), forUser(user)),
   });
+  if (!existing) return c.json({ error: "Notification not found" }, 404);
+
+  if (!existing.readAt) {
+    const [updated] = await db
+      .update(notifications)
+      .set({ readAt: new Date().toISOString() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return c.json({ data: shape(updated) });
+  }
+
+  return c.json({ data: shape(existing) });
 });

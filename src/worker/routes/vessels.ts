@@ -13,8 +13,20 @@ import { requireUser } from "../middleware/auth";
  * Writes require a logged-in user. A vessel is owned by the user who created it
  * (`ownerUserId`); only that user may update or delete it. Seed/legacy rows have
  * a null owner and are therefore read-only through the API.
+ *
+ * `privateAccess` is stored on the vessel but only returned to the owner on
+ * GET; accepted sitters use GET /api/sits/:id/access instead.
  */
 export const vesselsRouter = new Hono<AppEnv>();
+
+const privateAccessSchema = z
+  .object({
+    wifiNetwork: z.string().optional(),
+    wifiPassword: z.string().optional(),
+    accessCodes: z.string().optional(),
+    otherNotes: z.string().optional(),
+  })
+  .nullish();
 
 const vesselSchema = z.object({
   id: z.string().min(1).max(120),
@@ -35,22 +47,37 @@ const vesselSchema = z.object({
   voltageType: z.string().default("Not specified"),
   stoveFuelType: z.string().default("Not specified"),
   amenities: z.array(z.string()).default([]),
+  privateAccess: privateAccessSchema,
 });
+
+function stripPrivateAccess<T extends { privateAccess?: unknown }>(row: T, include: boolean) {
+  if (include) return row;
+  const { privateAccess: _ignored, ...rest } = row;
+  return rest;
+}
 
 vesselsRouter.get("/", async (c) => {
   const db = getDb(c.env);
   const owner = c.req.query("owner");
+  const user = c.get("user");
   const rows = owner
     ? await db.select().from(vessels).where(eq(vessels.owner, owner))
     : await db.select().from(vessels);
-  return c.json({ data: rows });
+  return c.json({
+    data: rows.map((row) =>
+      stripPrivateAccess(row, Boolean(user && row.ownerUserId === user.id)),
+    ),
+  });
 });
 
 vesselsRouter.get("/:id", async (c) => {
   const db = getDb(c.env);
+  const user = c.get("user");
   const row = await db.query.vessels.findFirst({ where: eq(vessels.id, c.req.param("id")) });
   if (!row) return c.json({ error: "Vessel not found" }, 404);
-  return c.json({ data: row });
+  return c.json({
+    data: stripPrivateAccess(row, Boolean(user && row.ownerUserId === user.id)),
+  });
 });
 
 /** PUT = upsert, matching the frontend's saveVessel (create or update). */
@@ -64,17 +91,47 @@ vesselsRouter.put("/:id", requireUser, zValidator("json", vesselSchema), async (
 
   const existing = await db.query.vessels.findFirst({ where: eq(vessels.id, id) });
   if (existing && existing.ownerUserId !== user.id) {
-    // Either someone else's vessel, or a null-owner seed row: not yours to edit.
     return c.json({ error: "You do not own this vessel" }, 403);
   }
 
-  // Owner display fields come from the session, not the client, so they can't
-  // be spoofed. ownerUserId is stamped on create and preserved on update.
+  const privateAccess = body.privateAccess
+    ? {
+        wifiNetwork: body.privateAccess.wifiNetwork?.trim() || undefined,
+        wifiPassword: body.privateAccess.wifiPassword?.trim() || undefined,
+        accessCodes: body.privateAccess.accessCodes?.trim() || undefined,
+        otherNotes: body.privateAccess.otherNotes?.trim() || undefined,
+      }
+    : null;
+  const hasPrivate =
+    privateAccess &&
+    Boolean(
+      privateAccess.wifiNetwork ||
+        privateAccess.wifiPassword ||
+        privateAccess.accessCodes ||
+        privateAccess.otherNotes,
+    );
+
   const values = {
-    ...body,
+    id: body.id,
+    name: body.name,
+    type: body.type,
+    length: body.length,
+    homePort: body.homePort,
+    image: body.image,
+    gallery: body.gallery,
     owner: user.name,
     ownerImage: user.image ?? body.ownerImage,
     ownerUserId: user.id,
+    rating: body.rating,
+    reviews: body.reviews,
+    description: body.description,
+    home: body.home,
+    systems: body.systems,
+    engineType: body.engineType,
+    voltageType: body.voltageType,
+    stoveFuelType: body.stoveFuelType,
+    amenities: body.amenities,
+    privateAccess: hasPrivate ? privateAccess : null,
   };
 
   const [row] = await db

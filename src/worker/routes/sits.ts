@@ -1,10 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { sits, vessels } from "../db/schema";
+import { applications, sits, vessels } from "../db/schema";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -47,8 +47,48 @@ function toRow(body: z.infer<typeof sitSchema>) {
 sitsRouter.get("/", async (c) => {
   const db = getDb(c.env);
   const rows = await db.select().from(sits);
-  // Expose vesselId as boatId to match the frontend.
   return c.json({ data: rows.map(({ vesselId, ...s }) => ({ ...s, boatId: vesselId })) });
+});
+
+/**
+ * Private marina/Wi-Fi details for the sit's vessel — owner or accepted sitter only.
+ */
+sitsRouter.get("/:id/access", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const sit = await db.query.sits.findFirst({ where: eq(sits.id, c.req.param("id")) });
+  if (!sit) return c.json({ error: "Sit not found" }, 404);
+
+  const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+  if (!vessel) return c.json({ error: "Vessel not found" }, 404);
+
+  const isOwner = vessel.ownerUserId === user.id;
+  if (!isOwner) {
+    const mine = await db
+      .select()
+      .from(applications)
+      .where(
+        and(
+          eq(applications.sitId, sit.id),
+          eq(applications.applicantUserId, user.id),
+          eq(applications.status, "accepted"),
+        ),
+      )
+      .limit(1);
+    if (!mine.length) return c.json({ error: "Forbidden" }, 403);
+  }
+
+  const privateAccess = vessel.privateAccess ?? undefined;
+  const fullAddress = sit.fullAddress?.trim() || undefined;
+  if (!privateAccess && !fullAddress) {
+    return c.json({ data: null });
+  }
+  return c.json({
+    data: {
+      ...(privateAccess ?? {}),
+      ...(fullAddress ? { fullAddress } : {}),
+    },
+  });
 });
 
 sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => {
@@ -59,7 +99,6 @@ sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => 
   const db = getDb(c.env);
   const user = c.get("user")!;
 
-  // Guard the foreign key so we return a clean 400 rather than a raw FK error.
   const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, body.boatId) });
   if (!vessel) return c.json({ error: "Referenced vessel does not exist" }, 400);
   if (vessel.ownerUserId !== user.id) {

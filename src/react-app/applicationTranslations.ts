@@ -7,7 +7,6 @@ const en = {
   "auth.continueWithApple": "Continue with Apple",
   "auth.continueWithFacebook": "Continue with Facebook",
   "auth.orEmail": "Or use email",
-  "auth.socialMockNotice": "Social sign-in is mocked in this prototype and stays in this browser.",
   "applications.reviewCount": "Applicants ({{count}})",
   "applications.kicker": "Applicant review",
   "applications.title": "Applications for {{boat}}",
@@ -360,8 +359,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Continuer avec Apple",
     "auth.continueWithFacebook": "Continuer avec Facebook",
     "auth.orEmail": "Ou utiliser l’e-mail",
-    "auth.socialMockNotice":
-      "La connexion sociale est simulée dans ce prototype et reste dans ce navigateur.",
     "applications.reviewCount": "Candidatures ({{count}})",
     "applications.kicker": "Examen des candidatures",
     "applications.title": "Candidatures pour {{boat}}",
@@ -721,8 +718,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Continuar con Apple",
     "auth.continueWithFacebook": "Continuar con Facebook",
     "auth.orEmail": "O usar el correo",
-    "auth.socialMockNotice":
-      "El acceso social está simulado en este prototipo y se guarda solo en este navegador.",
     "applications.reviewCount": "Solicitudes ({{count}})",
     "applications.kicker": "Revisión de solicitudes",
     "applications.title": "Solicitudes para {{boat}}",
@@ -1079,8 +1074,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Continua con Apple",
     "auth.continueWithFacebook": "Continua con Facebook",
     "auth.orEmail": "Oppure usa l’e-mail",
-    "auth.socialMockNotice":
-      "L’accesso social è simulato in questo prototipo e resta in questo browser.",
     "applications.reviewCount": "Candidature ({{count}})",
     "applications.kicker": "Esame delle candidature",
     "applications.title": "Candidature per {{boat}}",
@@ -1439,8 +1432,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Weiter mit Apple",
     "auth.continueWithFacebook": "Weiter mit Facebook",
     "auth.orEmail": "Oder E-Mail verwenden",
-    "auth.socialMockNotice":
-      "Die soziale Anmeldung ist in diesem Prototyp nur simuliert und bleibt in diesem Browser.",
     "applications.reviewCount": "Bewerbungen ({{count}})",
     "applications.kicker": "Bewerbungen prüfen",
     "applications.title": "Bewerbungen für {{boat}}",
@@ -1803,8 +1794,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Doorgaan met Apple",
     "auth.continueWithFacebook": "Doorgaan met Facebook",
     "auth.orEmail": "Of gebruik e-mail",
-    "auth.socialMockNotice":
-      "Sociale login is in dit prototype nagespeeld en blijft in deze browser.",
     "applications.reviewCount": "Aanvragen ({{count}})",
     "applications.kicker": "Aanvragen beoordelen",
     "applications.title": "Aanvragen voor {{boat}}",
@@ -2163,8 +2152,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Continuar com a Apple",
     "auth.continueWithFacebook": "Continuar com o Facebook",
     "auth.orEmail": "Ou usar o e-mail",
-    "auth.socialMockNotice":
-      "O acesso social é simulado neste protótipo e permanece neste navegador.",
     "applications.reviewCount": "Candidaturas ({{count}})",
     "applications.kicker": "Análise de candidaturas",
     "applications.title": "Candidaturas para {{boat}}",
@@ -2517,8 +2504,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Συνέχεια με Apple",
     "auth.continueWithFacebook": "Συνέχεια με Facebook",
     "auth.orEmail": "Ή χρησιμοποιήστε email",
-    "auth.socialMockNotice":
-      "Η κοινωνική σύνδεση είναι προσομοιωμένη σε αυτό το πρωτότυπο και παραμένει σε αυτό το πρόγραμμα περιήγησης.",
     "applications.reviewCount": "Αιτήσεις ({{count}})",
     "applications.kicker": "Έλεγχος αιτήσεων",
     "applications.title": "Αιτήσεις για το {{boat}}",
@@ -2877,8 +2862,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Nastavi s Appleom",
     "auth.continueWithFacebook": "Nastavi s Facebookom",
     "auth.orEmail": "Ili koristi e-poštu",
-    "auth.socialMockNotice":
-      "Društvena prijava je simulirana u ovom prototipu i ostaje u ovom pregledniku.",
     "applications.reviewCount": "Prijave ({{count}})",
     "applications.kicker": "Pregled prijava",
     "applications.title": "Prijave za {{boat}}",
@@ -3235,7 +3218,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Apple ile devam et",
     "auth.continueWithFacebook": "Facebook ile devam et",
     "auth.orEmail": "Veya e-posta kullan",
-    "auth.socialMockNotice": "Sosyal giriş bu prototipte simüle edilir ve bu tarayıcıda kalır.",
     "applications.reviewCount": "Başvurular ({{count}})",
     "applications.kicker": "Başvuru incelemesi",
     "applications.title": "{{boat}} için başvurular",
@@ -3584,8 +3566,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Fortsätt med Apple",
     "auth.continueWithFacebook": "Fortsätt med Facebook",
     "auth.orEmail": "Eller använd e-post",
-    "auth.socialMockNotice":
-      "Social inloggning hånas i den här prototypen och stannar i den här webbläsaren.",
     "applications.reviewCount": "Sökande ({{count}})",
     "applications.kicker": "Sökande granskning",
     "applications.title": "Ansökningar för {{boat}}",
@@ -3936,8 +3916,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Fortsett med Apple",
     "auth.continueWithFacebook": "Fortsett med Facebook",
     "auth.orEmail": "Eller bruk e-post",
-    "auth.socialMockNotice":
-      "Sosial pålogging blir hånet i denne prototypen og forblir i denne nettleseren.",
     "applications.reviewCount": "Søkere ({{count}})",
     "applications.kicker": "Søkergjennomgang",
     "applications.title": "Søknader for {{boat}}",
@@ -4285,8 +4263,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Fortsæt med Apple",
     "auth.continueWithFacebook": "Fortsæt med Facebook",
     "auth.orEmail": "Eller brug e-mail",
-    "auth.socialMockNotice":
-      "Socialt login er hånet i denne prototype og forbliver i denne browser.",
     "applications.reviewCount": "Ansøgere ({{count}})",
     "applications.kicker": "Ansøgergennemgang",
     "applications.title": "Ansøgninger om {{boat}}",
@@ -4634,8 +4610,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Jatka Applella",
     "auth.continueWithFacebook": "Jatka Facebookissa",
     "auth.orEmail": "Tai käytä sähköpostia",
-    "auth.socialMockNotice":
-      "Sosiaalista sisäänkirjautumista pilkataan tässä prototyypissä ja se pysyy tässä selaimessa.",
     "applications.reviewCount": "Hakijat ({{count}})",
     "applications.kicker": "Hakijan arvostelu",
     "applications.title": "Hakemukset {{boat}}",
@@ -4984,8 +4958,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.continueWithApple": "Apple で続行",
     "auth.continueWithFacebook": "Facebookを続ける",
     "auth.orEmail": "または電子メールを使用する",
-    "auth.socialMockNotice":
-      "ソーシャル サインインはこのプロトタイプでは模擬されており、このブラウザーに留まります。",
     "applications.reviewCount": "申請者 ({{count}})",
     "applications.kicker": "申請者の審査",
     "applications.title": "{{boat}} のアプリケーション",

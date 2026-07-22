@@ -46,6 +46,7 @@ const vesselCols = [
   ["voltageType", "voltage_type"],
   ["stoveFuelType", "stove_fuel_type"],
   ["amenities", "amenities"],
+  ["privateAccess", "private_access"],
 ] as const;
 
 const sitCols = [

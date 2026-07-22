@@ -4,8 +4,8 @@ import { seedVerifiedOwner } from "./helpers/auth";
 test.describe("owner sit delete and archive", () => {
   test("warns when deleting a sit with an accepted applicant", async ({ page }) => {
     await seedVerifiedOwner(page);
-    await page.goto("/owner/boats");
-    await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
+    await page.goto("/my-sits");
+    await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
 
     const sitCard = page
       .locator("article")
@@ -77,7 +77,7 @@ test.describe("owner sit delete and archive", () => {
       );
     });
 
-    await page.goto("/owner/boats");
+    await page.goto("/my-sits");
     await expect(page.getByRole("heading", { name: /Stay completed/i })).toBeVisible();
 
     const completedCard = page

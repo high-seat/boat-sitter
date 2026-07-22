@@ -8,16 +8,16 @@ import {
 } from "./helpers/sitEditor";
 
 async function sitsTabCount(page: Page) {
-  const label = await page.getByRole("button", { name: /^Sits/i }).innerText();
+  const label = await page.locator('main a[href="/my-sits"]').innerText();
   const match = label.match(/(\d+)/);
   return match ? Number(match[1]) : 0;
 }
 
 async function waitForOwnedBoats(page: Page) {
-  await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
   await expect
     .poll(async () => {
-      const label = await page.getByRole("button", { name: /^Boats/i }).innerText();
+      const label = await page.locator('main a[href="/my-boats"]').innerText();
       const match = label.match(/(\d+)/);
       return match ? Number(match[1]) : 0;
     })
@@ -93,9 +93,8 @@ test.describe("sit creation flow", () => {
 
   test("publishes an accommodation sit and lists it on the dashboard", async ({ page }) => {
     await seedVerifiedOwner(page);
-    await page.goto("/owner/boats");
+    await page.goto("/my-sits");
     await waitForOwnedBoats(page);
-    await page.getByRole("button", { name: /^Sits/i }).click();
     const beforeCount = await sitsTabCount(page);
 
     const modal = await openCreateSitModal(page);
@@ -106,7 +105,7 @@ test.describe("sit creation flow", () => {
     });
     await publishSit(modal);
 
-    await expect(page).toHaveURL(/\/owner\/boats/);
+    await expect(page).toHaveURL(/\/my-sits/);
     await expect(sitEditorPage(page)).toHaveCount(0);
     await expect.poll(async () => sitsTabCount(page)).toBe(beforeCount + 1);
     await expect(page.getByText(/3 care tasks/i)).toBeVisible();
@@ -114,9 +113,8 @@ test.describe("sit creation flow", () => {
 
   test("publishes a daytime checks sit", async ({ page }) => {
     await seedVerifiedOwner(page);
-    await page.goto("/owner/boats");
+    await page.goto("/my-sits");
     await waitForOwnedBoats(page);
-    await page.getByRole("button", { name: /^Sits/i }).click();
     const beforeCount = await sitsTabCount(page);
 
     const modal = await openCreateSitModal(page);
@@ -126,7 +124,7 @@ test.describe("sit creation flow", () => {
     });
     await publishSit(modal);
 
-    await expect(page).toHaveURL(/\/owner\/boats/);
+    await expect(page).toHaveURL(/\/my-sits/);
     await expect(sitEditorPage(page)).toHaveCount(0);
     await expect.poll(async () => sitsTabCount(page)).toBe(beforeCount + 1);
     await expect(page.getByText(/2 care tasks/i)).toBeVisible();
@@ -134,9 +132,8 @@ test.describe("sit creation flow", () => {
 
   test("blocks create when identity verification is incomplete", async ({ page }) => {
     await seedUnverifiedOwner(page);
-    await page.goto("/owner/boats");
+    await page.goto("/my-sits");
     await waitForOwnedBoats(page);
-    await page.getByRole("button", { name: /^Sits/i }).click();
     await page.getByRole("button", { name: /Create a sit/i }).click();
 
     await expect(page).toHaveURL(/\/owner\/sits\/new/);

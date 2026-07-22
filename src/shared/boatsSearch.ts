@@ -3,6 +3,8 @@
  * Used by the Worker `/api/boats` route and the SPA localStorage fallback.
  */
 
+import { vesselTypeFromParam, vesselTypeToSlug } from "./vesselTypes";
+
 export type BoatSearchItem = {
   id: string;
   name: string;
@@ -191,7 +193,10 @@ export function paginateBoats<T extends BoatSearchItem>(
 export function boatsSearchQueryString(params: BoatSearchParams): string {
   const search = new URLSearchParams();
   if (params.q) search.set("q", params.q);
-  if (params.type && params.type !== "All vessels") search.set("type", params.type);
+  if (params.type && params.type !== "All vessels") {
+    const slug = vesselTypeToSlug(params.type) ?? params.type;
+    search.set("type", slug);
+  }
   if (params.sitType && params.sitType !== "all") search.set("sitType", params.sitType);
   if (params.from) search.set("from", params.from);
   if (params.to) search.set("to", params.to);
@@ -231,7 +236,7 @@ export function parseBoatsSearchParams(
   const limit = get("limit");
   return {
     q: get("q") || undefined,
-    type: get("type") || undefined,
+    type: vesselTypeFromParam(get("type")),
     sitType,
     from: get("from") || undefined,
     to: get("to") || undefined,

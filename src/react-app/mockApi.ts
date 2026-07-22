@@ -16,11 +16,18 @@ import {
   apiGetBoats,
   apiGetBoatsPage,
   apiGetNotifications,
+  apiMarkAllNotificationsRead,
+  apiMarkNotificationRead,
   apiGetPublicProfile,
   apiGetReviewForApplication,
   apiGetReviewsForSitter,
+  apiGetSavedListings,
+  apiGetSitPrivateAccess,
   apiGetSits,
   apiGetVessels,
+  apiAcceptApplicationVideoCall,
+  apiDeclineApplicationVideoCall,
+  apiRequestApplicationVideoCall,
   apiRespondToReview,
   apiSaveSit,
   apiSaveVessel,
@@ -1218,19 +1225,6 @@ export function isAcceptingApplications(item: { applicationsOpen?: boolean }) {
   return item.applicationsOpen !== false;
 }
 
-function mergeLocalPrivateAccess(vessels: Vessel[]): Vessel[] {
-  const localById = new Map(
-    readVessels()
-      .filter((vessel) => vessel.privateAccess)
-      .map((vessel) => [vessel.id, vessel.privateAccess!] as const),
-  );
-  if (!localById.size) return vessels;
-  return vessels.map((vessel) => {
-    const privateAccess = localById.get(vessel.id);
-    return privateAccess ? { ...vessel, privateAccess } : vessel;
-  });
-}
-
 /** API adapters use loose string enums; cast into the SPA's branded unions. */
 function fromApiBoat(boat: Awaited<ReturnType<typeof apiGetBoats>>[number]): Boat {
   return boat as Boat;
@@ -1264,6 +1258,33 @@ export async function getBoats(): Promise<Boat[]> {
   return readSits()
     .map((sit) => joinSit(sit, vessels, acceptedIds))
     .filter((listing): listing is Boat => Boolean(listing));
+}
+
+/** Saved listings for the signed-in shortlist; filter changes hit the server. */
+export async function getSavedListings(options: {
+  availability: "open" | "all";
+  savedIds: string[];
+}): Promise<Boat[]> {
+  if (await hasApiSession()) {
+    try {
+      return (await apiGetSavedListings(options.availability)).map(fromApiBoat);
+    } catch {
+      // Fall through to local.
+    }
+  }
+  await wait(180);
+  if (options.savedIds.length === 0) return [];
+  const vessels = readVessels();
+  const acceptedIds = acceptedSitIds();
+  const savedSet = new Set(options.savedIds);
+  const listings = readSits()
+    .map((sit) => joinSit(sit, vessels, acceptedIds))
+    .filter((listing): listing is Boat => listing != null && savedSet.has(listing.id));
+  const ordered = options.savedIds
+    .map((id) => listings.find((boat) => boat.id === id))
+    .filter((boat): boat is Boat => Boolean(boat));
+  if (options.availability === "all") return ordered;
+  return ordered.filter((boat) => !boat.accepted);
 }
 
 export async function getBoatsPage(params: BoatSearchParams): Promise<{
@@ -1331,7 +1352,7 @@ export async function getBoat(id: string): Promise<Boat | undefined> {
 export async function getVessels(): Promise<Vessel[]> {
   if (await hasApiSession()) {
     try {
-      return mergeLocalPrivateAccess((await apiGetVessels()).map(fromApiVessel));
+      return (await apiGetVessels()).map(fromApiVessel);
     } catch {
       // Fall through to local.
     }
@@ -1401,18 +1422,7 @@ export async function saveVessel(vessel: Vessel): Promise<Vessel> {
   }
 
   if (await hasApiSession()) {
-    const saved = fromApiVessel(await apiSaveVessel(normalized));
-    // Keep Wi-Fi / access codes locally until the Worker stores privateAccess.
-    if (privateAccess) {
-      const current = readVessels();
-      const overlay: Vessel = { ...saved, privateAccess };
-      const next = current.some((item) => item.id === overlay.id)
-        ? current.map((item) => (item.id === overlay.id ? { ...item, ...overlay } : item))
-        : [overlay, ...current];
-      localStorage.setItem("harbourly-vessels", JSON.stringify(next));
-      return overlay;
-    }
-    return saved;
+    return fromApiVessel(await apiSaveVessel(normalized));
   }
 
   await wait(500);
@@ -1440,6 +1450,19 @@ export async function getSitPrivateAccessForViewer(
   sitId: string,
   viewerName: string,
 ): Promise<SitPrivateDetails | undefined> {
+  if (await hasApiSession()) {
+    try {
+      const details = await apiGetSitPrivateAccess(sitId);
+      if (!details) return undefined;
+      return hasSitPrivateDetails(details) ? details : undefined;
+    } catch (error) {
+      if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
+        return undefined;
+      }
+      throw error;
+    }
+  }
+
   await wait(180);
   const sit = readSits().find((item) => item.id === sitId);
   if (!sit) return undefined;
@@ -1532,6 +1555,29 @@ export async function saveSit(
     const currentRemote = await apiGetSits();
     const exists = currentRemote.some((item) => item.id === normalized.id);
     if (!exists) {
+      const { getFeatureFlag } = await import("@/featureFlags");
+      if (getFeatureFlag("requireVerificationToSit")) {
+        const creator = options?.creator;
+        if (!creator?.name) {
+          throw new Error("SIT_VERIFICATION_REQUIRED");
+        }
+        const { requireMemberVerified } = await import("@/verificationService");
+        await requireMemberVerified(
+          creator.name,
+          { email: creator.email, phoneNumber: creator.phoneNumber },
+          "SIT_VERIFICATION_REQUIRED",
+        );
+      }
+    }
+    return fromApiSit(await apiSaveSit(normalized));
+  }
+
+  await wait(500);
+  const current = readSits();
+  const exists = current.some((item) => item.id === normalized.id);
+  if (!exists) {
+    const { getFeatureFlag } = await import("@/featureFlags");
+    if (getFeatureFlag("requireVerificationToSit")) {
       const creator = options?.creator;
       if (!creator?.name) {
         throw new Error("SIT_VERIFICATION_REQUIRED");
@@ -1543,23 +1589,6 @@ export async function saveSit(
         "SIT_VERIFICATION_REQUIRED",
       );
     }
-    return fromApiSit(await apiSaveSit(normalized));
-  }
-
-  await wait(500);
-  const current = readSits();
-  const exists = current.some((item) => item.id === normalized.id);
-  if (!exists) {
-    const creator = options?.creator;
-    if (!creator?.name) {
-      throw new Error("SIT_VERIFICATION_REQUIRED");
-    }
-    const { requireMemberVerified } = await import("@/verificationService");
-    await requireMemberVerified(
-      creator.name,
-      { email: creator.email, phoneNumber: creator.phoneNumber },
-      "SIT_VERIFICATION_REQUIRED",
-    );
   }
   const next = exists
     ? current.map((item) => (item.id === normalized.id ? normalized : item))
@@ -1739,6 +1768,7 @@ export type MockNotification = {
   createdAt: string;
   href: string;
   id: string;
+  read?: boolean;
   type:
     | "applicationAccepted"
     | "applicationDeclined"
@@ -2210,11 +2240,14 @@ export async function sendApplication(
   if (containsOffPlatformContactDetails(message)) {
     throw new Error("APPLICATION_CONTACT_DETAILS_NOT_ALLOWED");
   }
-  const { requireApplicantVerified } = await import("@/verificationService");
-  await requireApplicantVerified(applicant.name, {
-    email: applicant.email,
-    phoneNumber: applicant.phoneNumber,
-  });
+  const { getFeatureFlag } = await import("@/featureFlags");
+  if (getFeatureFlag("requireVerificationToSit")) {
+    const { requireApplicantVerified } = await import("@/verificationService");
+    await requireApplicantVerified(applicant.name, {
+      email: applicant.email,
+      phoneNumber: applicant.phoneNumber,
+    });
+  }
 
   const applicantProfile = {
     name: applicant.name,
@@ -2514,6 +2547,7 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
         boatName: item.boatName,
         href: item.href,
         createdAt: item.createdAt,
+        read: Boolean(item.read),
       }));
     } catch {
       // Fall through to demo notifications.
@@ -2522,9 +2556,17 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
 
   await wait(250);
   const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60 * 1_000).toISOString();
+  let seenIds: string[] = [];
+  try {
+    seenIds = JSON.parse(localStorage.getItem(`boatstead-seen-notifications:${userName}`) ?? "[]");
+  } catch {
+    seenIds = [];
+  }
+  const withRead = (items: MockNotification[]) =>
+    items.map((item) => ({ ...item, read: seenIds.includes(item.id) }));
 
   if (userName === "Maya & Finn") {
-    return [
+    return withRead([
       {
         actor: "Theo Janssen",
         boatName: "Solstice",
@@ -2549,11 +2591,11 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
         id: "maya-new-message",
         type: "newMessage",
       },
-    ];
+    ]);
   }
 
   if (userName === "Alex Morgan") {
-    return [
+    return withRead([
       {
         actor: "Maya & Finn",
         boatName: "Solstice",
@@ -2577,17 +2619,78 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
         id: "alex-sit-reminder",
         type: "sitReminder",
       },
-    ];
+    ]);
   }
 
-  return [
+  return withRead([
     {
       createdAt: minutesAgo(5),
       href: "/boats",
       id: `welcome-${userName}`,
       type: "welcome",
     },
-  ];
+  ]);
+}
+
+export async function markNotificationRead(
+  notificationId: string,
+  userName: string,
+): Promise<MockNotification | undefined> {
+  if (await hasApiSession()) {
+    try {
+      const item = await apiMarkNotificationRead(notificationId);
+      return {
+        id: item.id,
+        type: item.type as MockNotification["type"],
+        actor: item.actor,
+        boatName: item.boatName,
+        href: item.href,
+        createdAt: item.createdAt,
+        read: Boolean(item.read),
+      };
+    } catch {
+      // Fall through to local seen tracking.
+    }
+  }
+
+  const key = `boatstead-seen-notifications:${userName}`;
+  let seenIds: string[] = [];
+  try {
+    seenIds = JSON.parse(localStorage.getItem(key) ?? "[]");
+  } catch {
+    seenIds = [];
+  }
+  if (!seenIds.includes(notificationId)) {
+    seenIds = [...seenIds, notificationId];
+    localStorage.setItem(key, JSON.stringify(seenIds));
+  }
+  const items = await getNotificationsForUser(userName);
+  return items.find((item) => item.id === notificationId);
+}
+
+export async function markAllNotificationsRead(userName: string): Promise<MockNotification[]> {
+  if (await hasApiSession()) {
+    try {
+      const remote = await apiMarkAllNotificationsRead();
+      return remote.map((item) => ({
+        id: item.id,
+        type: item.type as MockNotification["type"],
+        actor: item.actor,
+        boatName: item.boatName,
+        href: item.href,
+        createdAt: item.createdAt,
+        read: Boolean(item.read),
+      }));
+    } catch {
+      // Fall through to local seen tracking.
+    }
+  }
+
+  const items = await getNotificationsForUser(userName);
+  const key = `boatstead-seen-notifications:${userName}`;
+  const seenIds = [...new Set([...items.map((item) => item.id)])];
+  localStorage.setItem(key, JSON.stringify(seenIds));
+  return items.map((item) => ({ ...item, read: true }));
 }
 
 export async function sendApplicationMessage(
@@ -2676,6 +2779,22 @@ export async function requestApplicationVideoCall(
   proposal: { startsAt: string; durationMinutes: number },
   options?: { counter?: boolean },
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(
+        await apiRequestApplicationVideoCall(applicationId, proposal, options),
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.message === "APPLICATION_NOT_FOUND") {
+        throw new Error("APPLICATION_NOT_FOUND");
+      }
+      if (error instanceof ApiError && error.message === "VIDEO_CALL_TIME_PAST") {
+        throw new Error("VIDEO_CALL_TIME_PAST");
+      }
+      throw error;
+    }
+  }
+
   await wait(350);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);
@@ -2717,6 +2836,23 @@ export async function acceptApplicationVideoCall(
   senderName: string,
   messageId: string,
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(await apiAcceptApplicationVideoCall(applicationId, messageId));
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.message === "APPLICATION_NOT_FOUND") throw new Error("APPLICATION_NOT_FOUND");
+        if (error.message === "VIDEO_CALL_PROPOSAL_NOT_FOUND") {
+          throw new Error("VIDEO_CALL_PROPOSAL_NOT_FOUND");
+        }
+        if (error.message === "VIDEO_CALL_CANNOT_ACCEPT_OWN") {
+          throw new Error("VIDEO_CALL_CANNOT_ACCEPT_OWN");
+        }
+      }
+      throw error;
+    }
+  }
+
   await wait(320);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);
@@ -2756,6 +2892,23 @@ export async function declineApplicationVideoCall(
   senderName: string,
   messageId: string,
 ): Promise<SitApplication> {
+  if (await hasApiSession()) {
+    try {
+      return fromApiApplication(await apiDeclineApplicationVideoCall(applicationId, messageId));
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.message === "APPLICATION_NOT_FOUND") throw new Error("APPLICATION_NOT_FOUND");
+        if (error.message === "VIDEO_CALL_PROPOSAL_NOT_FOUND") {
+          throw new Error("VIDEO_CALL_PROPOSAL_NOT_FOUND");
+        }
+        if (error.message === "VIDEO_CALL_CANNOT_DECLINE_OWN") {
+          throw new Error("VIDEO_CALL_CANNOT_DECLINE_OWN");
+        }
+      }
+      throw error;
+    }
+  }
+
   await wait(320);
   const applications = readApplications();
   const application = applications.find((item) => item.id === applicationId);

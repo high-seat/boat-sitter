@@ -83,6 +83,28 @@ export async function hydrateSession(): Promise<void> {
           : null,
       }));
     }
+
+    try {
+      const { apiGetPrefs } = await import("@/apiRemote");
+      const prefs = await apiGetPrefs();
+      useAppStore.getState().hydratePrefs({
+        saved: prefs.saved,
+        archivedConversations: prefs.archivedConversations,
+        archivedSits: prefs.archivedSits,
+        blockedUsers: prefs.blockedUsers,
+        userReports: prefs.userReports.map((report) => ({
+          ...report,
+          reason: report.reason as
+            | "spam"
+            | "harassment"
+            | "scam"
+            | "inappropriate"
+            | "other",
+        })),
+      });
+    } catch {
+      // Prefs table may not be migrated yet — keep local persist.
+    }
   } catch {
     // Offline or auth not migrated — stay logged out.
   }

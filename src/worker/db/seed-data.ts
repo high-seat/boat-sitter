@@ -47,6 +47,13 @@ export const seedVessels: NewVessel[] = [
       "Paddleboard",
       "Shore power",
     ],
+    privateAccess: {
+      wifiNetwork: "Solstice-Guest",
+      wifiPassword: "aegean-sun-42",
+      accessCodes:
+        "Marina pedestrian gate: 4821#\nLockbox on starboard winch: 3391\nCompanionway padlock: 2048",
+      otherNotes: "Spare ignition key with marina office under Maya Ellison.",
+    },
   },
   {
     id: "blue-hour-boat",

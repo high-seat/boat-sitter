@@ -75,6 +75,16 @@ function fallbackEmail(name: string) {
   return `${local || "member"}@boatstead.mock`;
 }
 
+async function withApiSession<T>(fn: () => Promise<T>): Promise<void> {
+  try {
+    const m = await import("@/apiRemote");
+    if (!(await m.hasApiSession())) return;
+    await fn();
+  } catch {
+    // Keep optimistic local state if the Worker is unreachable.
+  }
+}
+
 export type SitCreationDefaults = {
   nonSmokerRequired: boolean;
 };
@@ -112,6 +122,13 @@ type AppStore = {
   blockedUsers: BlockedUser[];
   userReports: UserReport[];
   user: UserProfile | null;
+  hydratePrefs: (prefs: {
+    saved: string[];
+    archivedConversations: string[];
+    archivedSits: string[];
+    blockedUsers: BlockedUser[];
+    userReports: UserReport[];
+  }) => void;
   toggleSaved: (id: string) => void;
   archiveConversation: (id: string) => void;
   unarchiveConversation: (id: string) => void;
@@ -153,54 +170,95 @@ export const useAppStore = create<AppStore>()(
       blockedUsers: [],
       userReports: [],
       user: null,
-      toggleSaved: (id) =>
+      hydratePrefs: (prefs) =>
+        set({
+          saved: prefs.saved,
+          archivedConversations: prefs.archivedConversations,
+          archivedSits: prefs.archivedSits,
+          blockedUsers: prefs.blockedUsers,
+          userReports: prefs.userReports.map((report) => ({
+            ...report,
+            reason: report.reason as ReportReason,
+          })),
+        }),
+      toggleSaved: (id) => {
+        const currentlySaved = get().saved.includes(id);
         set((state) => ({
-          saved: state.saved.includes(id)
+          saved: currentlySaved
             ? state.saved.filter((savedId) => savedId !== id)
             : [...state.saved, id],
-        })),
-      archiveConversation: (id) =>
-        set((state) =>
-          state.archivedConversations.includes(id)
-            ? state
-            : { archivedConversations: [...state.archivedConversations, id] },
-        ),
-      unarchiveConversation: (id) =>
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiSetSaved(id, !currentlySaved);
+        });
+      },
+      archiveConversation: (id) => {
+        if (get().archivedConversations.includes(id)) return;
+        set((state) => ({
+          archivedConversations: [...state.archivedConversations, id],
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiSetArchivedConversation(id, true);
+        });
+      },
+      unarchiveConversation: (id) => {
         set((state) => ({
           archivedConversations: state.archivedConversations.filter(
             (conversationId) => conversationId !== id,
           ),
-        })),
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiSetArchivedConversation(id, false);
+        });
+      },
       isConversationArchived: (id) => get().archivedConversations.includes(id),
-      archiveSit: (id) =>
-        set((state) =>
-          state.archivedSits.includes(id) ? state : { archivedSits: [...state.archivedSits, id] },
-        ),
-      unarchiveSit: (id) =>
+      archiveSit: (id) => {
+        if (get().archivedSits.includes(id)) return;
+        set((state) => ({ archivedSits: [...state.archivedSits, id] }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiSetArchivedSit(id, true);
+        });
+      },
+      unarchiveSit: (id) => {
         set((state) => ({
           archivedSits: state.archivedSits.filter((sitId) => sitId !== id),
-        })),
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiSetArchivedSit(id, false);
+        });
+      },
       isSitArchived: (id) => get().archivedSits.includes(id),
-      blockUser: (user) =>
-        set((state) => {
-          if (state.blockedUsers.some((blocked) => blocked.name === user.name)) {
-            return state;
-          }
-          return {
-            blockedUsers: [
-              {
-                name: user.name,
-                image: user.image,
-                blockedAt: new Date().toISOString(),
-              },
-              ...state.blockedUsers,
-            ],
-          };
-        }),
-      unblockUser: (name) =>
+      blockUser: (user) => {
+        if (get().blockedUsers.some((blocked) => blocked.name === user.name)) return;
+        set((state) => ({
+          blockedUsers: [
+            {
+              name: user.name,
+              image: user.image,
+              blockedAt: new Date().toISOString(),
+            },
+            ...state.blockedUsers,
+          ],
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiBlockUser({ name: user.name, image: user.image });
+        });
+      },
+      unblockUser: (name) => {
         set((state) => ({
           blockedUsers: state.blockedUsers.filter((blocked) => blocked.name !== name),
-        })),
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiUnblockUser(name);
+        });
+      },
       isUserBlocked: (name) => get().blockedUsers.some((blocked) => blocked.name === name),
       reportUser: ({
         targetName,
@@ -212,25 +270,45 @@ export const useAppStore = create<AppStore>()(
         messageId,
         messageText,
         messageCreatedAt,
-      }) =>
+      }) => {
+        const localReport: UserReport = {
+          id: `report-${Date.now()}`,
+          targetName,
+          reason,
+          details: details.trim(),
+          createdAt: new Date().toISOString(),
+          escalated: escalated || undefined,
+          applicationId,
+          boatName,
+          messageId,
+          messageText,
+          messageCreatedAt,
+        };
         set((state) => ({
-          userReports: [
-            {
-              id: `report-${Date.now()}`,
-              targetName,
-              reason,
-              details: details.trim(),
-              createdAt: new Date().toISOString(),
-              escalated: escalated || undefined,
-              applicationId,
-              boatName,
-              messageId,
-              messageText,
-              messageCreatedAt,
-            },
-            ...state.userReports,
-          ],
-        })),
+          userReports: [localReport, ...state.userReports],
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          const remote = await m.apiCreateUserReport({
+            targetName,
+            reason,
+            details,
+            escalated,
+            applicationId,
+            boatName,
+            messageId,
+            messageText,
+            messageCreatedAt,
+          });
+          set((state) => ({
+            userReports: state.userReports.map((report) =>
+              report.id === localReport.id
+                ? { ...report, id: remote.id, createdAt: remote.createdAt }
+                : report,
+            ),
+          }));
+        });
+      },
       loginAs: (user) => {
         void import("@/apiRemote").then((m) => m.invalidateApiSessionCache());
         const email = user.email?.trim() || fallbackEmail(user.name);

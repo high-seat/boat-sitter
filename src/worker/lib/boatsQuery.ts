@@ -19,7 +19,18 @@ function hasAcceptedApplicationSql() {
 }
 
 function buildWhere(params: BoatSearchParams): SQL | undefined {
-  const parts: SQL[] = [eq(sits.published, true)];
+  const parts: SQL[] = [];
+
+  // "Accepted" listings are unpublished once a sitter is chosen — still show them
+  // when that filter is active. Everything else is the public catalogue.
+  if (params.availability === "accepted") {
+    parts.push(hasAcceptedApplicationSql());
+  } else {
+    parts.push(eq(sits.published, true));
+    if (params.availability === "open") {
+      parts.push(sql`not (${hasAcceptedApplicationSql()})`);
+    }
+  }
 
   const searchValues = (params.q ?? "")
     .split("|")
@@ -51,7 +62,6 @@ function buildWhere(params: BoatSearchParams): SQL | undefined {
   }
 
   // Date overlap: boatEnd >= from AND boatStart <= to.
-  // boatEnd ≈ date(date_start, '+N days') where N is CAST(duration AS INTEGER).
   if (params.from) {
     parts.push(
       sql`date(${sits.dateStart}, '+' || CAST(${sits.duration} AS INTEGER) || ' days') >= ${params.from}`,
@@ -59,12 +69,6 @@ function buildWhere(params: BoatSearchParams): SQL | undefined {
   }
   if (params.to) {
     parts.push(sql`${sits.dateStart} <= ${params.to}`);
-  }
-
-  if (params.availability === "accepted") {
-    parts.push(hasAcceptedApplicationSql());
-  } else if (params.availability === "open") {
-    parts.push(sql`not (${hasAcceptedApplicationSql()})`);
   }
 
   return and(...parts);

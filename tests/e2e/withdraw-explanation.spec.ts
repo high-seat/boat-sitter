@@ -46,9 +46,8 @@ test.describe("withdraw with explanation", () => {
       );
     });
 
-    await page.goto("/owner/boats");
-    await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
-    await page.getByRole("button", { name: /^Sits/i }).click();
+    await page.goto("/my-sits");
+    await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
 
     const activeCard = page
       .locator("article")

@@ -12,11 +12,11 @@ export function sitEditorModal(page: Page) {
 }
 
 export async function openCreateSitModal(page: Page) {
-  await page.goto("/owner/boats");
-  await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
+  await page.goto("/my-sits");
+  await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
 
   // Wait until owned vessels are loaded so Create opens the sit editor, not Add a boat.
-  const boatsTab = page.getByRole("button", { name: /^Boats/i });
+  const boatsTab = page.locator('main a[href="/my-boats"]');
   await expect(boatsTab).toBeVisible();
   await expect
     .poll(async () => {
@@ -26,8 +26,6 @@ export async function openCreateSitModal(page: Page) {
     })
     .toBeGreaterThan(0);
 
-  const sitsTab = page.getByRole("button", { name: /^Sits/i });
-  await sitsTab.click();
   await page.getByRole("button", { name: /Create a sit/i }).click();
   await expect(page).toHaveURL(/\/owner\/sits\/new/);
   const editor = sitEditorPage(page);

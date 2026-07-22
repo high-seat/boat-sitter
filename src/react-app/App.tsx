@@ -53,9 +53,11 @@ import {
 } from "lucide-react";
 import {
   Link,
+  Navigate,
   NavLink,
   Route,
   Routes,
+  useLocation,
   useNavigate,
   useParams,
   useSearchParams,
@@ -76,10 +78,12 @@ import { VesselPreviewCard } from "@/components/listing/VesselPreviewCard";
 import { ResultsPagination } from "@/components/ui/ResultsPagination";
 import { SitDetailSkeleton } from "@/components/ui/SitDetailSkeleton";
 import { MessagesPageSkeleton } from "@/components/ui/MessagesPageSkeleton";
+import { ApplicationReviewSkeleton } from "@/components/ui/ApplicationReviewSkeleton";
 import { FeatureIcon } from "@/components/ui/FeatureIcon";
 import { IconTooltip } from "@/components/ui/IconTooltip";
 import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
 import { Select } from "@/components/ui/Select";
+import { ShimmerBlock } from "@/components/ui/Shimmer";
 import { VesselPicker } from "@/components/ui/VesselPicker";
 import { DestinationAutocomplete } from "@/components/search/DestinationAutocomplete";
 import { AuthModal } from "@/components/forms/AuthModal";
@@ -123,6 +127,7 @@ import {
   getBoat,
   getBoats,
   getBoatsPage,
+  getSavedListings,
   getApplicationsForSit,
   getApplicationsForUser,
   getPublicMemberProfile,
@@ -169,6 +174,7 @@ import {
 import { coverPhotoClassName, coverPhotoStyle, optimizePhotoUrl } from "@/photoUtils";
 import { useFeatureFlag } from "@/featureFlags";
 import { setOwnerDashboardTab } from "@/ownerDashboardDev";
+import { VESSEL_TYPES, vesselTypeFromParam, vesselTypeToSlug } from "../shared/vesselTypes";
 import {
   LeaveReviewForm,
   SitterRatingBadge,
@@ -291,6 +297,15 @@ async function prepareImageUpload(file: File): Promise<string> {
     throw new Error("upload.tooDetailed");
   }
 
+  try {
+    const { apiUploadImage, hasApiSession } = await import("@/apiRemote");
+    if (await hasApiSession()) {
+      return await apiUploadImage(blob, "image.webp");
+    }
+  } catch {
+    // Fall through to a data URL when R2/upload is unavailable (mock login / local).
+  }
+
   return await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
@@ -298,15 +313,6 @@ async function prepareImageUpload(file: File): Promise<string> {
     reader.readAsDataURL(blob);
   });
 }
-
-const VESSEL_TYPES = [
-  "Sailing yacht",
-  "Catamaran",
-  "Motor yacht",
-  "Narrowboat",
-  "Trawler",
-  "Houseboat",
-] as const;
 
 const ENGINE_TYPES: EngineType[] = [
   "Not specified",
@@ -547,7 +553,7 @@ function Header() {
               <>
                 <Link
                   className="rounded-full px-3 py-2 text-sm font-semibold text-navy hover:bg-white"
-                  to="/owner/boats"
+                  to="/my-sits"
                 >
                   {t("nav.manage")}
                 </Link>
@@ -786,7 +792,10 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
     event.preventDefault();
     const params = new URLSearchParams();
     if (where) params.set("q", where);
-    if (type) params.set("type", type);
+    if (type) {
+      const slug = vesselTypeToSlug(type);
+      if (slug) params.set("type", slug);
+    }
     if (sitType) params.set("sitType", sitType);
     if (dates.startDate) params.set("from", dates.startDate);
     if (dates.endDate) params.set("to", dates.endDate);
@@ -1147,7 +1156,7 @@ function BoatsPage() {
   const { t } = useTranslation();
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get("q") ?? "");
-  const [type, setType] = useState(params.get("type") ?? "All vessels");
+  const [type, setType] = useState(() => vesselTypeFromParam(params.get("type")) ?? "All vessels");
   const [sitTypeFilter, setSitTypeFilter] = useState<"all" | SitType>(() =>
     parseSitTypeParam(params.get("sitType")),
   );
@@ -1207,8 +1216,11 @@ function BoatsPage() {
 
     if (q) nextParams.set("q", q);
     else nextParams.delete("q");
-    if (vesselType && vesselType !== "All vessels") nextParams.set("type", vesselType);
-    else nextParams.delete("type");
+    if (vesselType && vesselType !== "All vessels") {
+      const slug = vesselTypeToSlug(vesselType);
+      if (slug) nextParams.set("type", slug);
+      else nextParams.delete("type");
+    } else nextParams.delete("type");
     if (sitType !== "all") nextParams.set("sitType", sitType);
     else nextParams.delete("sitType");
     if (from) nextParams.set("from", from);
@@ -1382,6 +1394,7 @@ function BoatsPage() {
             variant="browse"
           />
           <Select
+            aria-label={t("search.vessel")}
             onChange={(event) => {
               const value = event.target.value;
               setType(value);
@@ -1686,7 +1699,7 @@ function ApplyModal({
 }) {
   const { t } = useTranslation();
   const user = useAppStore((state) => state.user)!;
-  const identityVerificationEnabled = useFeatureFlag("identityVerification");
+  const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
   const queryClient = useQueryClient();
   const [message, setMessage] = useState(
     t("apply.defaultMessage", { owner: boat.owner, boat: boat.name }),
@@ -1709,9 +1722,10 @@ function ApplyModal({
         email: user.email,
         phoneNumber: user.phoneNumber,
       }),
+    enabled: requireVerificationToSit,
   });
   let canApply = true;
-  if (identityVerificationEnabled) {
+  if (requireVerificationToSit) {
     canApply = verificationChecks ? isFullyVerified(verificationChecks) : false;
   }
   const acceptingApplications = isAcceptingApplications(boat);
@@ -1957,7 +1971,7 @@ function ApplyModal({
             <Link
               className="mt-6 inline-flex rounded-full bg-teal px-6 py-3 font-bold text-white hover:bg-teal/90"
               onClick={close}
-              to="/owner/boats"
+              to="/my-sits"
             >
               {t("apply.viewInSits")}
             </Link>
@@ -1997,6 +2011,7 @@ function ApplyModal({
 function DetailPage() {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
+  const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
@@ -2035,7 +2050,9 @@ function DetailPage() {
   });
   const { data: applicantVerification } = useQuery({
     queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "apply-gate"],
-    enabled: Boolean(user && boat && user.name !== boat.owner),
+    enabled: Boolean(
+      requireVerificationToSit && user && boat && user.name !== boat.owner,
+    ),
     queryFn: () =>
       getMemberVerificationChecks(user!.name, {
         isSelf: true,
@@ -2044,6 +2061,7 @@ function DetailPage() {
       }),
   });
   const applicantNeedsVerification =
+    requireVerificationToSit &&
     Boolean(user && boat && user.name !== boat.owner) &&
     applicantVerification !== undefined &&
     !isFullyVerified(applicantVerification);
@@ -2468,7 +2486,7 @@ function DetailPage() {
                   </div>
                   <Link
                     className="flex w-full items-center justify-center rounded-xl border border-line py-3 text-sm font-bold text-navy hover:border-teal"
-                    to="/owner/boats"
+                    to="/my-sits"
                   >
                     {t("detail.viewInSits")}
                   </Link>
@@ -2545,18 +2563,18 @@ function SavedPage() {
   const [showAll, setShowAll] = useState(false);
   const [page, setPage] = useState(0);
   const resultsTopRef = useRef<HTMLDivElement>(null);
-  const { data: boats = [], isLoading } = useQuery({
-    queryKey: ["boats"],
-    queryFn: getBoats,
+  const availability = showAll ? "all" : "open";
+  const { data: visibleBoats = [], isLoading, isFetching } = useQuery({
+    queryKey: ["saved-listings", availability, saved],
+    queryFn: () => getSavedListings({ availability, savedIds: saved }),
     enabled: Boolean(user),
   });
-  const savedBoats = boats.filter((boat) => saved.includes(boat.id));
-  const visibleBoats = showAll ? savedBoats : savedBoats.filter((boat) => !boat.accepted);
   const totalPages = Math.max(1, Math.ceil(visibleBoats.length / BOATS_PER_PAGE));
   const currentPage = Math.min(page, totalPages - 1);
   const pageStart = currentPage * BOATS_PER_PAGE;
   const pageEnd = Math.min(pageStart + BOATS_PER_PAGE, visibleBoats.length);
   const pagedBoats = visibleBoats.slice(pageStart, pageEnd);
+  const showLoading = isLoading || (isFetching && visibleBoats.length === 0);
 
   useEffect(() => {
     setPage(0);
@@ -2572,7 +2590,7 @@ function SavedPage() {
   }
 
   function renderSavedContent() {
-    if (isLoading) {
+    if (showLoading) {
       return (
         <div
           aria-busy="true"
@@ -2602,7 +2620,7 @@ function SavedPage() {
         </>
       );
     }
-    if (savedBoats.length) {
+    if (saved.length && !showAll) {
       return (
         <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
           <Heart className="mx-auto text-coral" size={38} />
@@ -4250,7 +4268,7 @@ function VesselEditorPage({ mode }: { mode: "new" | "edit" }) {
         <p className="mt-3 text-slate">{t("owner.boatUnavailable")}</p>
         <button
           className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
-          onClick={() => navigate("/owner/boats")}
+          onClick={() => navigate("/my-boats")}
           type="button"
         >
           {t("owner.backToBoats")}
@@ -4259,7 +4277,7 @@ function VesselEditorPage({ mode }: { mode: "new" | "edit" }) {
     );
   }
 
-  return <VesselEditor boat={boat} close={() => navigate("/owner/boats")} />;
+  return <VesselEditor boat={boat} close={() => navigate("/my-boats")} />;
 }
 
 function SitEditor({
@@ -4323,7 +4341,7 @@ function SitEditor({
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState("");
-  const identityVerificationEnabled = useFeatureFlag("identityVerification");
+  const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
   const isCreating = !sit;
   const { data: verificationChecks, isLoading: verificationLoading } = useQuery({
     queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "sit-create"],
@@ -4333,10 +4351,10 @@ function SitEditor({
         email: user!.email,
         phoneNumber: user!.phoneNumber,
       }),
-    enabled: Boolean(isCreating && identityVerificationEnabled && user),
+    enabled: Boolean(isCreating && requireVerificationToSit && user),
   });
   let canCreateSit = true;
-  if (identityVerificationEnabled) {
+  if (requireVerificationToSit) {
     canCreateSit = verificationChecks ? isFullyVerified(verificationChecks) : false;
   }
   const verifyMutation = useMutation({
@@ -4350,7 +4368,7 @@ function SitEditor({
     mutationFn: () => {
       if (locked) throw new Error("sitEditor.lockedBanner");
       if (!acceptedTerms) throw new Error("sitEditor.termsRequired");
-      if (isCreating && identityVerificationEnabled && !canCreateSit) {
+      if (isCreating && requireVerificationToSit && !canCreateSit) {
         throw new Error("SIT_VERIFICATION_REQUIRED");
       }
       const selectedVessel = vessels.find((vessel) => vessel.id === form.boatId);
@@ -4538,9 +4556,12 @@ function SitEditor({
         })
       : "";
   const showSitVerificationLoading =
-    isCreating && identityVerificationEnabled && verificationLoading;
+    isCreating && requireVerificationToSit && verificationLoading;
   const showSitVerificationGate =
-    isCreating && identityVerificationEnabled && !canCreateSit && Boolean(verificationChecks);
+    isCreating &&
+    requireVerificationToSit &&
+    !canCreateSit &&
+    Boolean(verificationChecks);
   let sitSaveButtonLabel = t("sitEditor.publish");
   if (mutation.isPending) sitSaveButtonLabel = t("common.saving");
   else if (sit) sitSaveButtonLabel = t("sitEditor.save");
@@ -5085,10 +5106,10 @@ function SitEditorPage({ mode }: { mode: "new" | "edit" }) {
         <p className="mt-3 text-slate">{t("owner.sitUnavailable")}</p>
         <button
           className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
-          onClick={() => navigate("/owner/boats")}
+          onClick={() => navigate("/my-sits")}
           type="button"
         >
-          {t("owner.backToBoats")}
+          {t("owner.backToSits")}
         </button>
       </main>
     );
@@ -5101,7 +5122,7 @@ function SitEditorPage({ mode }: { mode: "new" | "edit" }) {
 
   return (
     <SitEditor
-      close={() => navigate("/owner/boats")}
+      close={() => navigate("/my-sits")}
       locked={locked}
       preferredBoatId={preferredBoatId}
       sit={sit}
@@ -5118,8 +5139,11 @@ function OwnerBoatsPage() {
   const unarchiveSit = useAppStore((state) => state.unarchiveSit);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const identityVerificationEnabled = useFeatureFlag("identityVerification");
-  const [activeTab, setActiveTab] = useState<"boats" | "sits">("sits");
+  const location = useLocation();
+  const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
+  const activeTab: "boats" | "sits" = location.pathname.startsWith("/my-boats")
+    ? "boats"
+    : "sits";
   const [sitPhaseFilter, setSitPhaseFilter] = useState<"all" | SitPhase | "archived">("all");
   const [flaggingSit, setFlaggingSit] = useState<Sit | null>(null);
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState<Sit | null>(null);
@@ -5145,7 +5169,6 @@ function OwnerBoatsPage() {
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     const onOpenCreateSit = () => {
-      setActiveTab("sits");
       navigate("/owner/sits/new");
     };
     window.addEventListener("open-create-sit", onOpenCreateSit);
@@ -5160,7 +5183,7 @@ function OwnerBoatsPage() {
     queryKey: ["sits"],
     queryFn: getSits,
   });
-  const { data: ownerApplications = [] } = useQuery({
+  const { data: ownerApplications = [], isLoading: applicationsLoading } = useQuery({
     queryKey: ["applications", "user", user?.name],
     queryFn: () => getApplicationsForUser(user!.name),
     enabled: Boolean(user),
@@ -5179,11 +5202,13 @@ function OwnerBoatsPage() {
         email: user!.email,
         phoneNumber: user!.phoneNumber,
       }),
-    enabled: Boolean(identityVerificationEnabled && user),
+    enabled: Boolean(requireVerificationToSit && user),
   });
   let canCreateSit = true;
-  if (identityVerificationEnabled) {
-    canCreateSit = ownerVerificationChecks ? isFullyVerified(ownerVerificationChecks) : false;
+  if (requireVerificationToSit) {
+    canCreateSit = ownerVerificationChecks
+      ? isFullyVerified(ownerVerificationChecks)
+      : false;
   }
   const removeVesselMutation = useMutation({
     mutationFn: deleteVessel,
@@ -5290,11 +5315,13 @@ function OwnerBoatsPage() {
   );
   const sitsTabCount = ownedSits.length + archivedOwnedSits.length + sitterApplications.length;
   const isLoading = vesselsLoading || sitsLoading;
+  const boatsCountLoading = vesselsLoading;
+  const sitsCountLoading = vesselsLoading || sitsLoading || applicationsLoading;
   const sitCreateBlockedByBoat = activeTab === "sits" && ownedBoats.length === 0;
   const sitCreateBlockedByVerification =
     activeTab === "sits" &&
     ownedBoats.length > 0 &&
-    identityVerificationEnabled &&
+    requireVerificationToSit &&
     (ownerVerificationLoading || !canCreateSit);
   const sitCreateMuted = sitCreateBlockedByBoat || sitCreateBlockedByVerification;
 
@@ -5594,8 +5621,12 @@ function OwnerBoatsPage() {
     <main className="mx-auto max-w-6xl px-5 py-12 lg:px-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
-          <h1 className="section-title">{t("owner.manage")}</h1>
-          <p className="mt-3 text-slate">{t("owner.dashboardHint")}</p>
+          <h1 className="section-title">
+            {activeTab === "boats" ? t("owner.myBoatsTitle") : t("owner.mySitsTitle")}
+          </h1>
+          <p className="mt-3 text-slate">
+            {activeTab === "boats" ? t("owner.boatsHint") : t("owner.sitsHint")}
+          </p>
         </div>
         <div className="group relative">
           <button
@@ -5642,20 +5673,31 @@ function OwnerBoatsPage() {
         </div>
       </div>
       <div className="mt-8 flex gap-1 rounded-xl bg-seafoam p-1 sm:w-fit">
-        {(["sits", "boats"] as const).map((tab) => (
-          <button
-            className={`flex-1 rounded-lg px-6 py-2.5 text-sm font-bold capitalize transition sm:flex-none ${
-              activeTab === tab ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
-            }`}
+        {(
+          [
+            { tab: "sits", to: "/my-sits" },
+            { tab: "boats", to: "/my-boats" },
+          ] as const
+        ).map(({ tab, to }) => (
+          <NavLink
+            className={({ isActive }) =>
+              `flex-1 rounded-lg px-6 py-2.5 text-sm font-bold capitalize transition sm:flex-none ${
+                isActive ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
+              }`
+            }
+            end
             key={tab}
-            onClick={() => setActiveTab(tab)}
-            type="button"
+            to={to}
           >
             {t(`owner.tab.${tab}`)}{" "}
-            <span className="ml-1 text-xs text-slate">
-              {tab === "boats" ? ownedBoats.length : sitsTabCount}
-            </span>
-          </button>
+            {(tab === "boats" ? boatsCountLoading : sitsCountLoading) ? (
+              <ShimmerBlock className="ml-1 inline-block h-3 w-4 align-middle" />
+            ) : (
+              <span className="ml-1 text-xs text-slate">
+                {tab === "boats" ? ownedBoats.length : sitsTabCount}
+              </span>
+            )}
+          </NavLink>
         ))}
       </div>
       {removeVesselMutation.isError && (
@@ -5928,12 +5970,12 @@ function OwnerBoatsPage() {
               <div className="group relative">
                 <button
                   aria-describedby={
-                    identityVerificationEnabled && (ownerVerificationLoading || !canCreateSit)
+                    requireVerificationToSit && (ownerVerificationLoading || !canCreateSit)
                       ? "sit-empty-requires-verification-tooltip"
                       : undefined
                   }
                   className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition ${
-                    identityVerificationEnabled && (ownerVerificationLoading || !canCreateSit)
+                    requireVerificationToSit && (ownerVerificationLoading || !canCreateSit)
                       ? "bg-slate/25 text-slate hover:bg-slate/35"
                       : "bg-coral text-white hover:bg-coral-dark"
                   }`}
@@ -5943,7 +5985,7 @@ function OwnerBoatsPage() {
                   <Plus size={16} />
                   {t("owner.firstSit")}
                 </button>
-                {identityVerificationEnabled && (ownerVerificationLoading || !canCreateSit) && (
+                {requireVerificationToSit && (ownerVerificationLoading || !canCreateSit) && (
                   <span
                     className="pointer-events-none absolute top-[calc(100%+0.5rem)] left-1/2 z-20 hidden w-64 -translate-x-1/2 rounded-xl bg-navy px-3 py-2 text-sm font-medium text-white shadow-float group-focus-within:block group-hover:block"
                     id="sit-empty-requires-verification-tooltip"
@@ -7340,10 +7382,10 @@ function ApplicationReviewPage() {
         </h1>
         <button
           className="mt-6 rounded-full bg-navy px-6 py-3 font-bold text-white"
-          onClick={() => navigate("/owner/boats")}
+          onClick={() => navigate("/my-sits")}
           type="button"
         >
-          {t("owner.backToBoats")}
+          {t("owner.backToSits")}
         </button>
       </main>
     );
@@ -7370,11 +7412,14 @@ function ApplicationReviewPage() {
     <main className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
       <button
         className="mb-6 flex items-center gap-2 text-sm font-bold text-slate hover:text-navy"
-        onClick={() => navigate("/owner/boats")}
+        onClick={() => navigate("/my-sits")}
         type="button"
       >
         <ArrowLeft size={17} /> {t("applications.backToSits")}
       </button>
+      {pageLoading ? <ApplicationReviewSkeleton /> : null}
+      {!pageLoading ? (
+        <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="section-title">{t("applications.title", { boat: vessel?.name ?? "" })}</h1>
@@ -7475,8 +7520,7 @@ function ApplicationReviewPage() {
           </div>
         )}
 
-      {pageLoading ? <div className="mt-8 h-80 animate-pulse rounded-2xl bg-seafoam" /> : null}
-      {!pageLoading && applications.length ? (
+      {applications.length ? (
         <div className="mt-8 space-y-6">
           {acceptedApplications.length > 0 &&
             (statusFilter === "all" || statusFilter === "accepted") && (
@@ -8016,11 +8060,13 @@ function ApplicationReviewPage() {
           </div>
         </div>
       ) : null}
-      {!pageLoading && !applications.length ? (
+      {!applications.length ? (
         <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
           <MessageCircle className="mx-auto text-teal" size={38} />
           <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
         </div>
+      ) : null}
+        </>
       ) : null}
       {confirmingStatus && selected && (
         <div
@@ -8600,7 +8646,9 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="/boats" element={<BoatsPage />} />
         <Route path="/boats/:id" element={<DetailPage />} />
-        <Route path="/owner/boats" element={<OwnerBoatsPage />} />
+        <Route path="/my-boats" element={<OwnerBoatsPage />} />
+        <Route path="/my-sits" element={<OwnerBoatsPage />} />
+        <Route path="/owner/boats" element={<Navigate replace to="/my-sits" />} />
         <Route path="/owner/boats/new" element={<VesselEditorPage mode="new" />} />
         <Route path="/owner/boats/:boatId/edit" element={<VesselEditorPage mode="edit" />} />
         <Route path="/owner/sits/new" element={<SitEditorPage mode="new" />} />

@@ -45,6 +45,12 @@ export const vessels = sqliteTable(
     voltageType: text("voltage_type").notNull().default("Not specified"),
     stoveFuelType: text("stove_fuel_type").notNull().default("Not specified"),
     amenities: jsonArray("amenities"),
+    privateAccess: text("private_access", { mode: "json" }).$type<{
+      wifiNetwork?: string;
+      wifiPassword?: string;
+      accessCodes?: string;
+      otherNotes?: string;
+    } | null>(),
     createdAt: text("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
@@ -262,6 +268,7 @@ export const notifications = sqliteTable(
     actor: text("actor"),
     boatName: text("boat_name"),
     href: text("href").notNull(),
+    readAt: text("read_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
@@ -270,6 +277,78 @@ export const notifications = sqliteTable(
     index("notifications_user_id_idx").on(t.userId),
     index("notifications_user_name_idx").on(t.userName),
   ],
+);
+
+/** Per-user saved sit ids, archives, blocks, and reports. */
+export const userSaved = sqliteTable(
+  "user_saved",
+  {
+    userId: text("user_id").notNull(),
+    sitId: text("sit_id").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("user_saved_user_idx").on(t.userId)],
+);
+
+export const userArchivedConversations = sqliteTable(
+  "user_archived_conversations",
+  {
+    userId: text("user_id").notNull(),
+    applicationId: text("application_id").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("user_archived_conversations_user_idx").on(t.userId)],
+);
+
+export const userArchivedSits = sqliteTable(
+  "user_archived_sits",
+  {
+    userId: text("user_id").notNull(),
+    sitId: text("sit_id").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("user_archived_sits_user_idx").on(t.userId)],
+);
+
+export const userBlocks = sqliteTable(
+  "user_blocks",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    blockedName: text("blocked_name").notNull(),
+    blockedImage: text("blocked_image").notNull().default(""),
+    blockedAt: text("blocked_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("user_blocks_user_idx").on(t.userId)],
+);
+
+export const userReports = sqliteTable(
+  "user_reports",
+  {
+    id: text("id").primaryKey(),
+    reporterUserId: text("reporter_user_id").notNull(),
+    targetName: text("target_name").notNull(),
+    reason: text("reason").notNull(),
+    details: text("details").notNull().default(""),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    escalated: integer("escalated", { mode: "boolean" }).notNull().default(false),
+    applicationId: text("application_id"),
+    boatName: text("boat_name"),
+    messageId: text("message_id"),
+    messageText: text("message_text"),
+    messageCreatedAt: text("message_created_at"),
+  },
+  (t) => [index("user_reports_reporter_idx").on(t.reporterUserId)],
 );
 
 // Re-export the Better Auth tables so the Drizzle client registers them.

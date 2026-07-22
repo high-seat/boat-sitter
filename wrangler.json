@@ -21,6 +21,13 @@
       "migrations_dir": "./drizzle"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS",
+      "bucket_name": "boatstead-uploads",
+      "preview_bucket_name": "boatstead-uploads"
+    }
+  ],
   "vars": {
     "ENVIRONMENT": "production",
     "BETTER_AUTH_URL": "https://boatstead.sharukrules.workers.dev"

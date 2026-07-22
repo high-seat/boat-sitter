@@ -14,6 +14,7 @@ import {
   type SocialProvider,
 } from "@/mockAuth";
 import { signInWithGoogle } from "@/authClient";
+import { useFeatureFlag } from "@/featureFlags";
 import { useAppStore } from "@/store";
 
 const socialButtonStyle = {
@@ -37,6 +38,8 @@ const socialButtonActiveStyle = {
 export function AuthModal() {
   const { t } = useTranslation();
   const loginAs = useAppStore((state) => state.loginAs);
+  const loginWithApple = useFeatureFlag("loginWithApple");
+  const loginWithFacebook = useFeatureFlag("loginWithFacebook");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
@@ -183,27 +186,28 @@ export function AuthModal() {
             text={t("auth.continueWithGoogle")}
             type="button"
           />
-          <AppleLoginButton
-            activeStyle={socialButtonActiveStyle}
-            disabled={pending}
-            onClick={() => void continueWith("apple")}
-            style={socialButtonStyle}
-            text={t("auth.continueWithApple")}
-            type="button"
-          />
-          <FacebookLoginButton
-            activeStyle={socialButtonActiveStyle}
-            disabled={pending}
-            iconColor="#3b5998"
-            onClick={() => void continueWith("facebook")}
-            style={socialButtonStyle}
-            text={t("auth.continueWithFacebook")}
-            type="button"
-          />
+          {loginWithApple && (
+            <AppleLoginButton
+              activeStyle={socialButtonActiveStyle}
+              disabled={pending}
+              onClick={() => void continueWith("apple")}
+              style={socialButtonStyle}
+              text={t("auth.continueWithApple")}
+              type="button"
+            />
+          )}
+          {loginWithFacebook && (
+            <FacebookLoginButton
+              activeStyle={socialButtonActiveStyle}
+              disabled={pending}
+              iconColor="#3b5998"
+              onClick={() => void continueWith("facebook")}
+              style={socialButtonStyle}
+              text={t("auth.continueWithFacebook")}
+              type="button"
+            />
+          )}
         </div>
-        <p className="mt-1 text-center text-xs leading-5 text-slate">
-          {t("auth.socialMockNotice")}
-        </p>
 
         <div className="my-5 flex items-center gap-3">
           <span className="h-px flex-1 bg-line" />
@@ -272,7 +276,6 @@ export function AuthModal() {
               return t("auth.signupSubmit");
             })()}
           </button>
-          <p className="text-center text-xs leading-5 text-slate">{t("auth.mockNotice")}</p>
         </form>
       </section>
     </div>

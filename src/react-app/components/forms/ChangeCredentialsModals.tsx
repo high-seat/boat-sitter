@@ -48,8 +48,8 @@ export function ChangeEmailModal({
       titleId="change-email-title"
     >
       <p className="text-sm leading-6 text-slate">{t("settings.changeEmailHint")}</p>
-      <form className="mt-5 space-y-4" onSubmit={(event) => void submit(event)}>
-        <label>
+      <form className="mt-8 space-y-4" onSubmit={(event) => void submit(event)}>
+        <label className="block">
           <span className="form-label">{t("settings.currentEmail")}</span>
           <input
             className="form-input bg-cream/80 text-slate"
@@ -58,7 +58,7 @@ export function ChangeEmailModal({
             value={currentEmail}
           />
         </label>
-        <label>
+        <label className="block">
           <span className="form-label">{t("settings.newEmail")}</span>
           <input
             autoComplete="email"
@@ -71,7 +71,7 @@ export function ChangeEmailModal({
             value={form.newEmail}
           />
         </label>
-        <label>
+        <label className="block">
           <span className="form-label">{t("settings.currentPassword")}</span>
           <input
             autoComplete="current-password"
@@ -89,7 +89,7 @@ export function ChangeEmailModal({
             {error}
           </p>
         ) : null}
-        <div className="flex flex-wrap justify-end gap-3 pt-2">
+        <div className="flex flex-wrap justify-end gap-3 pt-6">
           <button
             className="rounded-xl border border-line px-5 py-3 text-sm font-bold text-navy disabled:opacity-60"
             disabled={pending}
@@ -165,8 +165,8 @@ export function ChangePasswordModal({
       titleId="change-password-title"
     >
       <p className="text-sm leading-6 text-slate">{t("settings.changePasswordHint")}</p>
-      <form className="mt-5 space-y-4" onSubmit={(event) => void submit(event)}>
-        <label>
+      <form className="mt-8 space-y-4" onSubmit={(event) => void submit(event)}>
+        <label className="block">
           <span className="form-label">{t("settings.currentPassword")}</span>
           <input
             autoComplete="current-password"
@@ -180,7 +180,7 @@ export function ChangePasswordModal({
           />
         </label>
         <div>
-          <label>
+          <label className="block">
             <span className="form-label">{t("settings.newPassword")}</span>
             <input
               autoComplete="new-password"
@@ -195,7 +195,7 @@ export function ChangePasswordModal({
           </label>
           <span className="mt-1 block text-xs text-slate">{t("auth.passwordHint")}</span>
         </div>
-        <label>
+        <label className="block">
           <span className="form-label">{t("settings.confirmPassword")}</span>
           <input
             autoComplete="new-password"
@@ -213,7 +213,7 @@ export function ChangePasswordModal({
             {error}
           </p>
         ) : null}
-        <div className="flex flex-wrap justify-end gap-3 pt-2">
+        <div className="flex flex-wrap justify-end gap-3 pt-6">
           <button
             className="rounded-xl border border-line px-5 py-3 text-sm font-bold text-navy disabled:opacity-60"
             disabled={pending}

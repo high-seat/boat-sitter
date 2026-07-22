@@ -36,7 +36,6 @@ import {
 } from "@/featureFlags";
 import { useFeatureFlagStore } from "@/featureFlagStore";
 import { createDevRandomSit, createDevRandomVessel } from "@/mockApi";
-import { getOwnerDashboardTab } from "@/ownerDashboardDev";
 import { isAdminUser } from "@/adminAccess";
 import { useAppStore } from "@/store";
 import { getVerificationStatusSync, setMockVerificationStatus } from "@/verificationService";
@@ -144,7 +143,9 @@ export function CommandPalette() {
   const applicationsMatch = matchPath("/owner/sits/:sitId/applications", location.pathname);
   const vesselEditMatch = matchPath("/owner/boats/:boatId/edit", location.pathname);
   const memberMatch = matchPath("/members/:id", location.pathname);
-  const onOwnerDashboard = Boolean(matchPath("/owner/boats", location.pathname));
+  const onOwnerDashboard = Boolean(
+    matchPath("/my-boats", location.pathname) || matchPath("/my-sits", location.pathname),
+  );
   const onOwnerNewBoat = Boolean(matchPath("/owner/boats/new", location.pathname));
   const onSaved = Boolean(matchPath("/saved", location.pathname));
   const onSettings = Boolean(matchPath("/settings", location.pathname));
@@ -230,7 +231,7 @@ export function CommandPalette() {
     }
 
     if (onOwnerDashboard && user) {
-      const ownerTab = getOwnerDashboardTab();
+      const ownerTab = matchPath("/my-boats", location.pathname) ? "boats" : "sits";
       if (ownerTab === "boats") {
         contextualItems.push(
           <CommandItem key="add-boat" onSelect={() => run(() => navigate("/owner/boats/new"))}>
@@ -303,7 +304,7 @@ export function CommandPalette() {
 
     if (onOwnerNewBoat) {
       contextualItems.push(
-        <CommandItem key="back-owner" onSelect={() => run(() => navigate("/owner/boats"))}>
+        <CommandItem key="back-owner" onSelect={() => run(() => navigate("/my-boats"))}>
           <Anchor className="size-4" />
           Back to boat dashboard
         </CommandItem>,
@@ -426,7 +427,7 @@ export function CommandPalette() {
       contextualItems.push(
         <CommandItem
           key="go-applications-owner"
-          onSelect={() => run(() => navigate("/owner/boats"))}
+          onSelect={() => run(() => navigate("/my-sits"))}
         >
           <Anchor className="size-4" />
           Open boat dashboard
@@ -482,7 +483,7 @@ export function CommandPalette() {
                   <Settings className="size-4" />
                   {t("settings.title")}
                 </CommandItem>
-                <CommandItem onSelect={() => run(() => navigate("/owner/boats"))}>
+                <CommandItem onSelect={() => run(() => navigate("/my-sits"))}>
                   <Anchor className="size-4" />
                   {t("nav.manage")}
                 </CommandItem>

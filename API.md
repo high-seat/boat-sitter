@@ -5,8 +5,8 @@ API through `src/react-app/mockApi.ts` (filename kept for import stability).
 
 That module routes to the Worker when a Better Auth session exists (e.g. Google
 sign-in), via `apiClient.ts` / `apiRemote.ts`. Mock login and e2e still use the
-browser localStorage fallback. Remaining local-only gaps: identity verification,
-vessel private access codes, and video-call scheduling system messages.
+browser localStorage fallback. Remaining local-only gaps: identity verification
+and non-Google auth (`mockAuth`).
 
 ## Data model
 
@@ -48,49 +48,70 @@ npm run build && npm run deploy
 
 ### Public — browse / detail
 
-| Method | Path             | Notes                                                                                                                                                                                                                               |
-| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/boats`     | Filters applied in D1 SQL: `q`, `type`, `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
-| GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished                                                                                                                                                                                   |
+| Method | Path             | Notes                                             |
+| ------ | ---------------- | ------------------------------------------------- |
+| GET    | `/api/boats`     | Filters applied in D1 SQL: `q`, `type` (slug e.g. `motor-yacht`; legacy labels still accepted), `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
+| GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished |
 
 ### Owner — vessels & sits _(writes require Better Auth session)_
 
-| Method | Path                       | Notes                                         |
-| ------ | -------------------------- | --------------------------------------------- |
-| GET    | `/api/vessels` · `?owner=` | List (optionally by owner)                    |
-| GET    | `/api/vessels/:id`         | One vessel                                    |
-| PUT    | `/api/vessels/:id`         | Upsert (create or update); owner from session |
-| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it    |
-| GET    | `/api/sits`                | List (sits expose `boatId` = vessel id)       |
-| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist  |
-| DELETE | `/api/sits/:id`            |                                               |
+| Method | Path                       | Notes                                        |
+| ------ | -------------------------- | -------------------------------------------- |
+| GET    | `/api/vessels` · `?owner=` | List (optionally by owner); `privateAccess` only for owner |
+| GET    | `/api/vessels/:id`         | One vessel; `privateAccess` only for owner           |
+| PUT    | `/api/vessels/:id`         | Upsert (create or update); stores `privateAccess`    |
+| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it   |
+| GET    | `/api/sits`                | List (sits expose `boatId` = vessel id)      |
+| GET    | `/api/sits/:id/access`     | Private Wi-Fi/codes + full address; owner or accepted sitter |
+| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist |
+| DELETE | `/api/sits/:id`            |                                              |
 
 ### Applications _(writes require Better Auth session)_
 
-| Method | Path                             | Notes                                                              |
-| ------ | -------------------------------- | ------------------------------------------------------------------ |
-| GET    | `/api/applications?sitId=`       | Applications for one listing                                       |
-| GET    | `/api/applications?user=`        | Where user is owner **or** applicant                               |
+| Method | Path                             | Notes                                                            |
+| ------ | -------------------------------- | ---------------------------------------------------------------- |
+| GET    | `/api/applications?sitId=`       | Applications for one listing                                     |
+| GET    | `/api/applications?user=`        | Where user is owner **or** applicant                             |
 | POST   | `/api/applications`              | `{ sitId, message, partySize?, applicant }`; identity from session |
-| PATCH  | `/api/applications/:id`          | `{ status, ownerPhone? }`; owner only; emits system messages       |
-| POST   | `/api/applications/:id/withdraw` | Applicant withdraw + system message                                |
-| POST   | `/api/applications/:id/messages` | `{ text }`; sender from session                                    |
-| POST   | `/api/applications/:id/phone`    | `{ phoneNumber }` phone-share system message                       |
+| PATCH  | `/api/applications/:id`          | `{ status, ownerPhone? }`; owner only; emits system messages     |
+| POST   | `/api/applications/:id/withdraw` | Applicant withdraw + system message                              |
+| POST   | `/api/applications/:id/messages` | `{ text }`; sender from session                                  |
+| POST   | `/api/applications/:id/phone`    | `{ phoneNumber }` phone-share system message                     |
+| POST   | `/api/applications/:id/video-call` | `{ startsAt, durationMinutes, counter? }` request/counter     |
+| POST   | `/api/applications/:id/video-call/:messageId/accept` | Accept a proposal                          |
+| POST   | `/api/applications/:id/video-call/:messageId/decline` | Decline a proposal                         |
+
+### Prefs, uploads _(Better Auth session)_
+
+| Method | Path                                      | Notes |
+| ------ | ----------------------------------------- | ----- |
+| GET    | `/api/prefs`                              | Saved sits, archives, blocks, reports |
+| GET    | `/api/prefs/saved/listings`               | Saved sit listings; `availability=open` (default) or `all` |
+| PUT/DELETE | `/api/prefs/saved/:sitId`             | Toggle saved listing |
+| PUT/DELETE | `/api/prefs/archived-conversations/:id` | Archive conversation |
+| PUT/DELETE | `/api/prefs/archived-sits/:sitId`     | Archive sit |
+| POST   | `/api/prefs/blocks`                       | `{ name, image }` |
+| DELETE | `/api/prefs/blocks/:name`                 | Unblock |
+| POST   | `/api/prefs/reports`                      | User report |
+| POST   | `/api/uploads`                            | multipart `file` → R2; returns `{ url }` |
+| GET    | `/api/files/:key`                         | Serve uploaded object |
 
 ### Profile, reviews, notifications _(Better Auth session)_
 
-| Method | Path                          | Notes                                       |
-| ------ | ----------------------------- | ------------------------------------------- |
-| GET    | `/api/me`                     | `{ user, profile }` (creates profile row)   |
-| GET    | `/api/me/profile`             | Current member profile                      |
-| PUT    | `/api/me/profile`             | Patch profile fields                        |
-| DELETE | `/api/me`                     | Delete account + owned vessels/apps/reviews |
-| GET    | `/api/profiles/:name`         | Public profile by display name              |
-| GET    | `/api/notifications`          | Inbox for the signed-in user                |
-| GET    | `/api/reviews?sitter=`        | Reviews for a sitter                        |
-| GET    | `/api/reviews?applicationId=` | One review or null                          |
-| POST   | `/api/reviews`                | Owner leaves a review                       |
-| POST   | `/api/reviews/:id/response`   | Sitter responds                             |
+| Method | Path                         | Notes                                      |
+| ------ | ---------------------------- | ------------------------------------------ |
+| GET    | `/api/me`                    | `{ user, profile }` (creates profile row)  |
+| GET    | `/api/me/profile`            | Current member profile                     |
+| PUT    | `/api/me/profile`            | Patch profile fields                       |
+| DELETE | `/api/me`                    | Delete account + owned vessels/apps/reviews |
+| GET    | `/api/profiles/:name`        | Public profile by display name             |
+| GET    | `/api/notifications`         | Inbox for the signed-in user (`read` boolean) |
+| POST   | `/api/notifications/read-all`| Mark every notification as read              |
+| POST   | `/api/notifications/:id/read`| Mark one notification as read                |
+| GET    | `/api/reviews?sitter=`       | Reviews for a sitter                       |
+| GET    | `/api/reviews?applicationId=`| One review or null                         |
+| POST   | `/api/reviews`               | Owner leaves a review                      |
+| POST   | `/api/reviews/:id/response`  | Sitter responds                            |
 
 ### Support
 

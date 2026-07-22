@@ -241,6 +241,12 @@ type ApiVessel = {
   voltageType: string;
   stoveFuelType: string;
   amenities: string[];
+  privateAccess?: {
+    wifiNetwork?: string;
+    wifiPassword?: string;
+    accessCodes?: string;
+    otherNotes?: string;
+  } | null;
 };
 
 type ApiSit = {
@@ -334,6 +340,7 @@ export type ApiNotification = {
   boatName?: string;
   href: string;
   createdAt: string;
+  read?: boolean;
 };
 
 export type ApiReview = {
@@ -441,6 +448,22 @@ export function normalizeApiBoat(row: ApiBoat): Boat {
 }
 
 export function normalizeApiVessel(row: ApiVessel): Vessel {
+  const privateAccess = row.privateAccess
+    ? {
+        wifiNetwork: row.privateAccess.wifiNetwork || undefined,
+        wifiPassword: row.privateAccess.wifiPassword || undefined,
+        accessCodes: row.privateAccess.accessCodes || undefined,
+        otherNotes: row.privateAccess.otherNotes || undefined,
+      }
+    : undefined;
+  const hasPrivate =
+    privateAccess &&
+    Boolean(
+      privateAccess.wifiNetwork ||
+        privateAccess.wifiPassword ||
+        privateAccess.accessCodes ||
+        privateAccess.otherNotes,
+    );
   return {
     id: row.id,
     name: row.name,
@@ -461,6 +484,7 @@ export function normalizeApiVessel(row: ApiVessel): Vessel {
     voltageType: asVoltageType(row.voltageType),
     stoveFuelType: asStoveFuelType(row.stoveFuelType),
     amenities: row.amenities,
+    ...(hasPrivate ? { privateAccess } : {}),
   };
 }
 
@@ -513,6 +537,7 @@ export function vesselToApiBody(vessel: Vessel) {
     voltageType: vessel.voltageType,
     stoveFuelType: vessel.stoveFuelType,
     amenities: vessel.amenities,
+    privateAccess: vessel.privateAccess ?? null,
   };
 }
 
@@ -645,7 +670,6 @@ export async function apiSaveVessel(vessel: Vessel): Promise<Vessel> {
   );
   return {
     ...normalizeApiVessel(row),
-    privateAccess: vessel.privateAccess,
     ownerLanguages: vessel.ownerLanguages,
   };
 }
@@ -762,6 +786,148 @@ export async function apiShareApplicationPhone(
   return normalizeApiApplication(row);
 }
 
+export async function apiGetSitPrivateAccess(
+  sitId: string,
+): Promise<{
+  wifiNetwork?: string;
+  wifiPassword?: string;
+  accessCodes?: string;
+  otherNotes?: string;
+  fullAddress?: string;
+} | null> {
+  return apiGet(`/api/sits/${encodeURIComponent(sitId)}/access`);
+}
+
+export async function apiRequestApplicationVideoCall(
+  applicationId: string,
+  proposal: { startsAt: string; durationMinutes: number },
+  options?: { counter?: boolean },
+): Promise<SitApplication> {
+  const row = await apiPost<ApiApplication>(
+    `/api/applications/${encodeURIComponent(applicationId)}/video-call`,
+    {
+      startsAt: proposal.startsAt,
+      durationMinutes: proposal.durationMinutes,
+      counter: Boolean(options?.counter),
+    },
+  );
+  return normalizeApiApplication(row);
+}
+
+export async function apiAcceptApplicationVideoCall(
+  applicationId: string,
+  messageId: string,
+): Promise<SitApplication> {
+  const row = await apiPost<ApiApplication>(
+    `/api/applications/${encodeURIComponent(applicationId)}/video-call/${encodeURIComponent(messageId)}/accept`,
+  );
+  return normalizeApiApplication(row);
+}
+
+export async function apiDeclineApplicationVideoCall(
+  applicationId: string,
+  messageId: string,
+): Promise<SitApplication> {
+  const row = await apiPost<ApiApplication>(
+    `/api/applications/${encodeURIComponent(applicationId)}/video-call/${encodeURIComponent(messageId)}/decline`,
+  );
+  return normalizeApiApplication(row);
+}
+
+export async function apiUploadImage(blob: Blob, filename = "image.webp"): Promise<string> {
+  const form = new FormData();
+  form.append("file", blob, filename);
+  const res = await fetch("/api/uploads", {
+    method: "POST",
+    credentials: "include",
+    body: form,
+  });
+  const body = (await res.json().catch(() => null)) as
+    | { data?: { url?: string }; error?: string }
+    | null;
+  if (!res.ok) {
+    throw new ApiError(res.status, body?.error || res.statusText, body);
+  }
+  const url = body?.data?.url;
+  if (!url) throw new ApiError(500, "UPLOAD_FAILED", body);
+  return url;
+}
+
+export type ApiUserPrefs = {
+  saved: string[];
+  archivedConversations: string[];
+  archivedSits: string[];
+  blockedUsers: Array<{ name: string; image: string; blockedAt: string }>;
+  userReports: Array<{
+    id: string;
+    targetName: string;
+    reason: string;
+    details: string;
+    createdAt: string;
+    escalated?: boolean;
+    applicationId?: string;
+    boatName?: string;
+    messageId?: string;
+    messageText?: string;
+    messageCreatedAt?: string;
+  }>;
+};
+
+export async function apiGetPrefs(): Promise<ApiUserPrefs> {
+  return apiGet<ApiUserPrefs>("/api/prefs");
+}
+
+export async function apiGetSavedListings(
+  availability: "open" | "all" = "open",
+): Promise<Boat[]> {
+  const qs = availability === "all" ? "?availability=all" : "?availability=open";
+  const rows = await apiGet<ApiBoat[]>(`/api/prefs/saved/listings${qs}`);
+  return rows.map(normalizeApiBoat);
+}
+
+export async function apiSetSaved(sitId: string, saved: boolean): Promise<void> {
+  const path = `/api/prefs/saved/${encodeURIComponent(sitId)}`;
+  if (saved) await apiPut(path, {});
+  else await apiDelete(path);
+}
+
+export async function apiSetArchivedConversation(
+  applicationId: string,
+  archived: boolean,
+): Promise<void> {
+  const path = `/api/prefs/archived-conversations/${encodeURIComponent(applicationId)}`;
+  if (archived) await apiPut(path, {});
+  else await apiDelete(path);
+}
+
+export async function apiSetArchivedSit(sitId: string, archived: boolean): Promise<void> {
+  const path = `/api/prefs/archived-sits/${encodeURIComponent(sitId)}`;
+  if (archived) await apiPut(path, {});
+  else await apiDelete(path);
+}
+
+export async function apiBlockUser(input: { name: string; image: string }): Promise<void> {
+  await apiPost("/api/prefs/blocks", input);
+}
+
+export async function apiUnblockUser(name: string): Promise<void> {
+  await apiDelete(`/api/prefs/blocks/${encodeURIComponent(name)}`);
+}
+
+export async function apiCreateUserReport(input: {
+  targetName: string;
+  reason: string;
+  details: string;
+  escalated?: boolean;
+  applicationId?: string;
+  boatName?: string;
+  messageId?: string;
+  messageText?: string;
+  messageCreatedAt?: string;
+}): Promise<ApiUserPrefs["userReports"][number]> {
+  return apiPost("/api/prefs/reports", input);
+}
+
 export async function apiSubmitSupportRequest(
   request: Omit<SupportRequest, "createdAt">,
 ): Promise<SupportRequest> {
@@ -799,6 +965,14 @@ export async function apiGetPublicProfile(name: string) {
 
 export async function apiGetNotifications(): Promise<ApiNotification[]> {
   return apiGet<ApiNotification[]>("/api/notifications");
+}
+
+export async function apiMarkNotificationRead(id: string): Promise<ApiNotification> {
+  return apiPost<ApiNotification>(`/api/notifications/${encodeURIComponent(id)}/read`);
+}
+
+export async function apiMarkAllNotificationsRead(): Promise<ApiNotification[]> {
+  return apiPost<ApiNotification[]>("/api/notifications/read-all");
 }
 
 export async function apiGetReviewsForSitter(sitterName: string): Promise<ApiReview[]> {

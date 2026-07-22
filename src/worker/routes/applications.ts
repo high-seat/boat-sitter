@@ -529,3 +529,127 @@ applicationsRouter.post(
     return c.json({ data: shape(app, msgs) });
   },
 );
+
+const videoCallSchema = z.object({
+  startsAt: z.string().min(1),
+  durationMinutes: z.number().min(5).max(180),
+  counter: z.boolean().optional(),
+});
+
+applicationsRouter.post(
+  "/:id/video-call",
+  requireUser,
+  zValidator("json", videoCallSchema),
+  async (c) => {
+    const db = getDb(c.env);
+    const id = c.req.param("id");
+    const body = c.req.valid("json");
+    const user = c.get("user")!;
+
+    const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+    if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+    const ownerId = await ownerIdForApplication(c.env, app);
+    if (user.id !== app.applicantUserId && user.id !== ownerId) {
+      return c.json({ error: "You are not part of this conversation" }, 403);
+    }
+
+    const startsAt = new Date(body.startsAt);
+    if (Number.isNaN(startsAt.getTime()) || startsAt.getTime() <= Date.now()) {
+      return c.json({ error: "VIDEO_CALL_TIME_PAST" }, 400);
+    }
+    const durationMinutes = Math.max(5, Math.round(body.durationMinutes));
+    const isCounter = Boolean(body.counter);
+    const systemKind = isCounter ? "videoCallCounter" : "videoCallRequest";
+
+    await insertSystemMessage(c.env, {
+      applicationId: id,
+      senderName: user.name,
+      text: isCounter
+        ? `${user.name} suggested a different video call time`
+        : `${user.name} proposed a video call`,
+      systemKind,
+      payload: { videoCall: { startsAt: startsAt.toISOString(), durationMinutes } },
+    });
+
+    const msgs = await loadMessages(c.env, [id]);
+    return c.json({ data: shape(app, msgs) });
+  },
+);
+
+applicationsRouter.post("/:id/video-call/:messageId/accept", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const id = c.req.param("id");
+  const messageId = c.req.param("messageId");
+  const user = c.get("user")!;
+
+  const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+  const ownerId = await ownerIdForApplication(c.env, app);
+  if (user.id !== app.applicantUserId && user.id !== ownerId) {
+    return c.json({ error: "You are not part of this conversation" }, 403);
+  }
+
+  const msgs = await loadMessages(c.env, [id]);
+  const proposal = msgs.find((m) => m.id === messageId);
+  const payload = (proposal?.payload ?? null) as { videoCall?: { startsAt: string; durationMinutes: number } } | null;
+  if (
+    !proposal ||
+    !payload?.videoCall ||
+    (proposal.systemKind !== "videoCallRequest" && proposal.systemKind !== "videoCallCounter")
+  ) {
+    return c.json({ error: "VIDEO_CALL_PROPOSAL_NOT_FOUND" }, 404);
+  }
+  if (proposal.senderName === user.name) {
+    return c.json({ error: "VIDEO_CALL_CANNOT_ACCEPT_OWN" }, 400);
+  }
+
+  await insertSystemMessage(c.env, {
+    applicationId: id,
+    senderName: user.name,
+    text: `${user.name} accepted the video call time`,
+    systemKind: "videoCallAccepted",
+    payload: { videoCall: { ...payload.videoCall } },
+  });
+
+  const next = await loadMessages(c.env, [id]);
+  return c.json({ data: shape(app, next) });
+});
+
+applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async (c) => {
+  const id = c.req.param("id");
+  const messageId = c.req.param("messageId");
+  const user = c.get("user")!;
+
+  const db = getDb(c.env);
+  const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+  const ownerId = await ownerIdForApplication(c.env, app);
+  if (user.id !== app.applicantUserId && user.id !== ownerId) {
+    return c.json({ error: "You are not part of this conversation" }, 403);
+  }
+
+  const msgs = await loadMessages(c.env, [id]);
+  const proposal = msgs.find((m) => m.id === messageId);
+  const payload = (proposal?.payload ?? null) as { videoCall?: { startsAt: string; durationMinutes: number } } | null;
+  if (
+    !proposal ||
+    !payload?.videoCall ||
+    (proposal.systemKind !== "videoCallRequest" && proposal.systemKind !== "videoCallCounter")
+  ) {
+    return c.json({ error: "VIDEO_CALL_PROPOSAL_NOT_FOUND" }, 404);
+  }
+  if (proposal.senderName === user.name) {
+    return c.json({ error: "VIDEO_CALL_CANNOT_DECLINE_OWN" }, 400);
+  }
+
+  await insertSystemMessage(c.env, {
+    applicationId: id,
+    senderName: user.name,
+    text: `${user.name} declined the video call proposal`,
+    systemKind: "videoCallDeclined",
+    payload: { videoCall: { ...payload.videoCall } },
+  });
+
+  const next = await loadMessages(c.env, [id]);
+  return c.json({ data: shape(app, next) });
+});

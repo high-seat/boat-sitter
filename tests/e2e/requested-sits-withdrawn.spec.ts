@@ -114,8 +114,8 @@ test.describe("withdrawn requested sits", () => {
       );
     });
 
-    await page.goto("/owner/boats");
-    await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
+    await page.goto("/my-sits");
+    await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
 
     const requested = page.locator("section").filter({
       has: page.getByRole("heading", { name: /^Requested sits$/i }),
