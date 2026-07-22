@@ -2012,6 +2012,7 @@ function DetailPage() {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
   const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
+  const identityVerificationEnabled = useFeatureFlag("identityVerification");
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
@@ -2263,7 +2264,7 @@ function DetailPage() {
                   </p>
                 </div>
               </Link>
-              {ownerVerification && (
+              {identityVerificationEnabled && ownerVerification && (
                 <div className="mt-5">
                   <IdentityVerificationCard checks={ownerVerification} />
                 </div>

@@ -15,7 +15,7 @@ export const FEATURE_FLAGS = {
   identityVerification: {
     label: "Identity verification",
     description: "Show identity verification prompts and badges across the app.",
-    default: true,
+    default: false,
   },
   requireVerificationToSit: {
     label: "Require verification to sit",
