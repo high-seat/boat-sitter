@@ -80,6 +80,7 @@ export const DEFAULT_SIT_CREATION_DEFAULTS: SitCreationDefaults = {
 
 export type UserProfile = {
   email: string;
+  emailConfirmed: boolean;
   name: string;
   legalName: string;
   image: string;
@@ -127,7 +128,12 @@ type AppStore = {
     messageText?: string;
     messageCreatedAt?: string;
   }) => void;
-  loginAs: (user: Pick<UserProfile, "name" | "image"> & { email?: string }) => void;
+  loginAs: (
+    user: Pick<UserProfile, "name" | "image"> & {
+      email?: string;
+      emailConfirmed?: boolean;
+    },
+  ) => void;
   updateProfile: (patch: Partial<Omit<UserProfile, "role">>) => void;
   deleteAccount: () => void;
   logout: () => void;
@@ -226,6 +232,7 @@ export const useAppStore = create<AppStore>()(
           user: {
             ...user,
             email,
+            emailConfirmed: user.emailConfirmed ?? true,
             legalName: user.name,
             bio: "Practical, calm and happiest near the water. I value transparent communication, careful preparation and thorough handovers.",
             location: "Brighton, United Kingdom",
@@ -258,7 +265,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: "harbourly",
-      version: 14,
+      version: 15,
       migrate: (persistedState) => {
         const state = persistedState as AppStore;
         const next = {
@@ -275,6 +282,7 @@ export const useAppStore = create<AppStore>()(
           user: {
             ...next.user,
             email,
+            emailConfirmed: next.user.emailConfirmed ?? true,
             legalName: next.user.legalName ?? next.user.name,
             coverImage: next.user.coverImage || undefined,
             preferredCountries: next.user.preferredCountries ?? [],

@@ -43,6 +43,18 @@ export function formatApplicationSystemMessage(
       name: message.senderName,
     });
   }
+  if (message.systemKind === "phoneShared") {
+    return t("applications.systemMessage.phoneShared", {
+      name: message.senderName,
+    });
+  }
+  if (message.systemKind === "withdrawn") {
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.withdrawnOwner", {
+          name: application.applicant.name,
+        })
+      : t("applications.systemMessage.withdrawn");
+  }
   return message.text;
 }
 

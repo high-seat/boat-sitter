@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Anchor,
   CalendarPlus,
+  Check,
   ClipboardCopy,
   Eraser,
   Flag,
@@ -412,6 +413,20 @@ export function CommandPalette() {
         >
           <Eraser className="size-4" />
           Clear phone number
+        </CommandItem>,
+        <CommandItem
+          key="settings-confirm-email"
+          onSelect={() => run(() => updateProfile({ emailConfirmed: true }))}
+        >
+          <Check className="size-4" />
+          Mark email confirmed
+        </CommandItem>,
+        <CommandItem
+          key="settings-unconfirm-email"
+          onSelect={() => run(() => updateProfile({ emailConfirmed: false }))}
+        >
+          <Eraser className="size-4" />
+          Mark email unconfirmed
         </CommandItem>,
       );
     }

@@ -86,6 +86,7 @@ export async function fillMinimalCreateSitForm(
     sitType?: "liveaboard" | "daytimeChecks";
     responsibilities?: string;
     maxGuests?: number;
+    fullAddress?: string;
   },
 ) {
   const sitType = options?.sitType ?? "liveaboard";
@@ -97,13 +98,19 @@ export async function fillMinimalCreateSitForm(
 
   await pickFutureSitDates(modal, page);
 
+  await modal
+    .getByPlaceholder(/Street, marina berth|Straße|marina/i)
+    .fill(options?.fullAddress ?? "Berth A4, Demo Marina, Harbor Road 12");
+
   const maxGuests = modal.locator('input[type="number"]');
   await maxGuests.fill(String(options?.maxGuests ?? 2));
 
   const responsibilities =
     options?.responsibilities ??
     "Daily bilge check\nBattery and shore power check\nLine and fender inspection";
-  await modal.locator("textarea").first().fill(responsibilities);
+  await modal
+    .getByPlaceholder(/One task per line|Jeden Morgen|Eine Aufgabe/i)
+    .fill(responsibilities);
 
   await acceptSitTerms(modal);
 }

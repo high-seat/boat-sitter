@@ -19,6 +19,7 @@ const sitSchema = z.object({
   duration: z.string().min(1),
   location: z.string().min(1),
   country: z.string().min(1),
+  fullAddress: z.string().optional(),
   latitude: z.number().nullish(),
   longitude: z.number().nullish(),
   responsibilities: z.array(z.string()).default([]),

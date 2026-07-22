@@ -68,6 +68,8 @@ export const sits = sqliteTable(
     // stored separately so the frontend can recombine as needed.
     location: text("location").notNull(),
     country: text("country").notNull(),
+    /** Full street/marina address; only returned to owner and accepted sitters. */
+    fullAddress: text("full_address"),
     latitude: real("latitude"),
     longitude: real("longitude"),
 

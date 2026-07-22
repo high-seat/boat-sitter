@@ -1,26 +1,42 @@
-import { KeyRound, Lock, Wifi } from "lucide-react";
+import { KeyRound, Lock, MapPinned, Wifi } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
-  hasVesselPrivateAccess,
-  type VesselPrivateAccess,
+  hasSitPrivateDetails,
+  type SitPrivateDetails,
 } from "@/mockApi";
 
 export function VesselPrivateAccessCard({
   details,
   variant = "sitter",
 }: {
-  details?: VesselPrivateAccess | null;
+  details?: SitPrivateDetails | null;
   variant?: "sitter" | "owner";
 }) {
   const { t } = useTranslation();
-  if (!hasVesselPrivateAccess(details)) return null;
+  if (!hasSitPrivateDetails(details)) return null;
 
-  const rows: Array<{ key: string; label: string; value: string; multiline?: boolean }> = [];
+  const rows: Array<{
+    key: string;
+    label: string;
+    value: string;
+    multiline?: boolean;
+    icon: "map" | "wifi" | "key";
+  }> = [];
+  if (details?.fullAddress?.trim()) {
+    rows.push({
+      key: "fullAddress",
+      label: t("privateAccess.fullAddress"),
+      value: details.fullAddress.trim(),
+      multiline: true,
+      icon: "map",
+    });
+  }
   if (details?.wifiNetwork?.trim()) {
     rows.push({
       key: "wifiNetwork",
       label: t("privateAccess.wifiNetwork"),
       value: details.wifiNetwork.trim(),
+      icon: "wifi",
     });
   }
   if (details?.wifiPassword?.trim()) {
@@ -28,6 +44,7 @@ export function VesselPrivateAccessCard({
       key: "wifiPassword",
       label: t("privateAccess.wifiPassword"),
       value: details.wifiPassword.trim(),
+      icon: "wifi",
     });
   }
   if (details?.accessCodes?.trim()) {
@@ -36,6 +53,7 @@ export function VesselPrivateAccessCard({
       label: t("privateAccess.accessCodes"),
       value: details.accessCodes.trim(),
       multiline: true,
+      icon: "key",
     });
   }
   if (details?.otherNotes?.trim()) {
@@ -44,6 +62,7 @@ export function VesselPrivateAccessCard({
       label: t("privateAccess.otherNotes"),
       value: details.otherNotes.trim(),
       multiline: true,
+      icon: "key",
     });
   }
 
@@ -69,8 +88,10 @@ export function VesselPrivateAccessCard({
         {rows.map((row) => (
           <div className="grid gap-1 px-5 py-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4" key={row.key}>
             <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal">
-              {row.key.startsWith("wifi") ? (
+              {row.icon === "wifi" ? (
                 <Wifi aria-hidden="true" size={14} />
+              ) : row.icon === "map" ? (
+                <MapPinned aria-hidden="true" size={14} />
               ) : (
                 <KeyRound aria-hidden="true" size={14} />
               )}

@@ -157,6 +157,7 @@ export const seedSits: NewSit[] = [
     duration: "22 nights",
     location: "Lefkada",
     country: "Greece",
+    fullAddress: "Berth B12, Lefkas Marina, Lefkada 311 00, Greece",
     latitude: 38.7066,
     longitude: 20.7019,
     responsibilities: [

@@ -15,6 +15,7 @@ import {
   type ReportReason,
 } from "@/store";
 import { translateWithGoogle } from "@/translationService";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Select } from "@/components/ui/Select";
 import {
   VideoCallScheduleModal,
@@ -31,6 +32,7 @@ export function ConversationPanel({
   onSend,
   onRequestVideoCall,
   onRespondToVideoCall,
+  onSharePhone,
   pending,
   translationLanguage,
 }: {
@@ -43,10 +45,12 @@ export function ConversationPanel({
     messageId: string;
     proposal?: VideoCallScheduleValues;
   }) => void;
+  onSharePhone: (phoneNumber: string) => void;
   pending: boolean;
   translationLanguage: string;
 }) {
   const { i18n, t } = useTranslation();
+  const user = useAppStore((state) => state.user);
   const [reply, setReply] = useState("");
   const [typingUser, setTypingUser] = useState("");
   const [translations, setTranslations] = useState<Record<string, string>>({});
@@ -54,6 +58,7 @@ export function ConversationPanel({
   const [translationErrors, setTranslationErrors] = useState<Record<string, boolean>>({});
   const [reportingMessage, setReportingMessage] = useState<ApplicationMessage | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [sharePhoneConfirmOpen, setSharePhoneConfirmOpen] = useState(false);
   const [scheduleModal, setScheduleModal] = useState<
     null | { mode: "propose" } | { mode: "adjust"; message: ApplicationMessage }
   >(null);
@@ -159,6 +164,9 @@ export function ConversationPanel({
     currentUser === application.ownerName
       ? application.applicant.name
       : application.ownerName;
+  const profilePhone = user?.phoneNumber.trim()
+    ? `${user.phoneCountryCode} ${user.phoneNumber.trim()}`
+    : "";
   const latestPendingProposal = getLatestPendingVideoCallProposal(application.messages);
 
   function formatVideoCallDetails(message: ApplicationMessage) {
@@ -203,6 +211,66 @@ export function ConversationPanel({
       <div className="max-h-96 space-y-4 overflow-y-auto p-5">
         {application.messages.map((message) => {
           if (message.kind === "system") {
+            if (message.systemKind === "phoneShared" && message.sharedPhone) {
+              return (
+                <div className="flex justify-center" key={message.id}>
+                  <div className="flex max-w-[90%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
+                    <Phone aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
+                    <div className="min-w-0">
+                      <p className="font-bold text-navy">
+                        {t("applications.systemMessage.phoneSharedTitle")}
+                      </p>
+                      <p className="mt-1 text-slate">
+                        {formatApplicationSystemMessage(t, message, application, currentUser)}
+                      </p>
+                      <a
+                        className="mt-2 inline-flex items-center gap-2 font-bold text-navy hover:text-teal"
+                        href={`tel:${message.sharedPhone.replaceAll(/[^\d+]/g, "")}`}
+                      >
+                        <Phone aria-hidden="true" size={16} />
+                        {message.sharedPhone}
+                      </a>
+                      <p className="mt-2 text-[11px] font-semibold text-teal">
+                        {formatter.format(new Date(message.createdAt))}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+            if (message.systemKind === "withdrawn") {
+              const body = formatApplicationSystemMessage(
+                t,
+                message,
+                application,
+                currentUser,
+              );
+              if (message.text.trim()) {
+                return (
+                  <div className="flex justify-center" key={message.id}>
+                    <div className="max-w-[90%] rounded-2xl border border-slate/20 bg-cream px-4 py-3 text-sm leading-6 text-navy">
+                      <p className="font-bold text-navy">
+                        {t("applications.systemMessage.withdrawnTitle")}
+                      </p>
+                      <p className="mt-1 text-slate">{body}</p>
+                      <p className="mt-2 rounded-xl border border-line bg-white px-3 py-2 text-navy">
+                        {message.text}
+                      </p>
+                      <p className="mt-2 text-[11px] font-semibold text-teal">
+                        {formatter.format(new Date(message.createdAt))}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div className="flex justify-center" key={message.id}>
+                  <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
+                    {body}
+                  </p>
+                </div>
+              );
+            }
             if (
               message.systemKind === "videoCallRequest" ||
               message.systemKind === "videoCallCounter" ||
@@ -406,9 +474,43 @@ export function ConversationPanel({
             <Video size={16} />
             {t("applications.requestVideoCall")}
           </button>
+          <button
+            className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"
+            disabled={pending || !profilePhone}
+            onClick={() => setSharePhoneConfirmOpen(true)}
+            type="button"
+          >
+            <Phone size={16} />
+            {t("applications.sharePhoneInChat")}
+          </button>
         </div>
         <p className="mt-2 text-xs leading-5 text-slate">{t("applications.requestVideoCallHint")}</p>
+        {profilePhone ? (
+          <p className="mt-1 text-xs leading-5 text-slate">{t("applications.sharePhoneInChatHint")}</p>
+        ) : (
+          <p className="mt-1 text-xs leading-5 text-coral">{t("applications.sharePhoneUnavailable")}</p>
+        )}
       </div>
+      {sharePhoneConfirmOpen && profilePhone ? (
+        <ConfirmDialog
+          confirmLabel={t("applications.sharePhoneInChatConfirmAction")}
+          icon={<Phone size={24} />}
+          onCancel={() => setSharePhoneConfirmOpen(false)}
+          onConfirm={() => {
+            publishTyping(false);
+            onSharePhone(profilePhone);
+            setSharePhoneConfirmOpen(false);
+          }}
+          pending={pending}
+          text={t("applications.sharePhoneInChatConfirmText", {
+            name: otherPartyName,
+            phone: profilePhone,
+          })}
+          title={t("applications.sharePhoneInChatConfirmTitle")}
+          titleId="share-phone-confirm-title"
+          tone="default"
+        />
+      ) : null}
       {scheduleModal && (
         <VideoCallScheduleModal
           initial={

@@ -86,6 +86,7 @@ import { AuthModal } from "@/components/forms/AuthModal";
 import { ConversationPanel } from "@/components/applications/ConversationPanel";
 import { formatApplicationSystemMessage } from "@/components/applications/formatApplicationSystemMessage";
 import { CloseApplicationsRequestsDialog } from "@/components/applications/CloseApplicationsRequestsDialog";
+import { WithdrawInterestDialog } from "@/components/applications/WithdrawInterestDialog";
 import { AdminPage } from "@/components/admin/AdminPage";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { isAdminUser } from "@/adminAccess";
@@ -97,6 +98,7 @@ import {
   ChangeEmailModal,
   ChangePasswordModal,
 } from "@/components/forms/ChangeCredentialsModals";
+import { EmailConfirmationStatus } from "@/components/settings/EmailConfirmationStatus";
 import { UserSafetyActions, BlockedUserBanner } from "@/components/moderation/UserSafetyActions";
 import { getIntlLocale, normalizeLanguageCode, SUPPORTED_LANGUAGES } from "@/i18n";
 import { isHappeningSoon, getSitPhase, canLeaveReview, reviewDaysRemaining, parseSitDate, startOfLocalDay, SIT_PHASES, type SitPhase } from "@/dateUtils";
@@ -122,6 +124,7 @@ import {
   saveVessel,
   sendApplication,
   sendApplicationMessage,
+  shareApplicationPhoneNumber,
   requestApplicationVideoCall,
   acceptApplicationVideoCall,
   declineApplicationVideoCall,
@@ -142,6 +145,7 @@ import {
   type BoatPhoto,
   type Sit,
   type SitApplication,
+  type SitType,
   type Vessel,
 } from "@/mockApi";
 import { VesselPrivateAccessCard } from "@/components/listing/VesselPrivateAccessCard";
@@ -755,6 +759,7 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
   const navigate = useNavigate();
   const [where, setWhere] = useState("");
   const [type, setType] = useState("");
+  const [sitType, setSitType] = useState<"" | SitType>("");
   const [dates, setDates] = useState({ startDate: "", endDate: "" });
 
   function submit(event: React.FormEvent) {
@@ -762,6 +767,7 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
     const params = new URLSearchParams();
     if (where) params.set("q", where);
     if (type) params.set("type", type);
+    if (sitType) params.set("sitType", sitType);
     if (dates.startDate) params.set("from", dates.startDate);
     if (dates.endDate) params.set("to", dates.endDate);
     navigate(`/boats?${params.toString()}`);
@@ -769,7 +775,7 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
 
   return (
     <form
-      className={`grid rounded-2xl border border-line bg-white shadow-float md:grid-cols-[1.2fr_0.9fr_0.9fr_auto] ${compact ? "" : "mx-auto max-w-5xl"}`}
+      className={`grid rounded-2xl border border-line bg-white shadow-float md:grid-cols-[1.1fr_0.85fr_0.8fr_0.8fr_auto] ${compact ? "" : "mx-auto max-w-5xl"}`}
       onSubmit={submit}
     >
       <DestinationAutocomplete multiple onChange={setWhere} value={where} variant="home" />
@@ -791,6 +797,23 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
                 {displayLabel(t, vesselType)}
               </option>
             ))}
+          </Select>
+        </span>
+      </label>
+      <label className="flex items-center gap-3 border-b border-line px-5 py-4 md:border-r md:border-b-0">
+        <span className="min-w-0 flex-1">
+          <span className="block text-[11px] font-bold uppercase tracking-[0.13em] text-slate">
+            {t("search.sitType")}
+          </span>
+          <Select
+            aria-label={t("search.sitType")}
+            onChange={(event) => setSitType(event.target.value as "" | SitType)}
+            value={sitType}
+            variant="inline"
+          >
+            <option value="">{t("search.anySitType")}</option>
+            <option value="liveaboard">{t("sitType.liveaboard")}</option>
+            <option value="daytimeChecks">{t("sitType.daytimeChecks")}</option>
           </Select>
         </span>
       </label>
@@ -1170,6 +1193,11 @@ function recommendedSitScore(
   return score;
 }
 
+function parseSitTypeParam(value: string | null): "all" | SitType {
+  if (value === "liveaboard" || value === "daytimeChecks") return value;
+  return "all";
+}
+
 function BoatsPage() {
   const { t } = useTranslation();
   const user = useAppStore((state) => state.user);
@@ -1178,6 +1206,9 @@ function BoatsPage() {
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get("q") ?? "");
   const [type, setType] = useState(params.get("type") ?? "All vessels");
+  const [sitTypeFilter, setSitTypeFilter] = useState<"all" | SitType>(() =>
+    parseSitTypeParam(params.get("sitType")),
+  );
   const [dates, setDates] = useState({
     startDate: params.get("from") ?? "",
     endDate: params.get("to") ?? "",
@@ -1204,6 +1235,19 @@ function BoatsPage() {
     );
   }
 
+  function updateSitTypeFilter(value: "all" | SitType) {
+    setSitTypeFilter(value);
+    const nextParams = new URLSearchParams(window.location.search);
+    if (value === "all") nextParams.delete("sitType");
+    else nextParams.set("sitType", value);
+    const search = nextParams.toString();
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${search ? `?${search}` : ""}`,
+    );
+  }
+
   const filtered = useMemo(
     () =>
       boats.filter((boat) => {
@@ -1216,6 +1260,8 @@ function BoatsPage() {
         const matchesQuery =
           searchValues.length === 0 || searchValues.some((value) => searchable.includes(value));
         const matchesType = type === "All vessels" || boat.type === type;
+        const boatSitType = boat.sitType ?? "liveaboard";
+        const matchesSitType = sitTypeFilter === "all" || boatSitType === sitTypeFilter;
         const boatStart = new Date(`${boat.dateStart}T00:00:00`);
         const boatEnd = new Date(boatStart);
         boatEnd.setDate(boatEnd.getDate() + Number.parseInt(boat.duration, 10));
@@ -1232,12 +1278,13 @@ function BoatsPage() {
         return (
           matchesQuery &&
           matchesType &&
+          matchesSitType &&
           matchesDates &&
           matchesAvailability &&
           (!petOnly || Boolean(boat.pet))
         );
       }),
-    [availability, boats, dates.endDate, dates.startDate, petOnly, query, type],
+    [availability, boats, dates.endDate, dates.startDate, petOnly, query, sitTypeFilter, type],
   );
   const sorted = useMemo(
     () =>
@@ -1278,7 +1325,7 @@ function BoatsPage() {
 
   useEffect(() => {
     setPage(0);
-  }, [availability, dates.endDate, dates.startDate, petOnly, query, sort, type]);
+  }, [availability, dates.endDate, dates.startDate, petOnly, query, sitTypeFilter, sort, type]);
 
   useEffect(() => {
     if (page > totalPages - 1) setPage(Math.max(0, totalPages - 1));
@@ -1292,6 +1339,7 @@ function BoatsPage() {
   function resetFilters() {
     setQuery("");
     setType("All vessels");
+    setSitTypeFilter("all");
     setDates({ startDate: "", endDate: "" });
     setPetOnly(false);
     setAvailability("all");
@@ -1301,6 +1349,7 @@ function BoatsPage() {
   const filtersActive =
     Boolean(query) ||
     type !== "All vessels" ||
+    sitTypeFilter !== "all" ||
     Boolean(dates.startDate) ||
     Boolean(dates.endDate) ||
     petOnly ||
@@ -1314,7 +1363,7 @@ function BoatsPage() {
           <h1 className="section-title">{t("boats.title")}</h1>
           <p className="mt-3 text-slate">{t("boats.subtitle")}</p>
         </div>
-        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm md:flex-row">
+        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm md:flex-row md:flex-wrap">
           <DestinationAutocomplete multiple onChange={updateLocationQuery} value={query} />
           <DateRangePicker
             endDate={dates.endDate}
@@ -1329,6 +1378,17 @@ function BoatsPage() {
                 {displayLabel(t, option)}
               </option>
             ))}
+          </Select>
+          <Select
+            aria-label={t("boats.sitTypeLabel")}
+            onChange={(event) =>
+              updateSitTypeFilter(event.target.value as "all" | SitType)
+            }
+            value={sitTypeFilter}
+          >
+            <option value="all">{t("boats.sitTypeAll")}</option>
+            <option value="liveaboard">{t("sitType.liveaboard")}</option>
+            <option value="daytimeChecks">{t("sitType.daytimeChecks")}</option>
           </Select>
           <label
             className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${petOnly ? "border-teal bg-seafoam text-teal" : "border-line text-slate"}`}
@@ -4214,6 +4274,7 @@ function SitEditor({
     boatId: initialBoatId,
     location: sit?.location ?? initialHomePort.location,
     country: sit?.country ?? initialHomePort.country,
+    fullAddress: sit?.fullAddress ?? "",
     startDate: sit?.dateStart ?? "",
     endDate: existingEnd,
     sitType: sit?.sitType ?? "liveaboard",
@@ -4287,6 +4348,7 @@ function SitEditor({
           duration: t("duration.nights", { count: nights }),
           location,
           country,
+          fullAddress: form.fullAddress.trim() || undefined,
           latitude: coordinates.latitude,
           longitude: coordinates.longitude,
           approximateLocation: true,
@@ -4421,6 +4483,7 @@ function SitEditor({
     if (!form.startDate || !form.endDate) reasons.push(t("sitEditor.dates"));
     if (!sameAsHomePort && !form.location.trim()) reasons.push(t("sitEditor.location"));
     if (!sameAsHomePort && !form.country.trim()) reasons.push(t("sitEditor.country"));
+    if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
     const guests = Number(form.maxGuests);
     if (!Number.isFinite(guests) || guests < 1 || guests > 12) {
       reasons.push(t("sitEditor.maxGuests"));
@@ -4430,6 +4493,7 @@ function SitEditor({
     form.boatId,
     form.country,
     form.endDate,
+    form.fullAddress,
     form.location,
     form.maxGuests,
     form.startDate,
@@ -4609,6 +4673,20 @@ function SitEditor({
               </div>
             </section>
           )}
+          <section className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
+            <label className="block">
+              <span className="form-label">{t("sitEditor.fullAddress")}</span>
+              <textarea
+                className="form-input mt-1 min-h-24"
+                onChange={(event) => setForm({ ...form, fullAddress: event.target.value })}
+                placeholder={t("sitEditor.fullAddressPlaceholder")}
+                value={form.fullAddress}
+              />
+            </label>
+            <p className="mt-2 text-xs leading-5 text-slate" role="note">
+              {t("sitEditor.fullAddressHint")}
+            </p>
+          </section>
           <div>
             <span className="form-label">{t("sitEditor.dates")}</span>
             <DateRangePicker
@@ -5076,7 +5154,13 @@ function OwnerBoatsPage() {
     },
   });
   const withdrawMutation = useMutation({
-    mutationFn: (applicationId: string) => withdrawApplication(applicationId, user!.name),
+    mutationFn: ({
+      applicationId,
+      explanation,
+    }: {
+      applicationId: string;
+      explanation: string;
+    }) => withdrawApplication(applicationId, user!.name, explanation),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
       await queryClient.invalidateQueries({ queryKey: ["sits"] });
@@ -5134,15 +5218,20 @@ function OwnerBoatsPage() {
   const showArchivedSection =
     archivedOwnedSits.length > 0 &&
     (sitPhaseFilter === "all" || sitPhaseFilter === "archived");
-  const filteredSitterApplications =
-    sitPhaseFilter === "all"
-      ? sitterApplications
-      : sitPhaseFilter === "archived"
-        ? []
-        : sitterApplications.filter((application) => {
-            const sit = sits.find((item) => item.id === application.sitId);
-            return sit ? resolveSitPhase(sit) === sitPhaseFilter : false;
-          });
+  function sitterApplicationMatchesPhaseFilter(application: SitApplication) {
+    if (sitPhaseFilter === "all") return true;
+    if (sitPhaseFilter === "archived") return false;
+    const sit = sits.find((item) => item.id === application.sitId);
+    return sit ? resolveSitPhase(sit) === sitPhaseFilter : false;
+  }
+  const activeSitterApplications = sitterApplications.filter(
+    (application) =>
+      application.status !== "withdrawn" && sitterApplicationMatchesPhaseFilter(application),
+  );
+  const withdrawnSitterApplications = sitterApplications.filter(
+    (application) =>
+      application.status === "withdrawn" && sitterApplicationMatchesPhaseFilter(application),
+  );
   const sitsTabCount = ownedSits.length + archivedOwnedSits.length + sitterApplications.length;
   const isLoading = vesselsLoading || sitsLoading;
   const sitCreateBlockedByBoat = activeTab === "sits" && ownedBoats.length === 0;
@@ -5330,6 +5419,103 @@ function OwnerBoatsPage() {
               type="button"
             >
               <Trash2 size={17} />
+            </button>
+          )}
+        </div>
+      </article>
+    );
+  }
+
+  function renderSitterApplicationCard(application: SitApplication) {
+    const sit = sits.find((item) => item.id === application.sitId);
+    const vessel = vessels.find((item) => item.id === (sit?.boatId ?? application.sitId));
+    const boatImage = vessel?.image;
+    const isWithdrawn = application.status === "withdrawn";
+    return (
+      <article
+        className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center sm:gap-5"
+        key={application.id}
+      >
+        <div className="flex min-w-0 flex-1 gap-4">
+          <Link
+            aria-label={t("sits.viewListing")}
+            className="block size-20 shrink-0 self-start overflow-hidden rounded-xl bg-cream sm:size-24"
+            to={`/boats/${application.sitId}`}
+          >
+            {boatImage ? (
+              <img
+                alt={t("boat.imageAlt", {
+                  name: application.boatName,
+                  type: displayLabel(t, vessel?.type ?? "Boat"),
+                })}
+                className="size-full object-cover"
+                onError={(event) => {
+                  event.currentTarget.src = fallbackImage;
+                }}
+                src={optimizePhotoUrl(boatImage, 320)}
+              />
+            ) : (
+              <span className="grid size-full place-items-center text-navy">
+                <Anchor aria-hidden="true" size={28} />
+              </span>
+            )}
+          </Link>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-teal">
+              {application.boatName}
+            </p>
+            <Link
+              className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
+              to={`/boats/${application.sitId}`}
+            >
+              {sit
+                ? formatSitDates(i18n.language, sit.dateStart, sit.duration)
+                : application.boatName}
+            </Link>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <SitParticipationBadge role="sitter" />
+              <ApplicationStatusBadge status={application.status} />
+              {sit && (
+                <SitPhaseBadge
+                  phase={
+                    sit.phase ??
+                    getSitPhase({
+                      dateStart: sit.dateStart,
+                      duration: sit.duration,
+                      applicationsOpen: sit.applicationsOpen,
+                      accepted: sit.accepted,
+                      applicants: sit.applicants,
+                    })
+                  }
+                />
+              )}
+            </div>
+            <p className="mt-1 text-sm text-slate">
+              {t("sits.withOwner", { owner: application.ownerName })}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:justify-end">
+          <Link
+            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+            to={`/boats/${application.sitId}`}
+          >
+            <Anchor size={16} /> {t("sits.viewListing")}
+          </Link>
+          <Link
+            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+            to={`/messages?application=${encodeURIComponent(application.id)}`}
+          >
+            <MessageCircle size={16} /> {t("nav.messages")}
+          </Link>
+          {!isWithdrawn && application.status !== "declined" && (
+            <button
+              className="flex items-center gap-2 rounded-xl border border-coral/40 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-60"
+              disabled={withdrawMutation.isPending}
+              onClick={() => setWithdrawConfirm(application)}
+              type="button"
+            >
+              {t("sits.withdrawInterest")}
             </button>
           )}
         </div>
@@ -5617,83 +5803,29 @@ function OwnerBoatsPage() {
               </button>
             </div>
           )}
-          {filteredSitterApplications.length > 0 && (
+          {activeSitterApplications.length > 0 && (
             <section className="space-y-4">
               <h2 className="font-display text-lg font-bold text-navy">
                 {t("sits.requestedHeading")}
               </h2>
-              {filteredSitterApplications.map((application) => {
-                const sit = sits.find((item) => item.id === application.sitId);
-                return (
-                  <article
-                    className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center"
-                    key={application.id}
-                  >
-                    <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-cream text-navy">
-                      <Anchor size={24} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                        {application.boatName}
-                      </p>
-                      <Link
-                        className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
-                        to={`/boats/${application.sitId}`}
-                      >
-                        {sit
-                          ? formatSitDates(i18n.language, sit.dateStart, sit.duration)
-                          : application.boatName}
-                      </Link>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <SitParticipationBadge role="sitter" />
-                        <ApplicationStatusBadge status={application.status} />
-                        {sit && (
-                          <SitPhaseBadge
-                            phase={
-                              sit.phase ??
-                              getSitPhase({
-                                dateStart: sit.dateStart,
-                                duration: sit.duration,
-                                applicationsOpen: sit.applicationsOpen,
-                                accepted: sit.accepted,
-                                applicants: sit.applicants,
-                              })
-                            }
-                          />
-                        )}
-                      </div>
-                      <p className="mt-1 text-sm text-slate">
-                        {t("sits.withOwner", { owner: application.ownerName })}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Link
-                        className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                        to={`/boats/${application.sitId}`}
-                      >
-                        <Anchor size={16} /> {t("sits.viewListing")}
-                      </Link>
-                      <Link
-                        className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                        to={`/messages?application=${encodeURIComponent(application.id)}`}
-                      >
-                        <MessageCircle size={16} /> {t("nav.messages")}
-                      </Link>
-                      {application.status !== "withdrawn" &&
-                        application.status !== "declined" && (
-                          <button
-                            className="flex items-center gap-2 rounded-xl border border-coral/40 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-60"
-                            disabled={withdrawMutation.isPending}
-                            onClick={() => setWithdrawConfirm(application)}
-                            type="button"
-                          >
-                            {t("sits.withdrawInterest")}
-                          </button>
-                        )}
-                    </div>
-                  </article>
-                );
-              })}
+              {activeSitterApplications.map((application) =>
+                renderSitterApplicationCard(application),
+              )}
+            </section>
+          )}
+          {withdrawnSitterApplications.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-display text-lg font-bold text-navy">
+                  {t("sits.withdrawnHeading")}
+                </h2>
+                <span className="rounded-full bg-cream px-2.5 py-1 text-xs font-bold text-slate">
+                  {t("sits.withdrawnCount", { count: withdrawnSitterApplications.length })}
+                </span>
+              </div>
+              {withdrawnSitterApplications.map((application) =>
+                renderSitterApplicationCard(application),
+              )}
             </section>
           )}
         </div>
@@ -5782,19 +5914,16 @@ function OwnerBoatsPage() {
         />
       )}
       {withdrawConfirm && (
-        <ConfirmDialog
-          confirmLabel={t("sits.withdrawConfirmAction")}
+        <WithdrawInterestDialog
+          application={withdrawConfirm}
           onCancel={() => setWithdrawConfirm(null)}
-          onConfirm={() => withdrawMutation.mutate(withdrawConfirm.id)}
-          pending={withdrawMutation.isPending}
-          text={
-            withdrawConfirm.status === "accepted"
-              ? t("sits.withdrawAcceptedConfirmText", { boat: withdrawConfirm.boatName })
-              : t("sits.withdrawConfirmText", { boat: withdrawConfirm.boatName })
+          onConfirm={(explanation) =>
+            withdrawMutation.mutate({
+              applicationId: withdrawConfirm.id,
+              explanation,
+            })
           }
-          title={t("sits.withdrawConfirmTitle")}
-          titleId="withdraw-interest-confirm-title"
-          tone="danger"
+          pending={withdrawMutation.isPending}
         />
       )}
       {deleteConfirm?.type === "boat" && (
@@ -6094,6 +6223,12 @@ function SettingsPage() {
                 <p className="mt-1 wrap-break-word text-base font-semibold text-navy">{user.email}</p>
               </div>
 
+              <EmailConfirmationStatus
+                confirmed={member.emailConfirmed}
+                email={member.email}
+                onFlash={flashAccountMessage}
+              />
+
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   className="rounded-xl border border-line px-5 py-3 text-sm font-bold text-navy hover:border-teal"
@@ -6295,7 +6430,7 @@ function SettingsPage() {
           currentEmail={member.email}
           onClose={() => setEmailModalOpen(false)}
           onSuccess={(email) => {
-            updateProfile({ email });
+            updateProfile({ email, emailConfirmed: false });
             flashAccountMessage(t("settings.emailUpdated"));
           }}
         />
@@ -7079,6 +7214,13 @@ function ApplicationReviewPage() {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
   });
+  const sharePhoneMutation = useMutation({
+    mutationFn: ({ id, phoneNumber }: { id: string; phoneNumber: string }) =>
+      shareApplicationPhoneNumber(id, user!.name, phoneNumber),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
 
   if (!user || (!pageLoading && !allowed)) {
     return (
@@ -7735,11 +7877,15 @@ function ApplicationReviewPage() {
                 }
               }}
               onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
+              onSharePhone={(phoneNumber) =>
+                sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
+              }
               pending={
                 messageMutation.isPending ||
                 videoCallMutation.isPending ||
                 videoCallAcceptMutation.isPending ||
-                videoCallDeclineMutation.isPending
+                videoCallDeclineMutation.isPending ||
+                sharePhoneMutation.isPending
               }
               translationLanguage={user.preferredLanguage}
             />
@@ -8018,6 +8164,13 @@ function MessagesPage() {
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
   });
+  const sharePhoneMutation = useMutation({
+    mutationFn: ({ id, phoneNumber }: { id: string; phoneNumber: string }) =>
+      shareApplicationPhoneNumber(id, user!.name, phoneNumber),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
 
   function handleArchiveSelected() {
     if (!selected) return;
@@ -8253,11 +8406,15 @@ function MessagesPage() {
                     }
                   }}
                   onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
+                  onSharePhone={(phoneNumber) =>
+                    sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
+                  }
                   pending={
                     messageMutation.isPending ||
                     videoCallMutation.isPending ||
                     videoCallAcceptMutation.isPending ||
-                    videoCallDeclineMutation.isPending
+                    videoCallDeclineMutation.isPending ||
+                    sharePhoneMutation.isPending
                   }
                   translationLanguage={user.preferredLanguage}
                 />

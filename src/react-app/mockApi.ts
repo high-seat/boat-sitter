@@ -143,6 +143,15 @@ export function hasVesselPrivateAccess(details?: VesselPrivateAccess | null) {
   );
 }
 
+/** Sit-level private details (vessel access plus optional full address). */
+export type SitPrivateDetails = VesselPrivateAccess & {
+  fullAddress?: string;
+};
+
+export function hasSitPrivateDetails(details?: SitPrivateDetails | null) {
+  return hasVesselPrivateAccess(details) || Boolean(details?.fullAddress?.trim());
+}
+
 export function normalizeVesselPrivateAccess(
   details?: VesselPrivateAccess | null,
 ): VesselPrivateAccess | undefined {
@@ -170,6 +179,11 @@ export type Sit = {
   longitude: number;
   /** When true or unset, the map pin is city-level only. */
   approximateLocation?: boolean;
+  /**
+   * Full street / marina berth address. Never included on public listings;
+   * shared only with the owner and accepted applicants.
+   */
+  fullAddress?: string;
   /** Whether the sitter stays aboard or just does daily visits. Defaults to liveaboard. */
   sitType?: SitType;
   responsibilities: string[];
@@ -388,6 +402,7 @@ const boats: Boat[] = [
     ],
     pet: "Pip, a sea-loving terrier",
     featured: true,
+    sitType: "liveaboard",
   },
   {
     id: "blue-hour",
@@ -598,6 +613,7 @@ const boats: Boat[] = [
     description:
       "A design-led floating home with a tender and two resident hens ashore. No cruising required, just attentive houseboat care.",
     home: "Two bedrooms, chef’s kitchen, roof deck and spectacular bay views.",
+    sitType: "daytimeChecks",
     responsibilities: [
       "Check float and utility connections",
       "Water roof planters",
@@ -876,6 +892,7 @@ const DEMO_SOLSTICE_PRIVATE_ACCESS: VesselPrivateAccess = {
     "Marina pedestrian gate: 4821#\nLockbox on starboard winch: 3391\nCompanionway padlock: 2048",
   otherNotes: "Spare ignition key with marina office under Maya Ellison.",
 };
+const DEMO_SOLSTICE_FULL_ADDRESS = "Berth B12, Lefkas Marina, Lefkada 311 00, Greece";
 
 const toVessel = (boat: Boat): Vessel => ({
   id: boat.boatId ?? boat.id,
@@ -933,6 +950,8 @@ const toSit = (boat: Boat): Sit => ({
   country: boat.country,
   latitude: boat.latitude,
   longitude: boat.longitude,
+  fullAddress: boat.id === "solstice" ? DEMO_SOLSTICE_FULL_ADDRESS : undefined,
+  sitType: boat.sitType ?? "liveaboard",
   responsibilities: boat.responsibilities,
   requirements: withoutNonSmokerRequirementLabels(boat.requirements),
   minYearsExperience: Number.parseInt(
@@ -953,7 +972,8 @@ const toSit = (boat: Boat): Sit => ({
 });
 
 const GENERATED_VESSELS_SEED_KEY = "boatstead-generated-vessels-v5";
-const GENERATED_SITS_SEED_KEY = "boatstead-generated-sits-v3";
+const GENERATED_SITS_SEED_KEY = "boatstead-generated-sits-v4";
+const HANDCRAFTED_SIT_TYPE_SEED_KEY = "boatstead-handcrafted-sit-type-v1";
 
 function mergeGeneratedVessels(current: Vessel[]) {
   if (localStorage.getItem(GENERATED_VESSELS_SEED_KEY)) return current;
@@ -978,6 +998,44 @@ function ensureSolsticePrivateAccess(current: Vessel[]) {
   });
   if (changed) {
     localStorage.setItem("harbourly-vessels", JSON.stringify(next));
+  }
+  return next;
+}
+
+const SOLSTICE_FULL_ADDRESS_SEED_KEY = "boatstead-solstice-full-address-v1";
+
+function ensureSolsticeFullAddress(current: Sit[]) {
+  if (localStorage.getItem(SOLSTICE_FULL_ADDRESS_SEED_KEY)) return current;
+  localStorage.setItem(SOLSTICE_FULL_ADDRESS_SEED_KEY, "complete");
+  let changed = false;
+  const next = current.map((sit) => {
+    if (sit.id !== "solstice" || sit.fullAddress?.trim()) return sit;
+    changed = true;
+    return { ...sit, fullAddress: DEMO_SOLSTICE_FULL_ADDRESS };
+  });
+  if (changed) {
+    localStorage.setItem("harbourly-sits", JSON.stringify(next));
+  }
+  return next;
+}
+
+const HANDCRAFTED_SIT_TYPES: Record<string, SitType> = {
+  solstice: "liveaboard",
+  "sea-glass": "daytimeChecks",
+};
+
+function ensureHandcraftedSitTypes(current: Sit[]) {
+  if (localStorage.getItem(HANDCRAFTED_SIT_TYPE_SEED_KEY)) return current;
+  localStorage.setItem(HANDCRAFTED_SIT_TYPE_SEED_KEY, "complete");
+  let changed = false;
+  const next = current.map((sit) => {
+    const sitType = HANDCRAFTED_SIT_TYPES[sit.id];
+    if (!sitType || sit.sitType === sitType) return sit;
+    changed = true;
+    return { ...sit, sitType };
+  });
+  if (changed) {
+    localStorage.setItem("harbourly-sits", JSON.stringify(next));
   }
   return next;
 }
@@ -1082,12 +1140,16 @@ function readSits(): Sit[] {
           maxGuests: Math.max(1, Math.floor(sit.maxGuests ?? 2)),
         };
       });
-      return mergeGeneratedSits(storedSits);
+      return ensureHandcraftedSitTypes(
+        ensureSolsticeFullAddress(mergeGeneratedSits(storedSits)),
+      );
     } catch {
       // Fall through to the legacy seed.
     }
   }
-  return mergeGeneratedSits(readLegacyBoats().map(toSit));
+  return ensureHandcraftedSitTypes(
+    ensureSolsticeFullAddress(mergeGeneratedSits(readLegacyBoats().map(toSit))),
+  );
 }
 
 function acceptedSitIds() {
@@ -1114,9 +1176,10 @@ function joinSit(
   const accepted = acceptedIds.has(sit.id);
   const applicationsOpen = sit.applicationsOpen !== false;
   const nonSmokerRequired = resolveNonSmokerRequired(sit);
+  const { fullAddress: _fullAddress, ...publicSit } = sit;
   return {
     ...publicVesselFields(vessel),
-    ...sit,
+    ...publicSit,
     id: sit.id,
     boatId: vessel.id,
     accepted,
@@ -1212,18 +1275,24 @@ function canViewerSeeVesselPrivateAccess(vessel: Vessel, sitId: string, viewerNa
   );
 }
 
-/** Private Wi-Fi / access codes for a sit; only owner or the accepted sitter. */
+/** Private Wi-Fi / access codes / full address for a sit; only owner or the accepted sitter. */
 export async function getSitPrivateAccessForViewer(
   sitId: string,
   viewerName: string,
-): Promise<VesselPrivateAccess | undefined> {
+): Promise<SitPrivateDetails | undefined> {
   await wait(180);
   const sit = readSits().find((item) => item.id === sitId);
   if (!sit) return undefined;
   const vessel = readVessels().find((item) => item.id === sit.boatId);
-  if (!vessel || !hasVesselPrivateAccess(vessel.privateAccess)) return undefined;
+  if (!vessel) return undefined;
   if (!canViewerSeeVesselPrivateAccess(vessel, sitId, viewerName)) return undefined;
-  return normalizeVesselPrivateAccess(vessel.privateAccess);
+  const privateAccess = normalizeVesselPrivateAccess(vessel.privateAccess);
+  const fullAddress = sit.fullAddress?.trim() || undefined;
+  const details: SitPrivateDetails = {
+    ...privateAccess,
+    ...(fullAddress ? { fullAddress } : {}),
+  };
+  return hasSitPrivateDetails(details) ? details : undefined;
 }
 
 export async function deleteVessel(id: string): Promise<void> {
@@ -1286,6 +1355,7 @@ export async function saveSit(
   await wait(500);
   const normalized: Sit = {
     ...sit,
+    fullAddress: sit.fullAddress?.trim() || undefined,
     nonSmokerRequired: Boolean(sit.nonSmokerRequired),
     requirements: withoutNonSmokerRequirementLabels(sit.requirements),
     requiredSkills: withoutNonSmokerRequirementLabels(sit.requiredSkills ?? []),
@@ -1493,11 +1563,15 @@ export type ApplicationMessage = {
     | "videoCallRequest"
     | "videoCallCounter"
     | "videoCallAccepted"
-    | "videoCallDeclined";
+    | "videoCallDeclined"
+    | "phoneShared"
+    | "withdrawn";
   videoCall?: {
     startsAt: string;
     durationMinutes: number;
   };
+  /** Profile phone shared into the thread (E.164-ish display string). */
+  sharedPhone?: string;
 };
 
 export type SitApplication = {
@@ -2044,7 +2118,11 @@ export async function getApplicationsForUser(userName: string): Promise<SitAppli
       (application) =>
         application.ownerName === userName || application.applicant.name === userName,
     )
-    .sort((a, b) => b.messages.at(-1)!.createdAt.localeCompare(a.messages.at(-1)!.createdAt));
+    .sort((a, b) => {
+      const aTime = a.messages.at(-1)?.createdAt ?? a.createdAt;
+      const bTime = b.messages.at(-1)?.createdAt ?? b.createdAt;
+      return bTime.localeCompare(aTime);
+    });
 }
 
 export async function updateApplicationStatus(
@@ -2105,6 +2183,7 @@ export async function updateApplicationStatus(
 export async function withdrawApplication(
   applicationId: string,
   applicantName: string,
+  explanation?: string,
 ): Promise<SitApplication> {
   await wait(350);
   const applications = readApplications();
@@ -2117,10 +2196,22 @@ export async function withdrawApplication(
     throw new Error("WITHDRAW_NOT_ALLOWED");
   }
   const wasAccepted = application.status === "accepted";
+  const note = explanation?.trim() ?? "";
   const updated = {
     ...application,
     status: "withdrawn" as const,
     ownerPhone: undefined,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-withdraw-${Date.now()}`,
+        senderName: applicantName,
+        text: note,
+        createdAt: new Date().toISOString(),
+        kind: "system" as const,
+        systemKind: "withdrawn" as const,
+      },
+    ],
   };
   writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
   const sits = readSits();
@@ -2234,6 +2325,36 @@ export async function sendApplicationMessage(
         senderName,
         text: text.trim(),
         createdAt: new Date().toISOString(),
+      },
+    ],
+  };
+  writeApplications(applications.map((item) => (item.id === applicationId ? updated : item)));
+  return updated;
+}
+
+export async function shareApplicationPhoneNumber(
+  applicationId: string,
+  senderName: string,
+  phoneNumber: string,
+): Promise<SitApplication> {
+  await wait(350);
+  const applications = readApplications();
+  const application = applications.find((item) => item.id === applicationId);
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+  const sharedPhone = phoneNumber.trim();
+  if (!sharedPhone) throw new Error("PHONE_NUMBER_REQUIRED");
+  const updated = {
+    ...application,
+    messages: [
+      ...application.messages,
+      {
+        id: `message-phone-${Date.now()}`,
+        senderName,
+        text: `${senderName} shared their phone number`,
+        createdAt: new Date().toISOString(),
+        kind: "system" as const,
+        systemKind: "phoneShared" as const,
+        sharedPhone,
       },
     ],
   };

@@ -114,8 +114,7 @@ select.select-control:not(.form-input) {
 }
 
 select.select-control.select-variant-inline {
-  background-position: right 0 center;
-  padding-right: 1.25rem;
+  padding-right: 2.25rem;
 }
 
 .phone-country-code.react-tel-input {

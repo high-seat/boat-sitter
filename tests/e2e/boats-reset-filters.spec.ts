@@ -2,11 +2,12 @@ import { expect, test } from "@playwright/test";
 
 test.describe("boats empty state", () => {
   test("resets filters from the empty results state", async ({ page }) => {
-    await page.goto("/boats?q=zzzz-no-match-xyz");
+    await page.goto("/boats?q=zzzz-no-match-xyz&sitType=daytimeChecks");
     await expect(page.getByRole("heading", { name: /No boats on this tide/i })).toBeVisible();
     await page.getByRole("button", { name: /Reset filters/i }).click();
     await expect(page.getByRole("heading", { name: /No boats on this tide/i })).toHaveCount(0);
     await expect(page).toHaveURL(/\/boats\/?$/);
+    await expect(page.getByLabel(/Sit type/i)).toHaveValue("all");
     await expect(page.getByText(/\d+ sits? found/i)).toBeVisible();
   });
 
