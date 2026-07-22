@@ -1741,6 +1741,7 @@ export type MockNotification = {
   id: string;
   type:
     | "applicationAccepted"
+    | "applicationDeclined"
     | "newApplication"
     | "newMessage"
     | "sitAccepted"

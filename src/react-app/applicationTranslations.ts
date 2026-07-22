@@ -190,6 +190,7 @@ const en = {
     "Listings must offer a vessel that is safe, legal, and reasonably habitable for the sitter to live and sleep aboard. Every sit is a liveaboard arrangement, not a day-check service. During the agreed dates, the sitter may use the vessel only as temporary accommodation and to perform agreed care. Unless the owner gives explicit written permission, the sitter must not navigate, relocate, charter, lend, sublet, commercially use, or host unauthorized overnight guests aboard the vessel. Safety and emergency instructions take priority.",
   "notifications.items.sitAccepted": "{{actor}} accepted your invitation to sit {{boat}}.",
   "notifications.items.applicationAccepted": "{{actor}} accepted your application for {{boat}}.",
+  "notifications.items.applicationDeclined": "{{actor}} declined your application for {{boat}}.",
   "notifications.items.newApplication": "{{actor}} applied to sit {{boat}}.",
   "notifications.items.newMessage": "{{actor}} sent you a new message about {{boat}}.",
   "notifications.items.sitReminder": "Your sit on {{boat}} starts soon.",

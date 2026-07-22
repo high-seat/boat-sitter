@@ -4,6 +4,7 @@ import { notifications, vessels } from "../db/schema";
 
 export type NotificationType =
   | "applicationAccepted"
+  | "applicationDeclined"
   | "newApplication"
   | "newMessage"
   | "sitAccepted"

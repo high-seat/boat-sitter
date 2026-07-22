@@ -348,6 +348,16 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
       text: `${user.name} declined this application`,
       systemKind: "declined",
     });
+    if (appRow.applicantUserId) {
+      await insertNotification(db, {
+        userId: appRow.applicantUserId,
+        userName: appRow.applicantName,
+        type: "applicationDeclined",
+        actor: user.name,
+        boatName: appRow.boatName,
+        href: `/messages?application=${id}`,
+      });
+    }
     await sendNotificationEmail(c.env, {
       subject: `Update on your application for ${appRow.boatName}`,
       heading: "Application update",
