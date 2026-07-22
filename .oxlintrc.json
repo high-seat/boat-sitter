@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "no-nested-ternary": "error",
+    "eslint/no-nested-ternary": "error",
+    "unicorn/no-nested-ternary": "off"
+  }
+}

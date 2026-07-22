@@ -70,7 +70,7 @@ export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>)
               role: ownerState.role,
             },
           },
-          version: 15,
+          version: 16,
         }),
       );
       if (ownerState.verified) {

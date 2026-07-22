@@ -94,7 +94,15 @@ import { DateRangePicker } from "@/components/forms/DateRangePicker";
 import { ImageUploadControl } from "@/components/forms/ImageUploadControl";
 import { PhoneCountryCodeSelect } from "@/components/forms/PhoneCountryCodeSelect";
 import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
-import { ChangeEmailModal, ChangePasswordModal } from "@/components/forms/ChangeCredentialsModals";
+import {
+  DEFAULT_PHONE_COUNTRY_CODE,
+  phoneCountryCodeFromLocation,
+  resolvePhoneCountryCode,
+} from "@/phoneCountryCode";
+import {
+  ChangeEmailModal,
+  ChangePasswordModal,
+} from "@/components/forms/ChangeCredentialsModals";
 import { EmailConfirmationStatus } from "@/components/settings/EmailConfirmationStatus";
 import { UserSafetyActions, BlockedUserBanner } from "@/components/moderation/UserSafetyActions";
 import { getIntlLocale, normalizeLanguageCode, SUPPORTED_LANGUAGES } from "@/i18n";
@@ -1346,6 +1354,49 @@ function BoatsPage() {
     resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function renderFilteredResults() {
+    if (filtered.length && view === "map") {
+      return (
+        <div className="mt-6">
+          <BoatMap boats={sorted} />
+        </div>
+      );
+    }
+    if (filtered.length) {
+      return (
+        <>
+          <div className="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+            {pagedBoats.map((boat) => (
+              <BoatCard boat={boat} key={boat.id} />
+            ))}
+          </div>
+          <ResultsPagination
+            currentPage={currentPage}
+            onPageChange={goToPage}
+            pageSize={BOATS_PER_PAGE}
+            totalItems={sorted.length}
+          />
+        </>
+      );
+    }
+    return (
+      <div className="mt-16 rounded-2xl border border-line bg-white py-16 text-center">
+        <LifeBuoy className="mx-auto text-teal" size={36} />
+        <h2 className="mt-4 font-display text-xl font-bold text-navy">{t("boats.empty")}</h2>
+        <p className="mt-2 text-sm text-slate">{t("boats.emptyHint")}</p>
+        {filtersActive && (
+          <button
+            className="mt-6 rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink"
+            onClick={resetFilters}
+            type="button"
+          >
+            {t("boats.resetFilters")}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   function resetFilters() {
     setQuery("");
     setType("All vessels");
@@ -1486,42 +1537,7 @@ function BoatsPage() {
                 )}
               </div>
             </div>
-            {filtered.length && view === "map" ? (
-              <div className="mt-6">
-                <BoatMap boats={sorted} />
-              </div>
-            ) : filtered.length ? (
-              <>
-                <div className="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
-                  {pagedBoats.map((boat) => (
-                    <BoatCard boat={boat} key={boat.id} />
-                  ))}
-                </div>
-                <ResultsPagination
-                  currentPage={currentPage}
-                  onPageChange={goToPage}
-                  pageSize={BOATS_PER_PAGE}
-                  totalItems={sorted.length}
-                />
-              </>
-            ) : (
-              <div className="mt-16 rounded-2xl border border-line bg-white py-16 text-center">
-                <LifeBuoy className="mx-auto text-teal" size={36} />
-                <h2 className="mt-4 font-display text-xl font-bold text-navy">
-                  {t("boats.empty")}
-                </h2>
-                <p className="mt-2 text-sm text-slate">{t("boats.emptyHint")}</p>
-                {filtersActive && (
-                  <button
-                    className="mt-6 rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-ink"
-                    onClick={resetFilters}
-                    type="button"
-                  >
-                    {t("boats.resetFilters")}
-                  </button>
-                )}
-              </div>
-            )}
+            {renderFilteredResults()}
           </>
         )}
       </div>
@@ -1725,11 +1741,10 @@ function ApplyModal({
         phoneNumber: user.phoneNumber,
       }),
   });
-  const canApply = identityVerificationEnabled
-    ? verificationChecks
-      ? isFullyVerified(verificationChecks)
-      : false
-    : true;
+  let canApply = true;
+  if (identityVerificationEnabled) {
+    canApply = verificationChecks ? isFullyVerified(verificationChecks) : false;
+  }
   const acceptingApplications = isAcceptingApplications(boat);
   const verifyMutation = useMutation({
     mutationFn: () => startVerification(user.name),
@@ -1779,6 +1794,184 @@ function ApplyModal({
     mutation.mutate();
   }
 
+  function getApplicationErrorMessage() {
+    if (applicationsClosedError) return t("apply.applicationsClosed");
+    if (confirmedSitConflictError) {
+      return t("apply.confirmedSitConflict", {
+        boat: conflictBoatName ?? boat.name,
+      });
+    }
+    if (verificationBlocked) return t("apply.verificationRequiredText");
+    return t("apply.sendFailed");
+  }
+
+  function renderApplyFormContent() {
+    if (!acceptingApplications) {
+      return (
+        <div
+          className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+          role="alert"
+        >
+          <p className="font-semibold">{t("detail.applicationsClosed")}</p>
+          <p className="mt-1">{t("apply.applicationsClosed")}</p>
+          <button
+            className="mt-4 w-full rounded-xl bg-navy py-3.5 font-bold text-white"
+            onClick={close}
+            type="button"
+          >
+            {t("common.done")}
+          </button>
+        </div>
+      );
+    }
+    if (confirmedSitConflict) {
+      return (
+        <div
+          className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+          role="alert"
+        >
+          <p className="font-semibold">{t("apply.confirmedSitConflictTitle")}</p>
+          <p className="mt-1">
+            {t("apply.confirmedSitConflict", { boat: confirmedSitConflict.boatName })}
+          </p>
+          <Link
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
+            onClick={close}
+            to={`/boats/${confirmedSitConflict.sitId}`}
+          >
+            {t("apply.viewConfirmedSit")}
+          </Link>
+          <button
+            className="mt-3 block w-full text-sm font-semibold text-slate hover:text-navy"
+            onClick={close}
+            type="button"
+          >
+            {t("common.done")}
+          </button>
+        </div>
+      );
+    }
+    if (verificationLoading) {
+      return <p className="mt-6 text-sm text-slate">{t("apply.verificationChecking")}</p>;
+    }
+    if (!canApply && verificationChecks) {
+      return (
+        <div className="mt-5 space-y-5">
+          <div
+            className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+            role="alert"
+          >
+            <ShieldCheck className="mt-0.5 shrink-0" size={18} />
+            <div>
+              <p className="font-semibold">{t("apply.verificationRequiredTitle")}</p>
+              <p className="mt-1">{t("apply.verificationRequiredText")}</p>
+            </div>
+          </div>
+          <IdentityVerificationCard
+            checks={verificationChecks}
+            isSelf
+            onStartVerification={() => verifyMutation.mutate()}
+            verifying={verifyMutation.isPending}
+          />
+          <Link
+            className="inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
+            onClick={close}
+            to="/members/me"
+          >
+            {t("apply.verificationRequiredCta")}
+          </Link>
+        </div>
+      );
+    }
+    return (
+      <>
+        <p className="mt-4 text-sm leading-6 text-slate">
+          {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
+        </p>
+        {!hasSharedLanguage && (
+          <div className="mt-5 flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+            <Languages className="mt-0.5 shrink-0" size={18} />
+            <p>{t("apply.noSharedLanguage", { owner: boat.owner })}</p>
+          </div>
+        )}
+        <label className="mt-5 block">
+          <span className="form-label">{t("apply.partySize")}</span>
+          <Select variant="form" onChange={(event) => setPartySize(Number(event.target.value))}
+            value={partySize}
+          >
+            {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
+              <option key={count} value={count}>
+                {count}
+              </option>
+            ))}
+          </Select>
+          <span className="mt-1.5 block text-xs leading-5 text-slate">
+            {t("apply.partySizeHint", { count: maxGuests })}
+          </span>
+        </label>
+        <textarea
+          aria-invalid={hasBlockedContactDetails}
+          className={`mt-5 min-h-40 w-full resize-none rounded-xl border bg-cream p-4 text-sm leading-6 outline-none ${
+            hasBlockedContactDetails
+              ? "border-red-400 focus:border-red-500"
+              : "border-line focus:border-teal"
+          }`}
+          onChange={(event) => setMessage(event.target.value)}
+          value={message}
+        />
+        {hasBlockedContactDetails && (
+          <div
+            className="mt-3 flex gap-3 rounded-xl border border-red-300 bg-red-50 p-4 text-sm leading-6 text-red-900"
+            role="alert"
+          >
+            <TriangleAlert className="mt-0.5 shrink-0" size={18} />
+            <div>
+              <p className="font-semibold">{t("apply.contactDetailsTerms")}</p>
+              <p className="mt-1">{t("apply.contactDetailsBlocked")}</p>
+              <Link
+                className="mt-2 inline-flex font-bold underline underline-offset-2"
+                to="/terms"
+              >
+                {t("footer.terms")}
+              </Link>
+            </div>
+          </div>
+        )}
+        <div className="mt-4">
+          <TermsAgreementCheckbox
+            checked={acceptedTerms}
+            i18nKey="apply.termsAgreement"
+            onChange={(checked) => {
+              setAcceptedTerms(checked);
+              if (checked) setTermsError("");
+            }}
+          />
+        </div>
+        {termsError && (
+          <p className="mt-3 text-sm font-semibold text-coral" role="alert">
+            {termsError}
+          </p>
+        )}
+        {(verificationBlocked ||
+          applicationsClosedError ||
+          confirmedSitConflictError ||
+          mutation.isError) && (
+          <p className="mt-3 text-sm font-semibold text-coral" role="alert">
+            {getApplicationErrorMessage()}
+          </p>
+        )}
+        <button
+          className="mt-4 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark disabled:opacity-60"
+          disabled={mutation.isPending || !message.trim() || hasBlockedContactDetails}
+          onClick={submitApplication}
+          type="button"
+        >
+          {mutation.isPending ? t("apply.sending") : t("apply.send")}
+        </button>
+      </>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-2000 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm">
       <div className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-float md:p-8">
@@ -1825,170 +2018,7 @@ function ApplyModal({
                 <X size={20} />
               </button>
             </div>
-            {!acceptingApplications ? (
-              <div
-                className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
-                role="alert"
-              >
-                <p className="font-semibold">{t("detail.applicationsClosed")}</p>
-                <p className="mt-1">{t("apply.applicationsClosed")}</p>
-                <button
-                  className="mt-4 w-full rounded-xl bg-navy py-3.5 font-bold text-white"
-                  onClick={close}
-                  type="button"
-                >
-                  {t("common.done")}
-                </button>
-              </div>
-            ) : confirmedSitConflict ? (
-              <div
-                className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
-                role="alert"
-              >
-                <p className="font-semibold">{t("apply.confirmedSitConflictTitle")}</p>
-                <p className="mt-1">
-                  {t("apply.confirmedSitConflict", { boat: confirmedSitConflict.boatName })}
-                </p>
-                <Link
-                  className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
-                  onClick={close}
-                  to={`/boats/${confirmedSitConflict.sitId}`}
-                >
-                  {t("apply.viewConfirmedSit")}
-                </Link>
-                <button
-                  className="mt-3 block w-full text-sm font-semibold text-slate hover:text-navy"
-                  onClick={close}
-                  type="button"
-                >
-                  {t("common.done")}
-                </button>
-              </div>
-            ) : verificationLoading ? (
-              <p className="mt-6 text-sm text-slate">{t("apply.verificationChecking")}</p>
-            ) : !canApply && verificationChecks ? (
-              <div className="mt-5 space-y-5">
-                <div
-                  className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
-                  role="alert"
-                >
-                  <ShieldCheck className="mt-0.5 shrink-0" size={18} />
-                  <div>
-                    <p className="font-semibold">{t("apply.verificationRequiredTitle")}</p>
-                    <p className="mt-1">{t("apply.verificationRequiredText")}</p>
-                  </div>
-                </div>
-                <IdentityVerificationCard
-                  checks={verificationChecks}
-                  isSelf
-                  onStartVerification={() => verifyMutation.mutate()}
-                  verifying={verifyMutation.isPending}
-                />
-                <Link
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-navy py-3.5 font-bold text-white"
-                  onClick={close}
-                  to="/members/me"
-                >
-                  {t("apply.verificationRequiredCta")}
-                </Link>
-              </div>
-            ) : (
-              <>
-                <p className="mt-4 text-sm leading-6 text-slate">
-                  {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
-                </p>
-                {!hasSharedLanguage && (
-                  <div className="mt-5 flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-                    <Languages className="mt-0.5 shrink-0" size={18} />
-                    <p>{t("apply.noSharedLanguage", { owner: boat.owner })}</p>
-                  </div>
-                )}
-                <label className="mt-5 block">
-                  <span className="form-label">{t("apply.partySize")}</span>
-                  <Select
-                    variant="form"
-                    onChange={(event) => setPartySize(Number(event.target.value))}
-                    value={partySize}
-                  >
-                    {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
-                      <option key={count} value={count}>
-                        {count}
-                      </option>
-                    ))}
-                  </Select>
-                  <span className="mt-1.5 block text-xs leading-5 text-slate">
-                    {t("apply.partySizeHint", { count: maxGuests })}
-                  </span>
-                </label>
-                <textarea
-                  aria-invalid={hasBlockedContactDetails}
-                  className={`mt-5 min-h-40 w-full resize-none rounded-xl border bg-cream p-4 text-sm leading-6 outline-none ${
-                    hasBlockedContactDetails
-                      ? "border-red-400 focus:border-red-500"
-                      : "border-line focus:border-teal"
-                  }`}
-                  onChange={(event) => setMessage(event.target.value)}
-                  value={message}
-                />
-                {hasBlockedContactDetails && (
-                  <div
-                    className="mt-3 flex gap-3 rounded-xl border border-red-300 bg-red-50 p-4 text-sm leading-6 text-red-900"
-                    role="alert"
-                  >
-                    <TriangleAlert className="mt-0.5 shrink-0" size={18} />
-                    <div>
-                      <p className="font-semibold">{t("apply.contactDetailsTerms")}</p>
-                      <p className="mt-1">{t("apply.contactDetailsBlocked")}</p>
-                      <Link
-                        className="mt-2 inline-flex font-bold underline underline-offset-2"
-                        to="/terms"
-                      >
-                        {t("footer.terms")}
-                      </Link>
-                    </div>
-                  </div>
-                )}
-                <div className="mt-4">
-                  <TermsAgreementCheckbox
-                    checked={acceptedTerms}
-                    i18nKey="apply.termsAgreement"
-                    onChange={(checked) => {
-                      setAcceptedTerms(checked);
-                      if (checked) setTermsError("");
-                    }}
-                  />
-                </div>
-                {termsError && (
-                  <p className="mt-3 text-sm font-semibold text-coral" role="alert">
-                    {termsError}
-                  </p>
-                )}
-                {(verificationBlocked ||
-                  applicationsClosedError ||
-                  confirmedSitConflictError ||
-                  mutation.isError) && (
-                  <p className="mt-3 text-sm font-semibold text-coral" role="alert">
-                    {applicationsClosedError
-                      ? t("apply.applicationsClosed")
-                      : confirmedSitConflictError
-                        ? t("apply.confirmedSitConflict", {
-                            boat: conflictBoatName ?? boat.name,
-                          })
-                        : verificationBlocked
-                          ? t("apply.verificationRequiredText")
-                          : t("apply.sendFailed")}
-                  </p>
-                )}
-                <button
-                  className="mt-4 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark disabled:opacity-60"
-                  disabled={mutation.isPending || !message.trim() || hasBlockedContactDetails}
-                  onClick={submitApplication}
-                  type="button"
-                >
-                  {mutation.isPending ? t("apply.sending") : t("apply.send")}
-                </button>
-              </>
-            )}
+            {renderApplyFormContent()}
           </>
         )}
       </div>
@@ -2070,19 +2100,33 @@ function DetailPage() {
 
   if (isLoading) return <SitDetailSkeleton />;
   if (!boat) return <NotFound />;
-  const photos = [{ url: boat.image }, ...boat.gallery].filter(
+  const listingBoat = boat;
+  const photos = [{ url: listingBoat.image }, ...listingBoat.gallery].filter(
     (photo, index, allPhotos) => allPhotos.findIndex((item) => item.url === photo.url) === index,
   );
+  let photoGridClass = "md:grid-cols-[1.5fr_0.8fr]";
+  if (photos.length === 1) photoGridClass = "grid-cols-1";
+  else if (photos.length === 2) photoGridClass = "grid-cols-2";
   const experienceRequirements = [
-    ...(boat.minYearsExperience
-      ? [t("experience.minimumYears", { count: boat.minYearsExperience })]
+    ...(listingBoat.minYearsExperience
+      ? [t("experience.minimumYears", { count: listingBoat.minYearsExperience })]
       : []),
-    ...(boat.requiredExperience ?? []),
-    ...(boat.requiredCertifications ?? []),
-    ...(boat.requiredSkills ?? []).filter((skill) => !isNonSmokerRequirementLabel(skill)),
-    ...(resolveNonSmokerRequired(boat) ? [t("requirement.nonSmoker")] : []),
-    ...withoutNonSmokerRequirementLabels(boat.requirements),
+    ...(listingBoat.requiredExperience ?? []),
+    ...(listingBoat.requiredCertifications ?? []),
+    ...(listingBoat.requiredSkills ?? []).filter(
+      (skill) => !isNonSmokerRequirementLabel(skill),
+    ),
+    ...(resolveNonSmokerRequired(listingBoat) ? [t("requirement.nonSmoker")] : []),
+    ...withoutNonSmokerRequirementLabels(listingBoat.requirements),
   ].filter((item, index, all) => all.indexOf(item) === index);
+
+  function getApplyButtonLabel() {
+    if (user?.name === listingBoat.owner) return t("detail.ownSit");
+    if (activeApplication) return t("detail.requestedSit");
+    if (confirmedSitConflict) return t("detail.confirmedSitConflict");
+    if (isAcceptingApplications(listingBoat)) return t("detail.apply");
+    return t("detail.applicationsClosed");
+  }
 
   return (
     <main className="pb-20">
@@ -2096,13 +2140,7 @@ function DetailPage() {
         </button>
         <div className="relative">
           <div
-            className={`grid h-136 gap-2 overflow-hidden rounded-3xl ${
-              photos.length === 1
-                ? "grid-cols-1"
-                : photos.length === 2
-                  ? "grid-cols-2"
-                  : "md:grid-cols-[1.5fr_0.8fr]"
-            }`}
+            className={`grid h-136 gap-2 overflow-hidden rounded-3xl ${photoGridClass}`}
           >
             <button
               aria-label={t("lightbox.viewPhoto", { number: 1 })}
@@ -2457,15 +2495,7 @@ function DetailPage() {
                 }}
                 type="button"
               >
-                {user?.name === boat.owner
-                  ? t("detail.ownSit")
-                  : activeApplication
-                    ? t("detail.requestedSit")
-                    : confirmedSitConflict
-                      ? t("detail.confirmedSitConflict")
-                      : isAcceptingApplications(boat)
-                        ? t("detail.apply")
-                        : t("detail.applicationsClosed")}
+                {getApplyButtonLabel()}
               </button>
               {activeApplication && user?.name !== boat.owner && (
                 <div className="mt-4 space-y-3">
@@ -2577,6 +2607,63 @@ function SavedPage() {
     resultsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function renderSavedContent() {
+    if (isLoading) {
+      return (
+        <div
+          aria-busy="true"
+          aria-live="polite"
+          className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+        >
+          {Array.from({ length: 3 }, (_, index) => (
+            <BoatCardSkeleton key={index} showBadge={index === 0} />
+          ))}
+        </div>
+      );
+    }
+    if (visibleBoats.length) {
+      return (
+        <>
+          <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {pagedBoats.map((boat) => (
+              <BoatCard boat={boat} key={boat.id} />
+            ))}
+          </div>
+          <ResultsPagination
+            currentPage={currentPage}
+            onPageChange={goToPage}
+            pageSize={BOATS_PER_PAGE}
+            totalItems={visibleBoats.length}
+          />
+        </>
+      );
+    }
+    if (savedBoats.length) {
+      return (
+        <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
+          <Heart className="mx-auto text-coral" size={38} />
+          <h2 className="mt-5 font-display text-2xl font-bold text-navy">
+            {t("saved.emptyFiltered")}
+          </h2>
+          <p className="mt-2 text-slate">{t("saved.emptyFilteredHint")}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
+        <Heart className="mx-auto text-coral" size={38} />
+        <h2 className="mt-5 font-display text-2xl font-bold text-navy">{t("saved.empty")}</h2>
+        <p className="mt-2 text-slate">{t("saved.emptyHint")}</p>
+        <Link
+          className="mt-6 inline-flex rounded-full bg-navy px-6 py-3 font-bold text-white"
+          to="/boats"
+        >
+          {t("saved.browse")}
+        </Link>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <main className="mx-auto max-w-3xl px-5 py-24 text-center">
@@ -2622,51 +2709,7 @@ function SavedPage() {
         {t("saved.showAll")}
       </label>
       <div ref={resultsTopRef} />
-      {isLoading ? (
-        <div
-          aria-busy="true"
-          aria-live="polite"
-          className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-        >
-          {Array.from({ length: 3 }, (_, index) => (
-            <BoatCardSkeleton key={index} showBadge={index === 0} />
-          ))}
-        </div>
-      ) : visibleBoats.length ? (
-        <>
-          <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {pagedBoats.map((boat) => (
-              <BoatCard boat={boat} key={boat.id} />
-            ))}
-          </div>
-          <ResultsPagination
-            currentPage={currentPage}
-            onPageChange={goToPage}
-            pageSize={BOATS_PER_PAGE}
-            totalItems={visibleBoats.length}
-          />
-        </>
-      ) : savedBoats.length ? (
-        <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
-          <Heart className="mx-auto text-coral" size={38} />
-          <h2 className="mt-5 font-display text-2xl font-bold text-navy">
-            {t("saved.emptyFiltered")}
-          </h2>
-          <p className="mt-2 text-slate">{t("saved.emptyFilteredHint")}</p>
-        </div>
-      ) : (
-        <div className="mt-12 rounded-3xl border border-line bg-white py-20 text-center">
-          <Heart className="mx-auto text-coral" size={38} />
-          <h2 className="mt-5 font-display text-2xl font-bold text-navy">{t("saved.empty")}</h2>
-          <p className="mt-2 text-slate">{t("saved.emptyHint")}</p>
-          <Link
-            className="mt-6 inline-flex rounded-full bg-navy px-6 py-3 font-bold text-white"
-            to="/boats"
-          >
-            {t("saved.browse")}
-          </Link>
-        </div>
-      )}
+      {renderSavedContent()}
     </main>
   );
 }
@@ -2949,7 +2992,6 @@ function ProfileEditor({ close }: { close: () => void }) {
   const user = useAppStore((state) => state.user)!;
   const updateProfile = useAppStore((state) => state.updateProfile);
   const [form, setForm] = useState({
-    legalName: user.legalName ?? user.name,
     name: user.name,
     image: user.image,
     coverImage: user.coverImage ?? "",
@@ -3026,7 +3068,6 @@ function ProfileEditor({ close }: { close: () => void }) {
     }
     updateProfile({
       ...form,
-      legalName: form.legalName.trim() || name,
       name,
       coverImage: form.coverImage || undefined,
       bio: form.bio.trim(),
@@ -3040,6 +3081,10 @@ function ProfileEditor({ close }: { close: () => void }) {
     setSaved(true);
     window.setTimeout(close, 500);
   }
+
+  let saveButtonLabel = t("profile.save");
+  if (saved) saveButtonLabel = t("common.saved");
+  else if (saving) saveButtonLabel = t("common.saving");
 
   return (
     <div className="fixed inset-0 z-60 overflow-y-auto bg-navy/60 p-4 backdrop-blur-sm">
@@ -3132,14 +3177,6 @@ function ProfileEditor({ close }: { close: () => void }) {
         </section>
 
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
-          <label>
-            <span className="form-label">{t("settings.legalName")}</span>
-            <input
-              className="form-input"
-              onChange={(event) => setForm({ ...form, legalName: event.target.value })}
-              value={form.legalName}
-            />
-          </label>
           <label>
             <span className="form-label">{t("profile.displayName")}</span>
             <input
@@ -3235,7 +3272,7 @@ function ProfileEditor({ close }: { close: () => void }) {
             onClick={() => void save()}
             type="button"
           >
-            {saved ? t("common.saved") : saving ? t("common.saving") : t("profile.save")}
+            {saveButtonLabel}
           </button>
         </div>
       </div>
@@ -3264,11 +3301,10 @@ function MemberPage() {
   });
   const isBoatOwnerProfile = !isMe && Boolean(boat);
   const isSitterNameProfile = !isMe && boatFetched && !boat;
-  const profileName = isMe
-    ? (currentUser?.name ?? "")
-    : isBoatOwnerProfile
-      ? boat!.owner
-      : memberKey;
+  let profileName: string;
+  if (isMe) profileName = currentUser?.name ?? "";
+  else if (isBoatOwnerProfile) profileName = boat!.owner;
+  else profileName = memberKey;
   const { data: namedMember, isLoading: namedLoading } = useQuery({
     queryKey: ["member-profile", memberKey],
     queryFn: () => getPublicMemberProfile(memberKey),
@@ -3361,67 +3397,104 @@ function MemberPage() {
   if (!isMe && !boat && !namedMember) return <NotFound />;
 
   const ratingSummary = summarizeSitterRating(sitterReviews);
-  const profile = isMe
-    ? {
-        name: currentUser!.name,
-        image: currentUser!.image,
-        coverImage: currentUser!.coverImage,
-        activity: t("member.member"),
-        location: currentUser!.location ?? "Brighton, United Kingdom",
-        since: currentUser!.memberSince,
-        about:
-          currentUser!.bio ??
-          "Practical, calm and happiest near the water, with hands-on coastal sailing experience.",
-        badges: currentUser!.skills ?? [
-          "RYA Day Skipper",
-          "Diesel basics",
-          "12V systems",
-          "Pet friendly",
-        ],
-        ownerSits: currentUser!.name === "Maya & Finn" ? 14 : 0,
-        sitterSits:
-          currentUser!.name === "Alex Morgan"
-            ? Math.max(8, ratingSummary.count)
-            : applications.filter(
-                (application) =>
-                  application.applicant.name === currentUser!.name &&
-                  application.status === "accepted",
-              ).length,
-        rating: ratingSummary.count ? ratingSummary.average : 0,
-        reviews: ratingSummary.count,
-        showSitterReviews: true,
+  let profile: {
+    name: string;
+    image: string;
+    coverImage?: string;
+    activity: string;
+    location: string;
+    since: string;
+    about: string;
+    badges: string[];
+    ownerSits: number;
+    sitterSits: number;
+    rating: number;
+    reviews: number;
+    showSitterReviews: boolean;
+  };
+  if (isMe) {
+    profile = {
+      name: currentUser!.name,
+      image: currentUser!.image,
+      coverImage: currentUser!.coverImage,
+      activity: t("member.member"),
+      location: currentUser!.location ?? "Brighton, United Kingdom",
+      since: String(currentUser!.memberSince),
+      about:
+        currentUser!.bio ??
+        "Practical, calm and happiest near the water, with hands-on coastal sailing experience.",
+      badges: currentUser!.skills ?? [
+        "RYA Day Skipper",
+        "Diesel basics",
+        "12V systems",
+        "Pet friendly",
+      ],
+      ownerSits: currentUser!.name === "Maya & Finn" ? 14 : 0,
+      sitterSits:
+        currentUser!.name === "Alex Morgan"
+          ? Math.max(8, ratingSummary.count)
+          : applications.filter(
+              (application) =>
+                application.applicant.name === currentUser!.name &&
+                application.status === "accepted",
+            ).length,
+      rating: ratingSummary.count ? ratingSummary.average : 0,
+      reviews: ratingSummary.count,
+      showSitterReviews: true,
+    };
+  } else if (isBoatOwnerProfile) {
+    profile = {
+      name: boat!.owner,
+      image: boat!.ownerImage,
+      coverImage: currentUser?.name === boat!.owner ? currentUser.coverImage : undefined,
+      activity: t("member.member"),
+      location: memberDetails[id]?.location ?? formatSitLocation(boat!.location, boat!.country),
+      since: memberDetails[id]?.since ?? "2022",
+      about: memberDetails[id]?.about ?? boat!.description,
+      badges: memberDetails[id]?.badges ?? ["Verified owner", "Fast responder"],
+      ownerSits: memberDetails[id]?.ownerSits ?? boat!.reviews,
+      sitterSits: 0,
+      rating: boat!.rating,
+      reviews: boat!.reviews,
+      showSitterReviews: false,
+    };
+  } else {
+    profile = {
+      name: namedMember!.name,
+      image: namedMember!.image,
+      coverImage: namedMember!.coverImage,
+      activity: t("member.member"),
+      location: namedMember!.location,
+      since: String(namedMember!.memberSince),
+      about: namedMember!.bio,
+      badges: [...namedMember!.certifications, ...namedMember!.skills.slice(0, 3)],
+      ownerSits: 0,
+      sitterSits: namedMember!.completedSits,
+      rating: ratingSummary.count ? ratingSummary.average : 0,
+      reviews: ratingSummary.count,
+      showSitterReviews: true,
+    };
+  }
+
+  function renderProfileReviews() {
+    if (profile.showSitterReviews) {
+      if (profile.reviews > 0) {
+        return (
+          <span className="flex items-center gap-1.5 font-bold text-navy">
+            <Star className="fill-sun text-sun" size={16} /> {profile.rating.toFixed(1)} ·{" "}
+            {t("member.reviews", { count: profile.reviews })}
+          </span>
+        );
       }
-    : isBoatOwnerProfile
-      ? {
-          name: boat!.owner,
-          image: boat!.ownerImage,
-          coverImage: currentUser?.name === boat!.owner ? currentUser.coverImage : undefined,
-          activity: t("member.member"),
-          location: memberDetails[id]?.location ?? formatSitLocation(boat!.location, boat!.country),
-          since: memberDetails[id]?.since ?? "2022",
-          about: memberDetails[id]?.about ?? boat!.description,
-          badges: memberDetails[id]?.badges ?? ["Verified owner", "Fast responder"],
-          ownerSits: memberDetails[id]?.ownerSits ?? boat!.reviews,
-          sitterSits: 0,
-          rating: boat!.rating,
-          reviews: boat!.reviews,
-          showSitterReviews: false,
-        }
-      : {
-          name: namedMember!.name,
-          image: namedMember!.image,
-          coverImage: namedMember!.coverImage,
-          activity: t("member.member"),
-          location: namedMember!.location,
-          since: String(namedMember!.memberSince),
-          about: namedMember!.bio,
-          badges: [...namedMember!.certifications, ...namedMember!.skills.slice(0, 3)],
-          ownerSits: 0,
-          sitterSits: namedMember!.completedSits,
-          rating: ratingSummary.count ? ratingSummary.average : 0,
-          reviews: ratingSummary.count,
-          showSitterReviews: true,
-        };
+      return <span>{t("reviews.noRatingYet")}</span>;
+    }
+    return (
+      <span className="flex items-center gap-1.5">
+        <Star className="fill-sun text-sun" size={16} /> {profile.rating} ·{" "}
+        {t("member.reviews", { count: profile.reviews })}
+      </span>
+    );
+  }
 
   return (
     <main className="px-5 py-12 lg:px-8">
@@ -3495,21 +3568,7 @@ function MemberPage() {
                   <span className="flex items-center gap-1.5">
                     <MapPin size={16} /> {profile.location}
                   </span>
-                  {profile.showSitterReviews ? (
-                    profile.reviews > 0 ? (
-                      <span className="flex items-center gap-1.5 font-bold text-navy">
-                        <Star className="fill-sun text-sun" size={16} /> {profile.rating.toFixed(1)}{" "}
-                        · {t("member.reviews", { count: profile.reviews })}
-                      </span>
-                    ) : (
-                      <span>{t("reviews.noRatingYet")}</span>
-                    )
-                  ) : (
-                    <span className="flex items-center gap-1.5">
-                      <Star className="fill-sun text-sun" size={16} /> {profile.rating} ·{" "}
-                      {t("member.reviews", { count: profile.reviews })}
-                    </span>
-                  )}
+                  {renderProfileReviews()}
                   <span>{t("member.since", { year: profile.since })}</span>
                 </p>
               </div>
@@ -3774,6 +3833,10 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   }> = [
     { key: "name", label: t("vesselEditor.name"), placeholder: t("vesselEditor.namePlaceholder") },
   ];
+
+  let vesselSaveButtonLabel = t("vesselEditor.publish");
+  if (mutation.isPending) vesselSaveButtonLabel = t("common.saving");
+  else if (boat) vesselSaveButtonLabel = t("vesselEditor.save");
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-14">
@@ -4146,11 +4209,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               onClick={() => mutation.mutate()}
               type="button"
             >
-              {mutation.isPending
-                ? t("common.saving")
-                : boat
-                  ? t("vesselEditor.save")
-                  : t("vesselEditor.publish")}
+              {vesselSaveButtonLabel}
             </button>
           </div>
         </div>
@@ -4312,11 +4371,10 @@ function SitEditor({
       }),
     enabled: Boolean(isCreating && identityVerificationEnabled && user),
   });
-  const canCreateSit = identityVerificationEnabled
-    ? verificationChecks
-      ? isFullyVerified(verificationChecks)
-      : false
-    : true;
+  let canCreateSit = true;
+  if (identityVerificationEnabled) {
+    canCreateSit = verificationChecks ? isFullyVerified(verificationChecks) : false;
+  }
   const verifyMutation = useMutation({
     mutationFn: () => startVerification(user!.name),
     onSuccess: async () => {
@@ -4515,6 +4573,16 @@ function SitEditor({
           }).format(publishBlockedReasons),
         })
       : "";
+  const showSitVerificationLoading =
+    isCreating && identityVerificationEnabled && verificationLoading;
+  const showSitVerificationGate =
+    isCreating &&
+    identityVerificationEnabled &&
+    !canCreateSit &&
+    Boolean(verificationChecks);
+  let sitSaveButtonLabel = t("sitEditor.publish");
+  if (mutation.isPending) sitSaveButtonLabel = t("common.saving");
+  else if (sit) sitSaveButtonLabel = t("sitEditor.save");
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-10 lg:px-8 lg:py-14">
@@ -4568,9 +4636,10 @@ function SitEditor({
               </div>
             </div>
           )}
-          {isCreating && identityVerificationEnabled && verificationLoading ? (
+          {showSitVerificationLoading ? (
             <p className="mt-6 text-sm text-slate">{t("sitEditor.verificationChecking")}</p>
-          ) : isCreating && identityVerificationEnabled && !canCreateSit && verificationChecks ? (
+          ) : null}
+          {showSitVerificationGate ? (
             <div className="mt-6 space-y-5">
               <div
                 className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
@@ -4583,7 +4652,7 @@ function SitEditor({
                 </div>
               </div>
               <IdentityVerificationCard
-                checks={verificationChecks}
+                checks={verificationChecks!}
                 isSelf
                 onStartVerification={() => verifyMutation.mutate()}
                 verifying={verifyMutation.isPending}
@@ -4603,7 +4672,8 @@ function SitEditor({
                 {t("common.cancel")}
               </button>
             </div>
-          ) : (
+          ) : null}
+          {!showSitVerificationLoading && !showSitVerificationGate ? (
             <>
               {locked && (
                 <div
@@ -4947,17 +5017,13 @@ function SitEditor({
                       }
                       type="button"
                     >
-                      {mutation.isPending
-                        ? t("common.saving")
-                        : sit
-                          ? t("sitEditor.save")
-                          : t("sitEditor.publish")}
+                      {sitSaveButtonLabel}
                     </button>
                   </IconTooltip>
                 )}
               </div>
             </>
-          )}
+          ) : null}
         </div>
         <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
           <EditorLivePreview hint={t("editorPreview.sitHint")}>
@@ -5154,11 +5220,12 @@ function OwnerBoatsPage() {
       }),
     enabled: Boolean(identityVerificationEnabled && user),
   });
-  const canCreateSit = identityVerificationEnabled
-    ? ownerVerificationChecks
+  let canCreateSit = true;
+  if (identityVerificationEnabled) {
+    canCreateSit = ownerVerificationChecks
       ? isFullyVerified(ownerVerificationChecks)
-      : false
-    : true;
+      : false;
+  }
   const removeVesselMutation = useMutation({
     mutationFn: deleteVessel,
     onSuccess: async () => {
@@ -5236,14 +5303,16 @@ function OwnerBoatsPage() {
     },
     {} as Record<SitPhase, Sit[]>,
   );
-  const visibleOwnedPhases =
-    sitPhaseFilter === "archived"
-      ? []
-      : sitPhaseFilter === "all"
-        ? SIT_PHASES.filter((phase) => ownedSitsByPhase[phase].length > 0)
-        : ownedSitsByPhase[sitPhaseFilter].length > 0
-          ? [sitPhaseFilter]
-          : [];
+  let visibleOwnedPhases: SitPhase[];
+  if (sitPhaseFilter === "archived") {
+    visibleOwnedPhases = [];
+  } else if (sitPhaseFilter === "all") {
+    visibleOwnedPhases = SIT_PHASES.filter((phase) => ownedSitsByPhase[phase].length > 0);
+  } else if (ownedSitsByPhase[sitPhaseFilter].length > 0) {
+    visibleOwnedPhases = [sitPhaseFilter];
+  } else {
+    visibleOwnedPhases = [];
+  }
   const showArchivedSection =
     archivedOwnedSits.length > 0 && (sitPhaseFilter === "all" || sitPhaseFilter === "archived");
   function sitterApplicationMatchesPhaseFilter(application: SitApplication) {
@@ -5280,6 +5349,78 @@ function OwnerBoatsPage() {
     const phase = resolveSitPhase(sit);
     const isArchived = Boolean(options?.archived);
     const sitDates = formatSitDates(i18n.language, sit.dateStart, sit.duration);
+
+    function renderSitArchiveOrDeleteAction() {
+      if (isArchived) {
+        return (
+          <IconTooltip label={t("owner.unarchiveSit")} wrap>
+            <button
+              aria-label={t("owner.unarchiveSitLabel", { boat: boat.name })}
+              className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
+              onClick={() => unarchiveSit(sit.id)}
+              type="button"
+            >
+              <ArchiveRestore aria-hidden="true" size={17} />
+            </button>
+          </IconTooltip>
+        );
+      }
+      if (phase === "stayUnderway") {
+        return (
+          <IconTooltip label={t("owner.sitDeleteUnderway")} wrap>
+            <button
+              aria-label={t("owner.sitDeleteUnderway")}
+              className="rounded-xl border border-line p-2.5 text-slate opacity-50"
+              disabled
+              type="button"
+            >
+              <Trash2 size={17} />
+            </button>
+          </IconTooltip>
+        );
+      }
+      if (phase === "stayCompleted") {
+        return (
+          <IconTooltip label={t("owner.archiveSitLabel", { boat: boat.name })} wrap>
+            <button
+              aria-label={t("owner.archiveSitLabel", { boat: boat.name })}
+              className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
+              onClick={() => {
+                setDeleteConfirm({
+                  type: "archiveSit",
+                  id: sit.id,
+                  boatName: boat.name,
+                  dates: sitDates,
+                });
+              }}
+              type="button"
+            >
+              <Archive aria-hidden="true" size={17} />
+            </button>
+          </IconTooltip>
+        );
+      }
+      return (
+        <button
+          aria-label={t("owner.deleteSitLabel", { boat: boat.name })}
+          className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral"
+          onClick={() => {
+            setDeleteConfirm({
+              type: "sit",
+              id: sit.id,
+              boatName: boat.name,
+              dates: sitDates,
+              applicantCount,
+              hasAccepted: Boolean(sit.accepted),
+            });
+          }}
+          type="button"
+        >
+          <Trash2 size={17} />
+        </button>
+      );
+    }
+
     return (
       <article
         className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center"
@@ -5387,65 +5528,7 @@ function OwnerBoatsPage() {
                 <Pencil size={16} /> {t("common.edit")}
               </button>
             ))}
-          {isArchived ? (
-            <IconTooltip label={t("owner.unarchiveSit")} wrap>
-              <button
-                aria-label={t("owner.unarchiveSitLabel", { boat: boat.name })}
-                className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
-                onClick={() => unarchiveSit(sit.id)}
-                type="button"
-              >
-                <ArchiveRestore aria-hidden="true" size={17} />
-              </button>
-            </IconTooltip>
-          ) : phase === "stayUnderway" ? (
-            <IconTooltip label={t("owner.sitDeleteUnderway")} wrap>
-              <button
-                aria-label={t("owner.sitDeleteUnderway")}
-                className="rounded-xl border border-line p-2.5 text-slate opacity-50"
-                disabled
-                type="button"
-              >
-                <Trash2 size={17} />
-              </button>
-            </IconTooltip>
-          ) : phase === "stayCompleted" ? (
-            <IconTooltip label={t("owner.archiveSitLabel", { boat: boat.name })} wrap>
-              <button
-                aria-label={t("owner.archiveSitLabel", { boat: boat.name })}
-                className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
-                onClick={() => {
-                  setDeleteConfirm({
-                    type: "archiveSit",
-                    id: sit.id,
-                    boatName: boat.name,
-                    dates: sitDates,
-                  });
-                }}
-                type="button"
-              >
-                <Archive aria-hidden="true" size={17} />
-              </button>
-            </IconTooltip>
-          ) : (
-            <button
-              aria-label={t("owner.deleteSitLabel", { boat: boat.name })}
-              className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral"
-              onClick={() => {
-                setDeleteConfirm({
-                  type: "sit",
-                  id: sit.id,
-                  boatName: boat.name,
-                  dates: sitDates,
-                  applicantCount,
-                  hasAccepted: Boolean(sit.accepted),
-                });
-              }}
-              type="button"
-            >
-              <Trash2 size={17} />
-            </button>
-          )}
+          {renderSitArchiveOrDeleteAction()}
         </div>
       </article>
     );
@@ -5557,13 +5640,11 @@ function OwnerBoatsPage() {
         </div>
         <div className="group relative">
           <button
-            aria-describedby={
-              sitCreateBlockedByBoat
-                ? "sit-requires-boat-tooltip"
-                : sitCreateBlockedByVerification
-                  ? "sit-requires-verification-tooltip"
-                  : undefined
-            }
+            aria-describedby={(() => {
+              if (sitCreateBlockedByBoat) return "sit-requires-boat-tooltip";
+              if (sitCreateBlockedByVerification) return "sit-requires-verification-tooltip";
+              return undefined;
+            })()}
             className={`flex items-center justify-center gap-2 rounded-full px-5 py-3 font-bold transition ${
               sitCreateMuted
                 ? "bg-slate/25 text-slate hover:bg-slate/35"
@@ -5634,22 +5715,26 @@ function OwnerBoatsPage() {
           className="mt-5 rounded-xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral"
           role="alert"
         >
-          {removeSitMutation.error instanceof Error &&
-          removeSitMutation.error.message === "SIT_IS_UNDERWAY"
-            ? t("owner.sitDeleteUnderway")
-            : removeSitMutation.error instanceof Error &&
-                removeSitMutation.error.message === "SIT_IS_COMPLETED"
-              ? t("owner.deleteSitCompletedError")
-              : t("owner.deleteSitError")}
+          {(() => {
+            if (
+              removeSitMutation.error instanceof Error &&
+              removeSitMutation.error.message === "SIT_IS_UNDERWAY"
+            ) {
+              return t("owner.sitDeleteUnderway");
+            }
+            if (
+              removeSitMutation.error instanceof Error &&
+              removeSitMutation.error.message === "SIT_IS_COMPLETED"
+            ) {
+              return t("owner.deleteSitCompletedError");
+            }
+            return t("owner.deleteSitError");
+          })()}
         </p>
       )}
-      {isLoading ? (
-        activeTab === "boats" ? (
-          <OwnerBoatsLoadingSkeleton />
-        ) : (
-          <OwnerSitsLoadingSkeleton />
-        )
-      ) : activeTab === "boats" && ownedBoats.length ? (
+      {isLoading && activeTab === "boats" ? <OwnerBoatsLoadingSkeleton /> : null}
+      {isLoading && activeTab !== "boats" ? <OwnerSitsLoadingSkeleton /> : null}
+      {!isLoading && activeTab === "boats" && ownedBoats.length ? (
         <div className="mt-10 space-y-4">
           {ownedBoats.map((boat) => {
             const hasSits = ownedSits.some((sit) => sit.boatId === boat.id);
@@ -5727,8 +5812,10 @@ function OwnerBoatsPage() {
             );
           })}
         </div>
-      ) : activeTab === "sits" &&
-        (ownedSits.length || archivedOwnedSits.length || sitterApplications.length) ? (
+      ) : null}
+      {!isLoading &&
+      activeTab === "sits" &&
+      (ownedSits.length || archivedOwnedSits.length || sitterApplications.length) ? (
         <div className="mt-10 space-y-8">
           {(ownedSits.length > 0 || archivedOwnedSits.length > 0) && (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -5849,18 +5936,24 @@ function OwnerBoatsPage() {
             </section>
           )}
         </div>
-      ) : (
+      ) : null}
+      {!isLoading &&
+      !(activeTab === "boats" && ownedBoats.length > 0) &&
+      !(
+        activeTab === "sits" &&
+        (ownedSits.length > 0 || archivedOwnedSits.length > 0 || sitterApplications.length > 0)
+      ) ? (
         <div className="mt-10 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
           <ShipWheel className="mx-auto text-teal" size={36} />
           <h2 className="mt-4 font-display text-xl font-bold text-navy">
             {activeTab === "boats" ? t("owner.firstBoat") : t("owner.sitsEmptyTitle")}
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate">
-            {activeTab === "boats"
-              ? t("owner.firstBoatHint")
-              : ownedBoats.length
-                ? t("owner.sitsEmptyHintWithBoats")
-                : t("owner.sitsEmptyHintNoBoats")}
+            {(() => {
+              if (activeTab === "boats") return t("owner.firstBoatHint");
+              if (ownedBoats.length) return t("owner.sitsEmptyHintWithBoats");
+              return t("owner.sitsEmptyHintNoBoats");
+            })()}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {activeTab === "boats" || ownedBoats.length === 0 ? (
@@ -5912,7 +6005,7 @@ function OwnerBoatsPage() {
             )}
           </div>
         </div>
-      )}
+      ) : null}
       {flaggingSit && (
         <FlagSitIssueModal
           boatName={
@@ -5984,7 +6077,8 @@ function OwnerBoatsPage() {
             <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 font-medium text-amber-950">
               {t("owner.deleteSitAcceptedWarning")}
             </p>
-          ) : deleteConfirm.applicantCount > 0 ? (
+          ) : null}
+          {!deleteConfirm.hasAccepted && deleteConfirm.applicantCount > 0 ? (
             <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 font-medium text-amber-950">
               {t("owner.deleteSitApplicantsWarning", {
                 count: deleteConfirm.applicantCount,
@@ -6022,6 +6116,13 @@ const EMAIL_NOTIFICATION_KEYS = [
   "productUpdates",
 ] as const satisfies ReadonlyArray<keyof EmailNotificationPrefs>;
 
+const ACCOUNT_TABS = ["personal", "security", "preferences", "privacy"] as const;
+type AccountTab = (typeof ACCOUNT_TABS)[number];
+const LEGACY_ACCOUNT_TABS: Record<string, AccountTab> = {
+  localization: "personal",
+  notifications: "preferences",
+};
+
 function SettingsPage() {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
@@ -6041,32 +6142,39 @@ function SettingsPage() {
   const [personalForm, setPersonalForm] = useState({
     legalName: user?.legalName ?? user?.name ?? "",
     location: user?.location ?? "",
-    phoneCountryCode: user?.phoneCountryCode ?? "+1",
+    phoneCountryCode: resolvePhoneCountryCode({
+      location: user?.location ?? "",
+      phoneCountryCode: user?.phoneCountryCode,
+      phoneNumber: user?.phoneNumber,
+    }),
     phoneNumber: user?.phoneNumber ?? "",
   });
-  const accountTabs = [
-    "personal",
-    "security",
-    "notifications",
-    "localization",
-    "preferences",
-    "privacy",
-  ] as const;
-  type AccountTab = (typeof accountTabs)[number];
+  const accountTabs = ACCOUNT_TABS;
   const requestedTab = searchParams.get("tab");
-  const activeTab: AccountTab = accountTabs.includes(requestedTab as AccountTab)
+  const activeTab: AccountTab = ACCOUNT_TABS.includes(requestedTab as AccountTab)
     ? (requestedTab as AccountTab)
-    : "personal";
+    : (LEGACY_ACCOUNT_TABS[requestedTab ?? ""] ?? "personal");
 
   useEffect(() => {
     if (!user) return;
     setPersonalForm({
       legalName: user.legalName ?? user.name,
       location: user.location,
-      phoneCountryCode: user.phoneCountryCode,
+      phoneCountryCode: resolvePhoneCountryCode({
+        location: user.location,
+        phoneCountryCode: user.phoneCountryCode,
+        phoneNumber: user.phoneNumber,
+      }),
       phoneNumber: user.phoneNumber,
     });
   }, [user]);
+
+  useEffect(() => {
+    if (!requestedTab) return;
+    const mapped = LEGACY_ACCOUNT_TABS[requestedTab];
+    if (!mapped) return;
+    setSearchParams(mapped === "personal" ? {} : { tab: mapped }, { replace: true });
+  }, [requestedTab, setSearchParams]);
 
   function setActiveTab(tab: AccountTab) {
     setSearchParams(tab === "personal" ? {} : { tab }, { replace: true });
@@ -6074,7 +6182,7 @@ function SettingsPage() {
 
   if (!user) {
     return (
-      <main className="mx-auto max-w-3xl px-5 py-24 text-center">
+      <main className="mx-auto max-w-5xl px-5 py-24 text-center">
         <Settings className="mx-auto text-teal" size={42} />
         <h1 className="mt-5 font-display text-3xl font-extrabold text-navy">
           {t("settings.signInTitle")}
@@ -6127,12 +6235,12 @@ function SettingsPage() {
 
   return (
     <>
-      <main className="mx-auto max-w-3xl px-5 py-14 lg:px-8">
+      <main className="mx-auto max-w-5xl px-5 py-14 lg:px-8">
         <h1 className="section-title">{t("settings.title")}</h1>
         <p className="mt-3 text-slate">{t("settings.subtitle")}</p>
 
         <div className="mt-8 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:overflow-visible sm:px-0">
-          <div className="flex w-max gap-1 rounded-xl bg-seafoam p-1 sm:w-fit sm:flex-wrap">
+          <div className="flex w-max gap-1 rounded-xl bg-seafoam p-1 sm:w-auto">
             {accountTabs.map((tab) => (
               <button
                 className={`rounded-lg px-4 py-2.5 text-sm font-bold whitespace-nowrap transition ${
@@ -6155,84 +6263,140 @@ function SettingsPage() {
         ) : null}
 
         {activeTab === "personal" && (
-          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold text-navy">
-              {t("settings.personalTitle")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.personalHint")}</p>
-            <form className="mt-6 space-y-5" onSubmit={submitPersonalDetails}>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label>
-                  <span className="form-label">{t("settings.legalName")}</span>
-                  <input
-                    autoComplete="name"
-                    className="form-input"
-                    onChange={(event) =>
-                      setPersonalForm((current) => ({ ...current, legalName: event.target.value }))
-                    }
-                    required
-                    value={personalForm.legalName}
-                  />
-                  <p className="mt-2 text-sm leading-6 text-slate">{t("settings.legalNameHint")}</p>
-                </label>
-                <div>
-                  <span className="form-label">{t("profile.location")}</span>
-                  <DestinationAutocomplete
-                    cityOnly
-                    includeCountry
-                    onChange={(location) =>
-                      setPersonalForm((current) => ({ ...current, location }))
-                    }
-                    value={personalForm.location}
-                    variant="profile"
-                  />
-                </div>
-              </div>
-              <div>
-                <span className="form-label">{t("profile.phoneNumber")}</span>
-                <div className="grid grid-cols-[minmax(9.5rem,10.5rem)_minmax(0,1fr)] gap-3">
-                  <div>
-                    <span className="sr-only">{t("profile.callingCode")}</span>
-                    <PhoneCountryCodeSelect
-                      onChange={(phoneCountryCode) =>
-                        setPersonalForm((current) => ({ ...current, phoneCountryCode }))
-                      }
-                      value={personalForm.phoneCountryCode}
-                    />
-                  </div>
+          <div className="mt-8 space-y-8">
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-xl font-bold text-navy">{t("settings.personalTitle")}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate">{t("settings.personalHint")}</p>
+              <form className="mt-6 space-y-5" onSubmit={submitPersonalDetails}>
+                <div className="grid gap-5 sm:grid-cols-2">
                   <label>
-                    <span className="sr-only">{t("profile.phoneNumber")}</span>
+                    <span className="form-label">{t("settings.legalName")}</span>
                     <input
-                      autoComplete="tel-national"
+                      autoComplete="name"
                       className="form-input"
-                      inputMode="tel"
                       onChange={(event) =>
+                        setPersonalForm((current) => ({ ...current, legalName: event.target.value }))
+                      }
+                      required
+                      value={personalForm.legalName}
+                    />
+                    <p className="mt-2 text-sm leading-6 text-slate">{t("settings.legalNameHint")}</p>
+                  </label>
+                  <div>
+                    <span className="form-label">{t("profile.location")}</span>
+                    <DestinationAutocomplete
+                      cityOnly
+                      includeCountry
+                      onChange={(location) =>
                         setPersonalForm((current) => ({
                           ...current,
-                          phoneNumber: event.target.value,
+                          location,
+                          phoneCountryCode: current.phoneNumber.trim()
+                            ? current.phoneCountryCode
+                            : phoneCountryCodeFromLocation(
+                                location,
+                                current.phoneCountryCode || DEFAULT_PHONE_COUNTRY_CODE,
+                              ),
                         }))
                       }
-                      placeholder={t("profile.phonePlaceholder")}
-                      type="tel"
-                      value={personalForm.phoneNumber}
+                      value={personalForm.location}
+                      variant="profile"
                     />
-                  </label>
+                  </div>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-slate">{t("profile.phoneHint")}</p>
+                <div>
+                  <span className="form-label">{t("profile.phoneNumber")}</span>
+                  <div className="grid grid-cols-[minmax(9.5rem,10.5rem)_minmax(0,1fr)] gap-3">
+                    <div>
+                      <span className="sr-only">{t("profile.callingCode")}</span>
+                      <PhoneCountryCodeSelect
+                        onChange={(phoneCountryCode) =>
+                          setPersonalForm((current) => ({ ...current, phoneCountryCode }))
+                        }
+                        value={personalForm.phoneCountryCode}
+                      />
+                    </div>
+                    <label>
+                      <span className="sr-only">{t("profile.phoneNumber")}</span>
+                      <input
+                        autoComplete="tel-national"
+                        className="form-input"
+                        inputMode="tel"
+                        onChange={(event) =>
+                          setPersonalForm((current) => ({
+                            ...current,
+                            phoneNumber: event.target.value,
+                          }))
+                        }
+                        placeholder={t("profile.phonePlaceholder")}
+                        type="tel"
+                        value={personalForm.phoneNumber}
+                      />
+                    </label>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate">{t("profile.phoneHint")}</p>
+                </div>
+                <button
+                  className="rounded-xl bg-navy px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                  disabled={personalStatus === "saving"}
+                  type="submit"
+                >
+                  {(() => {
+                    if (personalStatus === "saved") return t("settings.personalSaved");
+                    if (personalStatus === "saving") return t("common.saving");
+                    return t("settings.savePersonal");
+                  })()}
+                </button>
+              </form>
+            </section>
+
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-xl font-bold text-navy">
+                {t("settings.localizationTitle")}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate">{t("settings.localizationHint")}</p>
+              <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label className="block">
+                    <span className="form-label">{t("settings.language")}</span>
+                    <Select
+                      variant="form"
+                      onChange={(event) => {
+                        void i18n.changeLanguage(event.target.value);
+                        updateProfile({ preferredLanguage: event.target.value });
+                      }}
+                      value={normalizeLanguageCode(i18n.resolvedLanguage ?? i18n.language)}
+                    >
+                      {SUPPORTED_LANGUAGES.map((language) => (
+                        <option key={language.code} value={language.code}>
+                          {language.flag} {language.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                  <p className="mt-3 text-sm leading-6 text-slate">{t("settings.languageHint")}</p>
+                </div>
+                <div>
+                  <label className="block">
+                    <span className="form-label">{t("settings.measurementSystem")}</span>
+                    <Select
+                      variant="form"
+                      onChange={(event) =>
+                        updateProfile({
+                          measurementSystem: event.target.value as "metric" | "imperial",
+                        })
+                      }
+                      value={user.measurementSystem}
+                    >
+                      <option value="metric">{t("settings.metric")}</option>
+                      <option value="imperial">{t("settings.imperial")}</option>
+                    </Select>
+                  </label>
+                  <p className="mt-3 text-sm leading-6 text-slate">{t("settings.measurementHint")}</p>
+                </div>
               </div>
-              <button
-                className="rounded-xl bg-navy px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
-                disabled={personalStatus === "saving"}
-                type="submit"
-              >
-                {personalStatus === "saved"
-                  ? t("settings.personalSaved")
-                  : personalStatus === "saving"
-                    ? t("common.saving")
-                    : t("settings.savePersonal")}
-              </button>
-            </form>
-          </section>
+            </section>
+          </div>
         )}
 
         {activeTab === "security" && (
@@ -6295,114 +6459,68 @@ function SettingsPage() {
           </div>
         )}
 
-        {activeTab === "notifications" && (
-          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold text-navy">
-              {t("settings.emailsTitle")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.emailsHint")}</p>
-            <div className="mt-5 space-y-3">
-              {EMAIL_NOTIFICATION_KEYS.map((key) => (
-                <label
-                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream/60 px-4 py-3"
-                  key={key}
-                >
-                  <input
-                    checked={emailNotifications[key]}
-                    className="mt-0.5 size-4 shrink-0 accent-teal"
-                    onChange={(event) =>
-                      updateProfile({
-                        emailNotifications: {
-                          ...emailNotifications,
-                          [key]: event.target.checked,
-                        },
-                      })
-                    }
-                    type="checkbox"
-                  />
-                  <span className="text-sm leading-6 font-medium text-navy">
-                    {t(`settings.email.${key}`)}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {activeTab === "localization" && (
-          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold text-navy">
-              {t("settings.localizationTitle")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.localizationHint")}</p>
-            <label className="mt-6 block">
-              <span className="form-label">{t("settings.language")}</span>
-              <Select
-                variant="form"
-                onChange={(event) => {
-                  void i18n.changeLanguage(event.target.value);
-                  updateProfile({ preferredLanguage: event.target.value });
-                }}
-                value={normalizeLanguageCode(i18n.resolvedLanguage ?? i18n.language)}
-              >
-                {SUPPORTED_LANGUAGES.map((language) => (
-                  <option key={language.code} value={language.code}>
-                    {language.flag} {language.label}
-                  </option>
-                ))}
-              </Select>
-            </label>
-            <p className="mt-3 text-sm leading-6 text-slate">{t("settings.languageHint")}</p>
-            <div className="my-6 border-t border-line" />
-            <label className="block">
-              <span className="form-label">{t("settings.measurementSystem")}</span>
-              <Select
-                variant="form"
-                onChange={(event) =>
-                  updateProfile({
-                    measurementSystem: event.target.value as "metric" | "imperial",
-                  })
-                }
-                value={user.measurementSystem}
-              >
-                <option value="metric">{t("settings.metric")}</option>
-                <option value="imperial">{t("settings.imperial")}</option>
-              </Select>
-            </label>
-            <p className="mt-3 text-sm leading-6 text-slate">{t("settings.measurementHint")}</p>
-          </section>
-        )}
-
         {activeTab === "preferences" && (
-          <section className="mt-8 rounded-2xl border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-xl font-bold text-navy">
-              {t("settings.sitDefaultsTitle")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate">{t("settings.sitDefaultsHint")}</p>
-            <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-cream/50 px-4 py-3">
-              <input
-                checked={sitDefaults.nonSmokerRequired}
-                className="mt-1 size-4 accent-teal"
-                onChange={(event) =>
-                  updateProfile({
-                    sitDefaults: {
-                      ...sitDefaults,
-                      nonSmokerRequired: event.target.checked,
-                    },
-                  })
-                }
-                type="checkbox"
-              />
-              <span>
-                <span className="block text-sm font-bold text-navy">
-                  {t("settings.sitDefaults.nonSmoker")}
+          <div className="mt-8 space-y-8">
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-xl font-bold text-navy">{t("settings.emailsTitle")}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate">{t("settings.emailsHint")}</p>
+              <div className="mt-5 space-y-3">
+                {EMAIL_NOTIFICATION_KEYS.map((key) => (
+                  <label
+                    className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream/60 px-4 py-3"
+                    key={key}
+                  >
+                    <input
+                      checked={emailNotifications[key]}
+                      className="mt-0.5 size-4 shrink-0 accent-teal"
+                      onChange={(event) =>
+                        updateProfile({
+                          emailNotifications: {
+                            ...emailNotifications,
+                            [key]: event.target.checked,
+                          },
+                        })
+                      }
+                      type="checkbox"
+                    />
+                    <span className="text-sm leading-6 font-medium text-navy">
+                      {t(`settings.email.${key}`)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-xl font-bold text-navy">
+                {t("settings.sitDefaultsTitle")}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate">{t("settings.sitDefaultsHint")}</p>
+              <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-cream/50 px-4 py-3">
+                <input
+                  checked={sitDefaults.nonSmokerRequired}
+                  className="mt-1 size-4 accent-teal"
+                  onChange={(event) =>
+                    updateProfile({
+                      sitDefaults: {
+                        ...sitDefaults,
+                        nonSmokerRequired: event.target.checked,
+                      },
+                    })
+                  }
+                  type="checkbox"
+                />
+                <span>
+                  <span className="block text-sm font-bold text-navy">
+                    {t("settings.sitDefaults.nonSmoker")}
+                  </span>
+                  <span className="mt-1 block text-sm leading-6 text-slate">
+                    {t("settings.sitDefaults.nonSmokerHint")}
+                  </span>
                 </span>
-                <span className="mt-1 block text-sm leading-6 text-slate">
-                  {t("settings.sitDefaults.nonSmokerHint")}
-                </span>
-              </span>
-            </label>
-          </section>
+              </label>
+            </section>
+          </div>
         )}
 
         {activeTab === "privacy" && (
@@ -6898,13 +7016,11 @@ function SitPhaseStepper({ phase }: { phase: SitPhase }) {
         const current = index === currentIndex;
         return (
           <li
-            className={`rounded-xl border px-3 py-2.5 text-center ${
-              current
-                ? "border-teal bg-seafoam text-teal"
-                : done
-                  ? "border-line bg-white text-navy"
-                  : "border-line bg-cream/70 text-slate"
-            }`}
+            className={`rounded-xl border px-3 py-2.5 text-center ${(() => {
+              if (current) return "border-teal bg-seafoam text-teal";
+              if (done) return "border-line bg-white text-navy";
+              return "border-line bg-cream/70 text-slate";
+            })()}`}
             key={step}
           >
             <span className="block text-[10px] font-bold uppercase tracking-wider opacity-70">
@@ -7390,7 +7506,8 @@ function ApplicationReviewPage() {
 
       {pageLoading ? (
         <div className="mt-8 h-80 animate-pulse rounded-2xl bg-seafoam" />
-      ) : applications.length ? (
+      ) : null}
+      {!pageLoading && applications.length ? (
         <div className="mt-8 space-y-6">
           {acceptedApplications.length > 0 &&
             (statusFilter === "all" || statusFilter === "accepted") && (
@@ -7588,47 +7705,49 @@ function ApplicationReviewPage() {
                       ? t("applications.acceptedListHint")
                       : t("applications.filterEmpty")}
                   </p>
-                ) : visibleApplications.length ? (
-                  visibleApplications.map((application) => {
-                    const match = applicationRequirementMatch(application, sit);
-                    return (
-                      <button
-                        className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
-                          application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
-                        }`}
-                        key={application.id}
-                        onClick={() => setSelectedId(application.id)}
-                        type="button"
-                      >
-                        <img
-                          alt=""
-                          className="size-11 rounded-full object-cover"
-                          src={application.applicant.image}
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-bold text-navy">
-                            {application.applicant.name}
+                ) : null}
+                {statusFilter !== "accepted" && visibleApplications.length
+                  ? visibleApplications.map((application) => {
+                      const match = applicationRequirementMatch(application, sit);
+                      return (
+                        <button
+                          className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
+                            application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
+                          }`}
+                          key={application.id}
+                          onClick={() => setSelectedId(application.id)}
+                          type="button"
+                        >
+                          <img
+                            alt=""
+                            className="size-11 rounded-full object-cover"
+                            src={application.applicant.image}
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate font-bold text-navy">
+                              {application.applicant.name}
+                            </span>
+                            <span className="mt-1 block text-[11px] font-semibold text-slate">
+                              {t("applications.listMeta", {
+                                years: application.applicant.yearsExperience,
+                                matches: match.matchCount,
+                                total: match.matchTotal || 0,
+                                sits: application.applicant.completedSits,
+                              })}
+                            </span>
+                            <span className="mt-1 block">
+                              <ApplicationStatusBadge status={application.status} />
+                            </span>
                           </span>
-                          <span className="mt-1 block text-[11px] font-semibold text-slate">
-                            {t("applications.listMeta", {
-                              years: application.applicant.yearsExperience,
-                              matches: match.matchCount,
-                              total: match.matchTotal || 0,
-                              sits: application.applicant.completedSits,
-                            })}
-                          </span>
-                          <span className="mt-1 block">
-                            <ApplicationStatusBadge status={application.status} />
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })
-                ) : (
+                        </button>
+                      );
+                    })
+                  : null}
+                {statusFilter !== "accepted" && !visibleApplications.length ? (
                   <p className="px-3 py-6 text-center text-sm text-slate">
                     {t("applications.filterEmpty")}
                   </p>
-                )}
+                ) : null}
               </div>
             </aside>
 
@@ -7808,76 +7927,78 @@ function ApplicationReviewPage() {
                     </p>
                   </div>
 
-                  {anotherApplicantAccepted ? (
-                    <div
-                      className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
-                      role="status"
-                    >
-                      <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
-                      <div>
-                        <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
-                        <p className="mt-1">
-                          {t("applications.anotherAcceptedBanner", {
-                            name: primaryAcceptedApplication.applicant.name,
-                          })}
-                        </p>
-                      </div>
+                {anotherApplicantAccepted ? (
+                  <div
+                    className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                    role="status"
+                  >
+                    <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                    <div>
+                      <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
+                      <p className="mt-1">
+                        {t("applications.anotherAcceptedBanner", {
+                          name: primaryAcceptedApplication.applicant.name,
+                        })}
+                      </p>
                     </div>
-                  ) : selected.status === "accepted" ? (
-                    <div className="mt-6">
-                      <button
-                        className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
+                  </div>
+                ) : null}
+                {!anotherApplicantAccepted && selected.status === "accepted" ? (
+                  <div className="mt-6">
+                    <button
+                      className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
+                      disabled={statusMutation.isPending}
+                      onClick={() => {
+                        setSharePhone(false);
+                        setConfirmingStatus("unaccept");
+                      }}
+                      type="button"
+                    >
+                      {t("applications.action.unaccept")}
+                    </button>
+                  </div>
+                ) : null}
+                {!anotherApplicantAccepted && selected.status !== "accepted" ? (
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <label
+                      className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
+                        selected.status === "shortlisted"
+                          ? "border-amber-400 bg-amber-100 text-amber-900"
+                          : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                      }`}
+                    >
+                      <input
+                        checked={selected.status === "shortlisted"}
+                        className="size-4 accent-amber-600"
                         disabled={statusMutation.isPending}
+                        onChange={(event) =>
+                          statusMutation.mutate({
+                            id: selected.id,
+                            status: event.target.checked ? "shortlisted" : "new",
+                          })
+                        }
+                        type="checkbox"
+                      />
+                      {t("applications.action.shortlisted")}
+                    </label>
+                    {(["accepted", "declined"] as const).map((status) => (
+                      <button
+                        className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
+                          selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
+                        }`}
+                        disabled={statusMutation.isPending}
+                        key={status}
                         onClick={() => {
                           setSharePhone(false);
-                          setConfirmingStatus("unaccept");
+                          setConfirmingStatus(status);
                         }}
                         type="button"
                       >
-                        {t("applications.action.unaccept")}
+                        {t(`applications.action.${status}`)}
                       </button>
-                    </div>
-                  ) : (
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      <label
-                        className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
-                          selected.status === "shortlisted"
-                            ? "border-amber-400 bg-amber-100 text-amber-900"
-                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                        }`}
-                      >
-                        <input
-                          checked={selected.status === "shortlisted"}
-                          className="size-4 accent-amber-600"
-                          disabled={statusMutation.isPending}
-                          onChange={(event) =>
-                            statusMutation.mutate({
-                              id: selected.id,
-                              status: event.target.checked ? "shortlisted" : "new",
-                            })
-                          }
-                          type="checkbox"
-                        />
-                        {t("applications.action.shortlisted")}
-                      </label>
-                      {(["accepted", "declined"] as const).map((status) => (
-                        <button
-                          className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
-                            selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
-                          }`}
-                          disabled={statusMutation.isPending}
-                          key={status}
-                          onClick={() => {
-                            setSharePhone(false);
-                            setConfirmingStatus(status);
-                          }}
-                          type="button"
-                        >
-                          {t(`applications.action.${status}`)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                ) : null}
                 </section>
 
                 <ConversationPanel
@@ -7925,12 +8046,13 @@ function ApplicationReviewPage() {
             )}
           </div>
         </div>
-      ) : (
+      ) : null}
+      {!pageLoading && !applications.length ? (
         <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
           <MessageCircle className="mx-auto text-teal" size={38} />
           <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
         </div>
-      )}
+      ) : null}
       {confirmingStatus && selected && (
         <div
           className="fixed inset-0 z-70 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
@@ -7947,21 +8069,17 @@ function ApplicationReviewPage() {
             role="dialog"
           >
             <span
-              className={`grid size-12 place-items-center rounded-full ${
-                confirmingStatus === "accepted"
-                  ? "bg-emerald-100 text-emerald-700"
-                  : confirmingStatus === "unaccept"
-                    ? "bg-amber-100 text-amber-800"
-                    : "bg-red-100 text-red-700"
-              }`}
+              className={`grid size-12 place-items-center rounded-full ${(() => {
+                if (confirmingStatus === "accepted") return "bg-emerald-100 text-emerald-700";
+                if (confirmingStatus === "unaccept") return "bg-amber-100 text-amber-800";
+                return "bg-red-100 text-red-700";
+              })()}`}
             >
-              {confirmingStatus === "accepted" ? (
-                <Check size={24} />
-              ) : confirmingStatus === "unaccept" ? (
-                <TriangleAlert size={24} />
-              ) : (
+              {confirmingStatus === "accepted" ? <Check size={24} /> : null}
+              {confirmingStatus === "unaccept" ? <TriangleAlert size={24} /> : null}
+              {confirmingStatus !== "accepted" && confirmingStatus !== "unaccept" ? (
                 <X size={24} />
-              )}
+              ) : null}
             </span>
             <h2
               className="mt-5 font-display text-2xl font-bold text-navy"
@@ -8016,13 +8134,11 @@ function ApplicationReviewPage() {
                 {t("common.cancel")}
               </button>
               <button
-                className={`rounded-xl px-5 py-3 font-bold text-white disabled:opacity-60 ${
-                  confirmingStatus === "accepted"
-                    ? "bg-emerald-600 hover:bg-emerald-700"
-                    : confirmingStatus === "unaccept"
-                      ? "bg-amber-700 hover:bg-amber-800"
-                      : "bg-red-600 hover:bg-red-700"
-                }`}
+                className={`rounded-xl px-5 py-3 font-bold text-white disabled:opacity-60 ${(() => {
+                  if (confirmingStatus === "accepted") return "bg-emerald-600 hover:bg-emerald-700";
+                  if (confirmingStatus === "unaccept") return "bg-amber-700 hover:bg-amber-800";
+                  return "bg-red-600 hover:bg-red-700";
+                })()}`}
                 disabled={statusMutation.isPending}
                 onClick={() => {
                   statusMutation.mutate({
@@ -8245,9 +8361,8 @@ function MessagesPage() {
               </button>
             ))}
           </div>
-          {isLoading ? (
-            <MessagesPageSkeleton />
-          ) : tabApplications.length && selected ? (
+          {isLoading ? <MessagesPageSkeleton /> : null}
+          {!isLoading && tabApplications.length && selected ? (
             <div className="mt-8 grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
               <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-2 shadow-card">
                 {visibleApplications.map((application) => {
@@ -8443,7 +8558,8 @@ function MessagesPage() {
                 />
               </div>
             </div>
-          ) : (
+          ) : null}
+          {!isLoading && !(tabApplications.length && selected) ? (
             <div className="mt-8 rounded-2xl border border-line bg-white py-16 text-center">
               {messagesTab === "archived" ? (
                 <Archive className="mx-auto text-teal" size={38} />
@@ -8451,14 +8567,14 @@ function MessagesPage() {
                 <MessageCircle className="mx-auto text-teal" size={38} />
               )}
               <p className="mt-4 font-bold text-navy">
-                {messagesTab === "archived"
-                  ? t("messages.emptyArchived")
-                  : applications.length > 0
-                    ? t("messages.emptyInbox")
-                    : t("messages.empty")}
+                {(() => {
+                  if (messagesTab === "archived") return t("messages.emptyArchived");
+                  if (applications.length > 0) return t("messages.emptyInbox");
+                  return t("messages.empty");
+                })()}
               </p>
             </div>
-          )}
+          ) : null}
         </>
       )}
     </main>

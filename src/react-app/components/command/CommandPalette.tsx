@@ -78,12 +78,9 @@ function StatusBadge({
   children: ReactNode;
   tone?: "neutral" | "on" | "off";
 }) {
-  const toneClass =
-    tone === "on"
-      ? "bg-seafoam text-teal"
-      : tone === "off"
-        ? "bg-coral/10 text-coral"
-        : "bg-cream text-slate";
+  let toneClass = "bg-cream text-slate";
+  if (tone === "on") toneClass = "bg-seafoam text-teal";
+  else if (tone === "off") toneClass = "bg-coral/10 text-coral";
   return (
     <span
       className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${toneClass}`}

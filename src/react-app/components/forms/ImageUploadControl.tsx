@@ -17,17 +17,21 @@ export function ImageUploadControl({
   profile?: boolean;
 }) {
   const { t } = useTranslation();
-  const label = pending
-    ? multiple
-      ? t("upload.processingMultiple")
-      : t("upload.processing")
-    : profile
-      ? t("profile.replacePhoto")
-      : multiple
-        ? t("upload.uploadMultiple")
-        : hasImage
-          ? t("upload.replace")
-          : t("upload.upload");
+
+  let label = t("upload.upload");
+  if (pending) {
+    label = multiple ? t("upload.processingMultiple") : t("upload.processing");
+  } else if (profile) {
+    label = t("profile.replacePhoto");
+  } else if (multiple) {
+    label = t("upload.uploadMultiple");
+  } else if (hasImage) {
+    label = t("upload.replace");
+  }
+
+  let hint = t("upload.hint");
+  if (profile) hint = t("profile.photoUploadHint");
+  else if (multiple) hint = t("upload.hintMultiple");
 
   return (
     <div>
@@ -52,13 +56,7 @@ export function ImageUploadControl({
           type="file"
         />
       </label>
-      <p className="mt-2 text-xs leading-relaxed text-slate">
-        {profile
-          ? t("profile.photoUploadHint")
-          : multiple
-            ? t("upload.hintMultiple")
-            : t("upload.hint")}
-      </p>
+      <p className="mt-2 text-xs leading-relaxed text-slate">{hint}</p>
     </div>
   );
 }

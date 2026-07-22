@@ -41,11 +41,14 @@ export function IdentityVerificationCard({
             {allVerified ? t("verification.identityVerified") : t("verification.confirmIdentity")}
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate">
-            {allVerified
-              ? t("verification.verifiedHint")
-              : isSelf
-                ? t("verification.selfHint")
-                : t("verification.partialHint", { count: verifiedCount, total: items.length })}
+            {(() => {
+              if (allVerified) return t("verification.verifiedHint");
+              if (isSelf) return t("verification.selfHint");
+              return t("verification.partialHint", {
+                count: verifiedCount,
+                total: items.length,
+              });
+            })()}
           </p>
         </div>
       </div>
@@ -89,11 +92,11 @@ export function IdentityVerificationCard({
       )}
       {isSelf && checks.governmentId && (!checks.email || !checks.phone) && (
         <p className="mt-5 border-t border-line pt-4 text-sm leading-6 text-slate">
-          {!checks.phone && !checks.email
-            ? t("verification.addEmailAndPhone")
-            : !checks.phone
-              ? t("verification.addPhone")
-              : t("verification.addEmail")}
+          {(() => {
+            if (!checks.phone && !checks.email) return t("verification.addEmailAndPhone");
+            if (!checks.phone) return t("verification.addPhone");
+            return t("verification.addEmail");
+          })()}
         </p>
       )}
     </section>

@@ -1,22 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getCode } from "country-list";
 import { Compass, MapPin, Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { countryIsoFromName } from "@/countryUtils";
 import { destinations, type Destination } from "@/destinations";
-
-const COUNTRY_CODE_OVERRIDES: Record<string, string> = {
-  "Ivory Coast": "CI",
-  "North Korea": "KP",
-  "South Korea": "KR",
-  Türkiye: "TR",
-  "United Kingdom": "GB",
-  "United States": "US",
-  "Vatican City": "VA",
-};
-
-function countryCode(name: string) {
-  return COUNTRY_CODE_OVERRIDES[name] ?? getCode(name);
-}
 
 export function DestinationAutocomplete({
   value,
@@ -60,11 +46,12 @@ export function DestinationAutocomplete({
   }, [multiple, value]);
 
   const suggestions = useMemo(() => {
-    const source = countryOnly
-      ? destinations.filter((destination) => destination.kind === "Country")
-      : cityOnly
-        ? destinations.filter((destination) => destination.kind === "City")
-        : destinations;
+    let source = destinations;
+    if (countryOnly) {
+      source = destinations.filter((destination) => destination.kind === "Country");
+    } else if (cityOnly) {
+      source = destinations.filter((destination) => destination.kind === "City");
+    }
     const query = (multiple ? draft : value).trim().toLowerCase();
     const popularNames = countryOnly
       ? ["Greece", "Spain", "United Kingdom", "Croatia", "Italy", "France", "Sweden", "Norway"]
@@ -122,21 +109,28 @@ export function DestinationAutocomplete({
   }
 
   function suggestionCountryCode(destination: Destination) {
-    if (destination.kind === "City") return countryCode(destination.detail);
-    if (destination.kind === "Country") return countryCode(destination.name);
+    if (destination.kind === "City") return countryIsoFromName(destination.detail);
+    if (destination.kind === "Country") return countryIsoFromName(destination.name);
     return undefined;
   }
 
+  let containerClass =
+    "relative flex flex-1 items-center gap-3 rounded-xl bg-cream px-4";
+  if (variant === "home") {
+    containerClass =
+      "relative flex items-center gap-3 border-b border-line px-5 py-4 md:border-r md:border-b-0";
+  } else if (variant === "profile") {
+    containerClass =
+      "relative flex flex-1 items-center gap-3 rounded-xl border border-line bg-white px-4";
+  }
+
+  let placeholderText = t("boats.destination");
+  if (placeholder) placeholderText = placeholder;
+  else if (variant === "home") placeholderText = t("search.destination");
+  else if (variant === "profile") placeholderText = t("profile.locationPlaceholder");
+
   return (
-    <div
-      className={
-        variant === "home"
-          ? "relative flex items-center gap-3 border-b border-line px-5 py-4 md:border-r md:border-b-0"
-          : variant === "profile"
-            ? "relative flex flex-1 items-center gap-3 rounded-xl border border-line bg-white px-4"
-            : "relative flex flex-1 items-center gap-3 rounded-xl bg-cream px-4"
-      }
-    >
+    <div className={containerClass}>
       {variant === "home" ? (
         <MapPin className="shrink-0 text-coral" size={20} />
       ) : (
@@ -200,14 +194,7 @@ export function DestinationAutocomplete({
               }
               if (event.key === "Escape") setOpen(false);
             }}
-            placeholder={
-              placeholder ??
-              (variant === "home"
-                ? t("search.destination")
-                : variant === "profile"
-                  ? t("profile.locationPlaceholder")
-                  : t("boats.destination"))
-            }
+            placeholder={placeholderText}
             role="combobox"
             value={multiple ? draft : value}
           />
@@ -257,11 +244,9 @@ export function DestinationAutocomplete({
                       className="h-full w-full rounded-lg object-cover"
                       src={`https://flagcdn.com/${code.toLowerCase()}.svg`}
                     />
-                  ) : destination.kind === "City" ? (
-                    <MapPin size={16} />
-                  ) : (
-                    <Compass size={16} />
-                  )}
+                  ) : null}
+                  {!code && destination.kind === "City" ? <MapPin size={16} /> : null}
+                  {!code && destination.kind !== "City" ? <Compass size={16} /> : null}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-navy">

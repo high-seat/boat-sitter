@@ -266,11 +266,11 @@ export function AuthModal() {
             disabled={pending}
             type="submit"
           >
-            {pending
-              ? t("auth.pending")
-              : mode === "login"
-                ? t("auth.loginSubmit")
-                : t("auth.signupSubmit")}
+            {(() => {
+              if (pending) return t("auth.pending");
+              if (mode === "login") return t("auth.loginSubmit");
+              return t("auth.signupSubmit");
+            })()}
           </button>
           <p className="text-center text-xs leading-5 text-slate">{t("auth.mockNotice")}</p>
         </form>

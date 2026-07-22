@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { roleForEmail, type UserRole } from "@/adminAccess";
+import {
+  DEFAULT_PHONE_COUNTRY_CODE,
+  phoneCountryCodeFromLocation,
+  resolvePhoneCountryCode,
+} from "@/phoneCountryCode";
 
 export type MeasurementSystem = "metric" | "imperial";
 
@@ -228,6 +233,7 @@ export const useAppStore = create<AppStore>()(
         })),
       loginAs: (user) => {
         const email = user.email?.trim() || fallbackEmail(user.name);
+        const location = "Brighton, United Kingdom";
         set({
           user: {
             ...user,
@@ -235,7 +241,7 @@ export const useAppStore = create<AppStore>()(
             emailConfirmed: user.emailConfirmed ?? true,
             legalName: user.name,
             bio: "Practical, calm and happiest near the water. I value transparent communication, careful preparation and thorough handovers.",
-            location: "Brighton, United Kingdom",
+            location,
             languages: ["English"],
             preferredCountries: [],
             skills: ["Detailed handovers", "Fast responder"],
@@ -244,7 +250,7 @@ export const useAppStore = create<AppStore>()(
             emailNotifications: { ...DEFAULT_EMAIL_NOTIFICATIONS },
             sitDefaults: { ...DEFAULT_SIT_CREATION_DEFAULTS },
             memberSince: 2024,
-            phoneCountryCode: "+1",
+            phoneCountryCode: phoneCountryCodeFromLocation(location),
             phoneNumber: "",
             role: roleForEmail(email),
           },
@@ -270,7 +276,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: "harbourly",
-      version: 15,
+      version: 16,
       migrate: (persistedState) => {
         const state = persistedState as AppStore;
         const next = {
@@ -282,6 +288,7 @@ export const useAppStore = create<AppStore>()(
         };
         if (!next.user) return next;
         const email = next.user.email || fallbackEmail(next.user.name);
+        const phoneNumber = next.user.phoneNumber ?? "";
         return {
           ...next,
           user: {
@@ -308,8 +315,12 @@ export const useAppStore = create<AppStore>()(
               ...next.user.sitDefaults,
             },
             memberSince: next.user.memberSince ?? 2024,
-            phoneCountryCode: next.user.phoneCountryCode ?? "+1",
-            phoneNumber: next.user.phoneNumber ?? "",
+            phoneNumber,
+            phoneCountryCode: resolvePhoneCountryCode({
+              location: next.user.location ?? "",
+              phoneCountryCode: next.user.phoneCountryCode ?? DEFAULT_PHONE_COUNTRY_CODE,
+              phoneNumber,
+            }),
             role: next.user.role ?? roleForEmail(email),
           },
         };

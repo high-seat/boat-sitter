@@ -108,11 +108,11 @@ function ReviewCard({
     onError: (err) => {
       const code = err instanceof Error ? err.message : "";
       setError(
-        code === "REVIEW_RESPONSE_TOO_SHORT"
-          ? t("reviews.responseTooShort")
-          : code === "REVIEW_RESPONSE_EXISTS"
-            ? t("reviews.responseExists")
-            : t("reviews.responseFailed"),
+        (() => {
+          if (code === "REVIEW_RESPONSE_TOO_SHORT") return t("reviews.responseTooShort");
+          if (code === "REVIEW_RESPONSE_EXISTS") return t("reviews.responseExists");
+          return t("reviews.responseFailed");
+        })(),
       );
     },
   });
@@ -143,7 +143,8 @@ function ReviewCard({
                 {formatReviewDate(language, review.response.createdAt)}
               </p>
             </div>
-          ) : canRespond ? (
+          ) : null}
+          {!review.response && canRespond ? (
             <form
               className="mt-4 space-y-3"
               onSubmit={(event) => {
@@ -219,15 +220,13 @@ export function LeaveReviewForm({
     onError: (err) => {
       const code = err instanceof Error ? err.message : "";
       setError(
-        code === "REVIEW_TEXT_TOO_SHORT"
-          ? t("reviews.textTooShort")
-          : code === "REVIEW_ALREADY_EXISTS"
-            ? t("reviews.alreadyExists")
-            : code === "REVIEW_WINDOW_CLOSED"
-              ? t("reviews.windowClosed")
-              : code === "REVIEW_SIT_NOT_COMPLETED"
-                ? t("reviews.sitNotCompleted")
-                : t("reviews.submitFailed"),
+        (() => {
+          if (code === "REVIEW_TEXT_TOO_SHORT") return t("reviews.textTooShort");
+          if (code === "REVIEW_ALREADY_EXISTS") return t("reviews.alreadyExists");
+          if (code === "REVIEW_WINDOW_CLOSED") return t("reviews.windowClosed");
+          if (code === "REVIEW_SIT_NOT_COMPLETED") return t("reviews.sitNotCompleted");
+          return t("reviews.submitFailed");
+        })(),
       );
     },
   });

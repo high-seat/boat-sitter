@@ -92,12 +92,12 @@ export function DateRangePicker({
     return new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }, []);
   const hasDates = Boolean(startDate || endDate);
-  const label =
-    startDate && endDate
-      ? `${displayDate(startDate)} – ${displayDate(endDate)}`
-      : startDate
-        ? displayDate(startDate)
-        : t("search.anyDates");
+  let label = t("search.anyDates");
+  if (startDate && endDate) {
+    label = `${displayDate(startDate)} – ${displayDate(endDate)}`;
+  } else if (startDate) {
+    label = displayDate(startDate);
+  }
 
   function clear(event: MouseEvent) {
     event.preventDefault();

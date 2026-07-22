@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Ellipsis, Flag, Languages, Phone, Send, Video, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getIntlLocale } from "@/i18n";
+import { type ApplicationMessage, type SitApplication } from "@/mockApi";
 import {
-  getSitPrivateAccessForViewer,
-  type ApplicationMessage,
-  type SitApplication,
-} from "@/mockApi";
-import { VesselPrivateAccessCard } from "@/components/listing/VesselPrivateAccessCard";
-import { REPORT_REASONS, useAppStore, type ReportReason } from "@/store";
+  REPORT_REASONS,
+  useAppStore,
+  type ReportReason,
+} from "@/store";
 import { translateWithGoogle } from "@/translationService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Select } from "@/components/ui/Select";
@@ -152,11 +150,6 @@ export function ConversationPanel({
     application.status === "accepted" &&
     currentUser === application.applicant.name &&
     application.ownerPhone;
-  const { data: privateAccess } = useQuery({
-    queryKey: ["sit-private-access", application.sitId, currentUser],
-    queryFn: () => getSitPrivateAccessForViewer(application.sitId, currentUser),
-    enabled: application.status === "accepted",
-  });
   const otherPartyName =
     currentUser === application.ownerName ? application.applicant.name : application.ownerName;
   const profilePhone = user?.phoneNumber.trim()
@@ -193,14 +186,6 @@ export function ConversationPanel({
             <Phone aria-hidden="true" size={17} />
             {sharedOwnerPhone}
           </a>
-        </div>
-      )}
-      {application.status === "accepted" && privateAccess && (
-        <div className="border-b border-line p-4">
-          <VesselPrivateAccessCard
-            details={privateAccess}
-            variant={currentUser === application.ownerName ? "owner" : "sitter"}
-          />
         </div>
       )}
       <div className="max-h-96 space-y-4 overflow-y-auto p-5">
@@ -267,14 +252,14 @@ export function ConversationPanel({
               message.systemKind === "videoCallAccepted" ||
               message.systemKind === "videoCallDeclined"
             ) {
-              const titleKey =
-                message.systemKind === "videoCallRequest"
-                  ? "applications.systemMessage.videoCallRequestTitle"
-                  : message.systemKind === "videoCallCounter"
-                    ? "applications.systemMessage.videoCallCounterTitle"
-                    : message.systemKind === "videoCallAccepted"
-                      ? "applications.systemMessage.videoCallAcceptedTitle"
-                      : "applications.systemMessage.videoCallDeclinedTitle";
+              let titleKey = "applications.systemMessage.videoCallDeclinedTitle";
+              if (message.systemKind === "videoCallRequest") {
+                titleKey = "applications.systemMessage.videoCallRequestTitle";
+              } else if (message.systemKind === "videoCallCounter") {
+                titleKey = "applications.systemMessage.videoCallCounterTitle";
+              } else if (message.systemKind === "videoCallAccepted") {
+                titleKey = "applications.systemMessage.videoCallAcceptedTitle";
+              }
               const details = formatVideoCallDetails(message);
               const canRespond =
                 latestPendingProposal?.id === message.id &&
@@ -619,11 +604,11 @@ function MessageActionsMenu({
             type="button"
           >
             <Languages aria-hidden="true" className="text-teal" size={15} />
-            {translatePending
-              ? t("applications.translating")
-              : hasTranslation
-                ? t("applications.hideTranslation")
-                : t("applications.translateWithGoogle")}
+            {(() => {
+              if (translatePending) return t("applications.translating");
+              if (hasTranslation) return t("applications.hideTranslation");
+              return t("applications.translateWithGoogle");
+            })()}
           </button>
           <button
             className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream"

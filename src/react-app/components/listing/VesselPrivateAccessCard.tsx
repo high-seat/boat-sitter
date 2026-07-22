@@ -1,6 +1,18 @@
+import { type ReactNode } from "react";
 import { KeyRound, Lock, MapPinned, Wifi } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { hasSitPrivateDetails, type SitPrivateDetails } from "@/mockApi";
+import {
+  hasSitPrivateDetails,
+  type SitPrivateDetails,
+} from "@/mockApi";
+import { mapsAddressSearchUrl } from "@/mapUtils";
+import { CopyIconButton } from "@/components/ui/CopyIconButton";
+
+function RowIcon({ icon }: { icon: "map" | "wifi" | "key" }) {
+  if (icon === "wifi") return <Wifi aria-hidden="true" size={14} />;
+  if (icon === "map") return <MapPinned aria-hidden="true" size={14} />;
+  return <KeyRound aria-hidden="true" size={14} />;
+}
 
 export function VesselPrivateAccessCard({
   details,
@@ -18,6 +30,7 @@ export function VesselPrivateAccessCard({
     value: string;
     multiline?: boolean;
     icon: "map" | "wifi" | "key";
+    mapsLink?: boolean;
   }> = [];
   if (details?.fullAddress?.trim()) {
     rows.push({
@@ -26,6 +39,7 @@ export function VesselPrivateAccessCard({
       value: details.fullAddress.trim(),
       multiline: true,
       icon: "map",
+      mapsLink: true,
     });
   }
   if (details?.wifiNetwork?.trim()) {
@@ -82,30 +96,45 @@ export function VesselPrivateAccessCard({
         </div>
       </div>
       <dl className="divide-y divide-teal/20">
-        {rows.map((row) => (
-          <div
-            className="grid gap-1 px-5 py-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4"
-            key={row.key}
-          >
-            <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal">
-              {row.icon === "wifi" ? (
-                <Wifi aria-hidden="true" size={14} />
-              ) : row.icon === "map" ? (
-                <MapPinned aria-hidden="true" size={14} />
-              ) : (
-                <KeyRound aria-hidden="true" size={14} />
-              )}
-              {row.label}
-            </dt>
-            <dd
-              className={`wrap-break-word font-semibold text-navy ${
-                row.multiline ? "whitespace-pre-wrap leading-6" : ""
-              }`}
+        {rows.map((row) => {
+          let valueNode: ReactNode = row.value;
+          if (row.mapsLink) {
+            valueNode = (
+              <a
+                aria-label={t("privateAccess.openInMapsAria", { address: row.value })}
+                className="text-navy underline decoration-teal/50 underline-offset-2 transition hover:text-teal"
+                href={mapsAddressSearchUrl(row.value)}
+                rel="noreferrer"
+                target="_blank"
+                title={t("privateAccess.openInMaps")}
+              >
+                {row.value}
+              </a>
+            );
+          }
+
+          return (
+            <div
+              className="grid gap-1 px-5 py-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4"
+              key={row.key}
             >
-              {row.value}
-            </dd>
-          </div>
-        ))}
+              <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal">
+                <RowIcon icon={row.icon} />
+                {row.label}
+              </dt>
+              <dd className="flex items-start gap-2">
+                <div
+                  className={`min-w-0 flex-1 wrap-break-word font-semibold text-navy ${
+                    row.multiline ? "whitespace-pre-wrap leading-6" : ""
+                  }`}
+                >
+                  {valueNode}
+                </div>
+                <CopyIconButton label={row.label} value={row.value} />
+              </dd>
+            </div>
+          );
+        })}
       </dl>
     </section>
   );

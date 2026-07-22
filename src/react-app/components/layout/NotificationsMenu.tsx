@@ -133,7 +133,8 @@ export function NotificationsMenu() {
               <div className="h-16 animate-pulse rounded-xl bg-cream" />
               <div className="h-16 animate-pulse rounded-xl bg-cream" />
             </div>
-          ) : notifications.length ? (
+          ) : null}
+          {!isLoading && notifications.length ? (
             <>
               <div className="max-h-96 overflow-y-auto p-2">
                 {notifications.map((notification) => (
@@ -181,11 +182,12 @@ export function NotificationsMenu() {
                 </button>
               </div>
             </>
-          ) : (
+          ) : null}
+          {!isLoading && !notifications.length ? (
             <p className="m-4 rounded-xl bg-cream px-4 py-5 text-center text-sm text-slate">
               {t("notifications.empty")}
             </p>
-          )}
+          ) : null}
         </div>
       )}
     </div>

@@ -175,14 +175,14 @@ export function AdminPage() {
             ) : null}
           </div>
 
-          {usersQuery.isLoading ? (
-            <AdminPageSkeleton />
-          ) : filteredUsers.length === 0 ? (
+          {usersQuery.isLoading ? <AdminPageSkeleton /> : null}
+          {!usersQuery.isLoading && filteredUsers.length === 0 ? (
             <div className="mt-10 rounded-2xl border border-dashed border-line bg-white px-6 py-16 text-center">
               <Users className="mx-auto text-teal" size={36} />
               <p className="mt-4 font-bold text-navy">{t("admin.usersEmpty")}</p>
             </div>
-          ) : (
+          ) : null}
+          {!usersQuery.isLoading && filteredUsers.length > 0 ? (
             <ul className="mt-6 space-y-3">
               {filteredUsers.map((entry) => (
                 <li
@@ -232,16 +232,17 @@ export function AdminPage() {
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </>
-      ) : auditQuery.isLoading ? (
-        <AdminAuditSkeleton />
-      ) : (auditQuery.data?.length ?? 0) === 0 ? (
+      ) : null}
+      {tab !== "users" && auditQuery.isLoading ? <AdminAuditSkeleton /> : null}
+      {tab !== "users" && !auditQuery.isLoading && (auditQuery.data?.length ?? 0) === 0 ? (
         <div className="mt-10 rounded-2xl border border-dashed border-line bg-white px-6 py-16 text-center">
           <ShieldCheck className="mx-auto text-teal" size={36} />
           <p className="mt-4 font-bold text-navy">{t("admin.auditEmpty")}</p>
         </div>
-      ) : (
+      ) : null}
+      {tab !== "users" && !auditQuery.isLoading && (auditQuery.data?.length ?? 0) > 0 ? (
         <ul className="mt-8 space-y-3">
           {auditQuery.data!.map((entry) => (
             <li className="rounded-2xl border border-line bg-white p-4 shadow-card" key={entry.id}>
@@ -260,7 +261,7 @@ export function AdminPage() {
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
 
       {editing ? (
         <AdminUserEditModal

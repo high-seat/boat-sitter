@@ -32,4 +32,13 @@ test.describe("return to accepted applicant", () => {
     await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
     await expect(page.getByText("Viewing details")).toBeVisible();
   });
+
+  test("hides boat access details from the application conversation", async ({ page }) => {
+    await seedVerifiedOwner(page);
+    await page.goto("/owner/sits/solstice/applications");
+    await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Conversation/i })).toBeVisible();
+    await expect(page.getByRole("region", { name: /Boat access details/i })).toHaveCount(0);
+    await expect(page.getByText(/Solstice-Guest/i)).toHaveCount(0);
+  });
 });

@@ -182,11 +182,11 @@ export function VideoCallScheduleModal({
           onClick={submit}
           type="button"
         >
-          {pending
-            ? t("common.saving")
-            : mode === "adjust"
-              ? t("applications.videoCall.adjustAction")
-              : t("applications.requestVideoCallConfirmAction")}
+          {(() => {
+            if (pending) return t("common.saving");
+            if (mode === "adjust") return t("applications.videoCall.adjustAction");
+            return t("applications.requestVideoCallConfirmAction");
+          })()}
         </button>
       </div>
     </Modal>

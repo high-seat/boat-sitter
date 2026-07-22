@@ -8,6 +8,10 @@ export function mapsSearchUrl(latitude: number, longitude: number, label?: strin
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
+export function mapsAddressSearchUrl(address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
 export function isApproximateMapPin(item: { approximateLocation?: boolean }) {
   return item.approximateLocation !== false;
 }
