@@ -14,7 +14,9 @@ test.describe("message archive", () => {
 
     const firstConversation = page.locator("aside button").first();
     await expect(firstConversation).toBeVisible();
-    const otherName = (await firstConversation.locator("span.font-bold").first().innerText()).trim();
+    const otherName = (
+      await firstConversation.locator("span.font-bold").first().innerText()
+    ).trim();
     await firstConversation.click();
 
     await page.getByRole("button", { name: /Archive conversation/i }).click();

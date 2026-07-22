@@ -106,12 +106,14 @@ const localeExtrasSource = {
       "Log in or create an account to save sits to your shortlist and find them later.",
     "saved.showAll": "Show all including sitter chosen, completed, etc.",
     "saved.emptyFiltered": "No open saved sits",
-    "saved.emptyFilteredHint": "Your shortlist only has sits that already have a sitter chosen or are completed. Check the box above to see them.",
+    "saved.emptyFilteredHint":
+      "Your shortlist only has sits that already have a sitter chosen or are completed. Check the box above to see them.",
     "editorPreview.kicker": "Live preview",
     "editorPreview.title": "How it will look",
     "editorPreview.label": "Live preview",
     "editorPreview.vesselHint": "Updates as you edit your boat details.",
-    "editorPreview.sitHint": "Updates as you edit this sit. This is how it appears when sitters browse.",
+    "editorPreview.sitHint":
+      "Updates as you edit this sit. This is how it appears when sitters browse.",
     "editorPreview.untitledBoat": "Untitled boat",
     "editorPreview.homePortPending": "Add a home port",
     "editorPreview.lengthPending": "Length TBD",
@@ -213,8 +215,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identity verified",
     "verification.identityVerified": "Identity verified",
     "verification.confirmIdentity": "Confirm your identity",
-    "verification.verifiedHint": "Boatstead confirmed government ID, email, and phone for this member.",
-    "verification.selfHint": "Complete each item below so owners and sitters can trust your profile.",
+    "verification.verifiedHint":
+      "Boatstead confirmed government ID, email, and phone for this member.",
+    "verification.selfHint":
+      "Complete each item below so owners and sitters can trust your profile.",
     "verification.partialHint": "{{count}} of {{total}} checks confirmed so far.",
     "verification.governmentId": "Government ID",
     "verification.email": "Email address",
@@ -222,7 +226,8 @@ const localeExtrasSource = {
     "verification.statusVerified": "verified",
     "verification.statusMissing": "not verified",
     "verification.verifyGovernmentId": "Verify government ID",
-    "verification.addEmailAndPhone": "Add an email address and phone number in your profile to finish verification.",
+    "verification.addEmailAndPhone":
+      "Add an email address and phone number in your profile to finish verification.",
     "verification.addPhone": "Add a phone number in your profile to finish verification.",
     "verification.addEmail": "Add an email address in your profile to finish verification.",
     "member.verificationNeeded": "Verification needed",
@@ -281,7 +286,8 @@ const localeExtrasSource = {
     "owner.firstSitHint": "Choose a boat and publish the dates you need someone aboard.",
     "owner.boatBeforeSit": "Add a boat before creating a sit.",
     "owner.sitRequiresBoatTooltip": "Create a boat first. Click here to add your first boat.",
-    "owner.sitRequiresVerificationTooltip": "Verify your identity before creating a sit. Open your profile to complete verification.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verify your identity before creating a sit. Open your profile to complete verification.",
     "owner.deleteBoatLabel": "Delete {{boat}}",
     "owner.deleteBoatTitle": "Delete {{boat}}?",
     "owner.deleteBoatConfirm": "This permanently removes the boat and cannot be undone.",
@@ -297,14 +303,19 @@ const localeExtrasSource = {
     "owner.deleteSitError": "This sit could not be deleted. Please try again.",
     "owner.deleteSitAcceptedError":
       "This sit has an accepted applicant and can no longer be deleted.",
-    "owner.sitDeleteUnderway": "This sit is underway and cannot be deleted. Contact support if you need help with any issues.",
-    "owner.deleteSitApplicantsWarning_one": "This sit has 1 applicant right now. Deleting it removes the listing for everyone who applied.",
-    "owner.deleteSitApplicantsWarning_other": "This sit has {{count}} applicants right now. Deleting it removes the listing for everyone who applied.",
-    "owner.deleteSitAcceptedWarning": "Someone has already been accepted for this sit. Please inform them before you delete it.",
+    "owner.sitDeleteUnderway":
+      "This sit is underway and cannot be deleted. Contact support if you need help with any issues.",
+    "owner.deleteSitApplicantsWarning_one":
+      "This sit has 1 applicant right now. Deleting it removes the listing for everyone who applied.",
+    "owner.deleteSitApplicantsWarning_other":
+      "This sit has {{count}} applicants right now. Deleting it removes the listing for everyone who applied.",
+    "owner.deleteSitAcceptedWarning":
+      "Someone has already been accepted for this sit. Please inform them before you delete it.",
     "owner.deleteSitCompletedError": "Completed sits cannot be deleted. Archive them instead.",
     "owner.archiveSitLabel": "Archive {{boat}} sit",
     "owner.archiveSitTitle": "Archive this sit?",
-    "owner.archiveSitConfirm": "Archive the {{dates}} sit for {{boat}}? You can find it later under Archived.",
+    "owner.archiveSitConfirm":
+      "Archive the {{dates}} sit for {{boat}}? You can find it later under Archived.",
     "owner.archiveSitAction": "Yes, archive",
     "owner.unarchiveSit": "Move to active sits",
     "owner.unarchiveSitLabel": "Restore {{boat}} sit",
@@ -344,7 +355,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Boat cover preview",
     "vesselEditor.noCover": "No cover image yet",
     "vesselEditor.gallery": "More photos",
-    "vesselEditor.galleryHint": "Upload additional photos of the boat, marina, and life aboard. Captions are optional.",
+    "vesselEditor.galleryHint":
+      "Upload additional photos of the boat, marina, and life aboard. Captions are optional.",
     "vesselEditor.galleryCaption": "Caption",
     "vesselEditor.galleryCaptionPlaceholder": "Optional caption",
     "vesselEditor.galleryEmpty": "No additional photos yet",
@@ -396,11 +408,13 @@ const localeExtrasSource = {
     "upload.hint": "JPG, PNG or WebP up to 10 MB. Large images are resized before saving.",
     "upload.uploadMultiple": "Upload photos",
     "upload.processingMultiple": "Processing photos…",
-    "upload.hintMultiple": "JPG, PNG or WebP up to 10 MB each. Large images are resized before saving.",
+    "upload.hintMultiple":
+      "JPG, PNG or WebP up to 10 MB each. Large images are resized before saving.",
     "sitEditor.kicker": "Sit availability",
     "sitEditor.editTitle": "Edit boat sit",
     "sitEditor.lockedBannerTitle": "Editing is locked",
-    "sitEditor.lockedBanner": "This sit has received applicants, so its details can no longer be changed. You can still review applications and message sitters.",
+    "sitEditor.lockedBanner":
+      "This sit has received applicants, so its details can no longer be changed. You can still review applications and message sitters.",
     "sitEditor.createTitle": "Create a boat sit",
     "sitEditor.createShort": "Create a sit",
     "sitEditor.createEditLimitTitle": "Editable until someone applies",
@@ -413,8 +427,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Sit type",
     "sitType.liveaboard": "Accommodation",
     "sitType.liveaboardShort": "Accommodation",
-    "sitType.liveaboardHint":
-      "The sitter lives and sleeps aboard throughout the dates.",
+    "sitType.liveaboardHint": "The sitter lives and sleeps aboard throughout the dates.",
     "sitType.daytimeChecks": "Daytime checks",
     "sitType.daytimeChecksShort": "Daytime",
     "sitType.daytimeChecksHint":
@@ -431,12 +444,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certifications",
     "sitEditor.skills": "Practical skills",
     "sitEditor.nonSmoker": "Must be a non-smoker",
-    "sitEditor.nonSmokerHint":
-      "Require sitters who do not smoke aboard or during the stay.",
+    "sitEditor.nonSmokerHint": "Require sitters who do not smoke aboard or during the stay.",
     "requirement.nonSmoker": "Non-smoker",
     "sitEditor.additional": "Additional sitter requirements",
-    "sitEditor.additionalPlaceholder":
-      "One per line, for example two recent references",
+    "sitEditor.additionalPlaceholder": "One per line, for example two recent references",
     "sitEditor.pets": "Pets aboard (optional)",
     "sitEditor.petsPlaceholder": "for example Pip, a sea-loving terrier",
     "sitEditor.save": "Save sit",
@@ -506,7 +517,8 @@ const localeExtrasSource = {
     "settings.savePersonal": "Save personal details",
     "settings.personalSaved": "Personal details saved",
     "settings.accountTitle": "Account",
-    "settings.accountHint": "Your sign-in email is shown here. Use the buttons to change your email or password in a secure dialog.",
+    "settings.accountHint":
+      "Your sign-in email is shown here. Use the buttons to change your email or password in a secure dialog.",
     "settings.currentEmail": "Current email",
     "settings.newEmail": "New email",
     "settings.currentPassword": "Current password",
@@ -522,7 +534,8 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Password updated",
     "settings.passwordMismatch": "New passwords do not match.",
     "settings.sameEmail": "Enter a different email address.",
-    "settings.accountCredentialsUnavailable": "Password changes need an email sign-up account. Sign up with email, then try again.",
+    "settings.accountCredentialsUnavailable":
+      "Password changes need an email sign-up account. Sign up with email, then try again.",
     "settings.emailsTitle": "Email notifications",
     "settings.emailsHint": "Choose which events send you an email. You can change these anytime.",
     "settings.email.newApplications": "New sit applications on my boats",
@@ -534,19 +547,23 @@ const localeExtrasSource = {
     "safetyActions.block": "Block",
     "safetyActions.unblock": "Unblock",
     "safetyActions.reportTitle": "Report {{name}}?",
-    "safetyActions.reportText": "Tell us what happened. Reports are reviewed by Boatstead and are not shared with the reported member.",
+    "safetyActions.reportText":
+      "Tell us what happened. Reports are reviewed by Boatstead and are not shared with the reported member.",
     "safetyActions.reportReason": "Reason",
     "safetyActions.reportDetails": "Details",
     "safetyActions.reportDetailsPlaceholder": "Add any useful context",
     "safetyActions.reportDetailsRequired": "Please add a short description for this reason.",
     "safetyActions.reportSubmit": "Submit report",
     "safetyActions.reportThanksTitle": "Report submitted",
-    "safetyActions.reportThanksText": "Thanks. We received your report about {{name}} and will review it.",
+    "safetyActions.reportThanksText":
+      "Thanks. We received your report about {{name}} and will review it.",
     "safetyActions.blockTitle": "Block {{name}}?",
-    "safetyActions.blockText": "They will no longer be able to contact you easily, and you can unblock them anytime in Settings.",
+    "safetyActions.blockText":
+      "They will no longer be able to contact you easily, and you can unblock them anytime in Settings.",
     "safetyActions.blockConfirm": "Yes, block",
     "safetyActions.blockedBannerTitle": "You blocked this member",
-    "safetyActions.blockedBannerText": "{{name}} is on your blocked list. You can unblock them here or in Settings.",
+    "safetyActions.blockedBannerText":
+      "{{name}} is on your blocked list. You can unblock them here or in Settings.",
     "safetyActions.reason.spam": "Spam or unwanted contact",
     "safetyActions.reason.harassment": "Harassment or abuse",
     "safetyActions.reason.scam": "Scam or fraud",
@@ -749,8 +766,7 @@ const localeExtrasSource = {
     "support.topic.other": "Other",
     "support.formTitle": "Contact support",
     "support.accountDetails": "Your account",
-    "support.accountDetailsHint":
-      "We’ll use this name and email for your support request.",
+    "support.accountDetailsHint": "We’ll use this name and email for your support request.",
     "support.name": "Name",
     "support.email": "Email",
     "support.message": "Message",
@@ -829,7 +845,8 @@ const localeExtrasSource = {
     "footer.admin": "Admin",
     "admin.kicker": "Platform operations",
     "admin.title": "Admin",
-    "admin.subtitle": "Manage members, roles, and account status. Every change is recorded in the audit trail.",
+    "admin.subtitle":
+      "Manage members, roles, and account status. Every change is recorded in the audit trail.",
     "admin.tab.users": "Users",
     "admin.tab.audit": "Audit trail",
     "admin.signInTitle": "Sign in to open Admin",
@@ -981,12 +998,14 @@ const localeExtrasSource = {
       "Connectez-vous ou créez un compte pour enregistrer des gardes dans votre liste et les retrouver plus tard.",
     "saved.showAll": "Tout afficher, y compris sitter choisi, terminé, etc.",
     "saved.emptyFiltered": "Aucune garde ouverte enregistrée",
-    "saved.emptyFilteredHint": "Votre liste ne contient que des gardes déjà pourvues ou terminées. Cochez la case ci-dessus pour les voir.",
+    "saved.emptyFilteredHint":
+      "Votre liste ne contient que des gardes déjà pourvues ou terminées. Cochez la case ci-dessus pour les voir.",
     "editorPreview.kicker": "Aperçu en direct",
     "editorPreview.title": "À quoi cela ressemblera",
     "editorPreview.label": "Aperçu en direct",
     "editorPreview.vesselHint": "Se met à jour pendant que vous modifiez les détails du bateau.",
-    "editorPreview.sitHint": "Se met à jour pendant que vous modifiez cette garde. Voici comment les gardiens la voient.",
+    "editorPreview.sitHint":
+      "Se met à jour pendant que vous modifiez cette garde. Voici comment les gardiens la voient.",
     "editorPreview.untitledBoat": "Bateau sans nom",
     "editorPreview.homePortPending": "Ajoutez un port d’attache",
     "editorPreview.lengthPending": "Longueur à définir",
@@ -1084,13 +1103,16 @@ const localeExtrasSource = {
     "profile.save": "Enregistrer le profil",
     "member.member": "Membre Boatstead",
     "member.signInTitle": "Connectez-vous pour voir les profils",
-    "member.signInText": "Les profils des membres sont visibles uniquement par les membres connectés de Boatstead.",
+    "member.signInText":
+      "Les profils des membres sont visibles uniquement par les membres connectés de Boatstead.",
     "member.message": "Message",
     "member.identityVerified": "Identité vérifiée",
     "verification.identityVerified": "Identité vérifiée",
     "verification.confirmIdentity": "Confirmez votre identité",
-    "verification.verifiedHint": "Boatstead a confirmé la pièce d’identité, l’e-mail et le téléphone de ce membre.",
-    "verification.selfHint": "Complétez chaque élément ci-dessous pour renforcer la confiance sur votre profil.",
+    "verification.verifiedHint":
+      "Boatstead a confirmé la pièce d’identité, l’e-mail et le téléphone de ce membre.",
+    "verification.selfHint":
+      "Complétez chaque élément ci-dessous pour renforcer la confiance sur votre profil.",
     "verification.partialHint": "{{count}} vérifications sur {{total}} confirmées pour l’instant.",
     "verification.governmentId": "Pièce d’identité officielle",
     "verification.email": "Adresse e-mail",
@@ -1098,9 +1120,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "vérifié",
     "verification.statusMissing": "non vérifié",
     "verification.verifyGovernmentId": "Vérifier la pièce d’identité",
-    "verification.addEmailAndPhone": "Ajoutez une adresse e-mail et un numéro de téléphone dans votre profil pour terminer la vérification.",
-    "verification.addPhone": "Ajoutez un numéro de téléphone dans votre profil pour terminer la vérification.",
-    "verification.addEmail": "Ajoutez une adresse e-mail dans votre profil pour terminer la vérification.",
+    "verification.addEmailAndPhone":
+      "Ajoutez une adresse e-mail et un numéro de téléphone dans votre profil pour terminer la vérification.",
+    "verification.addPhone":
+      "Ajoutez un numéro de téléphone dans votre profil pour terminer la vérification.",
+    "verification.addEmail":
+      "Ajoutez une adresse e-mail dans votre profil pour terminer la vérification.",
     "member.verificationNeeded": "Vérification nécessaire",
     "member.reviews_one": "1 avis",
     "member.reviews_other": "{{count}} avis",
@@ -1142,7 +1167,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} périodes de garde",
     "owner.sitSummary": "{{duration}} · Candidats {{applicants}} · Tâches de soins {{tasks}}",
     "owner.sitPhaseFilter": "Filtrer les gardes par phase",
-    "owner.sitPhaseFilterHint": "Les gardes sont regroupées par phase. Utilisez le filtre pour vous concentrer sur une étape.",
+    "owner.sitPhaseFilterHint":
+      "Les gardes sont regroupées par phase. Utilisez le filtre pour vous concentrer sur une étape.",
     "owner.sitPhaseFilterAll": "Toutes les phases",
     "owner.sitPhaseEmpty": "Aucune garde dans cette phase",
     "owner.sitPhaseCount_one": "1 garde",
@@ -1162,30 +1188,39 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Ajoutez un bateau avant de créer un sit.",
     "owner.sitRequiresBoatTooltip":
       "Créez d’abord un bateau. Cliquez ici pour ajouter votre premier bateau.",
-    "owner.sitRequiresVerificationTooltip": "Vérifiez votre identité avant de créer une garde. Ouvrez votre profil pour terminer la vérification.",
+    "owner.sitRequiresVerificationTooltip":
+      "Vérifiez votre identité avant de créer une garde. Ouvrez votre profil pour terminer la vérification.",
     "owner.deleteBoatLabel": "Supprimer {{boat}}",
     "owner.deleteBoatTitle": "Supprimer {{boat}} ?",
-    "owner.deleteBoatConfirm": "Cette action supprime définitivement le bateau et ne peut pas être annulée.",
+    "owner.deleteBoatConfirm":
+      "Cette action supprime définitivement le bateau et ne peut pas être annulée.",
     "owner.deleteSitLabel": "Supprimer le site {{boat}}",
     "owner.deleteSitTitle": "Supprimer cette garde ?",
     "owner.deleteSitConfirm": "Supprimer la garde {{dates}} pour {{boat}} ?",
     "owner.deleteConfirmAction": "Oui, supprimer",
     "owner.deleteBlocked": "Supprimez d'abord tous les sièges pour ce bateau",
     "owner.sitEditLocked": "Cette garde a des candidats et ne peut plus être modifiée",
-    "owner.sitEditLockedBanner": "Des candidats ont postulé, cette garde ne peut plus être modifiée.",
+    "owner.sitEditLockedBanner":
+      "Des candidats ont postulé, cette garde ne peut plus être modifiée.",
     "owner.sitDeleteLocked": "Cette garde a un candidat accepté et ne peut plus être supprimée",
     "owner.deleteError": "Le bateau n'a pas pu être supprimé. Veuillez réessayer.",
     "owner.deleteSitError": "Cette garde n’a pas pu être supprimée. Veuillez réessayer.",
     "owner.deleteSitAcceptedError":
       "Cette garde a un candidat accepté et ne peut plus être supprimée.",
-    "owner.sitDeleteUnderway": "Cette garde est en cours et ne peut pas être supprimée. Contactez le support si vous avez besoin d’aide.",
-    "owner.deleteSitApplicantsWarning_one": "Cette garde a 1 candidature en ce moment. La supprimer retire l’annonce pour toutes les personnes qui ont postulé.",
-    "owner.deleteSitApplicantsWarning_other": "Cette garde a {{count}} candidatures en ce moment. La supprimer retire l’annonce pour toutes les personnes qui ont postulé.",
-    "owner.deleteSitAcceptedWarning": "Quelqu’un a déjà été accepté pour cette garde. Merci de l’en informer avant de la supprimer.",
-    "owner.deleteSitCompletedError": "Les gardes terminées ne peuvent pas être supprimées. Archivez-les à la place.",
+    "owner.sitDeleteUnderway":
+      "Cette garde est en cours et ne peut pas être supprimée. Contactez le support si vous avez besoin d’aide.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Cette garde a 1 candidature en ce moment. La supprimer retire l’annonce pour toutes les personnes qui ont postulé.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Cette garde a {{count}} candidatures en ce moment. La supprimer retire l’annonce pour toutes les personnes qui ont postulé.",
+    "owner.deleteSitAcceptedWarning":
+      "Quelqu’un a déjà été accepté pour cette garde. Merci de l’en informer avant de la supprimer.",
+    "owner.deleteSitCompletedError":
+      "Les gardes terminées ne peuvent pas être supprimées. Archivez-les à la place.",
     "owner.archiveSitLabel": "Archiver la garde {{boat}}",
     "owner.archiveSitTitle": "Archiver cette garde ?",
-    "owner.archiveSitConfirm": "Archiver la garde {{dates}} pour {{boat}} ? Vous la retrouverez plus tard sous Archivées.",
+    "owner.archiveSitConfirm":
+      "Archiver la garde {{dates}} pour {{boat}} ? Vous la retrouverez plus tard sous Archivées.",
     "owner.archiveSitAction": "Oui, archiver",
     "owner.unarchiveSit": "Remettre dans les gardes actives",
     "owner.unarchiveSitLabel": "Restaurer la garde {{boat}}",
@@ -1226,7 +1261,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Aperçu de la housse de bateau",
     "vesselEditor.noCover": "Pas encore d'image de couverture",
     "vesselEditor.gallery": "Plus de photos",
-    "vesselEditor.galleryHint": "Ajoutez d'autres photos du bateau, de la marina et de la vie à bord. Les légendes sont facultatives.",
+    "vesselEditor.galleryHint":
+      "Ajoutez d'autres photos du bateau, de la marina et de la vie à bord. Les légendes sont facultatives.",
     "vesselEditor.galleryCaption": "Légende",
     "vesselEditor.galleryCaptionPlaceholder": "Légende facultative",
     "vesselEditor.galleryEmpty": "Pas encore de photos supplémentaires",
@@ -1244,7 +1280,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Qu'est-ce qui est disponible ?",
     "vesselEditor.featuresHint":
       "Sélectionnez tout ce que les gardiens peuvent utiliser à bord ou à la marina.",
-        "vesselEditor.privateAccessTitle": "Détails d’accès privés",
+    "vesselEditor.privateAccessTitle": "Détails d’accès privés",
     "vesselEditor.privateAccessHint":
       "Partagés uniquement avec les boat-sitters confirmés après acceptation de leur candidature. Conservez ici les mots de passe Wi-Fi, codes d’accès et informations similaires.",
     "vesselEditor.wifiNetwork": "Réseau Wi-Fi",
@@ -1280,11 +1316,13 @@ const localeExtrasSource = {
       "JPG, PNG ou WebP jusqu'à 10 Mo. Les grandes images sont redimensionnées avant d'être enregistrées.",
     "upload.uploadMultiple": "Téléverser des photos",
     "upload.processingMultiple": "Traitement des photos…",
-    "upload.hintMultiple": "JPG, PNG ou WebP jusqu'à 10 Mo chacune. Les grandes images sont redimensionnées avant l'enregistrement.",
+    "upload.hintMultiple":
+      "JPG, PNG ou WebP jusqu'à 10 Mo chacune. Les grandes images sont redimensionnées avant l'enregistrement.",
     "sitEditor.kicker": "Disponibilité des places assises",
     "sitEditor.editTitle": "Modifier la garde",
     "sitEditor.lockedBannerTitle": "Modification verrouillée",
-    "sitEditor.lockedBanner": "Cette garde a reçu des candidatures, ses détails ne peuvent plus être modifiés. Vous pouvez toujours examiner les candidatures et écrire aux gardiens.",
+    "sitEditor.lockedBanner":
+      "Cette garde a reçu des candidatures, ses détails ne peuvent plus être modifiés. Vous pouvez toujours examiner les candidatures et écrire aux gardiens.",
     "sitEditor.createTitle": "Créer une garde de bateau",
     "sitEditor.createShort": "Créer une garde",
     "sitEditor.createEditLimitTitle": "Modifiable jusqu’à la première candidature",
@@ -1297,8 +1335,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Type de garde",
     "sitType.liveaboard": "Hébergement",
     "sitType.liveaboardShort": "Hébergement",
-    "sitType.liveaboardHint":
-      "Le gardien vit et dort à bord pendant toute la durée.",
+    "sitType.liveaboardHint": "Le gardien vit et dort à bord pendant toute la durée.",
     "sitType.daytimeChecks": "Visites de jour",
     "sitType.daytimeChecksShort": "Jour",
     "sitType.daytimeChecksHint":
@@ -1315,12 +1352,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certifications",
     "sitEditor.skills": "Compétences pratiques",
     "sitEditor.nonSmoker": "Doit être non-fumeur",
-    "sitEditor.nonSmokerHint":
-      "Exigez des gardiens qui ne fument pas à bord ni pendant le séjour.",
+    "sitEditor.nonSmokerHint": "Exigez des gardiens qui ne fument pas à bord ni pendant le séjour.",
     "requirement.nonSmoker": "Non-fumeur",
     "sitEditor.additional": "Exigences supplémentaires en matière de garde d'enfants",
-    "sitEditor.additionalPlaceholder":
-      "Un par ligne, par exemple deux références récentes",
+    "sitEditor.additionalPlaceholder": "Un par ligne, par exemple deux références récentes",
     "sitEditor.pets": "Animaux à bord (facultatif)",
     "sitEditor.petsPlaceholder": "par exemple Pip, un terrier amoureux de la mer",
     "sitEditor.save": "Enregistrer la garde",
@@ -1387,11 +1422,13 @@ const localeExtrasSource = {
     "settings.legalName": "Nom légal complet",
     "settings.legalNameHint": "Tel qu'il figure sur votre pièce d'identité officielle.",
     "settings.displayNameHint": "Affiché sur votre profil public et dans les messages.",
-    "settings.emailReadOnlyHint": "Utilisez la section de connexion ci-dessous pour changer votre adresse e-mail.",
+    "settings.emailReadOnlyHint":
+      "Utilisez la section de connexion ci-dessous pour changer votre adresse e-mail.",
     "settings.savePersonal": "Enregistrer les informations personnelles",
     "settings.personalSaved": "Informations personnelles enregistrées",
     "settings.accountTitle": "Compte",
-    "settings.accountHint": "Votre e-mail de connexion apparaît ici. Utilisez les boutons pour changer l’e-mail ou le mot de passe dans une fenêtre sécurisée.",
+    "settings.accountHint":
+      "Votre e-mail de connexion apparaît ici. Utilisez les boutons pour changer l’e-mail ou le mot de passe dans une fenêtre sécurisée.",
     "settings.currentEmail": "E-mail actuel",
     "settings.newEmail": "Nouvel e-mail",
     "settings.currentPassword": "Mot de passe actuel",
@@ -1400,16 +1437,20 @@ const localeExtrasSource = {
     "settings.changeEmail": "Changer l’e-mail",
     "settings.changePassword": "Changer le mot de passe",
     "settings.changeEmailTitle": "Changer l’e-mail",
-    "settings.changeEmailHint": "Saisissez un nouvel e-mail et confirmez avec votre mot de passe actuel.",
+    "settings.changeEmailHint":
+      "Saisissez un nouvel e-mail et confirmez avec votre mot de passe actuel.",
     "settings.changePasswordTitle": "Changer le mot de passe",
-    "settings.changePasswordHint": "Choisissez un nouveau mot de passe pour vous connecter à Boatstead.",
+    "settings.changePasswordHint":
+      "Choisissez un nouveau mot de passe pour vous connecter à Boatstead.",
     "settings.emailUpdated": "E-mail mis à jour",
     "settings.passwordUpdated": "Mot de passe mis à jour",
     "settings.passwordMismatch": "Les nouveaux mots de passe ne correspondent pas.",
     "settings.sameEmail": "Saisissez une adresse e-mail différente.",
-    "settings.accountCredentialsUnavailable": "Les changements de mot de passe nécessitent un compte créé par e-mail. Inscrivez-vous avec un e-mail, puis réessayez.",
+    "settings.accountCredentialsUnavailable":
+      "Les changements de mot de passe nécessitent un compte créé par e-mail. Inscrivez-vous avec un e-mail, puis réessayez.",
     "settings.emailsTitle": "Notifications par e-mail",
-    "settings.emailsHint": "Choisissez les événements pour lesquels vous recevez un e-mail. Vous pouvez les modifier à tout moment.",
+    "settings.emailsHint":
+      "Choisissez les événements pour lesquels vous recevez un e-mail. Vous pouvez les modifier à tout moment.",
     "settings.email.newApplications": "Nouvelles candidatures sur mes bateaux",
     "settings.email.applicationUpdates": "Mises à jour des gardiennages auxquels j'ai postulé",
     "settings.email.messages": "Nouveaux messages dans mes conversations",
@@ -1419,26 +1460,31 @@ const localeExtrasSource = {
     "safetyActions.block": "Bloquer",
     "safetyActions.unblock": "Débloquer",
     "safetyActions.reportTitle": "Signaler {{name}} ?",
-    "safetyActions.reportText": "Dites-nous ce qui s'est passé. Les signalements sont examinés par Boatstead et ne sont pas partagés avec le membre signalé.",
+    "safetyActions.reportText":
+      "Dites-nous ce qui s'est passé. Les signalements sont examinés par Boatstead et ne sont pas partagés avec le membre signalé.",
     "safetyActions.reportReason": "Motif",
     "safetyActions.reportDetails": "Détails",
     "safetyActions.reportDetailsPlaceholder": "Ajoutez tout contexte utile",
     "safetyActions.reportDetailsRequired": "Veuillez ajouter une courte description pour ce motif.",
     "safetyActions.reportSubmit": "Envoyer le signalement",
     "safetyActions.reportThanksTitle": "Signalement envoyé",
-    "safetyActions.reportThanksText": "Merci. Nous avons reçu votre signalement concernant {{name}} et allons l'examiner.",
+    "safetyActions.reportThanksText":
+      "Merci. Nous avons reçu votre signalement concernant {{name}} et allons l'examiner.",
     "safetyActions.blockTitle": "Bloquer {{name}} ?",
-    "safetyActions.blockText": "Cette personne ne pourra plus vous contacter facilement, et vous pourrez la débloquer à tout moment dans les Paramètres.",
+    "safetyActions.blockText":
+      "Cette personne ne pourra plus vous contacter facilement, et vous pourrez la débloquer à tout moment dans les Paramètres.",
     "safetyActions.blockConfirm": "Oui, bloquer",
     "safetyActions.blockedBannerTitle": "Vous avez bloqué ce membre",
-    "safetyActions.blockedBannerText": "{{name}} est sur votre liste de blocage. Vous pouvez le débloquer ici ou dans les Paramètres.",
+    "safetyActions.blockedBannerText":
+      "{{name}} est sur votre liste de blocage. Vous pouvez le débloquer ici ou dans les Paramètres.",
     "safetyActions.reason.spam": "Spam ou contact non souhaité",
     "safetyActions.reason.harassment": "Harcèlement ou abus",
     "safetyActions.reason.scam": "Arnaque ou fraude",
     "safetyActions.reason.inappropriate": "Contenu ou comportement inapproprié",
     "safetyActions.reason.other": "Autre chose",
     "settings.blockedUsersTitle": "Comptes bloqués",
-    "settings.blockedUsersHint": "Membres que vous avez bloqués. Le déblocage rétablit le contact normal.",
+    "settings.blockedUsersHint":
+      "Membres que vous avez bloqués. Le déblocage rétablit le contact normal.",
     "settings.blockedUsersEmpty": "Vous n'avez encore bloqué personne.",
     "settings.blockedOn": "Bloqué le {{date}}",
     "settings.dangerZone": "Zone dangereuse",
@@ -1721,7 +1767,8 @@ const localeExtrasSource = {
     "admin.tab.users": "Utilisateurs",
     "admin.tab.audit": "Journal d'audit",
     "admin.signInTitle": "Connectez-vous pour ouvrir l'admin",
-    "admin.signInText": "Les outils d'administration sont réservés aux super-utilisateurs connectés.",
+    "admin.signInText":
+      "Les outils d'administration sont réservés aux super-utilisateurs connectés.",
     "admin.deniedTitle": "Accès administrateur requis",
     "admin.deniedText": "Votre compte n'a pas l'autorisation de gérer les utilisateurs.",
     "admin.usersEmpty": "Aucun utilisateur ne correspond à cette recherche.",
@@ -1869,12 +1916,14 @@ const localeExtrasSource = {
       "Inicia sesión o crea una cuenta para guardar estancias en tu lista y encontrarlas más tarde.",
     "saved.showAll": "Mostrar todo, incluidas sitter elegido, completadas, etc.",
     "saved.emptyFiltered": "No hay estancias guardadas abiertas",
-    "saved.emptyFilteredHint": "Tu lista solo tiene estancias con sitter elegido o completadas. Marca la casilla de arriba para verlas.",
+    "saved.emptyFilteredHint":
+      "Tu lista solo tiene estancias con sitter elegido o completadas. Marca la casilla de arriba para verlas.",
     "editorPreview.kicker": "Vista previa en vivo",
     "editorPreview.title": "Así se verá",
     "editorPreview.label": "Vista previa en vivo",
     "editorPreview.vesselHint": "Se actualiza mientras editas los detalles del barco.",
-    "editorPreview.sitHint": "Se actualiza mientras editas esta estancia. Así la ven los cuidadores.",
+    "editorPreview.sitHint":
+      "Se actualiza mientras editas esta estancia. Así la ven los cuidadores.",
     "editorPreview.untitledBoat": "Barco sin nombre",
     "editorPreview.homePortPending": "Añade un puerto base",
     "editorPreview.lengthPending": "Eslora pendiente",
@@ -1972,12 +2021,14 @@ const localeExtrasSource = {
     "profile.save": "Guardar perfil",
     "member.member": "Miembro de Boatstead",
     "member.signInTitle": "Inicia sesión para ver perfiles",
-    "member.signInText": "Los perfiles de miembros solo son visibles para miembros conectados de Boatstead.",
+    "member.signInText":
+      "Los perfiles de miembros solo son visibles para miembros conectados de Boatstead.",
     "member.message": "Mensaje",
     "member.identityVerified": "Identidad verificada",
     "verification.identityVerified": "Identidad verificada",
     "verification.confirmIdentity": "Confirma tu identidad",
-    "verification.verifiedHint": "Boatstead confirmó el documento de identidad, el correo y el teléfono de este miembro.",
+    "verification.verifiedHint":
+      "Boatstead confirmó el documento de identidad, el correo y el teléfono de este miembro.",
     "verification.selfHint": "Completa cada elemento para que otros miembros confíen en tu perfil.",
     "verification.partialHint": "{{count}} de {{total}} comprobaciones confirmadas por ahora.",
     "verification.governmentId": "Documento de identidad oficial",
@@ -1986,9 +2037,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "verificado",
     "verification.statusMissing": "no verificado",
     "verification.verifyGovernmentId": "Verificar documento de identidad",
-    "verification.addEmailAndPhone": "Añade un correo electrónico y un teléfono en tu perfil para completar la verificación.",
-    "verification.addPhone": "Añade un número de teléfono en tu perfil para completar la verificación.",
-    "verification.addEmail": "Añade un correo electrónico en tu perfil para completar la verificación.",
+    "verification.addEmailAndPhone":
+      "Añade un correo electrónico y un teléfono en tu perfil para completar la verificación.",
+    "verification.addPhone":
+      "Añade un número de teléfono en tu perfil para completar la verificación.",
+    "verification.addEmail":
+      "Añade un correo electrónico en tu perfil para completar la verificación.",
     "member.verificationNeeded": "Verificación necesaria",
     "member.reviews_one": "1 opinión",
     "member.reviews_other": "{{count}} opiniones",
@@ -2031,7 +2085,8 @@ const localeExtrasSource = {
     "owner.sitSummary":
       "{{duration}} · Solicitantes de {{applicants}} · Tareas de cuidado de {{tasks}}",
     "owner.sitPhaseFilter": "Filtrar estancias por fase",
-    "owner.sitPhaseFilterHint": "Las estancias se agrupan por fase. Usa el filtro para centrarte en una etapa.",
+    "owner.sitPhaseFilterHint":
+      "Las estancias se agrupan por fase. Usa el filtro para centrarte en una etapa.",
     "owner.sitPhaseFilterAll": "Todas las fases",
     "owner.sitPhaseEmpty": "No hay estancias en esta fase",
     "owner.sitPhaseCount_one": "1 estancia",
@@ -2051,30 +2106,40 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Añade un barco antes de crear una estancia.",
     "owner.sitRequiresBoatTooltip":
       "Primero crea un barco. Haz clic aquí para añadir tu primer barco.",
-    "owner.sitRequiresVerificationTooltip": "Verifica tu identidad antes de crear una estancia. Abre tu perfil para completar la verificación.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verifica tu identidad antes de crear una estancia. Abre tu perfil para completar la verificación.",
     "owner.deleteBoatLabel": "Eliminar {{boat}}",
     "owner.deleteBoatTitle": "¿Eliminar {{boat}}?",
-    "owner.deleteBoatConfirm": "Esta acción elimina el barco de forma permanente y no se puede deshacer.",
+    "owner.deleteBoatConfirm":
+      "Esta acción elimina el barco de forma permanente y no se puede deshacer.",
     "owner.deleteSitLabel": "Eliminar {{boat}} sentarse",
     "owner.deleteSitTitle": "¿Eliminar esta estancia?",
     "owner.deleteSitConfirm": "¿Eliminar la estancia {{dates}} de {{boat}}?",
     "owner.deleteConfirmAction": "Sí, eliminar",
     "owner.deleteBlocked": "Primero elimine todos los asientos de este barco.",
     "owner.sitEditLocked": "Esta estancia tiene solicitantes y ya no se puede editar",
-    "owner.sitEditLockedBanner": "Ya hay solicitantes, por lo que esta estancia ya no se puede editar.",
-    "owner.sitDeleteLocked": "Esta estancia tiene un solicitante aceptado y ya no se puede eliminar",
+    "owner.sitEditLockedBanner":
+      "Ya hay solicitantes, por lo que esta estancia ya no se puede editar.",
+    "owner.sitDeleteLocked":
+      "Esta estancia tiene un solicitante aceptado y ya no se puede eliminar",
     "owner.deleteError": "El barco no se pudo borrar. Por favor inténtalo de nuevo.",
     "owner.deleteSitError": "No se pudo eliminar esta estancia. Inténtalo de nuevo.",
     "owner.deleteSitAcceptedError":
       "Esta estancia tiene un solicitante aceptado y ya no se puede eliminar.",
-    "owner.sitDeleteUnderway": "Esta estancia está en curso y no se puede eliminar. Contacta con soporte si necesitas ayuda.",
-    "owner.deleteSitApplicantsWarning_one": "Esta estancia tiene 1 solicitud ahora mismo. Eliminarla quita el anuncio para quienes hayan solicitado.",
-    "owner.deleteSitApplicantsWarning_other": "Esta estancia tiene {{count}} solicitudes ahora mismo. Eliminarla quita el anuncio para quienes hayan solicitado.",
-    "owner.deleteSitAcceptedWarning": "Alguien ya ha sido aceptado para esta estancia. Infórmale antes de eliminarla.",
-    "owner.deleteSitCompletedError": "Las estancias completadas no se pueden eliminar. Archívalas en su lugar.",
+    "owner.sitDeleteUnderway":
+      "Esta estancia está en curso y no se puede eliminar. Contacta con soporte si necesitas ayuda.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Esta estancia tiene 1 solicitud ahora mismo. Eliminarla quita el anuncio para quienes hayan solicitado.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Esta estancia tiene {{count}} solicitudes ahora mismo. Eliminarla quita el anuncio para quienes hayan solicitado.",
+    "owner.deleteSitAcceptedWarning":
+      "Alguien ya ha sido aceptado para esta estancia. Infórmale antes de eliminarla.",
+    "owner.deleteSitCompletedError":
+      "Las estancias completadas no se pueden eliminar. Archívalas en su lugar.",
     "owner.archiveSitLabel": "Archivar estancia de {{boat}}",
     "owner.archiveSitTitle": "¿Archivar esta estancia?",
-    "owner.archiveSitConfirm": "¿Archivar la estancia {{dates}} de {{boat}}? Podrás encontrarla más tarde en Archivadas.",
+    "owner.archiveSitConfirm":
+      "¿Archivar la estancia {{dates}} de {{boat}}? Podrás encontrarla más tarde en Archivadas.",
     "owner.archiveSitAction": "Sí, archivar",
     "owner.unarchiveSit": "Mover a estancias activas",
     "owner.unarchiveSitLabel": "Restaurar estancia de {{boat}}",
@@ -2115,7 +2180,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Vista previa de la cubierta del barco",
     "vesselEditor.noCover": "Aún no hay imagen de portada",
     "vesselEditor.gallery": "Más fotos",
-    "vesselEditor.galleryHint": "Sube fotos adicionales del barco, del puerto deportivo y de la vida a bordo. Los pies de foto son opcionales.",
+    "vesselEditor.galleryHint":
+      "Sube fotos adicionales del barco, del puerto deportivo y de la vida a bordo. Los pies de foto son opcionales.",
     "vesselEditor.galleryCaption": "Pie de foto",
     "vesselEditor.galleryCaptionPlaceholder": "Pie de foto opcional",
     "vesselEditor.galleryEmpty": "Aún no hay fotos adicionales",
@@ -2134,7 +2200,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "¿Qué hay disponible?",
     "vesselEditor.featuresHint":
       "Selecciona todo lo que los cuidadores pueden usar a bordo o en el puerto deportivo.",
-        "vesselEditor.privateAccessTitle": "Datos de acceso privados",
+    "vesselEditor.privateAccessTitle": "Datos de acceso privados",
     "vesselEditor.privateAccessHint":
       "Solo se comparten con cuidadores confirmados después de aceptar su solicitud. Guarda aquí contraseñas Wi-Fi, códigos de acceso y datos similares.",
     "vesselEditor.wifiNetwork": "Red Wi-Fi",
@@ -2170,11 +2236,13 @@ const localeExtrasSource = {
       "JPG, PNG o WebP hasta 10 MB. Las imágenes grandes cambian de tamaño antes de guardarlas.",
     "upload.uploadMultiple": "Subir fotos",
     "upload.processingMultiple": "Procesando fotos…",
-    "upload.hintMultiple": "JPG, PNG o WebP de hasta 10 MB cada una. Las imágenes grandes se redimensionan antes de guardar.",
+    "upload.hintMultiple":
+      "JPG, PNG o WebP de hasta 10 MB cada una. Las imágenes grandes se redimensionan antes de guardar.",
     "sitEditor.kicker": "Disponibilidad de asiento",
     "sitEditor.editTitle": "Editar asiento en barco",
     "sitEditor.lockedBannerTitle": "Edición bloqueada",
-    "sitEditor.lockedBanner": "Esta estancia ya tiene solicitantes, por lo que sus detalles ya no se pueden cambiar. Aún puede revisar solicitudes y escribir a los cuidadores.",
+    "sitEditor.lockedBanner":
+      "Esta estancia ya tiene solicitantes, por lo que sus detalles ya no se pueden cambiar. Aún puede revisar solicitudes y escribir a los cuidadores.",
     "sitEditor.createTitle": "Crear un asiento en barco",
     "sitEditor.createShort": "crear una sentada",
     "sitEditor.createEditLimitTitle": "Editable hasta la primera solicitud",
@@ -2188,8 +2256,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Tipo de estancia",
     "sitType.liveaboard": "Alojamiento",
     "sitType.liveaboardShort": "Alojamiento",
-    "sitType.liveaboardHint":
-      "El cuidador vive y duerme a bordo durante las fechas.",
+    "sitType.liveaboardHint": "El cuidador vive y duerme a bordo durante las fechas.",
     "sitType.daytimeChecks": "Visitas diurnas",
     "sitType.daytimeChecksShort": "Diurno",
     "sitType.daytimeChecksHint":
@@ -2206,12 +2273,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certificaciones",
     "sitEditor.skills": "Habilidades practicas",
     "sitEditor.nonSmoker": "Debe ser no fumador",
-    "sitEditor.nonSmokerHint":
-      "Exige cuidadores que no fumen a bordo ni durante la estancia.",
+    "sitEditor.nonSmokerHint": "Exige cuidadores que no fumen a bordo ni durante la estancia.",
     "requirement.nonSmoker": "No fumador",
     "sitEditor.additional": "Requisitos adicionales de niñera",
-    "sitEditor.additionalPlaceholder":
-      "Uno por línea, por ejemplo dos referencias recientes",
+    "sitEditor.additionalPlaceholder": "Uno por línea, por ejemplo dos referencias recientes",
     "sitEditor.pets": "Mascotas a bordo (opcional)",
     "sitEditor.petsPlaceholder": "por ejemplo Pip, un terrier amante del mar",
     "sitEditor.save": "Guardar sentarse",
@@ -2277,11 +2342,13 @@ const localeExtrasSource = {
     "settings.legalName": "Nombre legal completo",
     "settings.legalNameHint": "Tal como aparece en su documento de identidad.",
     "settings.displayNameHint": "Se muestra en su perfil público y en los mensajes.",
-    "settings.emailReadOnlyHint": "Use la sección de inicio de sesión más abajo para cambiar su correo electrónico.",
+    "settings.emailReadOnlyHint":
+      "Use la sección de inicio de sesión más abajo para cambiar su correo electrónico.",
     "settings.savePersonal": "Guardar datos personales",
     "settings.personalSaved": "Datos personales guardados",
     "settings.accountTitle": "Cuenta",
-    "settings.accountHint": "Aquí se muestra su correo de acceso. Use los botones para cambiar el correo o la contraseña en un diálogo seguro.",
+    "settings.accountHint":
+      "Aquí se muestra su correo de acceso. Use los botones para cambiar el correo o la contraseña en un diálogo seguro.",
     "settings.currentEmail": "Correo actual",
     "settings.newEmail": "Nuevo correo",
     "settings.currentPassword": "Contraseña actual",
@@ -2297,9 +2364,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Contraseña actualizada",
     "settings.passwordMismatch": "Las nuevas contraseñas no coinciden.",
     "settings.sameEmail": "Introduzca una dirección de correo distinta.",
-    "settings.accountCredentialsUnavailable": "Los cambios de contraseña requieren una cuenta creada con correo. Regístrese con un correo y vuelva a intentarlo.",
+    "settings.accountCredentialsUnavailable":
+      "Los cambios de contraseña requieren una cuenta creada con correo. Regístrese con un correo y vuelva a intentarlo.",
     "settings.emailsTitle": "Notificaciones por correo",
-    "settings.emailsHint": "Elija qué eventos le envían un correo. Puede cambiarlos en cualquier momento.",
+    "settings.emailsHint":
+      "Elija qué eventos le envían un correo. Puede cambiarlos en cualquier momento.",
     "settings.email.newApplications": "Nuevas solicitudes en mis barcos",
     "settings.email.applicationUpdates": "Actualizaciones de las estancias a las que me postulé",
     "settings.email.messages": "Nuevos mensajes en mis conversaciones",
@@ -2309,26 +2378,31 @@ const localeExtrasSource = {
     "safetyActions.block": "Bloquear",
     "safetyActions.unblock": "Desbloquear",
     "safetyActions.reportTitle": "¿Denunciar a {{name}}?",
-    "safetyActions.reportText": "Cuéntenos qué ocurrió. Boatstead revisa las denuncias y no se comparten con el miembro denunciado.",
+    "safetyActions.reportText":
+      "Cuéntenos qué ocurrió. Boatstead revisa las denuncias y no se comparten con el miembro denunciado.",
     "safetyActions.reportReason": "Motivo",
     "safetyActions.reportDetails": "Detalles",
     "safetyActions.reportDetailsPlaceholder": "Añada cualquier contexto útil",
     "safetyActions.reportDetailsRequired": "Añada una breve descripción para este motivo.",
     "safetyActions.reportSubmit": "Enviar denuncia",
     "safetyActions.reportThanksTitle": "Denuncia enviada",
-    "safetyActions.reportThanksText": "Gracias. Recibimos su denuncia sobre {{name}} y la revisaremos.",
+    "safetyActions.reportThanksText":
+      "Gracias. Recibimos su denuncia sobre {{name}} y la revisaremos.",
     "safetyActions.blockTitle": "¿Bloquear a {{name}}?",
-    "safetyActions.blockText": "Ya no podrá contactarle con facilidad, y podrá desbloquearlo en cualquier momento en Ajustes.",
+    "safetyActions.blockText":
+      "Ya no podrá contactarle con facilidad, y podrá desbloquearlo en cualquier momento en Ajustes.",
     "safetyActions.blockConfirm": "Sí, bloquear",
     "safetyActions.blockedBannerTitle": "Ha bloqueado a este miembro",
-    "safetyActions.blockedBannerText": "{{name}} está en su lista de bloqueados. Puede desbloquearlo aquí o en Ajustes.",
+    "safetyActions.blockedBannerText":
+      "{{name}} está en su lista de bloqueados. Puede desbloquearlo aquí o en Ajustes.",
     "safetyActions.reason.spam": "Spam o contacto no deseado",
     "safetyActions.reason.harassment": "Acoso o abuso",
     "safetyActions.reason.scam": "Estafa o fraude",
     "safetyActions.reason.inappropriate": "Contenido o conducta inapropiada",
     "safetyActions.reason.other": "Otra cosa",
     "settings.blockedUsersTitle": "Cuentas bloqueadas",
-    "settings.blockedUsersHint": "Miembros que ha bloqueado. Desbloquear restaura el contacto normal.",
+    "settings.blockedUsersHint":
+      "Miembros que ha bloqueado. Desbloquear restaura el contacto normal.",
     "settings.blockedUsersEmpty": "Todavía no ha bloqueado a nadie.",
     "settings.blockedOn": "Bloqueado el {{date}}",
     "settings.dangerZone": "Zona de peligro",
@@ -2611,7 +2685,8 @@ const localeExtrasSource = {
     "admin.tab.users": "Usuarios",
     "admin.tab.audit": "Registro de auditoría",
     "admin.signInTitle": "Inicia sesión para abrir Admin",
-    "admin.signInText": "Las herramientas de administración solo están disponibles para superusuarios conectados.",
+    "admin.signInText":
+      "Las herramientas de administración solo están disponibles para superusuarios conectados.",
     "admin.deniedTitle": "Se requiere acceso de administrador",
     "admin.deniedText": "Tu cuenta no tiene permiso para gestionar usuarios.",
     "admin.usersEmpty": "Ningún usuario coincide con esta búsqueda.",
@@ -2759,12 +2834,14 @@ const localeExtrasSource = {
       "Accedi o crea un account per salvare i soggiorni nella tua lista e ritrovarli in seguito.",
     "saved.showAll": "Mostra tutto, inclusi sitter scelto, completati, ecc.",
     "saved.emptyFiltered": "Nessun soggiorno salvato aperto",
-    "saved.emptyFilteredHint": "La tua lista contiene solo soggiorni con sitter già scelto o completati. Seleziona la casella sopra per vederli.",
+    "saved.emptyFilteredHint":
+      "La tua lista contiene solo soggiorni con sitter già scelto o completati. Seleziona la casella sopra per vederli.",
     "editorPreview.kicker": "Anteprima live",
     "editorPreview.title": "Come apparirà",
     "editorPreview.label": "Anteprima live",
     "editorPreview.vesselHint": "Si aggiorna mentre modifichi i dettagli della barca.",
-    "editorPreview.sitHint": "Si aggiorna mentre modifichi questo soggiorno. Così lo vedono i sitter.",
+    "editorPreview.sitHint":
+      "Si aggiorna mentre modifichi questo soggiorno. Così lo vedono i sitter.",
     "editorPreview.untitledBoat": "Barca senza nome",
     "editorPreview.homePortPending": "Aggiungi un porto base",
     "editorPreview.lengthPending": "Lunghezza da definire",
@@ -2868,8 +2945,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identità verificata",
     "verification.identityVerified": "Identità verificata",
     "verification.confirmIdentity": "Conferma la tua identità",
-    "verification.verifiedHint": "Boatstead ha confermato documento d’identità, e-mail e telefono di questo membro.",
-    "verification.selfHint": "Completa ogni voce qui sotto per rafforzare la fiducia nel tuo profilo.",
+    "verification.verifiedHint":
+      "Boatstead ha confermato documento d’identità, e-mail e telefono di questo membro.",
+    "verification.selfHint":
+      "Completa ogni voce qui sotto per rafforzare la fiducia nel tuo profilo.",
     "verification.partialHint": "{{count}} di {{total}} controlli confermati finora.",
     "verification.governmentId": "Documento d’identità",
     "verification.email": "Indirizzo e-mail",
@@ -2877,8 +2956,10 @@ const localeExtrasSource = {
     "verification.statusVerified": "verificato",
     "verification.statusMissing": "non verificato",
     "verification.verifyGovernmentId": "Verifica documento d’identità",
-    "verification.addEmailAndPhone": "Aggiungi e-mail e telefono nel profilo per completare la verifica.",
-    "verification.addPhone": "Aggiungi un numero di telefono nel profilo per completare la verifica.",
+    "verification.addEmailAndPhone":
+      "Aggiungi e-mail e telefono nel profilo per completare la verifica.",
+    "verification.addPhone":
+      "Aggiungi un numero di telefono nel profilo per completare la verifica.",
     "verification.addEmail": "Aggiungi un indirizzo e-mail nel profilo per completare la verifica.",
     "member.verificationNeeded": "Necessaria verifica",
     "member.reviews_one": "1 recensione",
@@ -2921,7 +3002,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} periodi di custodia",
     "owner.sitSummary": "{{duration}} · {{applicants}} richiedenti · {{tasks}} compiti di cura",
     "owner.sitPhaseFilter": "Filtra i soggiorni per fase",
-    "owner.sitPhaseFilterHint": "I soggiorni sono raggruppati per fase. Usa il filtro per concentrarti su una tappa.",
+    "owner.sitPhaseFilterHint":
+      "I soggiorni sono raggruppati per fase. Usa il filtro per concentrarti su una tappa.",
     "owner.sitPhaseFilterAll": "Tutte le fasi",
     "owner.sitPhaseEmpty": "Nessun soggiorno in questa fase",
     "owner.sitPhaseCount_one": "1 soggiorno",
@@ -2941,30 +3023,40 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Aggiungi una barca prima di creare un soggiorno.",
     "owner.sitRequiresBoatTooltip":
       "Prima crea una barca. Fai clic qui per aggiungere la tua prima barca.",
-    "owner.sitRequiresVerificationTooltip": "Verifica la tua identità prima di creare un posto. Apri il tuo profilo per completare la verifica.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verifica la tua identità prima di creare un posto. Apri il tuo profilo per completare la verifica.",
     "owner.deleteBoatLabel": "Elimina {{boat}}",
     "owner.deleteBoatTitle": "Eliminare {{boat}}?",
-    "owner.deleteBoatConfirm": "Questa azione rimuove definitivamente la barca e non può essere annullata.",
+    "owner.deleteBoatConfirm":
+      "Questa azione rimuove definitivamente la barca e non può essere annullata.",
     "owner.deleteSitLabel": "Elimina {{boat}} sit",
     "owner.deleteSitTitle": "Eliminare questa custodia?",
     "owner.deleteSitConfirm": "Eliminare la custodia {{dates}} per {{boat}}?",
     "owner.deleteConfirmAction": "Sì, elimina",
     "owner.deleteBlocked": "Elimina prima tutti i posti per questa barca",
     "owner.sitEditLocked": "Questa permanenza ha candidati e non può più essere modificata",
-    "owner.sitEditLockedBanner": "Ci sono candidati, quindi questa permanenza non può più essere modificata.",
-    "owner.sitDeleteLocked": "Questa permanenza ha un candidato accettato e non può più essere eliminata",
+    "owner.sitEditLockedBanner":
+      "Ci sono candidati, quindi questa permanenza non può più essere modificata.",
+    "owner.sitDeleteLocked":
+      "Questa permanenza ha un candidato accettato e non può più essere eliminata",
     "owner.deleteError": "Impossibile eliminare la barca. Per favore riprova.",
     "owner.deleteSitError": "Impossibile eliminare questa permanenza. Riprova.",
     "owner.deleteSitAcceptedError":
       "Questa permanenza ha un candidato accettato e non può più essere eliminata.",
-    "owner.sitDeleteUnderway": "Questo soggiorno è in corso e non può essere eliminato. Contatta l’assistenza se hai bisogno di aiuto.",
-    "owner.deleteSitApplicantsWarning_one": "Questo soggiorno ha 1 candidatura in questo momento. Eliminarlo rimuove l’annuncio per chi ha fatto domanda.",
-    "owner.deleteSitApplicantsWarning_other": "Questo soggiorno ha {{count}} candidature in questo momento. Eliminarlo rimuove l’annuncio per chi ha fatto domanda.",
-    "owner.deleteSitAcceptedWarning": "Qualcuno è già stato accettato per questo soggiorno. Informalo prima di eliminarlo.",
-    "owner.deleteSitCompletedError": "I soggiorni completati non possono essere eliminati. Archiviali invece.",
+    "owner.sitDeleteUnderway":
+      "Questo soggiorno è in corso e non può essere eliminato. Contatta l’assistenza se hai bisogno di aiuto.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Questo soggiorno ha 1 candidatura in questo momento. Eliminarlo rimuove l’annuncio per chi ha fatto domanda.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Questo soggiorno ha {{count}} candidature in questo momento. Eliminarlo rimuove l’annuncio per chi ha fatto domanda.",
+    "owner.deleteSitAcceptedWarning":
+      "Qualcuno è già stato accettato per questo soggiorno. Informalo prima di eliminarlo.",
+    "owner.deleteSitCompletedError":
+      "I soggiorni completati non possono essere eliminati. Archiviali invece.",
     "owner.archiveSitLabel": "Archivia soggiorno {{boat}}",
     "owner.archiveSitTitle": "Archiviare questo soggiorno?",
-    "owner.archiveSitConfirm": "Archiviare il soggiorno {{dates}} per {{boat}}? Lo troverai più tardi in Archiviati.",
+    "owner.archiveSitConfirm":
+      "Archiviare il soggiorno {{dates}} per {{boat}}? Lo troverai più tardi in Archiviati.",
     "owner.archiveSitAction": "Sì, archivia",
     "owner.unarchiveSit": "Sposta tra i soggiorni attivi",
     "owner.unarchiveSitLabel": "Ripristina soggiorno {{boat}}",
@@ -3005,7 +3097,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Anteprima della copertura della barca",
     "vesselEditor.noCover": "Nessuna immagine di copertina ancora",
     "vesselEditor.gallery": "Altre foto",
-    "vesselEditor.galleryHint": "Carica altre foto della barca, del porto e della vita a bordo. Le didascalie sono facoltative.",
+    "vesselEditor.galleryHint":
+      "Carica altre foto della barca, del porto e della vita a bordo. Le didascalie sono facoltative.",
     "vesselEditor.galleryCaption": "Didascalia",
     "vesselEditor.galleryCaptionPlaceholder": "Didascalia facoltativa",
     "vesselEditor.galleryEmpty": "Nessuna foto aggiuntiva ancora",
@@ -3023,7 +3116,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Cosa è disponibile?",
     "vesselEditor.featuresHint":
       "Seleziona tutto ciò che i sitter possono utilizzare a bordo o al porto.",
-        "vesselEditor.privateAccessTitle": "Dettagli di accesso privati",
+    "vesselEditor.privateAccessTitle": "Dettagli di accesso privati",
     "vesselEditor.privateAccessHint":
       "Condivisi solo con i sitter confermati dopo aver accettato la loro candidatura. Conserva qui password Wi-Fi, codici di accesso e dettagli simili.",
     "vesselEditor.wifiNetwork": "Rete Wi-Fi",
@@ -3031,7 +3124,8 @@ const localeExtrasSource = {
     "vesselEditor.wifiPassword": "Password Wi-Fi",
     "vesselEditor.wifiPasswordPlaceholder": "Password",
     "vesselEditor.accessCodes": "Codici di accesso",
-    "vesselEditor.accessCodesPlaceholder": "Cancello del porto, cassetta delle chiavi, pozzetto, allarme…",
+    "vesselEditor.accessCodesPlaceholder":
+      "Cancello del porto, cassetta delle chiavi, pozzetto, allarme…",
     "vesselEditor.otherPrivateNotes": "Altre note private",
     "vesselEditor.otherPrivateNotesPlaceholder":
       "Posizione della chiave di scorta, dettagli dell’ormeggio, contatti di emergenza a bordo…",
@@ -3059,11 +3153,13 @@ const localeExtrasSource = {
       "JPG, PNG o WebP fino a 10 MB. Le immagini di grandi dimensioni vengono ridimensionate prima del salvataggio.",
     "upload.uploadMultiple": "Carica foto",
     "upload.processingMultiple": "Elaborazione foto…",
-    "upload.hintMultiple": "JPG, PNG o WebP fino a 10 MB ciascuna. Le immagini grandi vengono ridimensionate prima del salvataggio.",
+    "upload.hintMultiple":
+      "JPG, PNG o WebP fino a 10 MB ciascuna. Le immagini grandi vengono ridimensionate prima del salvataggio.",
     "sitEditor.kicker": "Disponibilità di posti a sedere",
     "sitEditor.editTitle": "Modifica la posizione della barca",
     "sitEditor.lockedBannerTitle": "Modifica bloccata",
-    "sitEditor.lockedBanner": "Questa permanenza ha ricevuto candidature, quindi i dettagli non possono più essere modificati. Puoi ancora esaminare le candidature e scrivere ai sitter.",
+    "sitEditor.lockedBanner":
+      "Questa permanenza ha ricevuto candidature, quindi i dettagli non possono più essere modificati. Puoi ancora esaminare le candidature e scrivere ai sitter.",
     "sitEditor.createTitle": "Crea un posto in barca",
     "sitEditor.createShort": "Crea una seduta",
     "sitEditor.createEditLimitTitle": "Modificabile fino alla prima candidatura",
@@ -3076,8 +3172,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Tipo di permanenza",
     "sitType.liveaboard": "Alloggio",
     "sitType.liveaboardShort": "Alloggio",
-    "sitType.liveaboardHint":
-      "Il sitter vive e dorme a bordo per tutta la durata.",
+    "sitType.liveaboardHint": "Il sitter vive e dorme a bordo per tutta la durata.",
     "sitType.daytimeChecks": "Visite diurne",
     "sitType.daytimeChecksShort": "Diurno",
     "sitType.daytimeChecksHint":
@@ -3094,12 +3189,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certificazioni",
     "sitEditor.skills": "Abilità pratiche",
     "sitEditor.nonSmoker": "Deve essere non fumatore",
-    "sitEditor.nonSmokerHint":
-      "Richiedi sitter che non fumino a bordo né durante il soggiorno.",
+    "sitEditor.nonSmokerHint": "Richiedi sitter che non fumino a bordo né durante il soggiorno.",
     "requirement.nonSmoker": "Non fumatore",
     "sitEditor.additional": "Requisiti aggiuntivi del sitter",
-    "sitEditor.additionalPlaceholder":
-      "Uno per riga, ad esempio due referenze recenti",
+    "sitEditor.additionalPlaceholder": "Uno per riga, ad esempio due referenze recenti",
     "sitEditor.pets": "Animali a bordo (facoltativo)",
     "sitEditor.petsPlaceholder": "per esempio Pip, un terrier amante del mare",
     "sitEditor.save": "Salva, siediti",
@@ -3165,11 +3258,13 @@ const localeExtrasSource = {
     "settings.legalName": "Nome legale completo",
     "settings.legalNameHint": "Come appare sul documento d'identità.",
     "settings.displayNameHint": "Mostrato sul profilo pubblico e nei messaggi.",
-    "settings.emailReadOnlyHint": "Usa la sezione di accesso qui sotto per cambiare l'indirizzo e-mail.",
+    "settings.emailReadOnlyHint":
+      "Usa la sezione di accesso qui sotto per cambiare l'indirizzo e-mail.",
     "settings.savePersonal": "Salva dati personali",
     "settings.personalSaved": "Dati personali salvati",
     "settings.accountTitle": "Account",
-    "settings.accountHint": "La tua email di accesso è mostrata qui. Usa i pulsanti per cambiare email o password in una finestra protetta.",
+    "settings.accountHint":
+      "La tua email di accesso è mostrata qui. Usa i pulsanti per cambiare email o password in una finestra protetta.",
     "settings.currentEmail": "Email attuale",
     "settings.newEmail": "Nuova email",
     "settings.currentPassword": "Password attuale",
@@ -3185,9 +3280,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Password aggiornata",
     "settings.passwordMismatch": "Le nuove password non coincidono.",
     "settings.sameEmail": "Inserisci un indirizzo email diverso.",
-    "settings.accountCredentialsUnavailable": "Le modifiche alla password richiedono un account creato con email. Registrati con un'email e riprova.",
+    "settings.accountCredentialsUnavailable":
+      "Le modifiche alla password richiedono un account creato con email. Registrati con un'email e riprova.",
     "settings.emailsTitle": "Notifiche email",
-    "settings.emailsHint": "Scegli per quali eventi ricevere un'email. Puoi modificarli in qualsiasi momento.",
+    "settings.emailsHint":
+      "Scegli per quali eventi ricevere un'email. Puoi modificarli in qualsiasi momento.",
     "settings.email.newApplications": "Nuove candidature sulle mie barche",
     "settings.email.applicationUpdates": "Aggiornamenti sulle custodie a cui ho fatto domanda",
     "settings.email.messages": "Nuovi messaggi nelle mie conversazioni",
@@ -3197,26 +3294,31 @@ const localeExtrasSource = {
     "safetyActions.block": "Blocca",
     "safetyActions.unblock": "Sblocca",
     "safetyActions.reportTitle": "Segnalare {{name}}?",
-    "safetyActions.reportText": "Raccontaci cos'è successo. Le segnalazioni sono esaminate da Boatstead e non vengono condivise con il membro segnalato.",
+    "safetyActions.reportText":
+      "Raccontaci cos'è successo. Le segnalazioni sono esaminate da Boatstead e non vengono condivise con il membro segnalato.",
     "safetyActions.reportReason": "Motivo",
     "safetyActions.reportDetails": "Dettagli",
     "safetyActions.reportDetailsPlaceholder": "Aggiungi qualsiasi contesto utile",
     "safetyActions.reportDetailsRequired": "Aggiungi una breve descrizione per questo motivo.",
     "safetyActions.reportSubmit": "Invia segnalazione",
     "safetyActions.reportThanksTitle": "Segnalazione inviata",
-    "safetyActions.reportThanksText": "Grazie. Abbiamo ricevuto la tua segnalazione su {{name}} e la esamineremo.",
+    "safetyActions.reportThanksText":
+      "Grazie. Abbiamo ricevuto la tua segnalazione su {{name}} e la esamineremo.",
     "safetyActions.blockTitle": "Bloccare {{name}}?",
-    "safetyActions.blockText": "Non potrà più contattarti facilmente e potrai sbloccarlo in qualsiasi momento nelle Impostazioni.",
+    "safetyActions.blockText":
+      "Non potrà più contattarti facilmente e potrai sbloccarlo in qualsiasi momento nelle Impostazioni.",
     "safetyActions.blockConfirm": "Sì, blocca",
     "safetyActions.blockedBannerTitle": "Hai bloccato questo membro",
-    "safetyActions.blockedBannerText": "{{name}} è nella tua lista di blocco. Puoi sbloccarlo qui o nelle Impostazioni.",
+    "safetyActions.blockedBannerText":
+      "{{name}} è nella tua lista di blocco. Puoi sbloccarlo qui o nelle Impostazioni.",
     "safetyActions.reason.spam": "Spam o contatto indesiderato",
     "safetyActions.reason.harassment": "Molestie o abusi",
     "safetyActions.reason.scam": "Truffa o frode",
     "safetyActions.reason.inappropriate": "Contenuto o comportamento inappropriato",
     "safetyActions.reason.other": "Altro",
     "settings.blockedUsersTitle": "Account bloccati",
-    "settings.blockedUsersHint": "Membri che hai bloccato. Sbloccare ripristina il contatto normale.",
+    "settings.blockedUsersHint":
+      "Membri che hai bloccato. Sbloccare ripristina il contatto normale.",
     "settings.blockedUsersEmpty": "Non hai ancora bloccato nessuno.",
     "settings.blockedOn": "Bloccato il {{date}}",
     "settings.dangerZone": "Zona pericolosa",
@@ -3498,7 +3600,8 @@ const localeExtrasSource = {
     "admin.tab.users": "Utenti",
     "admin.tab.audit": "Registro di audit",
     "admin.signInTitle": "Accedi per aprire Admin",
-    "admin.signInText": "Gli strumenti di amministrazione sono disponibili solo per i super utenti connessi.",
+    "admin.signInText":
+      "Gli strumenti di amministrazione sono disponibili solo per i super utenti connessi.",
     "admin.deniedTitle": "Accesso amministratore richiesto",
     "admin.deniedText": "Il tuo account non ha il permesso di gestire gli utenti.",
     "admin.usersEmpty": "Nessun utente corrisponde a questa ricerca.",
@@ -3647,12 +3750,14 @@ const localeExtrasSource = {
       "Melden Sie sich an oder erstellen Sie ein Konto, um Sits auf Ihrer Merkliste zu speichern und später wiederzufinden.",
     "saved.showAll": "Alle anzeigen, inkl. Sitter gewählt, abgeschlossen usw.",
     "saved.emptyFiltered": "Keine offenen gespeicherten Sits",
-    "saved.emptyFilteredHint": "Deine Merkliste enthält nur Sits mit gewähltem Sitter oder abgeschlossene. Aktiviere das Kästchen oben, um sie zu sehen.",
+    "saved.emptyFilteredHint":
+      "Deine Merkliste enthält nur Sits mit gewähltem Sitter oder abgeschlossene. Aktiviere das Kästchen oben, um sie zu sehen.",
     "editorPreview.kicker": "Live-Vorschau",
     "editorPreview.title": "So wird es aussehen",
     "editorPreview.label": "Live-Vorschau",
     "editorPreview.vesselHint": "Aktualisiert sich, während du die Bootdetails bearbeitest.",
-    "editorPreview.sitHint": "Aktualisiert sich, während du diesen Sit bearbeitest. So sehen ihn Bootsitter.",
+    "editorPreview.sitHint":
+      "Aktualisiert sich, während du diesen Sit bearbeitest. So sehen ihn Bootsitter.",
     "editorPreview.untitledBoat": "Unbenanntes Boot",
     "editorPreview.homePortPending": "Heimathafen hinzufügen",
     "editorPreview.lengthPending": "Länge offen",
@@ -3719,7 +3824,8 @@ const localeExtrasSource = {
     "notFound.text": "Diese Seite ist nicht in unserer Tabelle.",
     "notFound.back": "Zurück zum Hafen",
     "errorBoundary.title": "Etwas ist schiefgelaufen",
-    "errorBoundary.text": "Es ist ein unerwartetes Problem aufgetreten. Versuchen Sie es erneut oder gehen Sie zur Startseite.",
+    "errorBoundary.text":
+      "Es ist ein unerwartetes Problem aufgetreten. Versuchen Sie es erneut oder gehen Sie zur Startseite.",
     "errorBoundary.tryAgain": "Erneut versuchen",
     "errorBoundary.goHome": "Zur Startseite",
     "profile.settings": "Öffentliches Profil",
@@ -3751,13 +3857,16 @@ const localeExtrasSource = {
     "profile.save": "Profil speichern",
     "member.member": "Boatstead-Mitglied",
     "member.signInTitle": "Melden Sie sich an, um Profile anzuzeigen",
-    "member.signInText": "Mitgliederprofile sind nur für angemeldete Boatstead-Mitglieder sichtbar.",
+    "member.signInText":
+      "Mitgliederprofile sind nur für angemeldete Boatstead-Mitglieder sichtbar.",
     "member.message": "Nachricht",
     "member.identityVerified": "Identität überprüft",
     "verification.identityVerified": "Identität überprüft",
     "verification.confirmIdentity": "Bestätigen Sie Ihre Identität",
-    "verification.verifiedHint": "Boatstead hat Ausweis, E-Mail und Telefon dieses Mitglieds bestätigt.",
-    "verification.selfHint": "Vervollständigen Sie die Punkte unten, damit andere Ihrem Profil vertrauen können.",
+    "verification.verifiedHint":
+      "Boatstead hat Ausweis, E-Mail und Telefon dieses Mitglieds bestätigt.",
+    "verification.selfHint":
+      "Vervollständigen Sie die Punkte unten, damit andere Ihrem Profil vertrauen können.",
     "verification.partialHint": "{{count}} von {{total}} Prüfungen bisher bestätigt.",
     "verification.governmentId": "Amtlicher Ausweis",
     "verification.email": "E-Mail-Adresse",
@@ -3765,9 +3874,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "bestätigt",
     "verification.statusMissing": "nicht bestätigt",
     "verification.verifyGovernmentId": "Ausweis verifizieren",
-    "verification.addEmailAndPhone": "Fügen Sie E-Mail und Telefonnummer in Ihrem Profil hinzu, um die Verifizierung abzuschließen.",
-    "verification.addPhone": "Fügen Sie eine Telefonnummer in Ihrem Profil hinzu, um die Verifizierung abzuschließen.",
-    "verification.addEmail": "Fügen Sie eine E-Mail-Adresse in Ihrem Profil hinzu, um die Verifizierung abzuschließen.",
+    "verification.addEmailAndPhone":
+      "Fügen Sie E-Mail und Telefonnummer in Ihrem Profil hinzu, um die Verifizierung abzuschließen.",
+    "verification.addPhone":
+      "Fügen Sie eine Telefonnummer in Ihrem Profil hinzu, um die Verifizierung abzuschließen.",
+    "verification.addEmail":
+      "Fügen Sie eine E-Mail-Adresse in Ihrem Profil hinzu, um die Verifizierung abzuschließen.",
     "member.verificationNeeded": "Verifizierung erforderlich",
     "member.reviews_one": "1 Bewertung",
     "member.reviews_other": "{{count}} Bewertungen",
@@ -3797,7 +3909,8 @@ const localeExtrasSource = {
     "owner.boatNotFound": "Boot nicht gefunden",
     "owner.boatUnavailable": "Dieses Boot ist nicht verfügbar oder gehört einem anderen Mitglied.",
     "owner.sitNotFound": "Bootsaufenthalt nicht gefunden",
-    "owner.sitUnavailable": "Dieser Bootsaufenthalt ist nicht verfügbar oder gehört einem anderen Mitglied.",
+    "owner.sitUnavailable":
+      "Dieser Bootsaufenthalt ist nicht verfügbar oder gehört einem anderen Mitglied.",
     "owner.backToBoats": "Zurück zu den Booten",
     "owner.dashboard": "Armaturenbrett für Boote",
     "owner.manage": "Verwalten Sie Boote und Sitze",
@@ -3809,7 +3922,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} Aufenthaltszeiträume",
     "owner.sitSummary": "{{duration}} · {{applicants}} Bewerber · {{tasks}} Pflegeaufgaben",
     "owner.sitPhaseFilter": "Aufenthalte nach Phase filtern",
-    "owner.sitPhaseFilterHint": "Aufenthalte sind nach Phase gruppiert. Nutzen Sie den Filter, um eine Phase zu fokussieren.",
+    "owner.sitPhaseFilterHint":
+      "Aufenthalte sind nach Phase gruppiert. Nutzen Sie den Filter, um eine Phase zu fokussieren.",
     "owner.sitPhaseFilterAll": "Alle Phasen",
     "owner.sitPhaseEmpty": "Keine Aufenthalte in dieser Phase",
     "owner.sitPhaseCount_one": "1 Aufenthalt",
@@ -3829,30 +3943,41 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Fügen Sie ein Boot hinzu, bevor Sie einen Aufenthalt erstellen.",
     "owner.sitRequiresBoatTooltip":
       "Erstellen Sie zuerst ein Boot. Klicken Sie hier, um Ihr erstes Boot hinzuzufügen.",
-    "owner.sitRequiresVerificationTooltip": "Bestätigen Sie Ihre Identität, bevor Sie eine Betreuung erstellen. Öffnen Sie Ihr Profil, um die Verifizierung abzuschließen.",
+    "owner.sitRequiresVerificationTooltip":
+      "Bestätigen Sie Ihre Identität, bevor Sie eine Betreuung erstellen. Öffnen Sie Ihr Profil, um die Verifizierung abzuschließen.",
     "owner.deleteBoatLabel": "Löschen Sie {{boat}}",
     "owner.deleteBoatTitle": "{{boat}} löschen?",
-    "owner.deleteBoatConfirm": "Diese Aktion entfernt das Boot dauerhaft und kann nicht rückgängig gemacht werden.",
+    "owner.deleteBoatConfirm":
+      "Diese Aktion entfernt das Boot dauerhaft und kann nicht rückgängig gemacht werden.",
     "owner.deleteSitLabel": "{{boat}} sit löschen",
     "owner.deleteSitTitle": "Diesen Aufenthalt löschen?",
     "owner.deleteSitConfirm": "Den Aufenthalt {{dates}} für {{boat}} löschen?",
     "owner.deleteConfirmAction": "Ja, löschen",
     "owner.deleteBlocked": "Löschen Sie zunächst alle Sitze für dieses Boot",
     "owner.sitEditLocked": "Dieser Aufenthalt hat Bewerber und kann nicht mehr bearbeitet werden",
-    "owner.sitEditLockedBanner": "Es gibt bereits Bewerber, daher kann dieser Aufenthalt nicht mehr bearbeitet werden.",
-    "owner.sitDeleteLocked": "Für diesen Aufenthalt gibt es einen angenommenen Bewerber und er kann nicht mehr gelöscht werden",
+    "owner.sitEditLockedBanner":
+      "Es gibt bereits Bewerber, daher kann dieser Aufenthalt nicht mehr bearbeitet werden.",
+    "owner.sitDeleteLocked":
+      "Für diesen Aufenthalt gibt es einen angenommenen Bewerber und er kann nicht mehr gelöscht werden",
     "owner.deleteError": "Das Boot konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
-    "owner.deleteSitError": "Dieser Aufenthalt konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+    "owner.deleteSitError":
+      "Dieser Aufenthalt konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
     "owner.deleteSitAcceptedError":
       "Für diesen Aufenthalt gibt es einen angenommenen Bewerber und er kann nicht mehr gelöscht werden.",
-    "owner.sitDeleteUnderway": "Dieser Sit läuft bereits und kann nicht gelöscht werden. Kontaktiere den Support, wenn du Hilfe brauchst.",
-    "owner.deleteSitApplicantsWarning_one": "Dieser Sit hat gerade 1 Bewerbung. Beim Löschen verschwindet die Anzeige für alle Bewerber.",
-    "owner.deleteSitApplicantsWarning_other": "Dieser Sit hat gerade {{count}} Bewerbungen. Beim Löschen verschwindet die Anzeige für alle Bewerber.",
-    "owner.deleteSitAcceptedWarning": "Für diesen Sit wurde bereits jemand akzeptiert. Bitte informiere die Person, bevor du ihn löschst.",
-    "owner.deleteSitCompletedError": "Abgeschlossene Sits können nicht gelöscht werden. Archiviere sie stattdessen.",
+    "owner.sitDeleteUnderway":
+      "Dieser Sit läuft bereits und kann nicht gelöscht werden. Kontaktiere den Support, wenn du Hilfe brauchst.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Dieser Sit hat gerade 1 Bewerbung. Beim Löschen verschwindet die Anzeige für alle Bewerber.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Dieser Sit hat gerade {{count}} Bewerbungen. Beim Löschen verschwindet die Anzeige für alle Bewerber.",
+    "owner.deleteSitAcceptedWarning":
+      "Für diesen Sit wurde bereits jemand akzeptiert. Bitte informiere die Person, bevor du ihn löschst.",
+    "owner.deleteSitCompletedError":
+      "Abgeschlossene Sits können nicht gelöscht werden. Archiviere sie stattdessen.",
     "owner.archiveSitLabel": "{{boat}}-Sit archivieren",
     "owner.archiveSitTitle": "Diesen Sit archivieren?",
-    "owner.archiveSitConfirm": "Den Sit {{dates}} für {{boat}} archivieren? Du findest ihn später unter Archiviert.",
+    "owner.archiveSitConfirm":
+      "Den Sit {{dates}} für {{boat}} archivieren? Du findest ihn später unter Archiviert.",
     "owner.archiveSitAction": "Ja, archivieren",
     "owner.unarchiveSit": "Zu aktiven Sits verschieben",
     "owner.unarchiveSitLabel": "{{boat}}-Sit wiederherstellen",
@@ -3893,7 +4018,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Vorschau der Bootsabdeckung",
     "vesselEditor.noCover": "Noch kein Titelbild",
     "vesselEditor.gallery": "Weitere Fotos",
-    "vesselEditor.galleryHint": "Laden Sie zusätzliche Fotos vom Boot, vom Hafen und vom Leben an Bord hoch. Bildunterschriften sind optional.",
+    "vesselEditor.galleryHint":
+      "Laden Sie zusätzliche Fotos vom Boot, vom Hafen und vom Leben an Bord hoch. Bildunterschriften sind optional.",
     "vesselEditor.galleryCaption": "Bildunterschrift",
     "vesselEditor.galleryCaptionPlaceholder": "Optionale Bildunterschrift",
     "vesselEditor.galleryEmpty": "Noch keine weiteren Fotos",
@@ -3912,7 +4038,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Was ist verfügbar?",
     "vesselEditor.featuresHint":
       "Wählen Sie alles aus, was Sitter an Bord oder im Yachthafen nutzen können.",
-        "vesselEditor.privateAccessTitle": "Private Zugangsdaten",
+    "vesselEditor.privateAccessTitle": "Private Zugangsdaten",
     "vesselEditor.privateAccessHint":
       "Werden nur mit bestätigten Bootsittern geteilt, nachdem Sie deren Bewerbung angenommen haben. Hinterlegen Sie hier WLAN-Passwörter, Zugangscodes und ähnliche Angaben.",
     "vesselEditor.wifiNetwork": "WLAN-Netzwerk",
@@ -3949,11 +4075,13 @@ const localeExtrasSource = {
       "JPG, PNG oder WebP bis zu 10 MB. Große Bilder werden vor dem Speichern in der Größe geändert.",
     "upload.uploadMultiple": "Fotos hochladen",
     "upload.processingMultiple": "Fotos werden verarbeitet…",
-    "upload.hintMultiple": "JPG, PNG oder WebP bis je 10 MB. Große Bilder werden vor dem Speichern verkleinert.",
+    "upload.hintMultiple":
+      "JPG, PNG oder WebP bis je 10 MB. Große Bilder werden vor dem Speichern verkleinert.",
     "sitEditor.kicker": "Sitzverfügbarkeit",
     "sitEditor.editTitle": "Bootssitz bearbeiten",
     "sitEditor.lockedBannerTitle": "Bearbeitung gesperrt",
-    "sitEditor.lockedBanner": "Für diesen Aufenthalt gibt es bereits Bewerbungen, daher können die Details nicht mehr geändert werden. Sie können Bewerbungen weiterhin prüfen und Sitter anschreiben.",
+    "sitEditor.lockedBanner":
+      "Für diesen Aufenthalt gibt es bereits Bewerbungen, daher können die Details nicht mehr geändert werden. Sie können Bewerbungen weiterhin prüfen und Sitter anschreiben.",
     "sitEditor.createTitle": "Erstellen Sie einen Bootssitz",
     "sitEditor.createShort": "Erstellen Sie eine Sitzung",
     "sitEditor.createEditLimitTitle": "Bearbeitbar bis zur ersten Bewerbung",
@@ -3966,8 +4094,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Art des Aufenthalts",
     "sitType.liveaboard": "Unterkunft",
     "sitType.liveaboardShort": "Unterkunft",
-    "sitType.liveaboardHint":
-      "Der Sitter wohnt und schläft während der gesamten Zeit an Bord.",
+    "sitType.liveaboardHint": "Der Sitter wohnt und schläft während der gesamten Zeit an Bord.",
     "sitType.daytimeChecks": "Tagesbesuche",
     "sitType.daytimeChecksShort": "Tagsüber",
     "sitType.daytimeChecksHint":
@@ -3988,14 +4115,14 @@ const localeExtrasSource = {
       "Verlange Sitter, die an Bord und während des Aufenthalts nicht rauchen.",
     "requirement.nonSmoker": "Nichtraucher",
     "sitEditor.additional": "Zusätzliche Sitteranforderungen",
-    "sitEditor.additionalPlaceholder":
-      "Eine pro Zeile, zum Beispiel zwei aktuelle Referenzen",
+    "sitEditor.additionalPlaceholder": "Eine pro Zeile, zum Beispiel zwei aktuelle Referenzen",
     "sitEditor.pets": "Haustiere an Bord (optional)",
     "sitEditor.petsPlaceholder": "zum Beispiel Pip, ein meeresliebender Terrier",
     "sitEditor.save": "Sitzen speichern",
     "sitEditor.publish": "Sitz veröffentlichen",
     "sitEditor.publishBlocked": "Noch nötig: {{items}}",
-    "sitEditor.verificationRequiredTitle": "Bestätigen Sie Ihre Identität, um eine Betreuung zu erstellen",
+    "sitEditor.verificationRequiredTitle":
+      "Bestätigen Sie Ihre Identität, um eine Betreuung zu erstellen",
     "sitEditor.verificationRequiredText":
       "Bestätigen Sie amtlichen Ausweis, E-Mail-Adresse und Telefonnummer, bevor Sie eine Bootsbetreuung veröffentlichen.",
     "sitEditor.verificationRequiredCta": "Verifizierung im Profil abschließen",
@@ -4056,11 +4183,13 @@ const localeExtrasSource = {
     "settings.legalName": "Vollständiger gesetzlicher Name",
     "settings.legalNameHint": "Wie auf Ihrem amtlichen Ausweis.",
     "settings.displayNameHint": "Wird in Ihrem öffentlichen Profil und in Nachrichten angezeigt.",
-    "settings.emailReadOnlyHint": "Verwenden Sie den Anmeldebereich unten, um Ihre E-Mail-Adresse zu ändern.",
+    "settings.emailReadOnlyHint":
+      "Verwenden Sie den Anmeldebereich unten, um Ihre E-Mail-Adresse zu ändern.",
     "settings.savePersonal": "Persönliche Angaben speichern",
     "settings.personalSaved": "Persönliche Angaben gespeichert",
     "settings.accountTitle": "Konto",
-    "settings.accountHint": "Ihre Anmelde-E-Mail wird hier angezeigt. Nutzen Sie die Schaltflächen, um E-Mail oder Passwort in einem sicheren Dialog zu ändern.",
+    "settings.accountHint":
+      "Ihre Anmelde-E-Mail wird hier angezeigt. Nutzen Sie die Schaltflächen, um E-Mail oder Passwort in einem sicheren Dialog zu ändern.",
     "settings.currentEmail": "Aktuelle E-Mail",
     "settings.newEmail": "Neue E-Mail",
     "settings.currentPassword": "Aktuelles Passwort",
@@ -4069,16 +4198,19 @@ const localeExtrasSource = {
     "settings.changeEmail": "E-Mail ändern",
     "settings.changePassword": "Passwort ändern",
     "settings.changeEmailTitle": "E-Mail ändern",
-    "settings.changeEmailHint": "Geben Sie eine neue E-Mail ein und bestätigen Sie mit Ihrem aktuellen Passwort.",
+    "settings.changeEmailHint":
+      "Geben Sie eine neue E-Mail ein und bestätigen Sie mit Ihrem aktuellen Passwort.",
     "settings.changePasswordTitle": "Passwort ändern",
     "settings.changePasswordHint": "Wählen Sie ein neues Passwort für die Anmeldung bei Boatstead.",
     "settings.emailUpdated": "E-Mail aktualisiert",
     "settings.passwordUpdated": "Passwort aktualisiert",
     "settings.passwordMismatch": "Die neuen Passwörter stimmen nicht überein.",
     "settings.sameEmail": "Geben Sie eine andere E-Mail-Adresse ein.",
-    "settings.accountCredentialsUnavailable": "Passwortänderungen erfordern ein per E-Mail erstelltes Konto. Registrieren Sie sich mit einer E-Mail und versuchen Sie es erneut.",
+    "settings.accountCredentialsUnavailable":
+      "Passwortänderungen erfordern ein per E-Mail erstelltes Konto. Registrieren Sie sich mit einer E-Mail und versuchen Sie es erneut.",
     "settings.emailsTitle": "E-Mail-Benachrichtigungen",
-    "settings.emailsHint": "Wählen Sie, für welche Ereignisse Sie eine E-Mail erhalten. Sie können das jederzeit ändern.",
+    "settings.emailsHint":
+      "Wählen Sie, für welche Ereignisse Sie eine E-Mail erhalten. Sie können das jederzeit ändern.",
     "settings.email.newApplications": "Neue Bewerbungen für meine Boote",
     "settings.email.applicationUpdates": "Updates zu Bewerbungen, die ich eingereicht habe",
     "settings.email.messages": "Neue Nachrichten in meinen Unterhaltungen",
@@ -4088,26 +4220,32 @@ const localeExtrasSource = {
     "safetyActions.block": "Blockieren",
     "safetyActions.unblock": "Entsperren",
     "safetyActions.reportTitle": "{{name}} melden?",
-    "safetyActions.reportText": "Erzählen Sie uns, was passiert ist. Meldungen werden von Boatstead geprüft und nicht mit dem gemeldeten Mitglied geteilt.",
+    "safetyActions.reportText":
+      "Erzählen Sie uns, was passiert ist. Meldungen werden von Boatstead geprüft und nicht mit dem gemeldeten Mitglied geteilt.",
     "safetyActions.reportReason": "Grund",
     "safetyActions.reportDetails": "Details",
     "safetyActions.reportDetailsPlaceholder": "Fügen Sie nützlichen Kontext hinzu",
-    "safetyActions.reportDetailsRequired": "Bitte fügen Sie für diesen Grund eine kurze Beschreibung hinzu.",
+    "safetyActions.reportDetailsRequired":
+      "Bitte fügen Sie für diesen Grund eine kurze Beschreibung hinzu.",
     "safetyActions.reportSubmit": "Meldung senden",
     "safetyActions.reportThanksTitle": "Meldung gesendet",
-    "safetyActions.reportThanksText": "Danke. Wir haben Ihre Meldung zu {{name}} erhalten und werden sie prüfen.",
+    "safetyActions.reportThanksText":
+      "Danke. Wir haben Ihre Meldung zu {{name}} erhalten und werden sie prüfen.",
     "safetyActions.blockTitle": "{{name}} blockieren?",
-    "safetyActions.blockText": "Diese Person kann Sie nicht mehr leicht kontaktieren, und Sie können die Sperre jederzeit in den Einstellungen aufheben.",
+    "safetyActions.blockText":
+      "Diese Person kann Sie nicht mehr leicht kontaktieren, und Sie können die Sperre jederzeit in den Einstellungen aufheben.",
     "safetyActions.blockConfirm": "Ja, blockieren",
     "safetyActions.blockedBannerTitle": "Sie haben dieses Mitglied blockiert",
-    "safetyActions.blockedBannerText": "{{name}} steht auf Ihrer Sperrliste. Sie können die Sperre hier oder in den Einstellungen aufheben.",
+    "safetyActions.blockedBannerText":
+      "{{name}} steht auf Ihrer Sperrliste. Sie können die Sperre hier oder in den Einstellungen aufheben.",
     "safetyActions.reason.spam": "Spam oder unerwünschter Kontakt",
     "safetyActions.reason.harassment": "Belästigung oder Missbrauch",
     "safetyActions.reason.scam": "Betrug oder Schwindel",
     "safetyActions.reason.inappropriate": "Unangemessener Inhalt oder unangemessenes Verhalten",
     "safetyActions.reason.other": "Etwas anderes",
     "settings.blockedUsersTitle": "Blockierte Konten",
-    "settings.blockedUsersHint": "Mitglieder, die Sie blockiert haben. Entsperren stellt den normalen Kontakt wieder her.",
+    "settings.blockedUsersHint":
+      "Mitglieder, die Sie blockiert haben. Entsperren stellt den normalen Kontakt wieder her.",
     "settings.blockedUsersEmpty": "Sie haben noch niemanden blockiert.",
     "settings.blockedOn": "Blockiert am {{date}}",
     "settings.dangerZone": "Gefahrenbereich",
@@ -4538,7 +4676,8 @@ const localeExtrasSource = {
       "Log in of maak een account aan om oppassen op je shortlist te zetten en later terug te vinden.",
     "saved.showAll": "Alles tonen, inclusief sitter gekozen, afgerond, enz.",
     "saved.emptyFiltered": "Geen open opgeslagen oppassen",
-    "saved.emptyFilteredHint": "Je shortlist bevat alleen oppassen met een gekozen sitter of afgeronde. Vink het vakje hierboven aan om ze te zien.",
+    "saved.emptyFilteredHint":
+      "Je shortlist bevat alleen oppassen met een gekozen sitter of afgeronde. Vink het vakje hierboven aan om ze te zien.",
     "editorPreview.kicker": "Live voorbeeld",
     "editorPreview.title": "Zo komt het eruit",
     "editorPreview.label": "Live voorbeeld",
@@ -4610,7 +4749,8 @@ const localeExtrasSource = {
     "notFound.text": "Die pagina staat niet in onze kaart.",
     "notFound.back": "Terug naar de haven",
     "errorBoundary.title": "Er ging iets mis",
-    "errorBoundary.text": "Er is een onverwacht probleem opgetreden. Probeer het opnieuw of ga terug naar de homepage.",
+    "errorBoundary.text":
+      "Er is een onverwacht probleem opgetreden. Probeer het opnieuw of ga terug naar de homepage.",
     "errorBoundary.tryAgain": "Opnieuw proberen",
     "errorBoundary.goHome": "Naar home",
     "profile.settings": "Openbaar profiel",
@@ -4645,8 +4785,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identiteit geverifieerd",
     "verification.identityVerified": "Identiteit geverifieerd",
     "verification.confirmIdentity": "Bevestig je identiteit",
-    "verification.verifiedHint": "Boatstead heeft de officiële ID, e-mail en telefoon van dit lid bevestigd.",
-    "verification.selfHint": "Rond elk punt hieronder af zodat anderen je profiel kunnen vertrouwen.",
+    "verification.verifiedHint":
+      "Boatstead heeft de officiële ID, e-mail en telefoon van dit lid bevestigd.",
+    "verification.selfHint":
+      "Rond elk punt hieronder af zodat anderen je profiel kunnen vertrouwen.",
     "verification.partialHint": "{{count}} van {{total}} controles tot nu toe bevestigd.",
     "verification.governmentId": "Officieel identiteitsbewijs",
     "verification.email": "E-mailadres",
@@ -4654,9 +4796,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "geverifieerd",
     "verification.statusMissing": "niet geverifieerd",
     "verification.verifyGovernmentId": "Identiteitsbewijs verifiëren",
-    "verification.addEmailAndPhone": "Voeg een e-mailadres en telefoonnummer toe in je profiel om de verificatie af te ronden.",
-    "verification.addPhone": "Voeg een telefoonnummer toe in je profiel om de verificatie af te ronden.",
-    "verification.addEmail": "Voeg een e-mailadres toe in je profiel om de verificatie af te ronden.",
+    "verification.addEmailAndPhone":
+      "Voeg een e-mailadres en telefoonnummer toe in je profiel om de verificatie af te ronden.",
+    "verification.addPhone":
+      "Voeg een telefoonnummer toe in je profiel om de verificatie af te ronden.",
+    "verification.addEmail":
+      "Voeg een e-mailadres toe in je profiel om de verificatie af te ronden.",
     "member.verificationNeeded": "Verificatie nodig",
     "member.reviews_one": "1 beoordeling",
     "member.reviews_other": "{{count}} beoordelingen",
@@ -4698,7 +4843,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} zitperiodes",
     "owner.sitSummary": "{{duration}} · {{applicants}} aanvragers · {{tasks}} zorgtaken",
     "owner.sitPhaseFilter": "Filter verblijven op fase",
-    "owner.sitPhaseFilterHint": "Verblijven zijn gegroepeerd per fase. Gebruik het filter om één fase te tonen.",
+    "owner.sitPhaseFilterHint":
+      "Verblijven zijn gegroepeerd per fase. Gebruik het filter om één fase te tonen.",
     "owner.sitPhaseFilterAll": "Alle fasen",
     "owner.sitPhaseEmpty": "Geen verblijven in deze fase",
     "owner.sitPhaseCount_one": "1 verblijf",
@@ -4718,10 +4864,12 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Voeg een boot toe voordat u een verblijf aanmaakt.",
     "owner.sitRequiresBoatTooltip":
       "Maak eerst een boot aan. Klik hier om uw eerste boot toe te voegen.",
-    "owner.sitRequiresVerificationTooltip": "Verifieer je identiteit voordat je een zitplaats maakt. Open je profiel om de verificatie te voltooien.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verifieer je identiteit voordat je een zitplaats maakt. Open je profiel om de verificatie te voltooien.",
     "owner.deleteBoatLabel": "{{boat}} verwijderen",
     "owner.deleteBoatTitle": "{{boat}} verwijderen?",
-    "owner.deleteBoatConfirm": "Deze actie verwijdert de boot definitief en kan niet ongedaan worden gemaakt.",
+    "owner.deleteBoatConfirm":
+      "Deze actie verwijdert de boot definitief en kan niet ongedaan worden gemaakt.",
     "owner.deleteSitLabel": "Verwijder {{boat}} sit",
     "owner.deleteSitTitle": "Dit verblijf verwijderen?",
     "owner.deleteSitConfirm": "Het verblijf {{dates}} voor {{boat}} verwijderen?",
@@ -4729,19 +4877,26 @@ const localeExtrasSource = {
     "owner.deleteBlocked": "Verwijder eerst alle zitplaatsen voor deze boot",
     "owner.sitEditLocked": "Deze sit heeft kandidaten en kan niet meer worden bewerkt",
     "owner.sitEditLockedBanner": "Er zijn kandidaten, dus deze sit kan niet meer worden bewerkt.",
-    "owner.sitDeleteLocked": "Deze sit heeft een geaccepteerde sollicitant en kan niet meer worden verwijderd",
+    "owner.sitDeleteLocked":
+      "Deze sit heeft een geaccepteerde sollicitant en kan niet meer worden verwijderd",
     "owner.deleteError": "De boot kon niet worden verwijderd. Probeer het opnieuw.",
     "owner.deleteSitError": "Deze sit kon niet worden verwijderd. Probeer het opnieuw.",
     "owner.deleteSitAcceptedError":
       "Deze sit heeft een geaccepteerde sollicitant en kan niet meer worden verwijderd.",
-    "owner.sitDeleteUnderway": "Deze sit is gaande en kan niet worden verwijderd. Neem contact op met support als je hulp nodig hebt.",
-    "owner.deleteSitApplicantsWarning_one": "Deze sit heeft nu 1 sollicitant. Verwijderen haalt de listing weg voor iedereen die heeft gesolliciteerd.",
-    "owner.deleteSitApplicantsWarning_other": "Deze sit heeft nu {{count}} sollicitanten. Verwijderen haalt de listing weg voor iedereen die heeft gesolliciteerd.",
-    "owner.deleteSitAcceptedWarning": "Er is al iemand geaccepteerd voor deze sit. Informeer die persoon voordat je hem verwijdert.",
-    "owner.deleteSitCompletedError": "Voltooide sits kunnen niet worden verwijderd. Archiveer ze in plaats daarvan.",
+    "owner.sitDeleteUnderway":
+      "Deze sit is gaande en kan niet worden verwijderd. Neem contact op met support als je hulp nodig hebt.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Deze sit heeft nu 1 sollicitant. Verwijderen haalt de listing weg voor iedereen die heeft gesolliciteerd.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Deze sit heeft nu {{count}} sollicitanten. Verwijderen haalt de listing weg voor iedereen die heeft gesolliciteerd.",
+    "owner.deleteSitAcceptedWarning":
+      "Er is al iemand geaccepteerd voor deze sit. Informeer die persoon voordat je hem verwijdert.",
+    "owner.deleteSitCompletedError":
+      "Voltooide sits kunnen niet worden verwijderd. Archiveer ze in plaats daarvan.",
     "owner.archiveSitLabel": "{{boat}}-sit archiveren",
     "owner.archiveSitTitle": "Deze sit archiveren?",
-    "owner.archiveSitConfirm": "De sit {{dates}} voor {{boat}} archiveren? Je vindt hem later onder Gearchiveerd.",
+    "owner.archiveSitConfirm":
+      "De sit {{dates}} voor {{boat}} archiveren? Je vindt hem later onder Gearchiveerd.",
     "owner.archiveSitAction": "Ja, archiveren",
     "owner.unarchiveSit": "Verplaatsen naar actieve sits",
     "owner.unarchiveSitLabel": "{{boat}}-sit herstellen",
@@ -4782,7 +4937,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Voorbeeld van een bootkap",
     "vesselEditor.noCover": "Nog geen omslagfoto",
     "vesselEditor.gallery": "Meer foto's",
-    "vesselEditor.galleryHint": "Upload extra foto's van de boot, jachthaven en het leven aan boord. Bijschriften zijn optioneel.",
+    "vesselEditor.galleryHint":
+      "Upload extra foto's van de boot, jachthaven en het leven aan boord. Bijschriften zijn optioneel.",
     "vesselEditor.galleryCaption": "Bijschrift",
     "vesselEditor.galleryCaptionPlaceholder": "Optioneel bijschrift",
     "vesselEditor.galleryEmpty": "Nog geen extra foto's",
@@ -4800,7 +4956,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Wat is er beschikbaar?",
     "vesselEditor.featuresHint":
       "Selecteer alles wat oppassers aan boord of in de jachthaven kunnen gebruiken.",
-        "vesselEditor.privateAccessTitle": "Privé toegangsgegevens",
+    "vesselEditor.privateAccessTitle": "Privé toegangsgegevens",
     "vesselEditor.privateAccessHint":
       "Alleen gedeeld met bevestigde boat sitters nadat je hun sollicitatie hebt geaccepteerd. Bewaar hier wifi-wachtwoorden, toegangscodes en vergelijkbare details.",
     "vesselEditor.wifiNetwork": "Wifi-netwerk",
@@ -4836,11 +4992,13 @@ const localeExtrasSource = {
       "JPG, PNG of WebP tot 10 MB. Grote afbeeldingen worden verkleind voordat ze worden opgeslagen.",
     "upload.uploadMultiple": "Foto's uploaden",
     "upload.processingMultiple": "Foto's verwerken…",
-    "upload.hintMultiple": "JPG, PNG of WebP tot 10 MB per stuk. Grote afbeeldingen worden verkleind vóór het opslaan.",
+    "upload.hintMultiple":
+      "JPG, PNG of WebP tot 10 MB per stuk. Grote afbeeldingen worden verkleind vóór het opslaan.",
     "sitEditor.kicker": "Beschikbaarheid van zitplaatsen",
     "sitEditor.editTitle": "Bewerk bootzit",
     "sitEditor.lockedBannerTitle": "Bewerken vergrendeld",
-    "sitEditor.lockedBanner": "Deze sit heeft kandidaten ontvangen, dus de details kunnen niet meer worden gewijzigd. U kunt nog steeds aanvragen bekijken en sitters berichten.",
+    "sitEditor.lockedBanner":
+      "Deze sit heeft kandidaten ontvangen, dus de details kunnen niet meer worden gewijzigd. U kunt nog steeds aanvragen bekijken en sitters berichten.",
     "sitEditor.createTitle": "Creëer een bootzit",
     "sitEditor.createShort": "Creëer een zit",
     "sitEditor.createEditLimitTitle": "Bewerkbaar tot de eerste aanvraag",
@@ -4853,12 +5011,10 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Type sit",
     "sitType.liveaboard": "Verblijf",
     "sitType.liveaboardShort": "Verblijf",
-    "sitType.liveaboardHint":
-      "De sitter woont en slaapt aan boord gedurende de hele periode.",
+    "sitType.liveaboardHint": "De sitter woont en slaapt aan boord gedurende de hele periode.",
     "sitType.daytimeChecks": "Dagelijkse controle",
     "sitType.daytimeChecksShort": "Overdag",
-    "sitType.daytimeChecksHint":
-      "De sitter komt elke dag controleren maar overnacht niet.",
+    "sitType.daytimeChecksHint": "De sitter komt elke dag controleren maar overnacht niet.",
     "sitEditor.responsibilities": "Zorgverantwoordelijkheden",
     "sitEditor.responsibilitiesPlaceholder":
       "Eén taak per lijn, bijvoorbeeld elke ochtend de bilges controleren",
@@ -4871,12 +5027,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certificeringen",
     "sitEditor.skills": "Praktische vaardigheden",
     "sitEditor.nonSmoker": "Moet niet-roker zijn",
-    "sitEditor.nonSmokerHint":
-      "Vereis oppassers die niet roken aan boord of tijdens het verblijf.",
+    "sitEditor.nonSmokerHint": "Vereis oppassers die niet roken aan boord of tijdens het verblijf.",
     "requirement.nonSmoker": "Niet-roker",
     "sitEditor.additional": "Aanvullende oppasvereisten",
-    "sitEditor.additionalPlaceholder":
-      "Eén per regel, bijvoorbeeld twee recente referenties",
+    "sitEditor.additionalPlaceholder": "Eén per regel, bijvoorbeeld twee recente referenties",
     "sitEditor.pets": "Huisdieren aan boord (optioneel)",
     "sitEditor.petsPlaceholder": "bijvoorbeeld Pip, een zeeminnende terriër",
     "sitEditor.save": "Bespaar zit",
@@ -4942,11 +5096,13 @@ const localeExtrasSource = {
     "settings.legalName": "Volledige wettelijke naam",
     "settings.legalNameHint": "Zoals op uw officiële identiteitsbewijs.",
     "settings.displayNameHint": "Wordt getoond op uw openbare profiel en in berichten.",
-    "settings.emailReadOnlyHint": "Gebruik het aanmeldgedeelte hieronder om uw e-mailadres te wijzigen.",
+    "settings.emailReadOnlyHint":
+      "Gebruik het aanmeldgedeelte hieronder om uw e-mailadres te wijzigen.",
     "settings.savePersonal": "Persoonlijke gegevens opslaan",
     "settings.personalSaved": "Persoonlijke gegevens opgeslagen",
     "settings.accountTitle": "Account",
-    "settings.accountHint": "Je inlog-e-mail staat hier. Gebruik de knoppen om e-mail of wachtwoord te wijzigen in een beveiligd dialoogvenster.",
+    "settings.accountHint":
+      "Je inlog-e-mail staat hier. Gebruik de knoppen om e-mail of wachtwoord te wijzigen in een beveiligd dialoogvenster.",
     "settings.currentEmail": "Huidig e-mailadres",
     "settings.newEmail": "Nieuw e-mailadres",
     "settings.currentPassword": "Huidig wachtwoord",
@@ -4955,16 +5111,19 @@ const localeExtrasSource = {
     "settings.changeEmail": "E-mail wijzigen",
     "settings.changePassword": "Wachtwoord wijzigen",
     "settings.changeEmailTitle": "E-mail wijzigen",
-    "settings.changeEmailHint": "Voer een nieuw e-mailadres in en bevestig met je huidige wachtwoord.",
+    "settings.changeEmailHint":
+      "Voer een nieuw e-mailadres in en bevestig met je huidige wachtwoord.",
     "settings.changePasswordTitle": "Wachtwoord wijzigen",
     "settings.changePasswordHint": "Kies een nieuw wachtwoord om in te loggen bij Boatstead.",
     "settings.emailUpdated": "E-mail bijgewerkt",
     "settings.passwordUpdated": "Wachtwoord bijgewerkt",
     "settings.passwordMismatch": "De nieuwe wachtwoorden komen niet overeen.",
     "settings.sameEmail": "Voer een ander e-mailadres in.",
-    "settings.accountCredentialsUnavailable": "Wachtwoordwijzigingen vereisen een account via e-mailregistratie. Meld u aan met e-mail en probeer opnieuw.",
+    "settings.accountCredentialsUnavailable":
+      "Wachtwoordwijzigingen vereisen een account via e-mailregistratie. Meld u aan met e-mail en probeer opnieuw.",
     "settings.emailsTitle": "E-mailmeldingen",
-    "settings.emailsHint": "Kies voor welke gebeurtenissen u een e-mail ontvangt. U kunt dit op elk moment wijzigen.",
+    "settings.emailsHint":
+      "Kies voor welke gebeurtenissen u een e-mail ontvangt. U kunt dit op elk moment wijzigen.",
     "settings.email.newApplications": "Nieuwe aanvragen voor mijn boten",
     "settings.email.applicationUpdates": "Updates over sits waarop ik heb gesolliciteerd",
     "settings.email.messages": "Nieuwe berichten in mijn gesprekken",
@@ -4974,26 +5133,31 @@ const localeExtrasSource = {
     "safetyActions.block": "Blokkeren",
     "safetyActions.unblock": "Deblokkeren",
     "safetyActions.reportTitle": "{{name}} melden?",
-    "safetyActions.reportText": "Vertel ons wat er is gebeurd. Meldingen worden door Boatstead beoordeeld en niet gedeeld met het gemelde lid.",
+    "safetyActions.reportText":
+      "Vertel ons wat er is gebeurd. Meldingen worden door Boatstead beoordeeld en niet gedeeld met het gemelde lid.",
     "safetyActions.reportReason": "Reden",
     "safetyActions.reportDetails": "Details",
     "safetyActions.reportDetailsPlaceholder": "Voeg nuttige context toe",
     "safetyActions.reportDetailsRequired": "Voeg een korte beschrijving toe voor deze reden.",
     "safetyActions.reportSubmit": "Melding versturen",
     "safetyActions.reportThanksTitle": "Melding verstuurd",
-    "safetyActions.reportThanksText": "Bedankt. We hebben uw melding over {{name}} ontvangen en zullen deze beoordelen.",
+    "safetyActions.reportThanksText":
+      "Bedankt. We hebben uw melding over {{name}} ontvangen en zullen deze beoordelen.",
     "safetyActions.blockTitle": "{{name}} blokkeren?",
-    "safetyActions.blockText": "Deze persoon kan u niet meer makkelijk contacteren, en u kunt de blokkering altijd opheffen in Instellingen.",
+    "safetyActions.blockText":
+      "Deze persoon kan u niet meer makkelijk contacteren, en u kunt de blokkering altijd opheffen in Instellingen.",
     "safetyActions.blockConfirm": "Ja, blokkeren",
     "safetyActions.blockedBannerTitle": "U heeft dit lid geblokkeerd",
-    "safetyActions.blockedBannerText": "{{name}} staat op uw blokkeerlijst. U kunt deblokkeren hier of in Instellingen.",
+    "safetyActions.blockedBannerText":
+      "{{name}} staat op uw blokkeerlijst. U kunt deblokkeren hier of in Instellingen.",
     "safetyActions.reason.spam": "Spam of ongewenst contact",
     "safetyActions.reason.harassment": "Intimidatie of misbruik",
     "safetyActions.reason.scam": "Oplichting of fraude",
     "safetyActions.reason.inappropriate": "Ongepaste inhoud of gedrag",
     "safetyActions.reason.other": "Iets anders",
     "settings.blockedUsersTitle": "Geblokkeerde accounts",
-    "settings.blockedUsersHint": "Leden die u heeft geblokkeerd. Deblokkeren herstelt normaal contact.",
+    "settings.blockedUsersHint":
+      "Leden die u heeft geblokkeerd. Deblokkeren herstelt normaal contact.",
     "settings.blockedUsersEmpty": "U heeft nog niemand geblokkeerd.",
     "settings.blockedOn": "Geblokkeerd op {{date}}",
     "settings.dangerZone": "Gevarenzone",
@@ -5423,7 +5587,8 @@ const localeExtrasSource = {
       "Entre ou crie uma conta para guardar estadias na sua lista e encontrá-las mais tarde.",
     "saved.showAll": "Mostrar tudo, incluindo sitter escolhido, concluídas, etc.",
     "saved.emptyFiltered": "Nenhuma estadia guardada aberta",
-    "saved.emptyFilteredHint": "A sua lista só tem estadias com sitter escolhido ou concluídas. Marque a caixa acima para as ver.",
+    "saved.emptyFilteredHint":
+      "A sua lista só tem estadias com sitter escolhido ou concluídas. Marque a caixa acima para as ver.",
     "editorPreview.kicker": "Pré-visualização em direto",
     "editorPreview.title": "Como vai ficar",
     "editorPreview.label": "Pré-visualização em direto",
@@ -5495,7 +5660,8 @@ const localeExtrasSource = {
     "notFound.text": "Essa página não está em nosso gráfico.",
     "notFound.back": "De volta ao porto",
     "errorBoundary.title": "Algo correu mal",
-    "errorBoundary.text": "Ocorreu um problema inesperado. Tente novamente ou volte à página inicial.",
+    "errorBoundary.text":
+      "Ocorreu um problema inesperado. Tente novamente ou volte à página inicial.",
     "errorBoundary.tryAgain": "Tentar novamente",
     "errorBoundary.goHome": "Ir para o início",
     "profile.settings": "Perfil público",
@@ -5527,12 +5693,14 @@ const localeExtrasSource = {
     "profile.save": "Salvar perfil",
     "member.member": "Membro Boatstead",
     "member.signInTitle": "Faça login para ver perfis",
-    "member.signInText": "Os perfis dos membros só são visíveis para membros conectados do Boatstead.",
+    "member.signInText":
+      "Os perfis dos membros só são visíveis para membros conectados do Boatstead.",
     "member.message": "Mensagem",
     "member.identityVerified": "Identidade verificada",
     "verification.identityVerified": "Identidade verificada",
     "verification.confirmIdentity": "Confirme a sua identidade",
-    "verification.verifiedHint": "A Boatstead confirmou o documento de identidade, o e-mail e o telefone deste membro.",
+    "verification.verifiedHint":
+      "A Boatstead confirmou o documento de identidade, o e-mail e o telefone deste membro.",
     "verification.selfHint": "Conclua cada item abaixo para aumentar a confiança no seu perfil.",
     "verification.partialHint": "{{count}} de {{total}} verificações confirmadas até agora.",
     "verification.governmentId": "Documento de identidade oficial",
@@ -5541,9 +5709,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "verificado",
     "verification.statusMissing": "não verificado",
     "verification.verifyGovernmentId": "Verificar documento de identidade",
-    "verification.addEmailAndPhone": "Adicione um e-mail e um telefone no perfil para concluir a verificação.",
-    "verification.addPhone": "Adicione um número de telefone no perfil para concluir a verificação.",
-    "verification.addEmail": "Adicione um endereço de e-mail no perfil para concluir a verificação.",
+    "verification.addEmailAndPhone":
+      "Adicione um e-mail e um telefone no perfil para concluir a verificação.",
+    "verification.addPhone":
+      "Adicione um número de telefone no perfil para concluir a verificação.",
+    "verification.addEmail":
+      "Adicione um endereço de e-mail no perfil para concluir a verificação.",
     "member.verificationNeeded": "Verificação necessária",
     "member.reviews_one": "1 avaliação",
     "member.reviews_other": "{{count}} avaliações",
@@ -5586,7 +5757,8 @@ const localeExtrasSource = {
     "owner.sitSummary":
       "{{duration}} · Candidatos {{applicants}} · Tarefas de atendimento {{tasks}}",
     "owner.sitPhaseFilter": "Filtrar estadias por fase",
-    "owner.sitPhaseFilterHint": "As estadias são agrupadas por fase. Use o filtro para focar numa etapa.",
+    "owner.sitPhaseFilterHint":
+      "As estadias são agrupadas por fase. Use o filtro para focar numa etapa.",
     "owner.sitPhaseFilterAll": "Todas as fases",
     "owner.sitPhaseEmpty": "Sem estadias nesta fase",
     "owner.sitPhaseCount_one": "1 estadia",
@@ -5605,7 +5777,8 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Adicione um barco antes de criar uma estadia.",
     "owner.sitRequiresBoatTooltip":
       "Crie primeiro um barco. Clique aqui para adicionar o seu primeiro barco.",
-    "owner.sitRequiresVerificationTooltip": "Verifique a sua identidade antes de criar uma estadia. Abra o seu perfil para concluir a verificação.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verifique a sua identidade antes de criar uma estadia. Abra o seu perfil para concluir a verificação.",
     "owner.deleteBoatLabel": "Excluir {{boat}}",
     "owner.deleteBoatTitle": "Excluir {{boat}}?",
     "owner.deleteBoatConfirm": "Esta ação remove o barco permanentemente e não pode ser desfeita.",
@@ -5621,14 +5794,20 @@ const localeExtrasSource = {
     "owner.deleteSitError": "Esta estadia não pôde ser excluída. Tente novamente.",
     "owner.deleteSitAcceptedError":
       "Esta estadia tem um candidato aceite e já não pode ser excluída.",
-    "owner.sitDeleteUnderway": "Esta estadia está em curso e não pode ser eliminada. Contacte o suporte se precisar de ajuda.",
-    "owner.deleteSitApplicantsWarning_one": "Esta estadia tem 1 candidatura neste momento. Eliminá-la remove o anúncio para quem se candidatou.",
-    "owner.deleteSitApplicantsWarning_other": "Esta estadia tem {{count}} candidaturas neste momento. Eliminá-la remove o anúncio para quem se candidatou.",
-    "owner.deleteSitAcceptedWarning": "Alguém já foi aceite para esta estadia. Informe essa pessoa antes de a eliminar.",
-    "owner.deleteSitCompletedError": "Estadias concluídas não podem ser eliminadas. Arquive-as em vez disso.",
+    "owner.sitDeleteUnderway":
+      "Esta estadia está em curso e não pode ser eliminada. Contacte o suporte se precisar de ajuda.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Esta estadia tem 1 candidatura neste momento. Eliminá-la remove o anúncio para quem se candidatou.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Esta estadia tem {{count}} candidaturas neste momento. Eliminá-la remove o anúncio para quem se candidatou.",
+    "owner.deleteSitAcceptedWarning":
+      "Alguém já foi aceite para esta estadia. Informe essa pessoa antes de a eliminar.",
+    "owner.deleteSitCompletedError":
+      "Estadias concluídas não podem ser eliminadas. Arquive-as em vez disso.",
     "owner.archiveSitLabel": "Arquivar estadia de {{boat}}",
     "owner.archiveSitTitle": "Arquivar esta estadia?",
-    "owner.archiveSitConfirm": "Arquivar a estadia {{dates}} de {{boat}}? Pode encontrá-la mais tarde em Arquivadas.",
+    "owner.archiveSitConfirm":
+      "Arquivar a estadia {{dates}} de {{boat}}? Pode encontrá-la mais tarde em Arquivadas.",
     "owner.archiveSitAction": "Sim, arquivar",
     "owner.unarchiveSit": "Mover para estadias ativas",
     "owner.unarchiveSitLabel": "Restaurar estadia de {{boat}}",
@@ -5669,7 +5848,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Visualização da capa do barco",
     "vesselEditor.noCover": "Ainda não há imagem de capa",
     "vesselEditor.gallery": "Mais fotos",
-    "vesselEditor.galleryHint": "Carregue fotos adicionais do barco, da marina e da vida a bordo. As legendas são opcionais.",
+    "vesselEditor.galleryHint":
+      "Carregue fotos adicionais do barco, da marina e da vida a bordo. As legendas são opcionais.",
     "vesselEditor.galleryCaption": "Legenda",
     "vesselEditor.galleryCaptionPlaceholder": "Legenda opcional",
     "vesselEditor.galleryEmpty": "Ainda sem fotos adicionais",
@@ -5687,7 +5867,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "O que está disponível?",
     "vesselEditor.featuresHint":
       "Selecione tudo o que os assistentes podem usar a bordo ou na marina.",
-        "vesselEditor.privateAccessTitle": "Detalhes de acesso privados",
+    "vesselEditor.privateAccessTitle": "Detalhes de acesso privados",
     "vesselEditor.privateAccessHint":
       "Partilhados apenas com boat-sitters confirmados depois de aceitar a candidatura. Guarde aqui palavras-passe Wi-Fi, códigos de acesso e detalhes semelhantes.",
     "vesselEditor.wifiNetwork": "Rede Wi-Fi",
@@ -5723,11 +5903,13 @@ const localeExtrasSource = {
       "JPG, PNG ou WebP até 10 MB. Imagens grandes são redimensionadas antes de serem salvas.",
     "upload.uploadMultiple": "Carregar fotos",
     "upload.processingMultiple": "A processar fotos…",
-    "upload.hintMultiple": "JPG, PNG ou WebP até 10 MB cada. Imagens grandes são redimensionadas antes de guardar.",
+    "upload.hintMultiple":
+      "JPG, PNG ou WebP até 10 MB cada. Imagens grandes são redimensionadas antes de guardar.",
     "sitEditor.kicker": "Disponibilidade de assento",
     "sitEditor.editTitle": "Editar assento de barco",
     "sitEditor.lockedBannerTitle": "Edição bloqueada",
-    "sitEditor.lockedBanner": "Esta estadia já recebeu candidaturas, por isso os detalhes já não podem ser alterados. Ainda pode rever candidaturas e escrever aos cuidadores.",
+    "sitEditor.lockedBanner":
+      "Esta estadia já recebeu candidaturas, por isso os detalhes já não podem ser alterados. Ainda pode rever candidaturas e escrever aos cuidadores.",
     "sitEditor.createTitle": "Crie um assento de barco",
     "sitEditor.createShort": "Crie um assento",
     "sitEditor.createEditLimitTitle": "Editável até a primeira candidatura",
@@ -5740,8 +5922,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Tipo de estadia",
     "sitType.liveaboard": "Alojamento",
     "sitType.liveaboardShort": "Alojamento",
-    "sitType.liveaboardHint":
-      "O cuidador vive e dorme a bordo durante todo o período.",
+    "sitType.liveaboardHint": "O cuidador vive e dorme a bordo durante todo o período.",
     "sitType.daytimeChecks": "Visitas diurnas",
     "sitType.daytimeChecksShort": "Diurno",
     "sitType.daytimeChecksHint":
@@ -5758,12 +5939,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certificações",
     "sitEditor.skills": "Habilidades práticas",
     "sitEditor.nonSmoker": "Deve ser não fumador",
-    "sitEditor.nonSmokerHint":
-      "Exija cuidadores que não fumem a bordo nem durante a estadia.",
+    "sitEditor.nonSmokerHint": "Exija cuidadores que não fumem a bordo nem durante a estadia.",
     "requirement.nonSmoker": "Não fumador",
     "sitEditor.additional": "Requisitos adicionais de babá",
-    "sitEditor.additionalPlaceholder":
-      "Uma por linha, por exemplo duas referências recentes",
+    "sitEditor.additionalPlaceholder": "Uma por linha, por exemplo duas referências recentes",
     "sitEditor.pets": "Animais de estimação a bordo (opcional)",
     "sitEditor.petsPlaceholder": "por exemplo Pip, um terrier amante do mar",
     "sitEditor.save": "Salvar sentar",
@@ -5829,11 +6008,13 @@ const localeExtrasSource = {
     "settings.legalName": "Nome legal completo",
     "settings.legalNameHint": "Como aparece no seu documento de identificação.",
     "settings.displayNameHint": "Mostrado no seu perfil público e nas mensagens.",
-    "settings.emailReadOnlyHint": "Use a secção de início de sessão abaixo para alterar o seu e-mail.",
+    "settings.emailReadOnlyHint":
+      "Use a secção de início de sessão abaixo para alterar o seu e-mail.",
     "settings.savePersonal": "Guardar dados pessoais",
     "settings.personalSaved": "Dados pessoais guardados",
     "settings.accountTitle": "Conta",
-    "settings.accountHint": "O seu e-mail de início de sessão aparece aqui. Use os botões para alterar o e-mail ou a palavra-passe num diálogo seguro.",
+    "settings.accountHint":
+      "O seu e-mail de início de sessão aparece aqui. Use os botões para alterar o e-mail ou a palavra-passe num diálogo seguro.",
     "settings.currentEmail": "E-mail atual",
     "settings.newEmail": "Novo e-mail",
     "settings.currentPassword": "Palavra-passe atual",
@@ -5844,14 +6025,17 @@ const localeExtrasSource = {
     "settings.changeEmailTitle": "Alterar e-mail",
     "settings.changeEmailHint": "Introduza um novo e-mail e confirme com a palavra-passe atual.",
     "settings.changePasswordTitle": "Alterar palavra-passe",
-    "settings.changePasswordHint": "Escolha uma nova palavra-passe para iniciar sessão na Boatstead.",
+    "settings.changePasswordHint":
+      "Escolha uma nova palavra-passe para iniciar sessão na Boatstead.",
     "settings.emailUpdated": "E-mail atualizado",
     "settings.passwordUpdated": "Palavra-passe atualizada",
     "settings.passwordMismatch": "As novas palavras-passe não coincidem.",
     "settings.sameEmail": "Introduza um endereço de e-mail diferente.",
-    "settings.accountCredentialsUnavailable": "As alterações de palavra-passe exigem uma conta criada por e-mail. Registe-se com um e-mail e tente novamente.",
+    "settings.accountCredentialsUnavailable":
+      "As alterações de palavra-passe exigem uma conta criada por e-mail. Registe-se com um e-mail e tente novamente.",
     "settings.emailsTitle": "Notificações por e-mail",
-    "settings.emailsHint": "Escolha para que eventos recebe um e-mail. Pode alterá-los a qualquer momento.",
+    "settings.emailsHint":
+      "Escolha para que eventos recebe um e-mail. Pode alterá-los a qualquer momento.",
     "settings.email.newApplications": "Novas candidaturas nos meus barcos",
     "settings.email.applicationUpdates": "Atualizações das candidaturas que enviei",
     "settings.email.messages": "Novas mensagens nas minhas conversas",
@@ -5861,19 +6045,23 @@ const localeExtrasSource = {
     "safetyActions.block": "Bloquear",
     "safetyActions.unblock": "Desbloquear",
     "safetyActions.reportTitle": "Denunciar {{name}}?",
-    "safetyActions.reportText": "Diga-nos o que aconteceu. As denúncias são analisadas pela Boatstead e não são partilhadas com o membro denunciado.",
+    "safetyActions.reportText":
+      "Diga-nos o que aconteceu. As denúncias são analisadas pela Boatstead e não são partilhadas com o membro denunciado.",
     "safetyActions.reportReason": "Motivo",
     "safetyActions.reportDetails": "Detalhes",
     "safetyActions.reportDetailsPlaceholder": "Adicione qualquer contexto útil",
     "safetyActions.reportDetailsRequired": "Adicione uma breve descrição para este motivo.",
     "safetyActions.reportSubmit": "Enviar denúncia",
     "safetyActions.reportThanksTitle": "Denúncia enviada",
-    "safetyActions.reportThanksText": "Obrigado. Recebemos a sua denúncia sobre {{name}} e vamos analisá-la.",
+    "safetyActions.reportThanksText":
+      "Obrigado. Recebemos a sua denúncia sobre {{name}} e vamos analisá-la.",
     "safetyActions.blockTitle": "Bloquear {{name}}?",
-    "safetyActions.blockText": "Esta pessoa deixará de o conseguir contactar facilmente, e pode desbloquear em qualquer altura nas Definições.",
+    "safetyActions.blockText":
+      "Esta pessoa deixará de o conseguir contactar facilmente, e pode desbloquear em qualquer altura nas Definições.",
     "safetyActions.blockConfirm": "Sim, bloquear",
     "safetyActions.blockedBannerTitle": "Bloqueou este membro",
-    "safetyActions.blockedBannerText": "{{name}} está na sua lista de bloqueados. Pode desbloquear aqui ou nas Definições.",
+    "safetyActions.blockedBannerText":
+      "{{name}} está na sua lista de bloqueados. Pode desbloquear aqui ou nas Definições.",
     "safetyActions.reason.spam": "Spam ou contacto indesejado",
     "safetyActions.reason.harassment": "Assédio ou abuso",
     "safetyActions.reason.scam": "Burla ou fraude",
@@ -6077,8 +6265,7 @@ const localeExtrasSource = {
     "support.topic.other": "Outro",
     "support.formTitle": "Contate o suporte",
     "support.accountDetails": "A sua conta",
-    "support.accountDetailsHint":
-      "Usaremos este nome e e-mail para o seu pedido de suporte.",
+    "support.accountDetailsHint": "Usaremos este nome e e-mail para o seu pedido de suporte.",
     "support.name": "Nome",
     "support.email": "E-mail",
     "support.message": "Mensagem",
@@ -6297,7 +6484,8 @@ const localeExtrasSource = {
     "detail.viewInSits": "Δείτε στις διαμονές σας",
     "detail.ownSit": "Αυτό είναι το σκάφος σας",
     "detail.applicants_one": "1 κοπιτρός έχει υποβάλει αίτηση · Χωρίς χρέωση διανυκτέρευσης",
-    "detail.applicants_other": "{{count}} κοπιτροί έχουν υποβάλει αίτηση · Χωρίς χρέωση διανυκτέρευσης",
+    "detail.applicants_other":
+      "{{count}} κοπιτροί έχουν υποβάλει αίτηση · Χωρίς χρέωση διανυκτέρευσης",
     "experience.minimumYears": "{{count}}+ χρόνια εμπειρίας στο σκάφος",
     "duration.nights_one": "1 νύχτα",
     "duration.nights_other": "{{count}} νύχτες",
@@ -6311,12 +6499,14 @@ const localeExtrasSource = {
       "Συνδεθείτε ή δημιουργήστε λογαριασμό για να αποθηκεύσετε διαμονές στη λίστα σας και να τις βρείτε αργότερα.",
     "saved.showAll": "Εμφάνιση όλων, συμπεριλαμβανομένων επιλεγμένου sitter, ολοκληρωμένων κ.λπ.",
     "saved.emptyFiltered": "Δεν υπάρχουν ανοιχτές αποθηκευμένες διαμονές",
-    "saved.emptyFilteredHint": "Η λίστα σας έχει μόνο διαμονές με επιλεγμένο sitter ή ολοκληρωμένες. Επιλέξτε το πλαίσιο παραπάνω για να τις δείτε.",
+    "saved.emptyFilteredHint":
+      "Η λίστα σας έχει μόνο διαμονές με επιλεγμένο sitter ή ολοκληρωμένες. Επιλέξτε το πλαίσιο παραπάνω για να τις δείτε.",
     "editorPreview.kicker": "Ζωντανή προεπισκόπηση",
     "editorPreview.title": "Πώς θα φαίνεται",
     "editorPreview.label": "Ζωντανή προεπισκόπηση",
     "editorPreview.vesselHint": "Ενημερώνεται καθώς επεξεργάζεστε τα στοιχεία του σκάφους.",
-    "editorPreview.sitHint": "Ενημερώνεται καθώς επεξεργάζεστε αυτή τη διαμονή. Έτσι τη βλέπουν οι sitters.",
+    "editorPreview.sitHint":
+      "Ενημερώνεται καθώς επεξεργάζεστε αυτή τη διαμονή. Έτσι τη βλέπουν οι sitters.",
     "editorPreview.untitledBoat": "Σκάφος χωρίς όνομα",
     "editorPreview.homePortPending": "Προσθέστε λιμάνι βάσης",
     "editorPreview.lengthPending": "Μήκος σε εκκρεμότητα",
@@ -6383,7 +6573,8 @@ const localeExtrasSource = {
     "notFound.text": "Αυτή η σελίδα δεν βρίσκεται στο γράφημά μας.",
     "notFound.back": "Επιστροφή στο λιμάνι",
     "errorBoundary.title": "Κάτι πήγε στραβά",
-    "errorBoundary.text": "Προέκυψε ένα απρόσμενο πρόβλημα. Δοκιμάστε ξανά ή επιστρέψτε στην αρχική.",
+    "errorBoundary.text":
+      "Προέκυψε ένα απρόσμενο πρόβλημα. Δοκιμάστε ξανά ή επιστρέψτε στην αρχική.",
     "errorBoundary.tryAgain": "Δοκιμάστε ξανά",
     "errorBoundary.goHome": "Αρχική",
     "profile.settings": "Δημόσιο προφίλ",
@@ -6395,7 +6586,8 @@ const localeExtrasSource = {
     "profile.photoUploadHint":
       "JPG, PNG ή WebP έως 10 MB. Οι μεγάλες εικόνες αλλάζουν μέγεθος πριν από την αποθήκευση.",
     "profile.coverImage": "Εικόνα εξωφύλλου",
-    "profile.coverHint": "Προαιρετικό. Αντικαθιστά το προεπιλεγμένο banner πίσω από τη φωτογραφία σας.",
+    "profile.coverHint":
+      "Προαιρετικό. Αντικαθιστά το προεπιλεγμένο banner πίσω από τη φωτογραφία σας.",
     "profile.coverPreviewAlt": "Τρέχουσα εικόνα εξωφύλλου",
     "profile.noCover": "Δεν υπάρχει ακόμη εικόνα εξωφύλλου",
     "profile.displayName": "Εμφανιζόμενο όνομα",
@@ -6419,8 +6611,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Επαληθεύτηκε η ταυτότητα",
     "verification.identityVerified": "Επαληθεύτηκε η ταυτότητα",
     "verification.confirmIdentity": "Επιβεβαιώστε την ταυτότητά σας",
-    "verification.verifiedHint": "Το Boatstead επιβεβαίωσε την επίσημη ταυτότητα, το email και το τηλέφωνο αυτού του μέλους.",
-    "verification.selfHint": "Ολοκληρώστε κάθε στοιχείο παρακάτω για να ενισχύσετε την εμπιστοσύνη στο προφίλ σας.",
+    "verification.verifiedHint":
+      "Το Boatstead επιβεβαίωσε την επίσημη ταυτότητα, το email και το τηλέφωνο αυτού του μέλους.",
+    "verification.selfHint":
+      "Ολοκληρώστε κάθε στοιχείο παρακάτω για να ενισχύσετε την εμπιστοσύνη στο προφίλ σας.",
     "verification.partialHint": "{{count}} από {{total}} ελέγχους επιβεβαιωμένοι μέχρι στιγμής.",
     "verification.governmentId": "Επίσημη ταυτότητα",
     "verification.email": "Διεύθυνση email",
@@ -6428,9 +6622,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "επαληθευμένο",
     "verification.statusMissing": "μη επαληθευμένο",
     "verification.verifyGovernmentId": "Επαλήθευση επίσημης ταυτότητας",
-    "verification.addEmailAndPhone": "Προσθέστε email και τηλέφωνο στο προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
-    "verification.addPhone": "Προσθέστε αριθμό τηλεφώνου στο προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
-    "verification.addEmail": "Προσθέστε διεύθυνση email στο προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
+    "verification.addEmailAndPhone":
+      "Προσθέστε email και τηλέφωνο στο προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
+    "verification.addPhone":
+      "Προσθέστε αριθμό τηλεφώνου στο προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
+    "verification.addEmail":
+      "Προσθέστε διεύθυνση email στο προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
     "member.verificationNeeded": "Απαιτείται επαλήθευση",
     "member.reviews_one": "1 κριτική",
     "member.reviews_other": "{{count}} κριτικές",
@@ -6471,7 +6668,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} περίοδοι διαμονής",
     "owner.sitSummary": "{{duration}} · {{applicants}} αιτούντες · {{tasks}} εργασίες φροντίδας",
     "owner.sitPhaseFilter": "Φιλτράρισμα διαμονών ανά φάση",
-    "owner.sitPhaseFilterHint": "Οι διαμονές ομαδοποιούνται ανά φάση. Χρησιμοποιήστε το φίλτρο για μία φάση.",
+    "owner.sitPhaseFilterHint":
+      "Οι διαμονές ομαδοποιούνται ανά φάση. Χρησιμοποιήστε το φίλτρο για μία φάση.",
     "owner.sitPhaseFilterAll": "Όλες οι φάσεις",
     "owner.sitPhaseEmpty": "Δεν υπάρχουν διαμονές σε αυτή τη φάση",
     "owner.sitPhaseCount_one": "1 διαμονή",
@@ -6491,30 +6689,40 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Προσθέστε ένα σκάφος πριν δημιουργήσετε μια διαμονή.",
     "owner.sitRequiresBoatTooltip":
       "Δημιουργήστε πρώτα ένα σκάφος. Κάντε κλικ εδώ για να προσθέσετε το πρώτο σας σκάφος.",
-    "owner.sitRequiresVerificationTooltip": "Επαληθεύστε την ταυτότητά σας πριν δημιουργήσετε μια φύλαξη. Ανοίξτε το προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
+    "owner.sitRequiresVerificationTooltip":
+      "Επαληθεύστε την ταυτότητά σας πριν δημιουργήσετε μια φύλαξη. Ανοίξτε το προφίλ σας για να ολοκληρώσετε την επαλήθευση.",
     "owner.deleteBoatLabel": "Διαγραφή {{boat}}",
     "owner.deleteBoatTitle": "Διαγραφή {{boat}};",
-    "owner.deleteBoatConfirm": "Αυτή η ενέργεια αφαιρεί οριστικά το σκάφος και δεν μπορεί να αναιρεθεί.",
+    "owner.deleteBoatConfirm":
+      "Αυτή η ενέργεια αφαιρεί οριστικά το σκάφος και δεν μπορεί να αναιρεθεί.",
     "owner.deleteSitLabel": "Διαγραφή {{boat}} sit",
     "owner.deleteSitTitle": "Διαγραφή αυτής της διαμονής;",
     "owner.deleteSitConfirm": "Διαγραφή της διαμονής {{dates}} για {{boat}};",
     "owner.deleteConfirmAction": "Ναι, διαγραφή",
     "owner.deleteBlocked": "Διαγράψτε πρώτα όλες τις θέσεις για αυτό το σκάφος",
     "owner.sitEditLocked": "Αυτή η φύλαξη έχει αιτούντες και δεν μπορεί πλέον να επεξεργαστεί",
-    "owner.sitEditLockedBanner": "Υπάρχουν αιτούντες, επομένως αυτή η φύλαξη δεν μπορεί πλέον να επεξεργαστεί.",
-    "owner.sitDeleteLocked": "Αυτή η φύλαξη έχει αποδεκτό υποψήφιο και δεν μπορεί πλέον να διαγραφεί",
+    "owner.sitEditLockedBanner":
+      "Υπάρχουν αιτούντες, επομένως αυτή η φύλαξη δεν μπορεί πλέον να επεξεργαστεί.",
+    "owner.sitDeleteLocked":
+      "Αυτή η φύλαξη έχει αποδεκτό υποψήφιο και δεν μπορεί πλέον να διαγραφεί",
     "owner.deleteError": "Δεν ήταν δυνατή η διαγραφή του σκάφους. Δοκιμάστε ξανά.",
     "owner.deleteSitError": "Δεν ήταν δυνατή η διαγραφή αυτής της φύλαξης. Δοκιμάστε ξανά.",
     "owner.deleteSitAcceptedError":
       "Αυτή η φύλαξη έχει αποδεκτό υποψήφιο και δεν μπορεί πλέον να διαγραφεί.",
-    "owner.sitDeleteUnderway": "Αυτή η διαμονή είναι σε εξέλιξη και δεν μπορεί να διαγραφεί. Επικοινωνήστε με την υποστήριξη αν χρειάζεστε βοήθεια.",
-    "owner.deleteSitApplicantsWarning_one": "Αυτή η διαμονή έχει 1 αίτηση αυτή τη στιγμή. Η διαγραφή αφαιρεί την αγγελία για όσους υπέβαλαν αίτηση.",
-    "owner.deleteSitApplicantsWarning_other": "Αυτή η διαμονή έχει {{count}} αιτήσεις αυτή τη στιγμή. Η διαγραφή αφαιρεί την αγγελία για όσους υπέβαλαν αίτηση.",
-    "owner.deleteSitAcceptedWarning": "Κάποιος έχει ήδη γίνει αποδεκτός για αυτή τη διαμονή. Ενημερώστε τον πριν τη διαγράψετε.",
-    "owner.deleteSitCompletedError": "Οι ολοκληρωμένες διαμονές δεν μπορούν να διαγραφούν. Αρχειοθετήστε τις αντ’ αυτού.",
+    "owner.sitDeleteUnderway":
+      "Αυτή η διαμονή είναι σε εξέλιξη και δεν μπορεί να διαγραφεί. Επικοινωνήστε με την υποστήριξη αν χρειάζεστε βοήθεια.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Αυτή η διαμονή έχει 1 αίτηση αυτή τη στιγμή. Η διαγραφή αφαιρεί την αγγελία για όσους υπέβαλαν αίτηση.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Αυτή η διαμονή έχει {{count}} αιτήσεις αυτή τη στιγμή. Η διαγραφή αφαιρεί την αγγελία για όσους υπέβαλαν αίτηση.",
+    "owner.deleteSitAcceptedWarning":
+      "Κάποιος έχει ήδη γίνει αποδεκτός για αυτή τη διαμονή. Ενημερώστε τον πριν τη διαγράψετε.",
+    "owner.deleteSitCompletedError":
+      "Οι ολοκληρωμένες διαμονές δεν μπορούν να διαγραφούν. Αρχειοθετήστε τις αντ’ αυτού.",
     "owner.archiveSitLabel": "Αρχειοθέτηση διαμονής {{boat}}",
     "owner.archiveSitTitle": "Αρχειοθέτηση αυτής της διαμονής;",
-    "owner.archiveSitConfirm": "Να αρχειοθετηθεί η διαμονή {{dates}} για {{boat}}; Θα τη βρείτε αργότερα στα Αρχειοθετημένα.",
+    "owner.archiveSitConfirm":
+      "Να αρχειοθετηθεί η διαμονή {{dates}} για {{boat}}; Θα τη βρείτε αργότερα στα Αρχειοθετημένα.",
     "owner.archiveSitAction": "Ναι, αρχειοθέτηση",
     "owner.unarchiveSit": "Μετακίνηση στις ενεργές διαμονές",
     "owner.unarchiveSitLabel": "Επαναφορά διαμονής {{boat}}",
@@ -6555,7 +6763,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Προεπισκόπηση κάλυψης σκάφους",
     "vesselEditor.noCover": "Δεν υπάρχει ακόμα εικόνα εξωφύλλου",
     "vesselEditor.gallery": "Περισσότερες φωτογραφίες",
-    "vesselEditor.galleryHint": "Ανεβάστε επιπλέον φωτογραφίες του σκάφους, της μαρίνας και της ζωής στο σκάφος. Οι λεζάντες είναι προαιρετικές.",
+    "vesselEditor.galleryHint":
+      "Ανεβάστε επιπλέον φωτογραφίες του σκάφους, της μαρίνας και της ζωής στο σκάφος. Οι λεζάντες είναι προαιρετικές.",
     "vesselEditor.galleryCaption": "Λεζάντα",
     "vesselEditor.galleryCaptionPlaceholder": "Προαιρετική λεζάντα",
     "vesselEditor.galleryEmpty": "Δεν υπάρχουν ακόμη επιπλέον φωτογραφίες",
@@ -6574,7 +6783,7 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Τι είναι διαθέσιμο;",
     "vesselEditor.featuresHint":
       "Επιλέξτε όλα όσα μπορούν να χρησιμοποιήσουν οι κάτοικοι στο πλοίο ή στη μαρίνα.",
-        "vesselEditor.privateAccessTitle": "Ιδιωτικά στοιχεία πρόσβασης",
+    "vesselEditor.privateAccessTitle": "Ιδιωτικά στοιχεία πρόσβασης",
     "vesselEditor.privateAccessHint":
       "Κοινοποιούνται μόνο σε επιβεβαιωμένους φύλακες αφού αποδεχτείτε την αίτησή τους. Κρατήστε εδώ κωδικούς Wi-Fi, κωδικούς πρόσβασης και παρόμοια στοιχεία.",
     "vesselEditor.wifiNetwork": "Δίκτυο Wi-Fi",
@@ -6611,11 +6820,13 @@ const localeExtrasSource = {
       "JPG, PNG ή WebP έως 10 MB. Οι μεγάλες εικόνες αλλάζουν μέγεθος πριν από την αποθήκευση.",
     "upload.uploadMultiple": "Μεταφόρτωση φωτογραφιών",
     "upload.processingMultiple": "Επεξεργασία φωτογραφιών…",
-    "upload.hintMultiple": "JPG, PNG ή WebP έως 10 MB η καθεμία. Οι μεγάλες εικόνες αλλάζουν μέγεθος πριν την αποθήκευση.",
+    "upload.hintMultiple":
+      "JPG, PNG ή WebP έως 10 MB η καθεμία. Οι μεγάλες εικόνες αλλάζουν μέγεθος πριν την αποθήκευση.",
     "sitEditor.kicker": "Διαθεσιμότητα καθιστικού",
     "sitEditor.editTitle": "Επεξεργαστείτε το καράβι",
     "sitEditor.lockedBannerTitle": "Η επεξεργασία είναι κλειδωμένη",
-    "sitEditor.lockedBanner": "Αυτή η φύλαξη έχει λάβει αιτήσεις, επομένως τα στοιχεία της δεν μπορούν πλέον να αλλάξουν. Μπορείτε ακόμα να ελέγξετε αιτήσεις και να στείλετε μηνύματα στους φύλακες.",
+    "sitEditor.lockedBanner":
+      "Αυτή η φύλαξη έχει λάβει αιτήσεις, επομένως τα στοιχεία της δεν μπορούν πλέον να αλλάξουν. Μπορείτε ακόμα να ελέγξετε αιτήσεις και να στείλετε μηνύματα στους φύλακες.",
     "sitEditor.createTitle": "Δημιουργήστε μια βάρκα",
     "sitEditor.createShort": "Δημιουργήστε ένα κάθισμα",
     "sitEditor.createEditLimitTitle": "Επεξεργάσιμο μέχρι την πρώτη αίτηση",
@@ -6629,8 +6840,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Τύπος φύλαξης",
     "sitType.liveaboard": "Διαμονή",
     "sitType.liveaboardShort": "Διαμονή",
-    "sitType.liveaboardHint":
-      "Ο φύλακας ζει και κοιμάται στο σκάφος καθ' όλη τη διάρκεια.",
+    "sitType.liveaboardHint": "Ο φύλακας ζει και κοιμάται στο σκάφος καθ' όλη τη διάρκεια.",
     "sitType.daytimeChecks": "Ημερήσιοι έλεγχοι",
     "sitType.daytimeChecksShort": "Ημέρα",
     "sitType.daytimeChecksHint":
@@ -6651,14 +6861,14 @@ const localeExtrasSource = {
       "Απαιτήστε φροντιστές που δεν καπνίζουν στο σκάφος ή κατά τη διαμονή.",
     "requirement.nonSmoker": "Μη καπνιστής",
     "sitEditor.additional": "Πρόσθετες απαιτήσεις για τη φροντίδα",
-    "sitEditor.additionalPlaceholder":
-      "Μία ανά γραμμή, για παράδειγμα δύο πρόσφατες αναφορές",
+    "sitEditor.additionalPlaceholder": "Μία ανά γραμμή, για παράδειγμα δύο πρόσφατες αναφορές",
     "sitEditor.pets": "Κατοικίδια στο πλοίο (προαιρετικά)",
     "sitEditor.petsPlaceholder": "για παράδειγμα ο Pip, ένα τεριέ που αγαπά τη θάλασσα",
     "sitEditor.save": "Αποθήκευση καθίστε",
     "sitEditor.publish": "Δημοσίευση καθίσει",
     "sitEditor.publishBlocked": "Ακόμα χρειάζεται: {{items}}",
-    "sitEditor.verificationRequiredTitle": "Επαληθεύστε την ταυτότητά σας για να δημιουργήσετε φύλαξη",
+    "sitEditor.verificationRequiredTitle":
+      "Επαληθεύστε την ταυτότητά σας για να δημιουργήσετε φύλαξη",
     "sitEditor.verificationRequiredText":
       "Επιβεβαιώστε την ταυτότητα, το email και τον αριθμό τηλεφώνου πριν δημοσιεύσετε μια φύλαξη σκάφους.",
     "sitEditor.verificationRequiredCta": "Ολοκληρώστε την επαλήθευση στο προφίλ σας",
@@ -6721,11 +6931,13 @@ const localeExtrasSource = {
     "settings.legalName": "Πλήρες νόμιμο όνομα",
     "settings.legalNameHint": "Όπως εμφανίζεται στο επίσημο ταυτότητάς σας.",
     "settings.displayNameHint": "Εμφανίζεται στο δημόσιο προφίλ και στα μηνύματα.",
-    "settings.emailReadOnlyHint": "Χρησιμοποιήστε την ενότητα σύνδεσης παρακάτω για να αλλάξετε το e-mail σας.",
+    "settings.emailReadOnlyHint":
+      "Χρησιμοποιήστε την ενότητα σύνδεσης παρακάτω για να αλλάξετε το e-mail σας.",
     "settings.savePersonal": "Αποθήκευση προσωπικών στοιχείων",
     "settings.personalSaved": "Τα προσωπικά στοιχεία αποθηκεύτηκαν",
     "settings.accountTitle": "Λογαριασμός",
-    "settings.accountHint": "Το email σύνδεσής σας εμφανίζεται εδώ. Χρησιμοποιήστε τα κουμπιά για αλλαγή email ή κωδικού σε ασφαλές παράθυρο.",
+    "settings.accountHint":
+      "Το email σύνδεσής σας εμφανίζεται εδώ. Χρησιμοποιήστε τα κουμπιά για αλλαγή email ή κωδικού σε ασφαλές παράθυρο.",
     "settings.currentEmail": "Τρέχον email",
     "settings.newEmail": "Νέο email",
     "settings.currentPassword": "Τρέχων κωδικός",
@@ -6741,9 +6953,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Ο κωδικός ενημερώθηκε",
     "settings.passwordMismatch": "Οι νέοι κωδικοί δεν ταιριάζουν.",
     "settings.sameEmail": "Εισαγάγετε διαφορετική διεύθυνση email.",
-    "settings.accountCredentialsUnavailable": "Οι αλλαγές κωδικού απαιτούν λογαριασμό με εγγραφή email. Εγγραφείτε με email και δοκιμάστε ξανά.",
+    "settings.accountCredentialsUnavailable":
+      "Οι αλλαγές κωδικού απαιτούν λογαριασμό με εγγραφή email. Εγγραφείτε με email και δοκιμάστε ξανά.",
     "settings.emailsTitle": "Ειδοποιήσεις email",
-    "settings.emailsHint": "Επιλέξτε για ποια συμβάντα λαμβάνετε email. Μπορείτε να τα αλλάξετε οποιαδήποτε στιγμή.",
+    "settings.emailsHint":
+      "Επιλέξτε για ποια συμβάντα λαμβάνετε email. Μπορείτε να τα αλλάξετε οποιαδήποτε στιγμή.",
     "settings.email.newApplications": "Νέες αιτήσεις στα σκάφη μου",
     "settings.email.applicationUpdates": "Ενημερώσεις για φύλαξεις στις οποίες αιτήθηκα",
     "settings.email.messages": "Νέα μηνύματα στις συνομιλίες μου",
@@ -6753,26 +6967,31 @@ const localeExtrasSource = {
     "safetyActions.block": "Αποκλεισμός",
     "safetyActions.unblock": "Άρση αποκλεισμού",
     "safetyActions.reportTitle": "Αναφορά του {{name}};",
-    "safetyActions.reportText": "Πείτε μας τι συνέβη. Οι αναφορές εξετάζονται από το Boatstead και δεν κοινοποιούνται στο μέλος που αναφέρεται.",
+    "safetyActions.reportText":
+      "Πείτε μας τι συνέβη. Οι αναφορές εξετάζονται από το Boatstead και δεν κοινοποιούνται στο μέλος που αναφέρεται.",
     "safetyActions.reportReason": "Λόγος",
     "safetyActions.reportDetails": "Λεπτομέρειες",
     "safetyActions.reportDetailsPlaceholder": "Προσθέστε χρήσιμο πλαίσιο",
     "safetyActions.reportDetailsRequired": "Προσθέστε μια σύντομη περιγραφή για αυτόν τον λόγο.",
     "safetyActions.reportSubmit": "Υποβολή αναφοράς",
     "safetyActions.reportThanksTitle": "Η αναφορά υποβλήθηκε",
-    "safetyActions.reportThanksText": "Ευχαριστούμε. Λάβαμε την αναφορά σας για τον/την {{name}} και θα την εξετάσουμε.",
+    "safetyActions.reportThanksText":
+      "Ευχαριστούμε. Λάβαμε την αναφορά σας για τον/την {{name}} και θα την εξετάσουμε.",
     "safetyActions.blockTitle": "Αποκλεισμός του {{name}};",
-    "safetyActions.blockText": "Δεν θα μπορεί πλέον να επικοινωνεί εύκολα μαζί σας και μπορείτε να άρετε τον αποκλεισμό οποιαδήποτε στιγμή στις Ρυθμίσεις.",
+    "safetyActions.blockText":
+      "Δεν θα μπορεί πλέον να επικοινωνεί εύκολα μαζί σας και μπορείτε να άρετε τον αποκλεισμό οποιαδήποτε στιγμή στις Ρυθμίσεις.",
     "safetyActions.blockConfirm": "Ναι, αποκλεισμός",
     "safetyActions.blockedBannerTitle": "Έχετε αποκλείσει αυτό το μέλος",
-    "safetyActions.blockedBannerText": "Ο/Η {{name}} είναι στη λίστα αποκλεισμού σας. Μπορείτε να άρετε τον αποκλεισμό εδώ ή στις Ρυθμίσεις.",
+    "safetyActions.blockedBannerText":
+      "Ο/Η {{name}} είναι στη λίστα αποκλεισμού σας. Μπορείτε να άρετε τον αποκλεισμό εδώ ή στις Ρυθμίσεις.",
     "safetyActions.reason.spam": "Ανεπιθύμητα μηνύματα ή επαφή",
     "safetyActions.reason.harassment": "Παρενόχληση ή κακοποίηση",
     "safetyActions.reason.scam": "Απάτη ή εξαπάτηση",
     "safetyActions.reason.inappropriate": "Ακατάλληλο περιεχόμενο ή συμπεριφορά",
     "safetyActions.reason.other": "Κάτι άλλο",
     "settings.blockedUsersTitle": "Αποκλεισμένοι λογαριασμοί",
-    "settings.blockedUsersHint": "Μέλη που έχετε αποκλείσει. Η άρση αποκλεισμού επαναφέρει την κανονική επικοινωνία.",
+    "settings.blockedUsersHint":
+      "Μέλη που έχετε αποκλείσει. Η άρση αποκλεισμού επαναφέρει την κανονική επικοινωνία.",
     "settings.blockedUsersEmpty": "Δεν έχετε αποκλείσει κανέναν ακόμη.",
     "settings.blockedOn": "Αποκλείστηκε στις {{date}}",
     "settings.dangerZone": "Επικίνδυνη ζώνη",
@@ -7054,7 +7273,8 @@ const localeExtrasSource = {
     "admin.tab.users": "Χρήστες",
     "admin.tab.audit": "Αρχείο ελέγχου",
     "admin.signInTitle": "Συνδεθείτε για να ανοίξετε τη Διαχείριση",
-    "admin.signInText": "Τα εργαλεία διαχείρισης είναι διαθέσιμα μόνο σε συνδεδεμένους υπερ-χρήστες.",
+    "admin.signInText":
+      "Τα εργαλεία διαχείρισης είναι διαθέσιμα μόνο σε συνδεδεμένους υπερ-χρήστες.",
     "admin.deniedTitle": "Απαιτείται πρόσβαση διαχειριστή",
     "admin.deniedText": "Ο λογαριασμός σας δεν έχει δικαίωμα διαχείρισης χρηστών.",
     "admin.usersEmpty": "Κανένας χρήστης δεν ταιριάζει με αυτή την αναζήτηση.",
@@ -7089,7 +7309,8 @@ const localeExtrasSource = {
     "admin.audit.action.user.enable": "Ο χρήστης ενεργοποιήθηκε",
     "admin.audit.action.role.change": "Ο ρόλος άλλαξε",
     "admin.error.notFound": "Δεν ήταν δυνατή η εύρεση αυτού του χρήστη.",
-    "admin.error.cannotDeleteSelf": "Δεν μπορείτε να διαγράψετε τον δικό σας λογαριασμό διαχειριστή.",
+    "admin.error.cannotDeleteSelf":
+      "Δεν μπορείτε να διαγράψετε τον δικό σας λογαριασμό διαχειριστή.",
     "admin.error.cannotDemoteSelf": "Δεν μπορείτε να αφαιρέσετε τον δικό σας ρόλο διαχειριστή.",
     "admin.error.generic": "Κάτι πήγε στραβά. Δοκιμάστε ξανά.",
     "admin.usersCount_few": "{{count}} χρήστες",
@@ -7205,7 +7426,8 @@ const localeExtrasSource = {
       "Prijavite se ili stvorite račun kako biste spremili boravke na svoj uži izbor i kasnije ih pronašli.",
     "saved.showAll": "Prikaži sve, uključujući odabranog sittera, završene itd.",
     "saved.emptyFiltered": "Nema otvorenih spremljenih boravaka",
-    "saved.emptyFilteredHint": "Vaš uži izbor ima samo boravke s odabranim sitterom ili završene. Označite gornji okvir da ih vidite.",
+    "saved.emptyFilteredHint":
+      "Vaš uži izbor ima samo boravke s odabranim sitterom ili završene. Označite gornji okvir da ih vidite.",
     "editorPreview.kicker": "Pregled uživo",
     "editorPreview.title": "Kako će izgledati",
     "editorPreview.label": "Pregled uživo",
@@ -7277,7 +7499,8 @@ const localeExtrasSource = {
     "notFound.text": "Ta stranica nije na našem grafikonu.",
     "notFound.back": "Povratak u luku",
     "errorBoundary.title": "Nešto je pošlo po zlu",
-    "errorBoundary.text": "Dogodio se neočekivani problem. Pokušajte ponovo ili se vratite na početnu stranicu.",
+    "errorBoundary.text":
+      "Dogodio se neočekivani problem. Pokušajte ponovo ili se vratite na početnu stranicu.",
     "errorBoundary.tryAgain": "Pokušaj ponovo",
     "errorBoundary.goHome": "Početna",
     "profile.settings": "Javni profil",
@@ -7312,8 +7535,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identitet potvrđen",
     "verification.identityVerified": "Identitet potvrđen",
     "verification.confirmIdentity": "Potvrdite svoj identitet",
-    "verification.verifiedHint": "Boatstead je potvrdio osobnu iskaznicu, e-mail i telefon ovog člana.",
-    "verification.selfHint": "Dovršite svaku stavku ispod kako bi drugi mogli vjerovati vašem profilu.",
+    "verification.verifiedHint":
+      "Boatstead je potvrdio osobnu iskaznicu, e-mail i telefon ovog člana.",
+    "verification.selfHint":
+      "Dovršite svaku stavku ispod kako bi drugi mogli vjerovati vašem profilu.",
     "verification.partialHint": "{{count}} od {{total}} provjera potvrđeno do sada.",
     "verification.governmentId": "Službena osobna iskaznica",
     "verification.email": "Adresa e-pošte",
@@ -7388,7 +7613,8 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Dodajte brod prije stvaranja boravka.",
     "owner.sitRequiresBoatTooltip":
       "Najprije izradite brod. Kliknite ovdje za dodavanje prvog broda.",
-    "owner.sitRequiresVerificationTooltip": "Potvrdite identitet prije stvaranja boravka. Otvorite profil kako biste dovršili provjeru.",
+    "owner.sitRequiresVerificationTooltip":
+      "Potvrdite identitet prije stvaranja boravka. Otvorite profil kako biste dovršili provjeru.",
     "owner.deleteBoatLabel": "Izbriši {{boat}}",
     "owner.deleteBoatTitle": "Izbrisati {{boat}}?",
     "owner.deleteBoatConfirm": "Ova radnja trajno uklanja brod i ne može se poništiti.",
@@ -7404,14 +7630,20 @@ const localeExtrasSource = {
     "owner.deleteSitError": "Ovo čuvanje nije se moglo izbrisati. Pokušajte ponovo.",
     "owner.deleteSitAcceptedError":
       "Ovo čuvanje ima prihvaćenog kandidata i više se ne može izbrisati.",
-    "owner.sitDeleteUnderway": "Ovaj boravak je u tijeku i ne može se izbrisati. Kontaktirajte podršku ako trebate pomoć.",
-    "owner.deleteSitApplicantsWarning_one": "Ovaj boravak trenutačno ima 1 prijavu. Brisanje uklanja oglas za sve koji su se prijavili.",
-    "owner.deleteSitApplicantsWarning_other": "Ovaj boravak trenutačno ima {{count}} prijava. Brisanje uklanja oglas za sve koji su se prijavili.",
-    "owner.deleteSitAcceptedWarning": "Netko je već prihvaćen za ovaj boravak. Obavijestite tu osobu prije brisanja.",
-    "owner.deleteSitCompletedError": "Završeni boravci ne mogu se brisati. Umjesto toga ih arhivirajte.",
+    "owner.sitDeleteUnderway":
+      "Ovaj boravak je u tijeku i ne može se izbrisati. Kontaktirajte podršku ako trebate pomoć.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Ovaj boravak trenutačno ima 1 prijavu. Brisanje uklanja oglas za sve koji su se prijavili.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Ovaj boravak trenutačno ima {{count}} prijava. Brisanje uklanja oglas za sve koji su se prijavili.",
+    "owner.deleteSitAcceptedWarning":
+      "Netko je već prihvaćen za ovaj boravak. Obavijestite tu osobu prije brisanja.",
+    "owner.deleteSitCompletedError":
+      "Završeni boravci ne mogu se brisati. Umjesto toga ih arhivirajte.",
     "owner.archiveSitLabel": "Arhiviraj boravak {{boat}}",
     "owner.archiveSitTitle": "Arhivirati ovaj boravak?",
-    "owner.archiveSitConfirm": "Arhivirati boravak {{dates}} za {{boat}}? Kasnije ga možete pronaći pod Arhivirano.",
+    "owner.archiveSitConfirm":
+      "Arhivirati boravak {{dates}} za {{boat}}? Kasnije ga možete pronaći pod Arhivirano.",
     "owner.archiveSitAction": "Da, arhiviraj",
     "owner.unarchiveSit": "Premjesti među aktivne boravke",
     "owner.unarchiveSitLabel": "Vrati boravak {{boat}}",
@@ -7421,7 +7653,8 @@ const localeExtrasSource = {
     "owner.archivedSitsCount_few": "{{count}} boravka",
     "owner.emptyArchivedSits": "Nema arhiviranih boravaka",
     "owner.sitPhaseFilterArchived": "Arhivirano",
-    "owner.deleteSitApplicantsWarning_few": "Ovaj boravak trenutačno ima {{count}} prijave. Brisanje uklanja oglas za sve koji su se prijavili.",
+    "owner.deleteSitApplicantsWarning_few":
+      "Ovaj boravak trenutačno ima {{count}} prijave. Brisanje uklanja oglas za sve koji su se prijavili.",
     "owner.engineSummary": "Motor: {{engine}}",
     "owner.voltageSummary": "Napon: {{voltage}}",
     "owner.stoveSummary": "Gorivo štednjaka: {{fuel}}",
@@ -7454,7 +7687,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Pregled poklopca broda",
     "vesselEditor.noCover": "Još nema naslovne slike",
     "vesselEditor.gallery": "Više fotografija",
-    "vesselEditor.galleryHint": "Prenesite dodatne fotografije broda, marine i života na brodu. Opisi su neobavezni.",
+    "vesselEditor.galleryHint":
+      "Prenesite dodatne fotografije broda, marine i života na brodu. Opisi su neobavezni.",
     "vesselEditor.galleryCaption": "Opis",
     "vesselEditor.galleryCaptionPlaceholder": "Neobavezan opis",
     "vesselEditor.galleryEmpty": "Još nema dodatnih fotografija",
@@ -7507,11 +7741,13 @@ const localeExtrasSource = {
       "JPG, PNG ili WebP do 10 MB. Velikim se slikama mijenja veličina prije spremanja.",
     "upload.uploadMultiple": "Prenesi fotografije",
     "upload.processingMultiple": "Obrada fotografija…",
-    "upload.hintMultiple": "JPG, PNG ili WebP do 10 MB po datoteci. Velike se slike smanjuju prije spremanja.",
+    "upload.hintMultiple":
+      "JPG, PNG ili WebP do 10 MB po datoteci. Velike se slike smanjuju prije spremanja.",
     "sitEditor.kicker": "Dostupnost sjediti",
     "sitEditor.editTitle": "Uredi boat sit",
     "sitEditor.lockedBannerTitle": "Uređivanje je zaključano",
-    "sitEditor.lockedBanner": "Ovo čuvanje je primilo prijave, stoga se detalji više ne mogu mijenjati. I dalje možete pregledavati prijave i slati poruke čuvarima.",
+    "sitEditor.lockedBanner":
+      "Ovo čuvanje je primilo prijave, stoga se detalji više ne mogu mijenjati. I dalje možete pregledavati prijave i slati poruke čuvarima.",
     "sitEditor.createTitle": "Stvorite mjesto za čamac",
     "sitEditor.createShort": "Stvorite sjedište",
     "sitEditor.createEditLimitTitle": "Može se uređivati do prve prijave",
@@ -7525,8 +7761,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Vrsta čuvanja",
     "sitType.liveaboard": "Smještaj",
     "sitType.liveaboardShort": "Smještaj",
-    "sitType.liveaboardHint":
-      "Čuvar živi i spava na brodu tijekom cijelog razdoblja.",
+    "sitType.liveaboardHint": "Čuvar živi i spava na brodu tijekom cijelog razdoblja.",
     "sitType.daytimeChecks": "Dnevne provjere",
     "sitType.daytimeChecksShort": "Dnevno",
     "sitType.daytimeChecksHint":
@@ -7543,12 +7778,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certifikati",
     "sitEditor.skills": "Praktične vještine",
     "sitEditor.nonSmoker": "Mora biti nepušač",
-    "sitEditor.nonSmokerHint":
-      "Zahtijevajte čuvare koji ne puše na brodu niti tijekom boravka.",
+    "sitEditor.nonSmokerHint": "Zahtijevajte čuvare koji ne puše na brodu niti tijekom boravka.",
     "requirement.nonSmoker": "Nepušač",
     "sitEditor.additional": "Dodatni zahtjevi za dadilju",
-    "sitEditor.additionalPlaceholder":
-      "Jedan po retku, na primjer dvije nedavne reference",
+    "sitEditor.additionalPlaceholder": "Jedan po retku, na primjer dvije nedavne reference",
     "sitEditor.pets": "Kućni ljubimci na brodu (opcionalno)",
     "sitEditor.petsPlaceholder": "na primjer Pip, terijer koji voli more",
     "sitEditor.save": "Spremi sjediti",
@@ -7604,8 +7837,7 @@ const localeExtrasSource = {
     "settings.sitDefaultsHint":
       "Ovi izbori su unaprijed odabrani kada stvorite novi boravak. I dalje ih možete mijenjati za svaki boravak.",
     "settings.sitDefaults.nonSmoker": "Zahtijevaj nepušače prema zadanim postavkama",
-    "settings.sitDefaults.nonSmokerHint":
-      "Novi boravci počinju s Mora biti nepušač uključenim.",
+    "settings.sitDefaults.nonSmokerHint": "Novi boravci počinju s Mora biti nepušač uključenim.",
     "settings.metric": "Metrički (metri)",
     "settings.imperial": "Imperijalni (stope)",
     "settings.personalTitle": "Osobni podaci",
@@ -7614,11 +7846,13 @@ const localeExtrasSource = {
     "settings.legalName": "Puno službeno ime",
     "settings.legalNameHint": "Kako je navedeno na vašem osobnom dokumentu.",
     "settings.displayNameHint": "Prikazuje se na javnom profilu i u porukama.",
-    "settings.emailReadOnlyHint": "Koristite odjeljak za prijavu u nastavku za promjenu e-mail adrese.",
+    "settings.emailReadOnlyHint":
+      "Koristite odjeljak za prijavu u nastavku za promjenu e-mail adrese.",
     "settings.savePersonal": "Spremi osobne podatke",
     "settings.personalSaved": "Osobni podaci spremljeni",
     "settings.accountTitle": "Račun",
-    "settings.accountHint": "Vaš e-mail za prijavu prikazan je ovdje. Koristite tipke za promjenu e-maila ili lozinke u sigurnom dijalogu.",
+    "settings.accountHint":
+      "Vaš e-mail za prijavu prikazan je ovdje. Koristite tipke za promjenu e-maila ili lozinke u sigurnom dijalogu.",
     "settings.currentEmail": "Trenutačni e-mail",
     "settings.newEmail": "Novi e-mail",
     "settings.currentPassword": "Trenutačna lozinka",
@@ -7634,9 +7868,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Lozinka ažurirana",
     "settings.passwordMismatch": "Nove lozinke se ne podudaraju.",
     "settings.sameEmail": "Unesite drugu e-mail adresu.",
-    "settings.accountCredentialsUnavailable": "Promjene lozinke zahtijevaju račun stvoren e-poštom. Registrirajte se e-poštom i pokušajte ponovno.",
+    "settings.accountCredentialsUnavailable":
+      "Promjene lozinke zahtijevaju račun stvoren e-poštom. Registrirajte se e-poštom i pokušajte ponovno.",
     "settings.emailsTitle": "Obavijesti e-poštom",
-    "settings.emailsHint": "Odaberite za koje događaje primate e-mail. Možete ih promijeniti bilo kada.",
+    "settings.emailsHint":
+      "Odaberite za koje događaje primate e-mail. Možete ih promijeniti bilo kada.",
     "settings.email.newApplications": "Nove prijave na moje brodove",
     "settings.email.applicationUpdates": "Ažuriranja prijava na koje sam se prijavio/la",
     "settings.email.messages": "Nove poruke u mojim razgovorima",
@@ -7646,19 +7882,23 @@ const localeExtrasSource = {
     "safetyActions.block": "Blokiraj",
     "safetyActions.unblock": "Odblokiraj",
     "safetyActions.reportTitle": "Prijaviti {{name}}?",
-    "safetyActions.reportText": "Recite nam što se dogodilo. Prijave pregledava Boatstead i ne dijele se s prijavljenim članom.",
+    "safetyActions.reportText":
+      "Recite nam što se dogodilo. Prijave pregledava Boatstead i ne dijele se s prijavljenim članom.",
     "safetyActions.reportReason": "Razlog",
     "safetyActions.reportDetails": "Detalji",
     "safetyActions.reportDetailsPlaceholder": "Dodajte koristan kontekst",
     "safetyActions.reportDetailsRequired": "Dodajte kratki opis za ovaj razlog.",
     "safetyActions.reportSubmit": "Pošalji prijavu",
     "safetyActions.reportThanksTitle": "Prijava poslana",
-    "safetyActions.reportThanksText": "Hvala. Primili smo vašu prijavu o {{name}} i pregledat ćemo je.",
+    "safetyActions.reportThanksText":
+      "Hvala. Primili smo vašu prijavu o {{name}} i pregledat ćemo je.",
     "safetyActions.blockTitle": "Blokirati {{name}}?",
-    "safetyActions.blockText": "Više vas neće moći lako kontaktirati, a možete ih odblokirati bilo kada u Postavkama.",
+    "safetyActions.blockText":
+      "Više vas neće moći lako kontaktirati, a možete ih odblokirati bilo kada u Postavkama.",
     "safetyActions.blockConfirm": "Da, blokiraj",
     "safetyActions.blockedBannerTitle": "Blokirali ste ovog člana",
-    "safetyActions.blockedBannerText": "{{name}} je na vašem popisu blokiranih. Možete odblokirati ovdje ili u Postavkama.",
+    "safetyActions.blockedBannerText":
+      "{{name}} je na vašem popisu blokiranih. Možete odblokirati ovdje ili u Postavkama.",
     "safetyActions.reason.spam": "Spam ili neželjeni kontakt",
     "safetyActions.reason.harassment": "Uznemiravanje ili zlostavljanje",
     "safetyActions.reason.scam": "Prijevara ili prijevarni postupci",
@@ -7861,8 +8101,7 @@ const localeExtrasSource = {
     "support.topic.other": "ostalo",
     "support.formTitle": "Kontaktirajte podršku",
     "support.accountDetails": "Vaš račun",
-    "support.accountDetailsHint":
-      "Za vaš zahtjev za podršku koristit ćemo ovo ime i e-poštu.",
+    "support.accountDetailsHint": "Za vaš zahtjev za podršku koristit ćemo ovo ime i e-poštu.",
     "support.name": "Ime",
     "support.email": "E-mail",
     "support.message": "Poruka",
@@ -8094,7 +8333,8 @@ const localeExtrasSource = {
       "Konaklamaları kısa listenize kaydetmek ve sonra bulmak için giriş yapın veya hesap oluşturun.",
     "saved.showAll": "Hepsini göster: sitter seçilmiş, tamamlanmış vb. dahil",
     "saved.emptyFiltered": "Açık kayıtlı konaklama yok",
-    "saved.emptyFilteredHint": "Kısa listenizde yalnızca sitter seçilmiş veya tamamlanmış konaklamalar var. Görmek için yukarıdaki kutuyu işaretleyin.",
+    "saved.emptyFilteredHint":
+      "Kısa listenizde yalnızca sitter seçilmiş veya tamamlanmış konaklamalar var. Görmek için yukarıdaki kutuyu işaretleyin.",
     "editorPreview.kicker": "Canlı önizleme",
     "editorPreview.title": "Nasıl görünecek",
     "editorPreview.label": "Canlı önizleme",
@@ -8201,7 +8441,8 @@ const localeExtrasSource = {
     "member.identityVerified": "Kimlik doğrulandı",
     "verification.identityVerified": "Kimlik doğrulandı",
     "verification.confirmIdentity": "Kimliğinizi doğrulayın",
-    "verification.verifiedHint": "Boatstead bu üyenin resmi kimliğini, e-postasını ve telefonunu doğruladı.",
+    "verification.verifiedHint":
+      "Boatstead bu üyenin resmi kimliğini, e-postasını ve telefonunu doğruladı.",
     "verification.selfHint": "Profilinize güvenilmesi için aşağıdaki her maddeyi tamamlayın.",
     "verification.partialHint": "Şu ana kadar {{total}} kontrolden {{count}} tanesi onaylandı.",
     "verification.governmentId": "Resmi kimlik",
@@ -8210,7 +8451,8 @@ const localeExtrasSource = {
     "verification.statusVerified": "doğrulandı",
     "verification.statusMissing": "doğrulanmadı",
     "verification.verifyGovernmentId": "Resmi kimliği doğrula",
-    "verification.addEmailAndPhone": "Doğrulamayı tamamlamak için profilinize e-posta ve telefon ekleyin.",
+    "verification.addEmailAndPhone":
+      "Doğrulamayı tamamlamak için profilinize e-posta ve telefon ekleyin.",
     "verification.addPhone": "Doğrulamayı tamamlamak için profilinize telefon numarası ekleyin.",
     "verification.addEmail": "Doğrulamayı tamamlamak için profilinize e-posta adresi ekleyin.",
     "member.verificationNeeded": "Doğrulama gerekli",
@@ -8254,7 +8496,8 @@ const localeExtrasSource = {
     "owner.sitSummary":
       "{{duration}} · {{applicants}} başvuru sahipleri · {{tasks}} bakım görevleri",
     "owner.sitPhaseFilter": "Konaklamaları aşamaya göre filtrele",
-    "owner.sitPhaseFilterHint": "Konaklamalar aşamaya göre gruplanır. Bir aşamaya odaklanmak için filtreyi kullanın.",
+    "owner.sitPhaseFilterHint":
+      "Konaklamalar aşamaya göre gruplanır. Bir aşamaya odaklanmak için filtreyi kullanın.",
     "owner.sitPhaseFilterAll": "Tüm aşamalar",
     "owner.sitPhaseEmpty": "Bu aşamada konaklama yok",
     "owner.sitPhaseCount_one": "1 konaklama",
@@ -8273,7 +8516,8 @@ const localeExtrasSource = {
     "owner.boatBeforeSit": "Bir konaklama oluşturmadan önce tekne ekleyin.",
     "owner.sitRequiresBoatTooltip":
       "Önce bir tekne oluşturun. İlk teknenizi eklemek için buraya tıklayın.",
-    "owner.sitRequiresVerificationTooltip": "Bir oturum oluşturmadan önce kimliğinizi doğrulayın. Doğrulamayı tamamlamak için profilinizi açın.",
+    "owner.sitRequiresVerificationTooltip":
+      "Bir oturum oluşturmadan önce kimliğinizi doğrulayın. Doğrulamayı tamamlamak için profilinizi açın.",
     "owner.deleteBoatLabel": "{{boat}}'i sil",
     "owner.deleteBoatTitle": "{{boat}} silinsin mi?",
     "owner.deleteBoatConfirm": "Bu işlem tekneyi kalıcı olarak kaldırır ve geri alınamaz.",
@@ -8289,14 +8533,19 @@ const localeExtrasSource = {
     "owner.deleteSitError": "Bu konaklama silinemedi. Lütfen tekrar deneyin.",
     "owner.deleteSitAcceptedError":
       "Bu konaklamanın kabul edilmiş bir başvuranı var ve artık silinemez.",
-    "owner.sitDeleteUnderway": "Bu konaklama devam ediyor ve silinemez. Yardıma ihtiyacınız varsa destekle iletişime geçin.",
-    "owner.deleteSitApplicantsWarning_one": "Bu konaklamanın şu anda 1 başvurusu var. Silmek, başvuran herkes için ilanı kaldırır.",
-    "owner.deleteSitApplicantsWarning_other": "Bu konaklamanın şu anda {{count}} başvurusu var. Silmek, başvuran herkes için ilanı kaldırır.",
-    "owner.deleteSitAcceptedWarning": "Bu konaklama için biri zaten kabul edildi. Silmeden önce lütfen bilgilendirin.",
+    "owner.sitDeleteUnderway":
+      "Bu konaklama devam ediyor ve silinemez. Yardıma ihtiyacınız varsa destekle iletişime geçin.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Bu konaklamanın şu anda 1 başvurusu var. Silmek, başvuran herkes için ilanı kaldırır.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Bu konaklamanın şu anda {{count}} başvurusu var. Silmek, başvuran herkes için ilanı kaldırır.",
+    "owner.deleteSitAcceptedWarning":
+      "Bu konaklama için biri zaten kabul edildi. Silmeden önce lütfen bilgilendirin.",
     "owner.deleteSitCompletedError": "Tamamlanan konaklamalar silinemez. Bunun yerine arşivleyin.",
     "owner.archiveSitLabel": "{{boat}} konaklamasını arşivle",
     "owner.archiveSitTitle": "Bu konaklama arşivlensin mi?",
-    "owner.archiveSitConfirm": "{{boat}} için {{dates}} konaklaması arşivlensin mi? Daha sonra Arşivlenmiş altında bulabilirsiniz.",
+    "owner.archiveSitConfirm":
+      "{{boat}} için {{dates}} konaklaması arşivlensin mi? Daha sonra Arşivlenmiş altında bulabilirsiniz.",
     "owner.archiveSitAction": "Evet, arşivle",
     "owner.unarchiveSit": "Aktif konaklamalara taşı",
     "owner.unarchiveSitLabel": "{{boat}} konaklamasını geri yükle",
@@ -8337,7 +8586,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Tekne örtüsü önizlemesi",
     "vesselEditor.noCover": "Henüz kapak resmi yok",
     "vesselEditor.gallery": "Daha fazla fotoğraf",
-    "vesselEditor.galleryHint": "Tekne, marina ve teknedeki yaşamdan ek fotoğraflar yükleyin. Açıklamalar isteğe bağlıdır.",
+    "vesselEditor.galleryHint":
+      "Tekne, marina ve teknedeki yaşamdan ek fotoğraflar yükleyin. Açıklamalar isteğe bağlıdır.",
     "vesselEditor.galleryCaption": "Açıklama",
     "vesselEditor.galleryCaptionPlaceholder": "İsteğe bağlı açıklama",
     "vesselEditor.galleryEmpty": "Henüz ek fotoğraf yok",
@@ -8390,11 +8640,13 @@ const localeExtrasSource = {
       "10 MB'a kadar JPG, PNG veya WebP. Büyük resimler kaydedilmeden önce yeniden boyutlandırılır.",
     "upload.uploadMultiple": "Fotoğraf yükle",
     "upload.processingMultiple": "Fotoğraflar işleniyor…",
-    "upload.hintMultiple": "Her biri en fazla 10 MB JPG, PNG veya WebP. Büyük görseller kaydedilmeden önce yeniden boyutlandırılır.",
+    "upload.hintMultiple":
+      "Her biri en fazla 10 MB JPG, PNG veya WebP. Büyük görseller kaydedilmeden önce yeniden boyutlandırılır.",
     "sitEditor.kicker": "Oturma durumu",
     "sitEditor.editTitle": "Tekne oturma yerini düzenle",
     "sitEditor.lockedBannerTitle": "Düzenleme kilitli",
-    "sitEditor.lockedBanner": "Bu konaklama başvurular aldı, bu yüzden ayrıntıları artık değiştirilemez. Başvuruları incelemeye ve bakıcılara mesaj göndermeye devam edebilirsiniz.",
+    "sitEditor.lockedBanner":
+      "Bu konaklama başvurular aldı, bu yüzden ayrıntıları artık değiştirilemez. Başvuruları incelemeye ve bakıcılara mesaj göndermeye devam edebilirsiniz.",
     "sitEditor.createTitle": "Bir tekne oturağı oluşturun",
     "sitEditor.createShort": "Oturma alanı oluştur",
     "sitEditor.createEditLimitTitle": "İlk başvuruya kadar düzenlenebilir",
@@ -8407,12 +8659,10 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Konaklama türü",
     "sitType.liveaboard": "Konaklama",
     "sitType.liveaboardShort": "Konaklama",
-    "sitType.liveaboardHint":
-      "Bakıcı tüm süre boyunca gemide yaşar ve uyur.",
+    "sitType.liveaboardHint": "Bakıcı tüm süre boyunca gemide yaşar ve uyur.",
     "sitType.daytimeChecks": "Gündüz kontrolleri",
     "sitType.daytimeChecksShort": "Gündüz",
-    "sitType.daytimeChecksHint":
-      "Bakıcı tekneyi kontrol etmek için her gün gelir ama gecelemez.",
+    "sitType.daytimeChecksHint": "Bakıcı tekneyi kontrol etmek için her gün gelir ama gecelemez.",
     "sitEditor.responsibilities": "Bakım sorumlulukları",
     "sitEditor.responsibilitiesPlaceholder":
       "Hat başına bir görev; örneğin her sabah sintineleri kontrol etmek",
@@ -8425,12 +8675,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Sertifikalar",
     "sitEditor.skills": "Pratik beceriler",
     "sitEditor.nonSmoker": "Sigara içmeyen olmalı",
-    "sitEditor.nonSmokerHint":
-      "Gemide veya konaklama sırasında sigara içmeyen bakıcılar isteyin.",
+    "sitEditor.nonSmokerHint": "Gemide veya konaklama sırasında sigara içmeyen bakıcılar isteyin.",
     "requirement.nonSmoker": "Sigara içmeyen",
     "sitEditor.additional": "Ek bakıcı gereksinimleri",
-    "sitEditor.additionalPlaceholder":
-      "Her satıra bir tane, örneğin iki yeni referans",
+    "sitEditor.additionalPlaceholder": "Her satıra bir tane, örneğin iki yeni referans",
     "sitEditor.pets": "Gemide evcil hayvanlar (isteğe bağlı)",
     "sitEditor.petsPlaceholder": "örneğin, denizi seven bir terrier olan Pip",
     "sitEditor.save": "Oturmayı kaydet",
@@ -8496,11 +8744,13 @@ const localeExtrasSource = {
     "settings.legalName": "Tam yasal ad",
     "settings.legalNameHint": "Resmi kimliğinizde göründüğü gibi.",
     "settings.displayNameHint": "Herkese açık profilinizde ve mesajlarda gösterilir.",
-    "settings.emailReadOnlyHint": "E-posta adresinizi değiştirmek için aşağıdaki oturum açma bölümünü kullanın.",
+    "settings.emailReadOnlyHint":
+      "E-posta adresinizi değiştirmek için aşağıdaki oturum açma bölümünü kullanın.",
     "settings.savePersonal": "Kişisel bilgileri kaydet",
     "settings.personalSaved": "Kişisel bilgiler kaydedildi",
     "settings.accountTitle": "Hesap",
-    "settings.accountHint": "Giriş e-postanız burada gösterilir. E-posta veya şifreyi güvenli bir pencerede değiştirmek için düğmeleri kullanın.",
+    "settings.accountHint":
+      "Giriş e-postanız burada gösterilir. E-posta veya şifreyi güvenli bir pencerede değiştirmek için düğmeleri kullanın.",
     "settings.currentEmail": "Mevcut e-posta",
     "settings.newEmail": "Yeni e-posta",
     "settings.currentPassword": "Mevcut şifre",
@@ -8516,9 +8766,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Şifre güncellendi",
     "settings.passwordMismatch": "Yeni şifreler eşleşmiyor.",
     "settings.sameEmail": "Farklı bir e-posta adresi girin.",
-    "settings.accountCredentialsUnavailable": "Şifre değişiklikleri e-posta ile oluşturulmuş bir hesap gerektirir. E-posta ile kaydolun ve yeniden deneyin.",
+    "settings.accountCredentialsUnavailable":
+      "Şifre değişiklikleri e-posta ile oluşturulmuş bir hesap gerektirir. E-posta ile kaydolun ve yeniden deneyin.",
     "settings.emailsTitle": "E-posta bildirimleri",
-    "settings.emailsHint": "Hangi olaylar için e-posta alacağınızı seçin. Bunları istediğiniz zaman değiştirebilirsiniz.",
+    "settings.emailsHint":
+      "Hangi olaylar için e-posta alacağınızı seçin. Bunları istediğiniz zaman değiştirebilirsiniz.",
     "settings.email.newApplications": "Teknelerime gelen yeni başvurular",
     "settings.email.applicationUpdates": "Başvurduğum bakımlarla ilgili güncellemeler",
     "settings.email.messages": "Sohbetlerimde yeni mesajlar",
@@ -8528,26 +8780,31 @@ const localeExtrasSource = {
     "safetyActions.block": "Engelle",
     "safetyActions.unblock": "Engeli kaldır",
     "safetyActions.reportTitle": "{{name}} bildirilsin mi?",
-    "safetyActions.reportText": "Ne olduğunu bize anlatın. Bildirimler Boatstead tarafından incelenir ve bildirilen üye ile paylaşılmaz.",
+    "safetyActions.reportText":
+      "Ne olduğunu bize anlatın. Bildirimler Boatstead tarafından incelenir ve bildirilen üye ile paylaşılmaz.",
     "safetyActions.reportReason": "Neden",
     "safetyActions.reportDetails": "Ayrıntılar",
     "safetyActions.reportDetailsPlaceholder": "Yararlı bağlam ekleyin",
     "safetyActions.reportDetailsRequired": "Bu neden için kısa bir açıklama ekleyin.",
     "safetyActions.reportSubmit": "Bildirimi gönder",
     "safetyActions.reportThanksTitle": "Bildirim gönderildi",
-    "safetyActions.reportThanksText": "Teşekkürler. {{name}} hakkındaki bildiriminizi aldık ve inceleyeceğiz.",
+    "safetyActions.reportThanksText":
+      "Teşekkürler. {{name}} hakkındaki bildiriminizi aldık ve inceleyeceğiz.",
     "safetyActions.blockTitle": "{{name}} engellensin mi?",
-    "safetyActions.blockText": "Sizinle kolayca iletişime geçemeyecek ve engeli istediğiniz zaman Ayarlar'dan kaldırabileceksiniz.",
+    "safetyActions.blockText":
+      "Sizinle kolayca iletişime geçemeyecek ve engeli istediğiniz zaman Ayarlar'dan kaldırabileceksiniz.",
     "safetyActions.blockConfirm": "Evet, engelle",
     "safetyActions.blockedBannerTitle": "Bu üyeyi engellediniz",
-    "safetyActions.blockedBannerText": "{{name}} engelli listenizde. Engeli buradan veya Ayarlar'dan kaldırabilirsiniz.",
+    "safetyActions.blockedBannerText":
+      "{{name}} engelli listenizde. Engeli buradan veya Ayarlar'dan kaldırabilirsiniz.",
     "safetyActions.reason.spam": "Spam veya istenmeyen iletişim",
     "safetyActions.reason.harassment": "Taciz veya kötüye kullanım",
     "safetyActions.reason.scam": "Dolandırıcılık veya sahtekârlık",
     "safetyActions.reason.inappropriate": "Uygunsuz içerik veya davranış",
     "safetyActions.reason.other": "Başka bir şey",
     "settings.blockedUsersTitle": "Engellenen hesaplar",
-    "settings.blockedUsersHint": "Engellediğiniz üyeler. Engeli kaldırmak normal iletişimi geri getirir.",
+    "settings.blockedUsersHint":
+      "Engellediğiniz üyeler. Engeli kaldırmak normal iletişimi geri getirir.",
     "settings.blockedUsersEmpty": "Henüz kimseyi engellemediniz.",
     "settings.blockedOn": "{{date}} tarihinde engellendi",
     "settings.dangerZone": "Tehlikeli bölge",
@@ -8743,8 +9000,7 @@ const localeExtrasSource = {
     "support.topic.other": "Diğer",
     "support.formTitle": "Desteğe başvurun",
     "support.accountDetails": "Hesabınız",
-    "support.accountDetailsHint":
-      "Destek talebiniz için bu adı ve e-postayı kullanacağız.",
+    "support.accountDetailsHint": "Destek talebiniz için bu adı ve e-postayı kullanacağız.",
     "support.name": "İsim",
     "support.email": "E-posta",
     "support.message": "Mesaj",
@@ -8823,7 +9079,8 @@ const localeExtrasSource = {
     "footer.admin": "Yönetim",
     "admin.kicker": "Platform işlemleri",
     "admin.title": "Yönetim",
-    "admin.subtitle": "Üyeleri, rolleri ve hesap durumunu yönetin. Her değişiklik denetim kaydına yazılır.",
+    "admin.subtitle":
+      "Üyeleri, rolleri ve hesap durumunu yönetin. Her değişiklik denetim kaydına yazılır.",
     "admin.tab.users": "Kullanıcılar",
     "admin.tab.audit": "Denetim kaydı",
     "admin.signInTitle": "Yönetimi açmak için oturum açın",
@@ -8870,7 +9127,8 @@ const localeExtrasSource = {
   },
   sv: {
     "meta.title": "Boatstead | Pålitlig båtvård",
-    "meta.description": "Boatstead förbinder pålitliga båtvaktare med ägare som behöver erfarna händer ombord.",
+    "meta.description":
+      "Boatstead förbinder pålitliga båtvaktare med ägare som behöver erfarna händer ombord.",
     "common.back": "Tillbaka",
     "common.cancel": "Avboka",
     "common.close": "Nära",
@@ -8880,7 +9138,8 @@ const localeExtrasSource = {
     "common.saving": "Sparande…",
     "nav.logout": "Logga ut",
     "nav.logoutConfirmTitle": "Är du säker på att du vill logga ut?",
-    "nav.logoutConfirmText": "Du måste logga in igen för att komma åt din profil, meddelanden och sparade sittningar.",
+    "nav.logoutConfirmText":
+      "Du måste logga in igen för att komma åt din profil, meddelanden och sparade sittningar.",
     "nav.logoutConfirm": "Ja, logga ut",
     "notifications.open": "Öppna aviseringar",
     "notifications.heading": "Aviseringar",
@@ -8921,9 +9180,11 @@ const localeExtrasSource = {
     "map.zoomOut": "Zooma ut",
     "map.openInMaps": "Öppna i Maps",
     "map.openInMapsAriaLabel": "Öppna {{location}} i Maps",
-    "map.approximateLocationNote": "Denna stift markerar det allmänna området. Exakta kajdetaljer delas efter att du ansökt.",
+    "map.approximateLocationNote":
+      "Denna stift markerar det allmänna området. Exakta kajdetaljer delas efter att du ansökt.",
     "home.heroImageAlt": "Segelbåt förankrad i en klar vik",
-    "apply.defaultMessage": "Hej {{owner}}, jag skulle gärna ta hand om {{boat}}. Jag har relevant båtvana och ordnar gärna ett videosamtal.",
+    "apply.defaultMessage":
+      "Hej {{owner}}, jag skulle gärna ta hand om {{boat}}. Jag har relevant båtvana och ordnar gärna ett videosamtal.",
     "apply.successTitle": "Meddelande skickat",
     "apply.successText": "{{owner}} kommer att få din ansökan för {{boat}}.",
     "apply.viewInSits": "Visa i dina sittningar",
@@ -8966,15 +9227,18 @@ const localeExtrasSource = {
     "saved.emptyHint": "Spara sittningar som fångar ditt öga och jämför dem här.",
     "saved.browse": "Bläddra båtar",
     "saved.signInTitle": "Logga in för att spara sittningar",
-    "saved.signInText": "Logga in eller skapa ett konto för att spara sitts till din kortlista och hitta dem senare.",
+    "saved.signInText":
+      "Logga in eller skapa ett konto för att spara sitts till din kortlista och hitta dem senare.",
     "saved.showAll": "Visa allt inklusive vald, avklarad barnvakt osv.",
     "saved.emptyFiltered": "Inga öppna sparade sittningar",
-    "saved.emptyFilteredHint": "Din kortlista har bara sittningar som redan har valts ut eller är klara. Markera rutan ovan för att se dem.",
+    "saved.emptyFilteredHint":
+      "Din kortlista har bara sittningar som redan har valts ut eller är klara. Markera rutan ovan för att se dem.",
     "editorPreview.kicker": "Live förhandsvisning",
     "editorPreview.title": "Hur det kommer att se ut",
     "editorPreview.label": "Live förhandsvisning",
     "editorPreview.vesselHint": "Uppdateras när du redigerar dina båtdetaljer.",
-    "editorPreview.sitHint": "Uppdateringar när du redigerar denna sits. Så här ser det ut när barnvakter surfar.",
+    "editorPreview.sitHint":
+      "Uppdateringar när du redigerar denna sits. Så här ser det ut när barnvakter surfar.",
     "editorPreview.untitledBoat": "Namnlös båt",
     "editorPreview.homePortPending": "Lägg till en hemmahamn",
     "editorPreview.lengthPending": "Längd TBD",
@@ -8983,17 +9247,22 @@ const localeExtrasSource = {
     "editorPreview.notSpecified": "Ej specificerat",
     "how.kicker": "Hur Boatstead fungerar",
     "how.title": "Förtroende börjar innan någon kliver ombord.",
-    "how.subtitle": "En båt är ett hem och ett levande system. Boatstead hjälper båda sidor att matcha de detaljer som betyder något.",
+    "how.subtitle":
+      "En båt är ett hem och ett levande system. Boatstead hjälper båda sidor att matcha de detaljer som betyder något.",
     "how.stepProfileTitle": "Bygg din besättningsprofil",
-    "how.stepProfileText": "Dela referenser, certifieringar, fartygserfarenhet och de system du är bekväm med.",
+    "how.stepProfileText":
+      "Dela referenser, certifieringar, fartygserfarenhet och de system du är bekväm med.",
     "how.stepFindTitle": "Hitta rätt båt",
-    "how.stepFindText": "Filtrera efter plats, fartygstyp, datum, husdjur ombord och efterfrågad erfarenhet.",
+    "how.stepFindText":
+      "Filtrera efter plats, fartygstyp, datum, husdjur ombord och efterfrågad erfarenhet.",
     "how.stepMeetTitle": "Träffas och matcha",
-    "how.stepMeetText": "Prata med ägare, ställ praktiska frågor och kom överens om ansvar innan du bekräftar.",
+    "how.stepMeetText":
+      "Prata med ägare, ställ praktiska frågor och kom överens om ansvar innan du bekräftar.",
     "how.stepHandoverTitle": "Slutför överlämningen",
-    "how.stepHandoverText": "Gå igenom båtkorten tillsammans, från länsar och batterier till väder- och nödplaner.",
+    "how.stepHandoverText":
+      "Gå igenom båtkorten tillsammans, från länsar och batterier till väder- och nödplaner.",
     "how.briefKicker": "The Boatstead båtkort",
-    "how.briefTitle": "Inget vagt \"håll ett öga på henne.\"",
+    "how.briefTitle": 'Inget vagt "håll ett öga på henne."',
     "how.briefMooring": "Förtöjning, linor & fendrar",
     "how.briefBilges": "Sjökranar",
     "how.briefBattery": "Batteri & landström",
@@ -9004,12 +9273,16 @@ const localeExtrasSource = {
     "how.briefContacts": "Marina kontakter",
     "how.storiesKicker": "Berättelser från kajen",
     "how.storiesTitle": "Betrodd på båda sidor av överlämnandet",
-    "how.storiesText": "Ägare får erfaren vård. Sitter får ärliga trosor och anmärkningsvärda platser att ringa hem.",
-    "how.testimonialOneQuote": "För första gången lämnade vi Sunbird i tre veckor utan att kontrollera marinans kameror varje timme. Claire förstod båten, skickade genomtänkta uppdateringar och lämnade tillbaka henne obefläckad.",
+    "how.storiesText":
+      "Ägare får erfaren vård. Sitter får ärliga trosor och anmärkningsvärda platser att ringa hem.",
+    "how.testimonialOneQuote":
+      "För första gången lämnade vi Sunbird i tre veckor utan att kontrollera marinans kameror varje timme. Claire förstod båten, skickade genomtänkta uppdateringar och lämnade tillbaka henne obefläckad.",
     "how.testimonialOneDetail": "Ägare av Sunbird · Antibes",
-    "how.testimonialTwoQuote": "Boatstead matchade mig med en båt som passade min faktiska upplevelse, inte bara en vacker plats. Överlämningsbrevet innebar att det inte fanns några överraskningar när ägarna väl gick.",
+    "how.testimonialTwoQuote":
+      "Boatstead matchade mig med en båt som passade min faktiska upplevelse, inte bara en vacker plats. Överlämningsbrevet innebar att det inte fanns några överraskningar när ägarna väl gick.",
     "how.testimonialTwoDetail": "RYA Yachtmaster · 11 genomförda sittningar",
-    "how.testimonialThreeQuote": "Vår barnvakt märkte ett litet landströmsproblem innan det blev dyrt. Att ha någon ombord som visste vad man skulle leta efter gjorde stor skillnad.",
+    "how.testimonialThreeQuote":
+      "Vår barnvakt märkte ett litet landströmsproblem innan det blev dyrt. Att ha någon ombord som visste vad man skulle leta efter gjorde stor skillnad.",
     "how.testimonialThreeDetail": "Ägare till Northbound · Vancouver",
     "role.owner": "Båtägare",
     "role.sitter": "Båtvaktare",
@@ -9022,15 +9295,18 @@ const localeExtrasSource = {
     "sits.withOwner": "Med {{owner}}",
     "sits.withdrawInterest": "Ta bort ränta",
     "sits.withdrawConfirmTitle": "Dra tillbaka ditt intresse?",
-    "sits.withdrawConfirmText": "Detta tar bort din ansökan för {{boat}}. Du kan ansöka igen senare om siten fortfarande är öppen.",
-    "sits.withdrawAcceptedConfirmText": "Du är för närvarande accepterad för {{boat}}. Att dra tillbaka den bekräftelsen avslutas så att ägaren kan välja någon annan.",
+    "sits.withdrawConfirmText":
+      "Detta tar bort din ansökan för {{boat}}. Du kan ansöka igen senare om siten fortfarande är öppen.",
+    "sits.withdrawAcceptedConfirmText":
+      "Du är för närvarande accepterad för {{boat}}. Att dra tillbaka den bekräftelsen avslutas så att ägaren kan välja någon annan.",
     "sits.withdrawConfirmAction": "Ja, dra dig tillbaka",
     "role.vesselOwner": "{{type}} ägare",
     "notFound.title": "Förlorad till sjöss?",
     "notFound.text": "Den sidan finns inte på vårt diagram.",
     "notFound.back": "Tillbaka till hamnen",
     "errorBoundary.title": "Något gick fel",
-    "errorBoundary.text": "Vi stötte på ett oväntat problem. Försök igen eller gå tillbaka till startsidan.",
+    "errorBoundary.text":
+      "Vi stötte på ett oväntat problem. Försök igen eller gå tillbaka till startsidan.",
     "errorBoundary.tryAgain": "Försök igen",
     "errorBoundary.goHome": "Gå hem",
     "profile.settings": "Offentlig profil",
@@ -9039,7 +9315,8 @@ const localeExtrasSource = {
     "profile.photo": "Profilfoto",
     "profile.photoPreviewAlt": "Aktuell profilbild",
     "profile.replacePhoto": "Ladda upp eller ersätt foto",
-    "profile.photoUploadHint": "JPG, PNG eller WebP upp till 10 MB. Stora bilder ändras innan de sparas.",
+    "profile.photoUploadHint":
+      "JPG, PNG eller WebP upp till 10 MB. Stora bilder ändras innan de sparas.",
     "profile.coverImage": "Omslagsbild",
     "profile.coverHint": "Frivillig. Ersätter standardbannern bakom ditt foto.",
     "profile.coverPreviewAlt": "Aktuell omslagsbild",
@@ -9048,7 +9325,8 @@ const localeExtrasSource = {
     "profile.location": "Hemmahamn/plats",
     "profile.locationPlaceholder": "Börja skriva en stad",
     "profile.aboutYou": "Om dig",
-    "profile.aboutPlaceholder": "Dela din båtupplevelse, tillvägagångssätt och vad som gör dig till en bra match...",
+    "profile.aboutPlaceholder":
+      "Dela din båtupplevelse, tillvägagångssätt och vad som gör dig till en bra match...",
     "profile.qualifications": "Erfarenhet & kvalifikationer",
     "profile.qualificationsPlaceholder": "En per rad, till exempel RYA Day Skipper",
     "profile.spokenLanguages": "Språk du talar",
@@ -9063,8 +9341,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identitet verifierad",
     "verification.identityVerified": "Identitet verifierad",
     "verification.confirmIdentity": "Bekräfta din identitet",
-    "verification.verifiedHint": "Boatstead bekräftade statligt ID, e-post och telefon för denna medlem.",
-    "verification.selfHint": "Fyll i varje objekt nedan så att ägare och sitter kan lita på din profil.",
+    "verification.verifiedHint":
+      "Boatstead bekräftade statligt ID, e-post och telefon för denna medlem.",
+    "verification.selfHint":
+      "Fyll i varje objekt nedan så att ägare och sitter kan lita på din profil.",
     "verification.partialHint": "{{count}} av {{total}} kontroller bekräftade hittills.",
     "verification.governmentId": "Regeringens ID",
     "verification.email": "E-postadress",
@@ -9072,9 +9352,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "verifierad",
     "verification.statusMissing": "inte verifierad",
     "verification.verifyGovernmentId": "Verifiera statligt ID",
-    "verification.addEmailAndPhone": "Lägg till en e-postadress och ett telefonnummer i din profil för att slutföra verifieringen.",
-    "verification.addPhone": "Lägg till ett telefonnummer i din profil för att slutföra verifieringen.",
-    "verification.addEmail": "Lägg till en e-postadress i din profil för att slutföra verifieringen.",
+    "verification.addEmailAndPhone":
+      "Lägg till en e-postadress och ett telefonnummer i din profil för att slutföra verifieringen.",
+    "verification.addPhone":
+      "Lägg till ett telefonnummer i din profil för att slutföra verifieringen.",
+    "verification.addEmail":
+      "Lägg till en e-postadress i din profil för att slutföra verifieringen.",
     "member.verificationNeeded": "Verifiering behövs",
     "member.reviews_one": "1 recension",
     "member.reviews_other": "{{count}} recensioner",
@@ -9107,14 +9390,16 @@ const localeExtrasSource = {
     "owner.backToBoats": "Tillbaka till båtarna",
     "owner.dashboard": "Båtinstrumentbräda",
     "owner.manage": "Hantera båtar & sitter",
-    "owner.dashboardHint": "Håll fartygsdetaljer åtskilda från varje period du behöver en barnvakt.",
+    "owner.dashboardHint":
+      "Håll fartygsdetaljer åtskilda från varje period du behöver en barnvakt.",
     "owner.tab.boats": "Båtar",
     "owner.tab.sits": "Sitter",
     "owner.sitPeriods_one": "1 sittperiod",
     "owner.sitPeriods_other": "{{count}} sittperioder",
     "owner.sitSummary": "{{duration}} · {{applicants}} sökande · {{tasks}} vårduppgifter",
     "owner.sitPhaseFilter": "Filter sitter efter fas",
-    "owner.sitPhaseFilterHint": "Sitter grupperas efter fas. Använd filtret för att fokusera på ett steg.",
+    "owner.sitPhaseFilterHint":
+      "Sitter grupperas efter fas. Använd filtret för att fokusera på ett steg.",
     "owner.sitPhaseFilterAll": "Alla faser",
     "owner.sitPhaseEmpty": "Ingen sitter i denna fas",
     "owner.sitPhaseCount_one": "1 sitta",
@@ -9122,14 +9407,19 @@ const localeExtrasSource = {
     "owner.firstBoat": "Lägg till din första båt",
     "owner.firstSit": "Skapa din första sittning",
     "owner.sitsEmptyTitle": "Inga sittningar än",
-    "owner.sitsEmptyHintWithBoats": "Publicera datum för en av dina båtar, eller bläddra bland öppna platser för att hitta ditt första vårdtillfälle.",
-    "owner.sitsEmptyHintNoBoats": "Lägg till en båt för att vara värd för en sittning, eller bläddra bland öppna sits för att hitta ditt första vårdtillfälle.",
+    "owner.sitsEmptyHintWithBoats":
+      "Publicera datum för en av dina båtar, eller bläddra bland öppna platser för att hitta ditt första vårdtillfälle.",
+    "owner.sitsEmptyHintNoBoats":
+      "Lägg till en båt för att vara värd för en sittning, eller bläddra bland öppna sits för att hitta ditt första vårdtillfälle.",
     "owner.browseOpenSits": "Bläddra öppna sitter",
-    "owner.firstBoatHint": "Lägg till kärlet en gång och skapa sedan separata sittningar när du reser.",
+    "owner.firstBoatHint":
+      "Lägg till kärlet en gång och skapa sedan separata sittningar när du reser.",
     "owner.firstSitHint": "Välj en båt och publicera de datum du behöver någon ombord.",
     "owner.boatBeforeSit": "Lägg till en båt innan du skapar en sit.",
-    "owner.sitRequiresBoatTooltip": "Skapa en båt först. Klicka här för att lägga till din första båt.",
-    "owner.sitRequiresVerificationTooltip": "Verifiera din identitet innan du skapar en sit. Öppna din profil för att slutföra verifieringen.",
+    "owner.sitRequiresBoatTooltip":
+      "Skapa en båt först. Klicka här för att lägga till din första båt.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verifiera din identitet innan du skapar en sit. Öppna din profil för att slutföra verifieringen.",
     "owner.deleteBoatLabel": "Ta bort {{boat}}",
     "owner.deleteBoatTitle": "Ta bort {{boat}}?",
     "owner.deleteBoatConfirm": "Detta tar bort båten permanent och kan inte ångras.",
@@ -9143,15 +9433,22 @@ const localeExtrasSource = {
     "owner.sitDeleteLocked": "Denna sits har en godkänd sökande och kan inte längre tas bort",
     "owner.deleteError": "Båten kunde inte raderas. Försök igen.",
     "owner.deleteSitError": "Denna sits kunde inte raderas. Försök igen.",
-    "owner.deleteSitAcceptedError": "Denna sits har en godkänd sökande och kan inte längre tas bort.",
-    "owner.sitDeleteUnderway": "Denna sittning pågår och kan inte raderas. Kontakta supporten om du behöver hjälp med några problem.",
-    "owner.deleteSitApplicantsWarning_one": "Denna sit har 1 sökande just nu. Om du tar bort den tar du bort listan för alla som ansökt.",
-    "owner.deleteSitApplicantsWarning_other": "Denna sits har {{count}} sökande just nu. Om du tar bort den tar du bort listan för alla som ansökt.",
-    "owner.deleteSitAcceptedWarning": "Någon har redan blivit accepterad för denna sittning. Vänligen informera dem innan du raderar den.",
-    "owner.deleteSitCompletedError": "Slutförda sittningar kan inte raderas. Arkivera dem istället.",
+    "owner.deleteSitAcceptedError":
+      "Denna sits har en godkänd sökande och kan inte längre tas bort.",
+    "owner.sitDeleteUnderway":
+      "Denna sittning pågår och kan inte raderas. Kontakta supporten om du behöver hjälp med några problem.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Denna sit har 1 sökande just nu. Om du tar bort den tar du bort listan för alla som ansökt.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Denna sits har {{count}} sökande just nu. Om du tar bort den tar du bort listan för alla som ansökt.",
+    "owner.deleteSitAcceptedWarning":
+      "Någon har redan blivit accepterad för denna sittning. Vänligen informera dem innan du raderar den.",
+    "owner.deleteSitCompletedError":
+      "Slutförda sittningar kan inte raderas. Arkivera dem istället.",
     "owner.archiveSitLabel": "Arkiv {{boat}} sitta",
     "owner.archiveSitTitle": "Arkivera den här sittningen?",
-    "owner.archiveSitConfirm": "Arkivera {{dates}} sitta för {{boat}}? Du hittar den senare under Arkiverad.",
+    "owner.archiveSitConfirm":
+      "Arkivera {{dates}} sitta för {{boat}}? Du hittar den senare under Arkiverad.",
     "owner.archiveSitAction": "Ja, arkiv",
     "owner.unarchiveSit": "Flytta till aktiva sittningar",
     "owner.unarchiveSitLabel": "Återställ {{boat}} sit",
@@ -9178,9 +9475,11 @@ const localeExtrasSource = {
     "vesselEditor.country": "Land",
     "vesselEditor.countryPlaceholder": "till exempel Grekland",
     "vesselEditor.homePort": "Hemort",
-    "vesselEditor.homePortHint": "Där båten vanligtvis förvaras. Varje sittning kan använda en annan plats.",
+    "vesselEditor.homePortHint":
+      "Där båten vanligtvis förvaras. Varje sittning kan använda en annan plats.",
     "sitEditor.sameAsHomePort": "Samma som hemmaport: {{homePort}}",
-    "sitEditor.sameAsHomePortHint": "Avmarkera detta om båten kommer att vara någon annanstans för denna sits.",
+    "sitEditor.sameAsHomePortHint":
+      "Avmarkera detta om båten kommer att vara någon annanstans för denna sits.",
     "sitEditor.location": "Sittplats",
     "sitEditor.locationPlaceholder": "Sök stad",
     "sitEditor.country": "Land",
@@ -9190,7 +9489,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Förhandsvisning av båttäcke",
     "vesselEditor.noCover": "Ingen omslagsbild ännu",
     "vesselEditor.gallery": "Fler bilder",
-    "vesselEditor.galleryHint": "Ladda upp ytterligare bilder av båten, marinan och livet ombord. Bildtexter är valfria.",
+    "vesselEditor.galleryHint":
+      "Ladda upp ytterligare bilder av båten, marinan och livet ombord. Bildtexter är valfria.",
     "vesselEditor.galleryCaption": "Rubrik",
     "vesselEditor.galleryCaptionPlaceholder": "Valfri bildtext",
     "vesselEditor.galleryEmpty": "Inga ytterligare bilder än",
@@ -9208,7 +9508,8 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Vad finns tillgängligt?",
     "vesselEditor.featuresHint": "Välj allt barnvakter kan använda ombord eller vid marinan.",
     "vesselEditor.privateAccessTitle": "Privat åtkomstinformation",
-    "vesselEditor.privateAccessHint": "Delas endast med bekräftade sittande efter att du accepterat deras ansökan. Spara Wi-Fi-lösenord, grindkoder och liknande detaljer här.",
+    "vesselEditor.privateAccessHint":
+      "Delas endast med bekräftade sittande efter att du accepterat deras ansökan. Spara Wi-Fi-lösenord, grindkoder och liknande detaljer här.",
     "vesselEditor.wifiNetwork": "Wi-Fi-nätverk",
     "vesselEditor.wifiNetworkPlaceholder": "Nätverksnamn",
     "vesselEditor.wifiPassword": "Wi-Fi lösenord",
@@ -9216,7 +9517,8 @@ const localeExtrasSource = {
     "vesselEditor.accessCodes": "Åtkomstkoder",
     "vesselEditor.accessCodesPlaceholder": "Marina grind, låsbox, sällskapsväg, larm...",
     "vesselEditor.otherPrivateNotes": "Andra privata anteckningar",
-    "vesselEditor.otherPrivateNotesPlaceholder": "Reservnyckelplats, kajdetaljer, nödkontakter ombord...",
+    "vesselEditor.otherPrivateNotesPlaceholder":
+      "Reservnyckelplats, kajdetaljer, nödkontakter ombord...",
     "privateAccess.title": "Information om båttillträde",
     "privateAccess.intro": "Delas endast med dig som bekräftad sittande.",
     "privateAccess.introOwner": "Synlig för bekräftade sittare för denna båt.",
@@ -9240,15 +9542,18 @@ const localeExtrasSource = {
     "upload.hint": "JPG, PNG eller WebP upp till 10 MB. Stora bilder ändras innan de sparas.",
     "upload.uploadMultiple": "Ladda upp bilder",
     "upload.processingMultiple": "Bearbetar foton...",
-    "upload.hintMultiple": "JPG, PNG eller WebP upp till 10 MB vardera. Stora bilder ändras innan de sparas.",
+    "upload.hintMultiple":
+      "JPG, PNG eller WebP upp till 10 MB vardera. Stora bilder ändras innan de sparas.",
     "sitEditor.kicker": "Sitttillgänglighet",
     "sitEditor.editTitle": "Redigera båt sitta",
     "sitEditor.lockedBannerTitle": "Redigering är låst",
-    "sitEditor.lockedBanner": "Denna sits har tagit emot sökande, så dess uppgifter kan inte längre ändras. Du kan fortfarande granska ansökningar och meddelandevakter.",
+    "sitEditor.lockedBanner":
+      "Denna sits har tagit emot sökande, så dess uppgifter kan inte längre ändras. Du kan fortfarande granska ansökningar och meddelandevakter.",
     "sitEditor.createTitle": "Skapa en båt sitta",
     "sitEditor.createShort": "Skapa en sit",
     "sitEditor.createEditLimitTitle": "Kan redigeras tills någon ansöker",
-    "sitEditor.createEditLimit": "Du kan ändra sitt detaljer tills den första ansökan kommer. Efter det är redigeringen låst så att sökande ser en stabil lista.",
+    "sitEditor.createEditLimit":
+      "Du kan ändra sitt detaljer tills den första ansökan kommer. Efter det är redigeringen låst så att sökande ser en stabil lista.",
     "sitEditor.hint": "En båt kan ha så många separata sittperioder som behövs.",
     "sitEditor.boat": "Båt",
     "sitEditor.boatOnlySelected": "Din enda båt är utvald för denna sits.",
@@ -9259,9 +9564,11 @@ const localeExtrasSource = {
     "sitType.liveaboardHint": "Sittaren bor och sover ombord under alla dejter.",
     "sitType.daytimeChecks": "Dagtid kontroller",
     "sitType.daytimeChecksShort": "Dagtid",
-    "sitType.daytimeChecksHint": "Sittaren besöker dagligen för att kontrollera båten men övernattar inte.",
+    "sitType.daytimeChecksHint":
+      "Sittaren besöker dagligen för att kontrollera båten men övernattar inte.",
     "sitEditor.responsibilities": "Vårdansvar",
-    "sitEditor.responsibilitiesPlaceholder": "En uppgift per rad, till exempel kolla länsen varje morgon",
+    "sitEditor.responsibilitiesPlaceholder":
+      "En uppgift per rad, till exempel kolla länsen varje morgon",
     "sitEditor.requirementsKicker": "Sitter krav",
     "sitEditor.requirementsTitle": "Vem passar bra för denna sits?",
     "sitEditor.minimumYears": "Minst års erfarenhet av båtliv",
@@ -9281,7 +9588,8 @@ const localeExtrasSource = {
     "sitEditor.publish": "Publicera sitta",
     "sitEditor.publishBlocked": "Behövs fortfarande: {{items}}",
     "sitEditor.verificationRequiredTitle": "Verifiera din identitet för att skapa en sit",
-    "sitEditor.verificationRequiredText": "Bekräfta ditt statliga ID, din e-postadress och ditt telefonnummer innan du publicerar en båtsittning.",
+    "sitEditor.verificationRequiredText":
+      "Bekräfta ditt statliga ID, din e-postadress och ditt telefonnummer innan du publicerar en båtsittning.",
     "sitEditor.verificationRequiredCta": "Slutför verifieringen av din profil",
     "sitEditor.verificationChecking": "Kontrollerar din verifiering...",
     "auth.kicker": "Välkommen ombord",
@@ -9323,15 +9631,19 @@ const localeExtrasSource = {
     "settings.language": "Gränssnittsspråk",
     "settings.languageHint": "Datum och nummerformat följer ditt gränssnittsspråk.",
     "settings.measurementSystem": "Mätsystem",
-    "settings.measurementHint": "Din webbläsarregion ställer in den ursprungliga standardinställningen. Båtformer låter dig fortfarande välja endera enheten.",
+    "settings.measurementHint":
+      "Din webbläsarregion ställer in den ursprungliga standardinställningen. Båtformer låter dig fortfarande välja endera enheten.",
     "settings.sitDefaultsTitle": "Standardinställningar för sittskapande",
-    "settings.sitDefaultsHint": "Dessa val är förvalda när du skapar en ny sit. Du kan fortfarande ändra dem vid varje sittning.",
+    "settings.sitDefaultsHint":
+      "Dessa val är förvalda när du skapar en ny sit. Du kan fortfarande ändra dem vid varje sittning.",
     "settings.sitDefaults.nonSmoker": "Kräv icke-rökare som standard",
-    "settings.sitDefaults.nonSmokerHint": "Nya sittningar börjar med Måste vara icke-rökare påslagen.",
+    "settings.sitDefaults.nonSmokerHint":
+      "Nya sittningar börjar med Måste vara icke-rökare påslagen.",
     "settings.metric": "Metriskt (meter)",
     "settings.imperial": "Imperial (fötter)",
     "settings.personalTitle": "Personliga uppgifter",
-    "settings.personalHint": "Ditt juridiska namn och kontaktuppgifter används för verifiering och sittavtal.",
+    "settings.personalHint":
+      "Ditt juridiska namn och kontaktuppgifter används för verifiering och sittavtal.",
     "settings.legalName": "Fullständigt juridiskt namn",
     "settings.legalNameHint": "Som det står på ditt statliga ID.",
     "settings.displayNameHint": "Visas på din offentliga profil och i meddelanden.",
@@ -9339,7 +9651,8 @@ const localeExtrasSource = {
     "settings.savePersonal": "Spara personliga uppgifter",
     "settings.personalSaved": "Personuppgifter sparade",
     "settings.accountTitle": "Konto",
-    "settings.accountHint": "Din e-postadress för inloggning visas här. Använd knapparna för att ändra din e-postadress eller ditt lösenord i en säker dialogruta.",
+    "settings.accountHint":
+      "Din e-postadress för inloggning visas här. Använd knapparna för att ändra din e-postadress eller ditt lösenord i en säker dialogruta.",
     "settings.currentEmail": "Aktuell e-post",
     "settings.newEmail": "Nytt mejl",
     "settings.currentPassword": "Aktuellt lösenord",
@@ -9355,9 +9668,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Lösenordet uppdaterat",
     "settings.passwordMismatch": "Nya lösenord matchar inte.",
     "settings.sameEmail": "Ange en annan e-postadress.",
-    "settings.accountCredentialsUnavailable": "Lösenordsändringar kräver ett e-postkonto. Registrera dig med e-post och försök sedan igen.",
+    "settings.accountCredentialsUnavailable":
+      "Lösenordsändringar kräver ett e-postkonto. Registrera dig med e-post och försök sedan igen.",
     "settings.emailsTitle": "E-postmeddelanden",
-    "settings.emailsHint": "Välj vilka händelser som skickar dig ett e-postmeddelande. Du kan ändra dessa när som helst.",
+    "settings.emailsHint":
+      "Välj vilka händelser som skickar dig ett e-postmeddelande. Du kan ändra dessa när som helst.",
     "settings.email.newApplications": "Nya sittapplikationer på mina båtar",
     "settings.email.applicationUpdates": "Uppdateringar på sits jag ansökt om",
     "settings.email.messages": "Nya meddelanden i mina konversationer",
@@ -9367,33 +9682,40 @@ const localeExtrasSource = {
     "safetyActions.block": "Blockera",
     "safetyActions.unblock": "Avblockera",
     "safetyActions.reportTitle": "Rapportera {{name}}?",
-    "safetyActions.reportText": "Berätta vad som hände. Rapporter granskas av Boatstead och delas inte med den rapporterade medlemmen.",
+    "safetyActions.reportText":
+      "Berätta vad som hände. Rapporter granskas av Boatstead och delas inte med den rapporterade medlemmen.",
     "safetyActions.reportReason": "Resonera",
     "safetyActions.reportDetails": "Detaljer",
     "safetyActions.reportDetailsPlaceholder": "Lägg till alla användbara sammanhang",
     "safetyActions.reportDetailsRequired": "Lägg till en kort beskrivning av denna anledning.",
     "safetyActions.reportSubmit": "Lämna rapport",
     "safetyActions.reportThanksTitle": "Rapport inlämnad",
-    "safetyActions.reportThanksText": "Tack. Vi har tagit emot din rapport om {{name}} och kommer att granska den.",
+    "safetyActions.reportThanksText":
+      "Tack. Vi har tagit emot din rapport om {{name}} och kommer att granska den.",
     "safetyActions.blockTitle": "Blockera {{name}}?",
-    "safetyActions.blockText": "De kommer inte längre att kunna kontakta dig enkelt, och du kan avblockera dem när som helst i Inställningar.",
+    "safetyActions.blockText":
+      "De kommer inte längre att kunna kontakta dig enkelt, och du kan avblockera dem när som helst i Inställningar.",
     "safetyActions.blockConfirm": "Ja, blockera",
     "safetyActions.blockedBannerTitle": "Du blockerade den här medlemmen",
-    "safetyActions.blockedBannerText": "{{name}} finns på din blockerade lista. Du kan avblockera dem här eller i Inställningar.",
+    "safetyActions.blockedBannerText":
+      "{{name}} finns på din blockerade lista. Du kan avblockera dem här eller i Inställningar.",
     "safetyActions.reason.spam": "Spam eller oönskad kontakt",
     "safetyActions.reason.harassment": "Trakasserier eller övergrepp",
     "safetyActions.reason.scam": "Bedrägeri eller bedrägeri",
     "safetyActions.reason.inappropriate": "Olämpligt innehåll eller beteende",
     "safetyActions.reason.other": "Något annat",
     "settings.blockedUsersTitle": "Blockerade konton",
-    "settings.blockedUsersHint": "Medlemmar du har blockerat. Avblockering återställer normal kontakt.",
+    "settings.blockedUsersHint":
+      "Medlemmar du har blockerat. Avblockering återställer normal kontakt.",
     "settings.blockedUsersEmpty": "Du har inte blockerat någon ännu.",
     "settings.blockedOn": "Blockerad {{date}}",
     "settings.dangerZone": "Riskzon",
     "settings.deleteAccount": "Ta bort konto",
-    "settings.deleteAccountHint": "Ta bort din profil, sparade sittningar och lokala kontodata permanent.",
+    "settings.deleteAccountHint":
+      "Ta bort din profil, sparade sittningar och lokala kontodata permanent.",
     "settings.deleteConfirmTitle": "Ta bort ditt konto?",
-    "settings.deleteConfirmText": "Denna åtgärd kan inte ångras. Du kommer att loggas ut omedelbart.",
+    "settings.deleteConfirmText":
+      "Denna åtgärd kan inte ångras. Du kommer att loggas ut omedelbart.",
     "settings.deleteConfirmationLabel": "Skriv {{term}} för att bekräfta borttagningen av kontot",
     "settings.deletingAccount": "Tar bort...",
     "settings.deleteConfirm": "Ja, radera mitt konto",
@@ -9531,32 +9853,45 @@ const localeExtrasSource = {
     "safety.title": "Säkrare båtsittande börjar med förberedelser",
     "safety.intro": "Använd dessa praktiska kontroller före, under och efter varje båtsittning.",
     "safety.verification.title": "Identitet och verifiering",
-    "safety.verification.text": "Slutför tillgängliga identitetskontroller och bekräfta att namn och kontaktuppgifter matchar innan du accepterar en sittning.",
+    "safety.verification.text":
+      "Slutför tillgängliga identitetskontroller och bekräfta att namn och kontaktuppgifter matchar innan du accepterar en sittning.",
     "safety.profiles.title": "Granska profiler och historik",
-    "safety.profiles.text": "Läs referenser, recensioner och erfarenhet noggrant. Ställ följdfrågor om luckor eller okända system.",
+    "safety.profiles.text":
+      "Läs referenser, recensioner och erfarenhet noggrant. Ställ följdfrågor om luckor eller okända system.",
     "safety.video.title": "Träffas via video",
-    "safety.video.text": "Ordna ett videosamtal, involvera alla som ska stanna ombord och gå igenom fartyget live när det är praktiskt möjligt.",
+    "safety.video.text":
+      "Ordna ett videosamtal, involvera alla som ska stanna ombord och gå igenom fartyget live när det är praktiskt möjligt.",
     "safety.expectations.title": "Skriv förväntningar i skrift",
-    "safety.expectations.text": "Skriv in datum, ansvar, åtkomst, utgifter, uppdateringar, besökare och avbokningsplaner.",
+    "safety.expectations.text":
+      "Skriv in datum, ansvar, åtkomst, utgifter, uppdateringar, besökare och avbokningsplaner.",
     "safety.handover.title": "Slutför en båtspecifik överlämning",
-    "safety.handover.text": "Täcksystem, sjökranar, länsar, batterier, landström, motorer, väderpåverkan, nödkontakter och avstängningsprocedurer.",
+    "safety.handover.text":
+      "Täcksystem, sjökranar, länsar, batterier, landström, motorer, väderpåverkan, nödkontakter och avstängningsprocedurer.",
     "safety.insurance.title": "Kolla försäkringen",
-    "safety.insurance.text": "Ägare och barnvakter bör oberoende bekräfta tillämpliga fartyg, marina, resor, ansvar och personlig försäkring.",
+    "safety.insurance.text":
+      "Ägare och barnvakter bör oberoende bekräfta tillämpliga fartyg, marina, resor, ansvar och personlig försäkring.",
     "safety.pets.title": "Plan för husdjur",
-    "safety.pets.text": "Dokumentera matning, medicinering, träning, veterinärkontakter, transport och säker förflyttning runt däck och bryggor.",
+    "safety.pets.text":
+      "Dokumentera matning, medicinering, träning, veterinärkontakter, transport och säker förflyttning runt däck och bryggor.",
     "safety.marina.title": "Följ marinreglerna",
-    "safety.marina.text": "Bekräfta gästregistrering, tillträde, parkering, avfall, buller, säkerhet och nödprocedurer med marinan.",
+    "safety.marina.text":
+      "Bekräfta gästregistrering, tillträde, parkering, avfall, buller, säkerhet och nödprocedurer med marinan.",
     "safety.redFlags.title": "Känn igen röda flaggor",
-    "safety.redFlags.text": "Pausa om någon pressar dig, undviker video, begär ovanliga betalningar, undanhåller dokumentation, ändrar nyckelfakta eller försöker flytta konversationen från plattformen direkt.",
+    "safety.redFlags.text":
+      "Pausa om någon pressar dig, undviker video, begär ovanliga betalningar, undanhåller dokumentation, ändrar nyckelfakta eller försöker flytta konversationen från plattformen direkt.",
     "safety.reporting.title": "Rapportera incidenter",
-    "safety.reporting.text": "Spara meddelanden, foton, datum och kvitton. Rapportera säkerhetsproblem till Boatstead support och relevanta försäkringsgivare eller myndigheter.",
+    "safety.reporting.text":
+      "Spara meddelanden, foton, datum och kvitton. Rapportera säkerhetsproblem till Boatstead support och relevanta försäkringsgivare eller myndigheter.",
     "safety.emergency.title": "I en nödsituation",
-    "safety.emergency.text": "Skydda livet först. Kontakta lokal räddningstjänst eller sjöräddningstjänst, sedan ägaren, småbåtshamnen och försäkringsgivaren vid behov.",
+    "safety.emergency.text":
+      "Skydda livet först. Kontakta lokal räddningstjänst eller sjöräddningstjänst, sedan ägaren, småbåtshamnen och försäkringsgivaren vid behov.",
     "safety.disclaimerTitle": "Viktig begränsning",
-    "safety.disclaimerText": "Boatstead ersätter inte räddningstjänst, försäkringsgivare, kvalificerad sjöfartspersonal eller professionell sjöfartsrådgivning.",
+    "safety.disclaimerText":
+      "Boatstead ersätter inte räddningstjänst, försäkringsgivare, kvalificerad sjöfartspersonal eller professionell sjöfartsrådgivning.",
     "support.kicker": "Hjälpcenter",
     "support.title": "Hur kan vi hjälpa till?",
-    "support.intro": "Välj en kategori och skicka ett meddelande. Denna prototyp lagrar förfrågningar lokalt och skickar inte e-post.",
+    "support.intro":
+      "Välj en kategori och skicka ett meddelande. Denna prototyp lagrar förfrågningar lokalt och skickar inte e-post.",
     "support.categories": "Stödkategorier",
     "support.topic": "Ämne",
     "support.chooseTopic": "Välj ett ämne",
@@ -9567,7 +9902,8 @@ const localeExtrasSource = {
     "support.topic.other": "Andra",
     "support.formTitle": "Kontakta supporten",
     "support.accountDetails": "Ditt konto",
-    "support.accountDetailsHint": "Vi använder detta namn och e-postadress för din supportförfrågan.",
+    "support.accountDetailsHint":
+      "Vi använder detta namn och e-postadress för din supportförfrågan.",
     "support.name": "Namn",
     "support.email": "E-post",
     "support.message": "Meddelande",
@@ -9580,56 +9916,79 @@ const localeExtrasSource = {
     "terms.kicker": "Rättslig",
     "terms.title": "Användarvillkor",
     "terms.updated": "Senast uppdaterad: 21 juli 2026",
-    "terms.reviewNotice": "Förlanseringsmeddelande: kvalificerad juridisk rådgivare måste granska och anpassa dessa villkor innan produktionsstart.",
+    "terms.reviewNotice":
+      "Förlanseringsmeddelande: kvalificerad juridisk rådgivare måste granska och anpassa dessa villkor innan produktionsstart.",
     "terms.eligibility.title": "Behörighet",
-    "terms.eligibility.text": "Du måste juridiskt kunna ingå avtal och tillhandahålla korrekt information för att använda Boatstead.",
+    "terms.eligibility.text":
+      "Du måste juridiskt kunna ingå avtal och tillhandahålla korrekt information för att använda Boatstead.",
     "terms.accounts.title": "konton",
-    "terms.accounts.text": "Du är ansvarig för ditt konto, inloggningsuppgifter och aktivitet. Berätta omedelbart om obehörig åtkomst.",
+    "terms.accounts.text":
+      "Du är ansvarig för ditt konto, inloggningsuppgifter och aktivitet. Berätta omedelbart om obehörig åtkomst.",
     "terms.platform.title": "Plattformsroll",
-    "terms.platform.text": "Boatstead underlättar endast introduktioner mellan båtägare och sittande. Varje sittarrangemang är ett kontrakt mellan ägaren och sitter. Boatstead äger inte fartyg, anställer inte medlemmar, övervakar sittningar eller blir en part i dessa arrangemang.",
+    "terms.platform.text":
+      "Boatstead underlättar endast introduktioner mellan båtägare och sittande. Varje sittarrangemang är ett kontrakt mellan ägaren och sitter. Boatstead äger inte fartyg, anställer inte medlemmar, övervakar sittningar eller blir en part i dessa arrangemang.",
     "terms.listings.title": "Listor och applikationer",
-    "terms.listings.text": "Listor och ansökningar måste vara korrekta, aktuella och fullständiga. Medlemmar bestämmer om de vill delta i ett sittarrangemang.",
+    "terms.listings.text":
+      "Listor och ansökningar måste vara korrekta, aktuella och fullständiga. Medlemmar bestämmer om de vill delta i ett sittarrangemang.",
     "terms.responsibilities.title": "Användaransvar",
-    "terms.responsibilities.text": "Medlemmar måste agera lagligt, kommunicera ärligt, följa skriftliga förväntningar och iaktta rimlig försiktighet.",
+    "terms.responsibilities.text":
+      "Medlemmar måste agera lagligt, kommunicera ärligt, följa skriftliga förväntningar och iaktta rimlig försiktighet.",
     "terms.verification.title": "Kontroll",
-    "terms.verification.text": "Kontroller kan minska risken men garanterar inte identitet, beteende, kvalifikationer, säkerhet eller lämplighet.",
+    "terms.verification.text":
+      "Kontroller kan minska risken men garanterar inte identitet, beteende, kvalifikationer, säkerhet eller lämplighet.",
     "terms.prohibited.title": "Förbjudet beteende",
-    "terms.prohibited.text": "Begå inte bedrägeri, trakasserier, diskriminering, osäkra handlingar, obehörig åtkomst, olaglig aktivitet eller missbruk av plattformen.",
+    "terms.prohibited.text":
+      "Begå inte bedrägeri, trakasserier, diskriminering, osäkra handlingar, obehörig åtkomst, olaglig aktivitet eller missbruk av plattformen.",
     "terms.payments.title": "Betalningar och avgifter",
-    "terms.payments.text": "Boatstead tar för närvarande ingen nattavgift. Om betalfunktioner introduceras kommer tillämpliga villkor och priser att visas först.",
+    "terms.payments.text":
+      "Boatstead tar för närvarande ingen nattavgift. Om betalfunktioner introduceras kommer tillämpliga villkor och priser att visas först.",
     "terms.cancellations.title": "Avbokningar",
-    "terms.cancellations.text": "Medlemmar bör godkänna avbokningsplaner skriftligen och meddela ändringar omgående för att minska skada och kostnader.",
+    "terms.cancellations.text":
+      "Medlemmar bör godkänna avbokningsplaner skriftligen och meddela ändringar omgående för att minska skada och kostnader.",
     "terms.insurance.title": "Försäkring",
-    "terms.insurance.text": "Medlemmarna ansvarar för att bekräfta lämplig försäkring. Boatstead tillhandahåller ingen fartygs-, rese- eller ansvarsförsäkring.",
+    "terms.insurance.text":
+      "Medlemmarna ansvarar för att bekräfta lämplig försäkring. Boatstead tillhandahåller ingen fartygs-, rese- eller ansvarsförsäkring.",
     "terms.damage.title": "Skador och anspråk",
-    "terms.damage.text": "Eventuella skador, stölder eller liknande anspråk sker i första hand mellan ägaren och hushållaren. Dokumentera incidenter skyndsamt, bevara bevis och samarbeta med den andra parten, småbåtshamnar, försäkringsbolag och myndigheter.",
+    "terms.damage.text":
+      "Eventuella skador, stölder eller liknande anspråk sker i första hand mellan ägaren och hushållaren. Dokumentera incidenter skyndsamt, bevara bevis och samarbeta med den andra parten, småbåtshamnar, försäkringsbolag och myndigheter.",
     "terms.intellectualProperty.title": "Immateriella rättigheter",
-    "terms.intellectualProperty.text": "Boatstead innehåll och varumärke är skyddade. Du behåller rättigheterna till ditt innehåll och ger oss tillåtelse att driva tjänsten.",
+    "terms.intellectualProperty.text":
+      "Boatstead innehåll och varumärke är skyddade. Du behåller rättigheterna till ditt innehåll och ger oss tillåtelse att driva tjänsten.",
     "terms.privacy.title": "Privatliv",
-    "terms.privacy.text": "Personuppgifter ska hanteras ansvarsfullt. Ett sekretessmeddelande för produktion kommer att beskriva insamling, användning, lagring och rättigheter.",
+    "terms.privacy.text":
+      "Personuppgifter ska hanteras ansvarsfullt. Ett sekretessmeddelande för produktion kommer att beskriva insamling, användning, lagring och rättigheter.",
     "terms.termination.title": "Avstängning och uppsägning",
-    "terms.termination.text": "Vi kan begränsa eller avsluta åtkomst för att skydda medlemmar, undersöka problem, genomdriva villkor eller följa lagar.",
+    "terms.termination.text":
+      "Vi kan begränsa eller avsluta åtkomst för att skydda medlemmar, undersöka problem, genomdriva villkor eller följa lagar.",
     "terms.disclaimers.title": "Friskrivningsklausuler",
-    "terms.disclaimers.text": "Prototypen tillhandahålls som tillgänglig utan garantier för oavbruten drift, lämplighet, noggrannhet eller resultat.",
+    "terms.disclaimers.text":
+      "Prototypen tillhandahålls som tillgänglig utan garantier för oavbruten drift, lämplighet, noggrannhet eller resultat.",
     "terms.liability.title": "Ansvarsbegränsning",
-    "terms.liability.text": "I den utsträckning det är tillåtet enligt lag är Boatstead inte ansvarigt för skada, stöld, förlust, personskada, reseavbrott, egendomsanspråk eller något annat resultat som härrör från arrangemang mellan medlemmar. Medlemmar hanterar varandra på egen risk.",
+    "terms.liability.text":
+      "I den utsträckning det är tillåtet enligt lag är Boatstead inte ansvarigt för skada, stöld, förlust, personskada, reseavbrott, egendomsanspråk eller något annat resultat som härrör från arrangemang mellan medlemmar. Medlemmar hanterar varandra på egen risk.",
     "terms.indemnity.title": "Ersättning",
-    "terms.indemnity.text": "Där det är lagligt tillåtet, samtycker du till att täcka anspråk orsakade av ditt olagliga beteende, innehåll eller brott mot dessa villkor.",
+    "terms.indemnity.text":
+      "Där det är lagligt tillåtet, samtycker du till att täcka anspråk orsakade av ditt olagliga beteende, innehåll eller brott mot dessa villkor.",
     "terms.disputes.title": "Tvister och tillämplig lag",
-    "terms.disputes.text": "Produktionsvillkoren måste specificera en företagsenhet, jurisdiktion, tillämplig lag och tvistprocess efter juridisk granskning.",
+    "terms.disputes.text":
+      "Produktionsvillkoren måste specificera en företagsenhet, jurisdiktion, tillämplig lag och tvistprocess efter juridisk granskning.",
     "terms.changes.title": "Ändringar av dessa villkor",
-    "terms.changes.text": "Vi kan komma att uppdatera dessa villkor och kommer att ge lämpligt meddelande innan väsentliga ändringar träder i kraft.",
+    "terms.changes.text":
+      "Vi kan komma att uppdatera dessa villkor och kommer att ge lämpligt meddelande innan väsentliga ändringar träder i kraft.",
     "terms.contact.title": "Kontakt och support",
-    "terms.contact.text": "Använd supportsidan för frågor. Lita inte på Boatsteads support för nödsituationer.",
+    "terms.contact.text":
+      "Använd supportsidan för frågor. Lita inte på Boatsteads support för nödsituationer.",
     "nav.admin": "Administration",
     "footer.admin": "Administration",
     "admin.kicker": "Plattformsoperationer",
     "admin.title": "Administration",
-    "admin.subtitle": "Hantera medlemmar, roller och kontostatus. Varje förändring registreras i revisionsspåret.",
+    "admin.subtitle":
+      "Hantera medlemmar, roller och kontostatus. Varje förändring registreras i revisionsspåret.",
     "admin.tab.users": "Användare",
     "admin.tab.audit": "Revisionsspår",
     "admin.signInTitle": "Logga in för att öppna Admin",
-    "admin.signInText": "Administratörsverktyg är endast tillgängliga för inloggade superanvändare.",
+    "admin.signInText":
+      "Administratörsverktyg är endast tillgängliga för inloggade superanvändare.",
     "admin.deniedTitle": "Adminåtkomst krävs",
     "admin.deniedText": "Ditt konto har inte behörighet att hantera användare.",
     "admin.usersEmpty": "Inga användare matchar denna sökning.",
@@ -9644,7 +10003,8 @@ const localeExtrasSource = {
     "admin.editUser": "Redigera användare",
     "admin.deleteUser": "Ta bort användare",
     "admin.deleteConfirmTitle": "Ta bort den här användaren?",
-    "admin.deleteConfirmText": "Detta tar bort {{name}} från admin-katalogen. Relaterade sittningar och meddelanden kan fortfarande visas i lokal demodata.",
+    "admin.deleteConfirmText":
+      "Detta tar bort {{name}} från admin-katalogen. Relaterade sittningar och meddelanden kan fortfarande visas i lokal demodata.",
     "admin.deleteConfirm": "Ja, ta bort användare",
     "admin.deleting": "Tar bort...",
     "admin.saveUser": "Spara användare",
@@ -9671,7 +10031,8 @@ const localeExtrasSource = {
   },
   nb: {
     "meta.title": "Boatstead | Pålitelig båtpleie",
-    "meta.description": "Boatstead forbinder pålitelige båtsittere med eiere som trenger erfarne hender om bord.",
+    "meta.description":
+      "Boatstead forbinder pålitelige båtsittere med eiere som trenger erfarne hender om bord.",
     "common.back": "Tilbake",
     "common.cancel": "Kansellere",
     "common.close": "Lukke",
@@ -9681,7 +10042,8 @@ const localeExtrasSource = {
     "common.saving": "Lagrer …",
     "nav.logout": "Logg ut",
     "nav.logoutConfirmTitle": "Er du sikker på at du vil logge ut?",
-    "nav.logoutConfirmText": "Du må logge på igjen for å få tilgang til profilen din, meldinger og lagrede sittings.",
+    "nav.logoutConfirmText":
+      "Du må logge på igjen for å få tilgang til profilen din, meldinger og lagrede sittings.",
     "nav.logoutConfirm": "Ja, logg ut",
     "notifications.open": "Åpne varsler",
     "notifications.heading": "Varsler",
@@ -9722,15 +10084,18 @@ const localeExtrasSource = {
     "map.zoomOut": "Zoom ut",
     "map.openInMaps": "Åpne i Maps",
     "map.openInMapsAriaLabel": "Åpne {{location}} i Maps",
-    "map.approximateLocationNote": "Denne pinnen markerer det generelle området. Nøyaktige kaidetaljer deles etter at du har søkt.",
+    "map.approximateLocationNote":
+      "Denne pinnen markerer det generelle området. Nøyaktige kaidetaljer deles etter at du har søkt.",
     "home.heroImageAlt": "Seilbåt ankret i en klar bukt",
-    "apply.defaultMessage": "Hei {{owner}}, jeg vil gjerne ta vare på {{boat}}. Jeg har relevant båterfaring og arrangerer gjerne en videosamtale.",
+    "apply.defaultMessage":
+      "Hei {{owner}}, jeg vil gjerne ta vare på {{boat}}. Jeg har relevant båterfaring og arrangerer gjerne en videosamtale.",
     "apply.successTitle": "Melding sendt",
     "apply.successText": "{{owner}} vil motta søknaden din for {{boat}}.",
     "apply.viewInSits": "Se i dine sitter",
     "apply.kicker": "Introduser deg selv",
     "apply.title": "Søk om {{boat}}",
-    "apply.hint": "Nevn din erfaring med {{type}}-båter og systemene ombord som er oppført i oversikten.",
+    "apply.hint":
+      "Nevn din erfaring med {{type}}-båter og systemene ombord som er oppført i oversikten.",
     "apply.sending": "Sender …",
     "apply.send": "Send søknad",
     "detail.back": "Tilbake til alle båter",
@@ -9767,15 +10132,18 @@ const localeExtrasSource = {
     "saved.emptyHint": "Lagre seter som fanger oppmerksomheten og sammenlign dem her.",
     "saved.browse": "Bla gjennom båter",
     "saved.signInTitle": "Logg på for å lagre sits",
-    "saved.signInText": "Logg på eller opprett en konto for å lagre sits på shortlisten din og finn dem senere.",
+    "saved.signInText":
+      "Logg på eller opprett en konto for å lagre sits på shortlisten din og finn dem senere.",
     "saved.showAll": "Vis alle inkludert sitter valgt, fullført osv.",
     "saved.emptyFiltered": "Ingen åpne lagrede sitter",
-    "saved.emptyFilteredHint": "Shortlisten din har bare sittinger som allerede har en sitter valgt eller er fullført. Merk av i boksen ovenfor for å se dem.",
+    "saved.emptyFilteredHint":
+      "Shortlisten din har bare sittinger som allerede har en sitter valgt eller er fullført. Merk av i boksen ovenfor for å se dem.",
     "editorPreview.kicker": "Live forhåndsvisning",
     "editorPreview.title": "Hvordan det vil se ut",
     "editorPreview.label": "Live forhåndsvisning",
     "editorPreview.vesselHint": "Oppdateres etter hvert som du redigerer båtdetaljene dine.",
-    "editorPreview.sitHint": "Oppdaterer mens du redigerer denne siden. Slik ser det ut når sittere surfer.",
+    "editorPreview.sitHint":
+      "Oppdaterer mens du redigerer denne siden. Slik ser det ut når sittere surfer.",
     "editorPreview.untitledBoat": "Båt uten navn",
     "editorPreview.homePortPending": "Legg til en hjemmeport",
     "editorPreview.lengthPending": "Lengde TBD",
@@ -9784,17 +10152,22 @@ const localeExtrasSource = {
     "editorPreview.notSpecified": "Ikke spesifisert",
     "how.kicker": "Hvordan Boatstead fungerer",
     "how.title": "Tillit starter før noen går ombord.",
-    "how.subtitle": "En båt er et hjem og et levende system. Boatstead hjelper begge sider med å matche detaljene som betyr noe.",
+    "how.subtitle":
+      "En båt er et hjem og et levende system. Boatstead hjelper begge sider med å matche detaljene som betyr noe.",
     "how.stepProfileTitle": "Bygg din mannskapsprofil",
-    "how.stepProfileText": "Del referanser, sertifiseringer, fartøyserfaring og systemene du er komfortabel med.",
+    "how.stepProfileText":
+      "Del referanser, sertifiseringer, fartøyserfaring og systemene du er komfortabel med.",
     "how.stepFindTitle": "Finn riktig båt",
-    "how.stepFindText": "Filtrer etter plassering, fartøystype, datoer, kjæledyr ombord og forespurt erfaring.",
+    "how.stepFindText":
+      "Filtrer etter plassering, fartøystype, datoer, kjæledyr ombord og forespurt erfaring.",
     "how.stepMeetTitle": "Møt og match",
-    "how.stepMeetText": "Snakk med eiere, still praktiske spørsmål og bli enige om ansvar før du bekrefter.",
+    "how.stepMeetText":
+      "Snakk med eiere, still praktiske spørsmål og bli enige om ansvar før du bekrefter.",
     "how.stepHandoverTitle": "Fullfør overleveringen",
-    "how.stepHandoverText": "Gå gjennom båten sammen, fra lenser og batterier til vær- og beredskapsplaner.",
+    "how.stepHandoverText":
+      "Gå gjennom båten sammen, fra lenser og batterier til vær- og beredskapsplaner.",
     "how.briefKicker": "The Boatstead båtkort",
-    "how.briefTitle": "Ingen vage \"hold øye med henne.\"",
+    "how.briefTitle": 'Ingen vage "hold øye med henne."',
     "how.briefMooring": "Fortøyning, liner og fendere",
     "how.briefBilges": "Lense og sjøhaner",
     "how.briefBattery": "Batteri og landstrøm",
@@ -9805,12 +10178,16 @@ const localeExtrasSource = {
     "how.briefContacts": "Marina kontakter",
     "how.storiesKicker": "Historier fra kaien",
     "how.storiesTitle": "Pålitelig på begge sider av overleveringen",
-    "how.storiesText": "Eiere får erfaren omsorg. Sittere får ærlige truser og bemerkelsesverdige steder å ringe hjem.",
-    "how.testimonialOneQuote": "For første gang forlot vi Sunbird i tre uker uten å sjekke havnekameraene hver time. Claire forsto båten, sendte gjennomtenkte oppdateringer og ga henne ulastelig tilbake.",
+    "how.storiesText":
+      "Eiere får erfaren omsorg. Sittere får ærlige truser og bemerkelsesverdige steder å ringe hjem.",
+    "how.testimonialOneQuote":
+      "For første gang forlot vi Sunbird i tre uker uten å sjekke havnekameraene hver time. Claire forsto båten, sendte gjennomtenkte oppdateringer og ga henne ulastelig tilbake.",
     "how.testimonialOneDetail": "Eiere av Sunbird · Antibes",
-    "how.testimonialTwoQuote": "Boatstead matchet meg med en båt som passet til min faktiske opplevelse, ikke bare en vakker beliggenhet. Overleveringsbrevet betydde at det ikke var noen overraskelser når eierne dro.",
+    "how.testimonialTwoQuote":
+      "Boatstead matchet meg med en båt som passet til min faktiske opplevelse, ikke bare en vakker beliggenhet. Overleveringsbrevet betydde at det ikke var noen overraskelser når eierne dro.",
     "how.testimonialTwoDetail": "RYA Yachtmaster · 11 fullførte seter",
-    "how.testimonialThreeQuote": "Sitteren vår la merke til et lite landstrømproblem før det ble dyrt. Å ha noen ombord som visste hva de skulle se etter gjorde hele forskjellen.",
+    "how.testimonialThreeQuote":
+      "Sitteren vår la merke til et lite landstrømproblem før det ble dyrt. Å ha noen ombord som visste hva de skulle se etter gjorde hele forskjellen.",
     "how.testimonialThreeDetail": "Eier av Northbound · Vancouver",
     "role.owner": "Båteier",
     "role.sitter": "Båtsitter",
@@ -9823,15 +10200,18 @@ const localeExtrasSource = {
     "sits.withOwner": "Med {{owner}}",
     "sits.withdrawInterest": "Trekk renter",
     "sits.withdrawConfirmTitle": "Trekk interessen din?",
-    "sits.withdrawConfirmText": "Dette fjerner applikasjonen din for {{boat}}. Du kan søke på nytt senere hvis siten fortsatt er åpen.",
-    "sits.withdrawAcceptedConfirmText": "Du er for øyeblikket akseptert for {{boat}}. Tilbaketrekking avslutter bekreftelsen slik at eieren kan velge noen andre.",
+    "sits.withdrawConfirmText":
+      "Dette fjerner applikasjonen din for {{boat}}. Du kan søke på nytt senere hvis siten fortsatt er åpen.",
+    "sits.withdrawAcceptedConfirmText":
+      "Du er for øyeblikket akseptert for {{boat}}. Tilbaketrekking avslutter bekreftelsen slik at eieren kan velge noen andre.",
     "sits.withdrawConfirmAction": "Ja, trekke deg tilbake",
     "role.vesselOwner": "{{type}} eier",
     "notFound.title": "Tapt på sjøen?",
     "notFound.text": "Den siden er ikke på diagrammet vårt.",
     "notFound.back": "Tilbake til havnen",
     "errorBoundary.title": "Noe gikk galt",
-    "errorBoundary.text": "Vi traff et uventet problem. Prøv igjen, eller gå tilbake til startsiden.",
+    "errorBoundary.text":
+      "Vi traff et uventet problem. Prøv igjen, eller gå tilbake til startsiden.",
     "errorBoundary.tryAgain": "Prøv igjen",
     "errorBoundary.goHome": "Gå hjem",
     "profile.settings": "Offentlig profil",
@@ -9840,7 +10220,8 @@ const localeExtrasSource = {
     "profile.photo": "Profilbilde",
     "profile.photoPreviewAlt": "Nåværende profilbilde",
     "profile.replacePhoto": "Last opp eller erstatt bilde",
-    "profile.photoUploadHint": "JPG, PNG eller WebP opptil 10 MB. Store bilder endres størrelse før de lagres.",
+    "profile.photoUploadHint":
+      "JPG, PNG eller WebP opptil 10 MB. Store bilder endres størrelse før de lagres.",
     "profile.coverImage": "Forsidebilde",
     "profile.coverHint": "Valgfri. Erstatter standardbanneret bak bildet ditt.",
     "profile.coverPreviewAlt": "Nåværende forsidebilde",
@@ -9849,7 +10230,8 @@ const localeExtrasSource = {
     "profile.location": "Hjemmehavn/sted",
     "profile.locationPlaceholder": "Begynn å skrive en by",
     "profile.aboutYou": "Om deg",
-    "profile.aboutPlaceholder": "Del din båtopplevelse, tilnærming og hva som gjør deg til en god match...",
+    "profile.aboutPlaceholder":
+      "Del din båtopplevelse, tilnærming og hva som gjør deg til en god match...",
     "profile.qualifications": "Erfaring og kvalifikasjoner",
     "profile.qualificationsPlaceholder": "En per linje, for eksempel RYA Day Skipper",
     "profile.spokenLanguages": "Språk du snakker",
@@ -9864,8 +10246,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identitet bekreftet",
     "verification.identityVerified": "Identitet bekreftet",
     "verification.confirmIdentity": "Bekreft identiteten din",
-    "verification.verifiedHint": "Boatstead bekreftet offentlig ID, e-post og telefon for dette medlemmet.",
-    "verification.selfHint": "Fullfør hvert element nedenfor slik at eiere og sittere kan stole på profilen din.",
+    "verification.verifiedHint":
+      "Boatstead bekreftet offentlig ID, e-post og telefon for dette medlemmet.",
+    "verification.selfHint":
+      "Fullfør hvert element nedenfor slik at eiere og sittere kan stole på profilen din.",
     "verification.partialHint": "{{count}} av {{total}} kontroller bekreftet så langt.",
     "verification.governmentId": "Offentlig ID",
     "verification.email": "E-postadresse",
@@ -9873,9 +10257,12 @@ const localeExtrasSource = {
     "verification.statusVerified": "verifisert",
     "verification.statusMissing": "ikke verifisert",
     "verification.verifyGovernmentId": "Bekreft offentlig ID",
-    "verification.addEmailAndPhone": "Legg til en e-postadresse og telefonnummer i profilen din for å fullføre bekreftelsen.",
-    "verification.addPhone": "Legg til et telefonnummer i profilen din for å fullføre bekreftelsen.",
-    "verification.addEmail": "Legg til en e-postadresse i profilen din for å fullføre bekreftelsen.",
+    "verification.addEmailAndPhone":
+      "Legg til en e-postadresse og telefonnummer i profilen din for å fullføre bekreftelsen.",
+    "verification.addPhone":
+      "Legg til et telefonnummer i profilen din for å fullføre bekreftelsen.",
+    "verification.addEmail":
+      "Legg til en e-postadresse i profilen din for å fullføre bekreftelsen.",
     "member.verificationNeeded": "Bekreftelse nødvendig",
     "member.reviews_one": "1 anmeldelse",
     "member.reviews_other": "{{count}} anmeldelser",
@@ -9915,7 +10302,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} sitteperioder",
     "owner.sitSummary": "{{duration}} · {{applicants}} søkere · {{tasks}} omsorgsoppgaver",
     "owner.sitPhaseFilter": "Filter sitter etter fase",
-    "owner.sitPhaseFilterHint": "Sittene er gruppert etter fase. Bruk filteret til å fokusere på ett trinn.",
+    "owner.sitPhaseFilterHint":
+      "Sittene er gruppert etter fase. Bruk filteret til å fokusere på ett trinn.",
     "owner.sitPhaseFilterAll": "Alle faser",
     "owner.sitPhaseEmpty": "Ingen sitter i denne fasen",
     "owner.sitPhaseCount_one": "1 sitte",
@@ -9923,14 +10311,18 @@ const localeExtrasSource = {
     "owner.firstBoat": "Legg til din første båt",
     "owner.firstSit": "Lag din første sitte",
     "owner.sitsEmptyTitle": "Ingen sitter ennå",
-    "owner.sitsEmptyHintWithBoats": "Publiser datoer for en av båtene dine, eller bla gjennom åpne seter for å finne din første omsorgsmulighet.",
-    "owner.sitsEmptyHintNoBoats": "Legg til en båt for å være vert for en sit, eller bla gjennom åpne sitteplasser for å finne din første omsorgsmulighet.",
+    "owner.sitsEmptyHintWithBoats":
+      "Publiser datoer for en av båtene dine, eller bla gjennom åpne seter for å finne din første omsorgsmulighet.",
+    "owner.sitsEmptyHintNoBoats":
+      "Legg til en båt for å være vert for en sit, eller bla gjennom åpne sitteplasser for å finne din første omsorgsmulighet.",
     "owner.browseOpenSits": "Bla gjennom åpne sitter",
-    "owner.firstBoatHint": "Legg til fartøyet én gang, og lag deretter separate sitteplasser når du reiser.",
+    "owner.firstBoatHint":
+      "Legg til fartøyet én gang, og lag deretter separate sitteplasser når du reiser.",
     "owner.firstSitHint": "Velg en båt og publiser datoene du trenger noen ombord.",
     "owner.boatBeforeSit": "Legg til en båt før du oppretter en sit.",
     "owner.sitRequiresBoatTooltip": "Lag en båt først. Klikk her for å legge til din første båt.",
-    "owner.sitRequiresVerificationTooltip": "Bekreft identiteten din før du oppretter en sit. Åpne profilen din for å fullføre bekreftelsen.",
+    "owner.sitRequiresVerificationTooltip":
+      "Bekreft identiteten din før du oppretter en sit. Åpne profilen din for å fullføre bekreftelsen.",
     "owner.deleteBoatLabel": "Slett {{boat}}",
     "owner.deleteBoatTitle": "Vil du slette {{boat}}?",
     "owner.deleteBoatConfirm": "Dette fjerner båten permanent og kan ikke angres.",
@@ -9944,15 +10336,21 @@ const localeExtrasSource = {
     "owner.sitDeleteLocked": "Dette setet har en akseptert søker og kan ikke lenger slettes",
     "owner.deleteError": "Båten kunne ikke slettes. Vennligst prøv igjen.",
     "owner.deleteSitError": "Denne siten kunne ikke slettes. Vennligst prøv igjen.",
-    "owner.deleteSitAcceptedError": "Dette setet har en akseptert søker og kan ikke lenger slettes.",
-    "owner.sitDeleteUnderway": "Denne siten er i gang og kan ikke slettes. Kontakt kundestøtte hvis du trenger hjelp med noen problemer.",
-    "owner.deleteSitApplicantsWarning_one": "Denne siten har 1 søker akkurat nå. Hvis du sletter den, fjernes oppføringen for alle som har søkt.",
-    "owner.deleteSitApplicantsWarning_other": "Dette setet har {{count}} søkere akkurat nå. Hvis du sletter den, fjernes oppføringen for alle som har søkt.",
-    "owner.deleteSitAcceptedWarning": "Noen har allerede blitt akseptert for dette setet. Vennligst informer dem før du sletter den.",
+    "owner.deleteSitAcceptedError":
+      "Dette setet har en akseptert søker og kan ikke lenger slettes.",
+    "owner.sitDeleteUnderway":
+      "Denne siten er i gang og kan ikke slettes. Kontakt kundestøtte hvis du trenger hjelp med noen problemer.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Denne siten har 1 søker akkurat nå. Hvis du sletter den, fjernes oppføringen for alle som har søkt.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Dette setet har {{count}} søkere akkurat nå. Hvis du sletter den, fjernes oppføringen for alle som har søkt.",
+    "owner.deleteSitAcceptedWarning":
+      "Noen har allerede blitt akseptert for dette setet. Vennligst informer dem før du sletter den.",
     "owner.deleteSitCompletedError": "Fullførte sets kan ikke slettes. Arkiver dem i stedet.",
     "owner.archiveSitLabel": "Arkiv {{boat}} sit",
     "owner.archiveSitTitle": "Arkivere denne siten?",
-    "owner.archiveSitConfirm": "Vil du arkivere {{dates}}-sitten for {{boat}}? Du finner den senere under Arkivert.",
+    "owner.archiveSitConfirm":
+      "Vil du arkivere {{dates}}-sitten for {{boat}}? Du finner den senere under Arkivert.",
     "owner.archiveSitAction": "Ja, arkiv",
     "owner.unarchiveSit": "Flytt til aktive sitter",
     "owner.unarchiveSitLabel": "Gjenopprett {{boat}} sit",
@@ -9979,9 +10377,11 @@ const localeExtrasSource = {
     "vesselEditor.country": "Land",
     "vesselEditor.countryPlaceholder": "for eksempel Hellas",
     "vesselEditor.homePort": "Hjemmehavn",
-    "vesselEditor.homePortHint": "Hvor båten vanligvis holdes. Hver sit kan bruke en annen plassering.",
+    "vesselEditor.homePortHint":
+      "Hvor båten vanligvis holdes. Hver sit kan bruke en annen plassering.",
     "sitEditor.sameAsHomePort": "Samme som hjemmeport: {{homePort}}",
-    "sitEditor.sameAsHomePortHint": "Fjern merket for dette hvis båten vil være et annet sted for denne siten.",
+    "sitEditor.sameAsHomePortHint":
+      "Fjern merket for dette hvis båten vil være et annet sted for denne siten.",
     "sitEditor.location": "Sitte plassering",
     "sitEditor.locationPlaceholder": "Søk etter by",
     "sitEditor.country": "Land",
@@ -9991,7 +10391,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Forhåndsvisning av båtdeksel",
     "vesselEditor.noCover": "Ingen forsidebilde ennå",
     "vesselEditor.gallery": "Flere bilder",
-    "vesselEditor.galleryHint": "Last opp flere bilder av båten, marinaen og livet ombord. Bildetekster er valgfrie.",
+    "vesselEditor.galleryHint":
+      "Last opp flere bilder av båten, marinaen og livet ombord. Bildetekster er valgfrie.",
     "vesselEditor.galleryCaption": "Bildetekst",
     "vesselEditor.galleryCaptionPlaceholder": "Valgfri bildetekst",
     "vesselEditor.galleryEmpty": "Ingen flere bilder ennå",
@@ -10009,7 +10410,8 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Hva er tilgjengelig?",
     "vesselEditor.featuresHint": "Velg alt sittere kan bruke ombord eller på marinaen.",
     "vesselEditor.privateAccessTitle": "Privat tilgangsdetaljer",
-    "vesselEditor.privateAccessHint": "Deles kun med bekreftede sittere etter at du har godtatt søknaden deres. Oppbevar Wi-Fi-passord, portkoder og lignende detaljer her.",
+    "vesselEditor.privateAccessHint":
+      "Deles kun med bekreftede sittere etter at du har godtatt søknaden deres. Oppbevar Wi-Fi-passord, portkoder og lignende detaljer her.",
     "vesselEditor.wifiNetwork": "Wi-Fi-nettverk",
     "vesselEditor.wifiNetworkPlaceholder": "Nettverksnavn",
     "vesselEditor.wifiPassword": "Wi-Fi passord",
@@ -10017,7 +10419,8 @@ const localeExtrasSource = {
     "vesselEditor.accessCodes": "Tilgangskoder",
     "vesselEditor.accessCodesPlaceholder": "Marina gate, låseboks, følge, alarm...",
     "vesselEditor.otherPrivateNotes": "Andre private notater",
-    "vesselEditor.otherPrivateNotesPlaceholder": "Reservenøkkelplassering, kaidetaljer, nødkontakter ombord...",
+    "vesselEditor.otherPrivateNotesPlaceholder":
+      "Reservenøkkelplassering, kaidetaljer, nødkontakter ombord...",
     "privateAccess.title": "Informasjon om båttilgang",
     "privateAccess.intro": "Deles kun med deg som bekreftet sitter.",
     "privateAccess.introOwner": "Synlig for bekreftede oppsittere for denne båten.",
@@ -10041,15 +10444,18 @@ const localeExtrasSource = {
     "upload.hint": "JPG, PNG eller WebP opptil 10 MB. Store bilder endres størrelse før de lagres.",
     "upload.uploadMultiple": "Last opp bilder",
     "upload.processingMultiple": "Behandler bilder …",
-    "upload.hintMultiple": "JPG, PNG eller WebP opptil 10 MB hver. Store bilder endres størrelse før de lagres.",
+    "upload.hintMultiple":
+      "JPG, PNG eller WebP opptil 10 MB hver. Store bilder endres størrelse før de lagres.",
     "sitEditor.kicker": "Sitte tilgjengelighet",
     "sitEditor.editTitle": "Rediger båtsitt",
     "sitEditor.lockedBannerTitle": "Redigering er låst",
-    "sitEditor.lockedBanner": "Dette setet har mottatt søkere, så detaljene kan ikke lenger endres. Du kan fortsatt gå gjennom søknader og meldingsvakter.",
+    "sitEditor.lockedBanner":
+      "Dette setet har mottatt søkere, så detaljene kan ikke lenger endres. Du kan fortsatt gå gjennom søknader og meldingsvakter.",
     "sitEditor.createTitle": "Lag en båtsitte",
     "sitEditor.createShort": "Lag en sit",
     "sitEditor.createEditLimitTitle": "Kan redigeres til noen søker",
-    "sitEditor.createEditLimit": "Du kan endre sittedetaljer til den første søknaden kommer. Etter det er redigering låst slik at søkere ser en stabil oppføring.",
+    "sitEditor.createEditLimit":
+      "Du kan endre sittedetaljer til den første søknaden kommer. Etter det er redigering låst slik at søkere ser en stabil oppføring.",
     "sitEditor.hint": "En båt kan ha så mange separate sitteperioder som nødvendig.",
     "sitEditor.boat": "Båt",
     "sitEditor.boatOnlySelected": "Din eneste båt er valgt for dette setet.",
@@ -10060,9 +10466,11 @@ const localeExtrasSource = {
     "sitType.liveaboardHint": "Sitteren bor og sover ombord gjennom datoene.",
     "sitType.daytimeChecks": "Kontroller på dagtid",
     "sitType.daytimeChecksShort": "Dagtid",
-    "sitType.daytimeChecksHint": "Sitteren er innom daglig for å sjekke båten, men overnatter ikke.",
+    "sitType.daytimeChecksHint":
+      "Sitteren er innom daglig for å sjekke båten, men overnatter ikke.",
     "sitEditor.responsibilities": "Omsorgsansvar",
-    "sitEditor.responsibilitiesPlaceholder": "En oppgave per linje, for eksempel sjekke lenser hver morgen",
+    "sitEditor.responsibilitiesPlaceholder":
+      "En oppgave per linje, for eksempel sjekke lenser hver morgen",
     "sitEditor.requirementsKicker": "Sitter krav",
     "sitEditor.requirementsTitle": "Hvem passer godt for denne sitteplassen?",
     "sitEditor.minimumYears": "Minimum års erfaring fra båtliv",
@@ -10082,7 +10490,8 @@ const localeExtrasSource = {
     "sitEditor.publish": "Publiser sit",
     "sitEditor.publishBlocked": "Fortsatt nødvendig: {{items}}",
     "sitEditor.verificationRequiredTitle": "Bekreft identiteten din for å opprette en sit",
-    "sitEditor.verificationRequiredText": "Bekreft offentlig ID, e-postadresse og telefonnummer før du publiserer en båtsitting.",
+    "sitEditor.verificationRequiredText":
+      "Bekreft offentlig ID, e-postadresse og telefonnummer før du publiserer en båtsitting.",
     "sitEditor.verificationRequiredCta": "Fullfør verifisering på profilen din",
     "sitEditor.verificationChecking": "Kontrollerer bekreftelsen din …",
     "auth.kicker": "Velkommen ombord",
@@ -10124,15 +10533,19 @@ const localeExtrasSource = {
     "settings.language": "Grensesnittspråk",
     "settings.languageHint": "Datoer og tallformater følger grensesnittspråket ditt.",
     "settings.measurementSystem": "Målesystem",
-    "settings.measurementHint": "Nettleserregionen din angir den opprinnelige standarden. Båtformer lar deg fortsatt velge en av enhetene.",
+    "settings.measurementHint":
+      "Nettleserregionen din angir den opprinnelige standarden. Båtformer lar deg fortsatt velge en av enhetene.",
     "settings.sitDefaultsTitle": "Standardinnstillinger for oppretting av sitteplasser",
-    "settings.sitDefaultsHint": "Disse valgene er forhåndsvalgt når du oppretter en ny sit. Du kan fortsatt endre dem på hver sitt.",
+    "settings.sitDefaultsHint":
+      "Disse valgene er forhåndsvalgt når du oppretter en ny sit. Du kan fortsatt endre dem på hver sitt.",
     "settings.sitDefaults.nonSmoker": "Krev ikke-røykere som standard",
-    "settings.sitDefaults.nonSmokerHint": "Nye sitteplasser starter med Må være ikke-røyker slått på.",
+    "settings.sitDefaults.nonSmokerHint":
+      "Nye sitteplasser starter med Må være ikke-røyker slått på.",
     "settings.metric": "Metrisk (meter)",
     "settings.imperial": "Imperial (føtter)",
     "settings.personalTitle": "Personlige detaljer",
-    "settings.personalHint": "Ditt juridiske navn og kontaktinformasjon brukes til verifisering og sitteavtaler.",
+    "settings.personalHint":
+      "Ditt juridiske navn og kontaktinformasjon brukes til verifisering og sitteavtaler.",
     "settings.legalName": "Fullt juridisk navn",
     "settings.legalNameHint": "Slik det vises på din offentlige ID.",
     "settings.displayNameHint": "Vises på den offentlige profilen din og i meldinger.",
@@ -10140,7 +10553,8 @@ const localeExtrasSource = {
     "settings.savePersonal": "Lagre personlige opplysninger",
     "settings.personalSaved": "Personlige opplysninger lagret",
     "settings.accountTitle": "Konto",
-    "settings.accountHint": "E-postadressen for pålogging vises her. Bruk knappene til å endre e-post eller passord i en sikker dialogboks.",
+    "settings.accountHint":
+      "E-postadressen for pålogging vises her. Bruk knappene til å endre e-post eller passord i en sikker dialogboks.",
     "settings.currentEmail": "Gjeldende e-post",
     "settings.newEmail": "Ny e-post",
     "settings.currentPassword": "Gjeldende passord",
@@ -10156,9 +10570,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Passord oppdatert",
     "settings.passwordMismatch": "Nye passord stemmer ikke.",
     "settings.sameEmail": "Skriv inn en annen e-postadresse.",
-    "settings.accountCredentialsUnavailable": "Passordendringer krever en e-postregistreringskonto. Registrer deg med e-post, og prøv på nytt.",
+    "settings.accountCredentialsUnavailable":
+      "Passordendringer krever en e-postregistreringskonto. Registrer deg med e-post, og prøv på nytt.",
     "settings.emailsTitle": "E-postvarsler",
-    "settings.emailsHint": "Velg hvilke hendelser som sender deg en e-post. Du kan endre disse når som helst.",
+    "settings.emailsHint":
+      "Velg hvilke hendelser som sender deg en e-post. Du kan endre disse når som helst.",
     "settings.email.newApplications": "Nye sitteapplikasjoner på mine båter",
     "settings.email.applicationUpdates": "Oppdateringer på sits jeg søkte på",
     "settings.email.messages": "Nye meldinger i samtalene mine",
@@ -10168,33 +10584,40 @@ const localeExtrasSource = {
     "safetyActions.block": "Blokkere",
     "safetyActions.unblock": "Fjern blokkering",
     "safetyActions.reportTitle": "Rapportere {{name}}?",
-    "safetyActions.reportText": "Fortell oss hva som skjedde. Rapporter gjennomgås av Boatstead og deles ikke med det rapporterte medlemmet.",
+    "safetyActions.reportText":
+      "Fortell oss hva som skjedde. Rapporter gjennomgås av Boatstead og deles ikke med det rapporterte medlemmet.",
     "safetyActions.reportReason": "Grunn",
     "safetyActions.reportDetails": "Detaljer",
     "safetyActions.reportDetailsPlaceholder": "Legg til en hvilken som helst nyttig kontekst",
     "safetyActions.reportDetailsRequired": "Vennligst legg til en kort beskrivelse av denne grunn.",
     "safetyActions.reportSubmit": "Send inn rapport",
     "safetyActions.reportThanksTitle": "Rapport levert",
-    "safetyActions.reportThanksText": "Takk. Vi mottok rapporten din om {{name}} og vil vurdere den.",
+    "safetyActions.reportThanksText":
+      "Takk. Vi mottok rapporten din om {{name}} og vil vurdere den.",
     "safetyActions.blockTitle": "Vil du blokkere {{name}}?",
-    "safetyActions.blockText": "De vil ikke lenger være i stand til å kontakte deg enkelt, og du kan oppheve blokkeringen av dem når som helst i Innstillinger.",
+    "safetyActions.blockText":
+      "De vil ikke lenger være i stand til å kontakte deg enkelt, og du kan oppheve blokkeringen av dem når som helst i Innstillinger.",
     "safetyActions.blockConfirm": "Ja, blokker",
     "safetyActions.blockedBannerTitle": "Du blokkerte dette medlemmet",
-    "safetyActions.blockedBannerText": "{{name}} er på blokkeringslisten din. Du kan oppheve blokkeringen av dem her eller i Innstillinger.",
+    "safetyActions.blockedBannerText":
+      "{{name}} er på blokkeringslisten din. Du kan oppheve blokkeringen av dem her eller i Innstillinger.",
     "safetyActions.reason.spam": "Spam eller uønsket kontakt",
     "safetyActions.reason.harassment": "Trakassering eller overgrep",
     "safetyActions.reason.scam": "Svindel eller svindel",
     "safetyActions.reason.inappropriate": "Upassende innhold eller oppførsel",
     "safetyActions.reason.other": "Noe annet",
     "settings.blockedUsersTitle": "Blokkerte kontoer",
-    "settings.blockedUsersHint": "Medlemmer du har blokkert. Oppheving av blokkering gjenoppretter normal kontakt.",
+    "settings.blockedUsersHint":
+      "Medlemmer du har blokkert. Oppheving av blokkering gjenoppretter normal kontakt.",
     "settings.blockedUsersEmpty": "Du har ikke blokkert noen ennå.",
     "settings.blockedOn": "Blokkert {{date}}",
     "settings.dangerZone": "Faresone",
     "settings.deleteAccount": "Slett konto",
-    "settings.deleteAccountHint": "Slett profilen din, lagrede visninger og lokale kontodata permanent.",
+    "settings.deleteAccountHint":
+      "Slett profilen din, lagrede visninger og lokale kontodata permanent.",
     "settings.deleteConfirmTitle": "Vil du slette kontoen din?",
-    "settings.deleteConfirmText": "Denne handlingen kan ikke angres. Du vil bli logget ut umiddelbart.",
+    "settings.deleteConfirmText":
+      "Denne handlingen kan ikke angres. Du vil bli logget ut umiddelbart.",
     "settings.deleteConfirmationLabel": "Skriv {{term}} for å bekrefte sletting av konto",
     "settings.deletingAccount": "Sletter ...",
     "settings.deleteConfirm": "Ja, slett kontoen min",
@@ -10332,32 +10755,45 @@ const localeExtrasSource = {
     "safety.title": "Tryggere båtsitting starter med klargjøring",
     "safety.intro": "Bruk disse praktiske kontrollene før, under og etter hver båtoppstilling.",
     "safety.verification.title": "Identitet og verifisering",
-    "safety.verification.text": "Fullfør tilgjengelige identitetskontroller og bekreft at navn og kontaktinformasjon stemmer overens før du godtar en sitting.",
+    "safety.verification.text":
+      "Fullfør tilgjengelige identitetskontroller og bekreft at navn og kontaktinformasjon stemmer overens før du godtar en sitting.",
     "safety.profiles.title": "Gjennomgå profiler og historie",
-    "safety.profiles.text": "Les referanser, anmeldelser og erfaring nøye. Still oppfølgingsspørsmål om hull eller ukjente systemer.",
+    "safety.profiles.text":
+      "Les referanser, anmeldelser og erfaring nøye. Still oppfølgingsspørsmål om hull eller ukjente systemer.",
     "safety.video.title": "Møt med video",
-    "safety.video.text": "Arranger en videosamtale, involver alle som skal være ombord og gå gjennom fartøyet live når det er praktisk mulig.",
+    "safety.video.text":
+      "Arranger en videosamtale, involver alle som skal være ombord og gå gjennom fartøyet live når det er praktisk mulig.",
     "safety.expectations.title": "Sett forventninger skriftlig",
-    "safety.expectations.text": "Skriv ned datoer, ansvar, tilgang, utgifter, oppdateringer, besøkende og avbestillingsplaner.",
+    "safety.expectations.text":
+      "Skriv ned datoer, ansvar, tilgang, utgifter, oppdateringer, besøkende og avbestillingsplaner.",
     "safety.handover.title": "Fullfør en båtspesifikk overlevering",
-    "safety.handover.text": "Dekke systemer, sjøkraner, lenser, batterier, landstrøm, motorer, væraksjoner, nødkontakter og avstengningsprosedyrer.",
+    "safety.handover.text":
+      "Dekke systemer, sjøkraner, lenser, batterier, landstrøm, motorer, væraksjoner, nødkontakter og avstengningsprosedyrer.",
     "safety.insurance.title": "Sjekk forsikring",
-    "safety.insurance.text": "Eiere og oppsittere bør uavhengig bekrefte gjeldende fartøy, marina, reise, ansvar og personlig forsikring.",
+    "safety.insurance.text":
+      "Eiere og oppsittere bør uavhengig bekrefte gjeldende fartøy, marina, reise, ansvar og personlig forsikring.",
     "safety.pets.title": "Plan for kjæledyr",
-    "safety.pets.text": "Dokumenter fôring, medisiner, trening, veterinærkontakter, transport og sikker bevegelse rundt dekk og kai.",
+    "safety.pets.text":
+      "Dokumenter fôring, medisiner, trening, veterinærkontakter, transport og sikker bevegelse rundt dekk og kai.",
     "safety.marina.title": "Følg marinaens regler",
-    "safety.marina.text": "Bekreft gjesteregistrering, tilgang, parkering, avfall, støy, sikkerhet og nødprosedyrer med marinaen.",
+    "safety.marina.text":
+      "Bekreft gjesteregistrering, tilgang, parkering, avfall, støy, sikkerhet og nødprosedyrer med marinaen.",
     "safety.redFlags.title": "Gjenkjenne røde flagg",
-    "safety.redFlags.text": "Sett på pause hvis noen presser deg, unngår video, ber om uvanlige betalinger, holder tilbake dokumentasjon, endrer nøkkelfakta eller prøver å flytte samtalen fra plattformen med en gang.",
+    "safety.redFlags.text":
+      "Sett på pause hvis noen presser deg, unngår video, ber om uvanlige betalinger, holder tilbake dokumentasjon, endrer nøkkelfakta eller prøver å flytte samtalen fra plattformen med en gang.",
     "safety.reporting.title": "Rapporter hendelser",
-    "safety.reporting.text": "Ta vare på meldinger, bilder, datoer og kvitteringer. Rapporter sikkerhetsproblemer til Boatstead-støtte og relevante forsikringsselskaper eller myndigheter.",
+    "safety.reporting.text":
+      "Ta vare på meldinger, bilder, datoer og kvitteringer. Rapporter sikkerhetsproblemer til Boatstead-støtte og relevante forsikringsselskaper eller myndigheter.",
     "safety.emergency.title": "I en nødssituasjon",
-    "safety.emergency.text": "Beskytt livet først. Kontakt lokale nød- eller sjøredningstjenester, deretter eier, marina og forsikringsselskap etter behov.",
+    "safety.emergency.text":
+      "Beskytt livet først. Kontakt lokale nød- eller sjøredningstjenester, deretter eier, marina og forsikringsselskap etter behov.",
     "safety.disclaimerTitle": "Viktig begrensning",
-    "safety.disclaimerText": "Boatstead erstatter ikke nødetater, forsikringsselskaper, kvalifiserte marine fagfolk eller profesjonelle maritime råd.",
+    "safety.disclaimerText":
+      "Boatstead erstatter ikke nødetater, forsikringsselskaper, kvalifiserte marine fagfolk eller profesjonelle maritime råd.",
     "support.kicker": "Hjelpesenter",
     "support.title": "Hvordan kan vi hjelpe?",
-    "support.intro": "Velg en kategori og send en melding. Denne prototypen lagrer forespørsler lokalt og sender ikke e-post.",
+    "support.intro":
+      "Velg en kategori og send en melding. Denne prototypen lagrer forespørsler lokalt og sender ikke e-post.",
     "support.categories": "Støttekategorier",
     "support.topic": "Emne",
     "support.chooseTopic": "Velg et emne",
@@ -10368,7 +10804,8 @@ const localeExtrasSource = {
     "support.topic.other": "Annen",
     "support.formTitle": "Kontakt support",
     "support.accountDetails": "Din konto",
-    "support.accountDetailsHint": "Vi bruker dette navnet og e-postadressen for støtteforespørselen din.",
+    "support.accountDetailsHint":
+      "Vi bruker dette navnet og e-postadressen for støtteforespørselen din.",
     "support.name": "Navn",
     "support.email": "E-post",
     "support.message": "Beskjed",
@@ -10381,52 +10818,74 @@ const localeExtrasSource = {
     "terms.kicker": "Lovlig",
     "terms.title": "Vilkår for bruk",
     "terms.updated": "Sist oppdatert: 21. juli 2026",
-    "terms.reviewNotice": "Førlanseringsvarsel: Kvalifisert juridisk rådgiver må gjennomgå og tilpasse disse vilkårene før produksjonsstart.",
+    "terms.reviewNotice":
+      "Førlanseringsvarsel: Kvalifisert juridisk rådgiver må gjennomgå og tilpasse disse vilkårene før produksjonsstart.",
     "terms.eligibility.title": "Kvalifisering",
-    "terms.eligibility.text": "Du må være juridisk i stand til å inngå avtaler og gi nøyaktig informasjon for å bruke Boatstead.",
+    "terms.eligibility.text":
+      "Du må være juridisk i stand til å inngå avtaler og gi nøyaktig informasjon for å bruke Boatstead.",
     "terms.accounts.title": "Kontoer",
-    "terms.accounts.text": "Du er ansvarlig for kontoen din, påloggingsdetaljer og aktivitet. Fortell oss umiddelbart om uautorisert tilgang.",
+    "terms.accounts.text":
+      "Du er ansvarlig for kontoen din, påloggingsdetaljer og aktivitet. Fortell oss umiddelbart om uautorisert tilgang.",
     "terms.platform.title": "Plattformrolle",
-    "terms.platform.text": "Boatstead legger kun til rette for introduksjoner mellom båteiere og oppsittere. Enhver sitteordning er en kontrakt mellom eier og sitter. Boatstead eier ikke fartøyer, ansetter ikke medlemmer, fører tilsyn med sitt eller blir en part i disse ordningene.",
+    "terms.platform.text":
+      "Boatstead legger kun til rette for introduksjoner mellom båteiere og oppsittere. Enhver sitteordning er en kontrakt mellom eier og sitter. Boatstead eier ikke fartøyer, ansetter ikke medlemmer, fører tilsyn med sitt eller blir en part i disse ordningene.",
     "terms.listings.title": "Oppføringer og applikasjoner",
-    "terms.listings.text": "Oppføringer og søknader må være nøyaktige, aktuelle og fullstendige. Medlemmene bestemmer om de vil delta i en sitteordning.",
+    "terms.listings.text":
+      "Oppføringer og søknader må være nøyaktige, aktuelle og fullstendige. Medlemmene bestemmer om de vil delta i en sitteordning.",
     "terms.responsibilities.title": "Brukeransvar",
-    "terms.responsibilities.text": "Medlemmer må handle lovlig, kommunisere ærlig, følge skriftlige forventninger og være rimelig forsiktig.",
+    "terms.responsibilities.text":
+      "Medlemmer må handle lovlig, kommunisere ærlig, følge skriftlige forventninger og være rimelig forsiktig.",
     "terms.verification.title": "Bekreftelse",
-    "terms.verification.text": "Sjekker kan redusere risiko, men garanterer ikke identitet, oppførsel, kvalifikasjoner, sikkerhet eller egnethet.",
+    "terms.verification.text":
+      "Sjekker kan redusere risiko, men garanterer ikke identitet, oppførsel, kvalifikasjoner, sikkerhet eller egnethet.",
     "terms.prohibited.title": "Forbudt oppførsel",
-    "terms.prohibited.text": "Ikke begå svindel, trakassering, diskriminering, utrygge handlinger, uautorisert tilgang, ulovlig aktivitet eller misbruk av plattformer.",
+    "terms.prohibited.text":
+      "Ikke begå svindel, trakassering, diskriminering, utrygge handlinger, uautorisert tilgang, ulovlig aktivitet eller misbruk av plattformer.",
     "terms.payments.title": "Betalinger og gebyrer",
-    "terms.payments.text": "Boatstead tar for øyeblikket ingen nattlig avgift. Hvis betalte funksjoner introduseres, vil gjeldende vilkår og priser vises først.",
+    "terms.payments.text":
+      "Boatstead tar for øyeblikket ingen nattlig avgift. Hvis betalte funksjoner introduseres, vil gjeldende vilkår og priser vises først.",
     "terms.cancellations.title": "Avbestillinger",
-    "terms.cancellations.text": "Medlemmer bør samtykke skriftlig til avbestillingsplaner og kommunisere endringer umiddelbart for å redusere skader og utgifter.",
+    "terms.cancellations.text":
+      "Medlemmer bør samtykke skriftlig til avbestillingsplaner og kommunisere endringer umiddelbart for å redusere skader og utgifter.",
     "terms.insurance.title": "Forsikring",
-    "terms.insurance.text": "Medlemmene er ansvarlige for å bekrefte passende forsikring. Boatstead tilbyr ikke fartøy-, reise- eller ansvarsforsikring.",
+    "terms.insurance.text":
+      "Medlemmene er ansvarlige for å bekrefte passende forsikring. Boatstead tilbyr ikke fartøy-, reise- eller ansvarsforsikring.",
     "terms.damage.title": "Skader og krav",
-    "terms.damage.text": "Eventuelle skader, tyveri eller lignende krav er primært mellom eier og sitter. Dokumenter hendelser raskt, bevar bevis og samarbeid med den andre parten, marinaer, forsikringsselskaper og myndigheter.",
+    "terms.damage.text":
+      "Eventuelle skader, tyveri eller lignende krav er primært mellom eier og sitter. Dokumenter hendelser raskt, bevar bevis og samarbeid med den andre parten, marinaer, forsikringsselskaper og myndigheter.",
     "terms.intellectualProperty.title": "Immaterielle rettigheter",
-    "terms.intellectualProperty.text": "Boatstead-innhold og merkevarebygging er beskyttet. Du beholder rettighetene til innholdet ditt og gir oss tillatelse til å drive tjenesten.",
+    "terms.intellectualProperty.text":
+      "Boatstead-innhold og merkevarebygging er beskyttet. Du beholder rettighetene til innholdet ditt og gir oss tillatelse til å drive tjenesten.",
     "terms.privacy.title": "Privatliv",
-    "terms.privacy.text": "Personopplysninger skal håndteres på en ansvarlig måte. En personvernerklæring for produksjon vil beskrive innsamling, bruk, oppbevaring og rettigheter.",
+    "terms.privacy.text":
+      "Personopplysninger skal håndteres på en ansvarlig måte. En personvernerklæring for produksjon vil beskrive innsamling, bruk, oppbevaring og rettigheter.",
     "terms.termination.title": "Suspensjon og oppsigelse",
-    "terms.termination.text": "Vi kan begrense eller avslutte tilgangen for å beskytte medlemmer, undersøke bekymringer, håndheve vilkår eller overholde lover.",
+    "terms.termination.text":
+      "Vi kan begrense eller avslutte tilgangen for å beskytte medlemmer, undersøke bekymringer, håndheve vilkår eller overholde lover.",
     "terms.disclaimers.title": "Ansvarsfraskrivelser",
-    "terms.disclaimers.text": "Prototypen leveres som tilgjengelig uten garantier for uavbrutt drift, egnethet, nøyaktighet eller utfall.",
+    "terms.disclaimers.text":
+      "Prototypen leveres som tilgjengelig uten garantier for uavbrutt drift, egnethet, nøyaktighet eller utfall.",
     "terms.liability.title": "Ansvarsbegrensning",
-    "terms.liability.text": "I den grad loven tillater det, er ikke Boatstead ansvarlig for skade, tyveri, tap, skade, reiseforstyrrelser, eiendomskrav eller andre utfall som oppstår fra avtaler mellom medlemmer. Medlemmer handler med hverandre på eget ansvar.",
+    "terms.liability.text":
+      "I den grad loven tillater det, er ikke Boatstead ansvarlig for skade, tyveri, tap, skade, reiseforstyrrelser, eiendomskrav eller andre utfall som oppstår fra avtaler mellom medlemmer. Medlemmer handler med hverandre på eget ansvar.",
     "terms.indemnity.title": "Skadeerstatning",
-    "terms.indemnity.text": "Der det er lovlig tillatt, godtar du å dekke krav forårsaket av din ulovlige oppførsel, innhold eller brudd på disse vilkårene.",
+    "terms.indemnity.text":
+      "Der det er lovlig tillatt, godtar du å dekke krav forårsaket av din ulovlige oppførsel, innhold eller brudd på disse vilkårene.",
     "terms.disputes.title": "Tvister og gjeldende lov",
-    "terms.disputes.text": "Produksjonsvilkårene må spesifisere en selskapsenhet, jurisdiksjon, gjeldende lov og tvisteprosess etter juridisk gjennomgang.",
+    "terms.disputes.text":
+      "Produksjonsvilkårene må spesifisere en selskapsenhet, jurisdiksjon, gjeldende lov og tvisteprosess etter juridisk gjennomgang.",
     "terms.changes.title": "Endringer i disse vilkårene",
-    "terms.changes.text": "Vi kan oppdatere disse vilkårene og vil gi passende varsel før vesentlige endringer trer i kraft.",
+    "terms.changes.text":
+      "Vi kan oppdatere disse vilkårene og vil gi passende varsel før vesentlige endringer trer i kraft.",
     "terms.contact.title": "Kontakt og støtte",
-    "terms.contact.text": "Bruk støttesiden for spørsmål. Ikke stol på Boatstead-støtte for nødhjelp.",
+    "terms.contact.text":
+      "Bruk støttesiden for spørsmål. Ikke stol på Boatstead-støtte for nødhjelp.",
     "nav.admin": "Admin",
     "footer.admin": "Admin",
     "admin.kicker": "Plattformoperasjoner",
     "admin.title": "Admin",
-    "admin.subtitle": "Administrer medlemmer, roller og kontostatus. Hver endring registreres i revisjonssporet.",
+    "admin.subtitle":
+      "Administrer medlemmer, roller og kontostatus. Hver endring registreres i revisjonssporet.",
     "admin.tab.users": "Brukere",
     "admin.tab.audit": "Revisjonsspor",
     "admin.signInTitle": "Logg på for å åpne Admin",
@@ -10445,7 +10904,8 @@ const localeExtrasSource = {
     "admin.editUser": "Rediger bruker",
     "admin.deleteUser": "Slett bruker",
     "admin.deleteConfirmTitle": "Vil du slette denne brukeren?",
-    "admin.deleteConfirmText": "Dette fjerner {{name}} fra admin-katalogen. Relaterte visninger og meldinger kan fortsatt vises i lokale demodata.",
+    "admin.deleteConfirmText":
+      "Dette fjerner {{name}} fra admin-katalogen. Relaterte visninger og meldinger kan fortsatt vises i lokale demodata.",
     "admin.deleteConfirm": "Ja, slett bruker",
     "admin.deleting": "Sletter …",
     "admin.saveUser": "Lagre bruker",
@@ -10472,7 +10932,8 @@ const localeExtrasSource = {
   },
   da: {
     "meta.title": "Boatstead | Pålidelig bådpleje",
-    "meta.description": "Boatstead forbinder betroede bådsittere med ejere, der har brug for erfarne hænder ombord.",
+    "meta.description":
+      "Boatstead forbinder betroede bådsittere med ejere, der har brug for erfarne hænder ombord.",
     "common.back": "Tilbage",
     "common.cancel": "Ophæve",
     "common.close": "Tæt",
@@ -10482,7 +10943,8 @@ const localeExtrasSource = {
     "common.saving": "Gemmer...",
     "nav.logout": "Log ud",
     "nav.logoutConfirmTitle": "Er du sikker på, at du vil logge ud?",
-    "nav.logoutConfirmText": "Du skal logge ind igen for at få adgang til din profil, beskeder og gemte sits.",
+    "nav.logoutConfirmText":
+      "Du skal logge ind igen for at få adgang til din profil, beskeder og gemte sits.",
     "nav.logoutConfirm": "Ja, log ud",
     "notifications.open": "Åbn notifikationer",
     "notifications.heading": "Meddelelser",
@@ -10523,15 +10985,18 @@ const localeExtrasSource = {
     "map.zoomOut": "Zoom ud",
     "map.openInMaps": "Åbn i Maps",
     "map.openInMapsAriaLabel": "Åbn {{location}} i Maps",
-    "map.approximateLocationNote": "Denne stift markerer det generelle område. De nøjagtige oplysninger om kajpladsen deles, når du har ansøgt.",
+    "map.approximateLocationNote":
+      "Denne stift markerer det generelle område. De nøjagtige oplysninger om kajpladsen deles, når du har ansøgt.",
     "home.heroImageAlt": "Sejlbåd forankret i en klar bugt",
-    "apply.defaultMessage": "Hej {{owner}}, jeg ville elske at passe {{boat}}. Jeg har relevant båderfaring og arrangerer gerne et videoopkald.",
+    "apply.defaultMessage":
+      "Hej {{owner}}, jeg ville elske at passe {{boat}}. Jeg har relevant båderfaring og arrangerer gerne et videoopkald.",
     "apply.successTitle": "Besked sendt",
     "apply.successText": "{{owner}} modtager din ansøgning til {{boat}}.",
     "apply.viewInSits": "Se i dine sidder",
     "apply.kicker": "Præsenter dig selv",
     "apply.title": "Ansøg om {{boat}}",
-    "apply.hint": "Nævn din oplevelse med {{type}} både og de indbyggede systemer, der er anført i oversigten.",
+    "apply.hint":
+      "Nævn din oplevelse med {{type}} både og de indbyggede systemer, der er anført i oversigten.",
     "apply.sending": "Sender...",
     "apply.send": "Send ansøgning",
     "detail.back": "Tilbage til alle både",
@@ -10568,15 +11033,18 @@ const localeExtrasSource = {
     "saved.emptyHint": "Gem sidde, der fanger dit øje, og sammenlign dem her.",
     "saved.browse": "Gennemse både",
     "saved.signInTitle": "Log ind for at gemme sits",
-    "saved.signInText": "Log ind eller opret en konto for at gemme sits på din shortliste og finde dem senere.",
+    "saved.signInText":
+      "Log ind eller opret en konto for at gemme sits på din shortliste og finde dem senere.",
     "saved.showAll": "Vis alle inklusiv valgte, gennemførte, osv.",
     "saved.emptyFiltered": "Ingen åbne gemte sits",
-    "saved.emptyFilteredHint": "Din shortliste har kun sits, der allerede har en sitter valgt eller er afsluttet. Marker boksen ovenfor for at se dem.",
+    "saved.emptyFilteredHint":
+      "Din shortliste har kun sits, der allerede har en sitter valgt eller er afsluttet. Marker boksen ovenfor for at se dem.",
     "editorPreview.kicker": "Live preview",
     "editorPreview.title": "Hvordan det vil se ud",
     "editorPreview.label": "Live preview",
     "editorPreview.vesselHint": "Opdateres, mens du redigerer dine båddetaljer.",
-    "editorPreview.sitHint": "Opdateringer, mens du redigerer denne side. Sådan ser det ud, når sitters browser.",
+    "editorPreview.sitHint":
+      "Opdateringer, mens du redigerer denne side. Sådan ser det ud, når sitters browser.",
     "editorPreview.untitledBoat": "Unavngivet båd",
     "editorPreview.homePortPending": "Tilføj en hjemmehavn",
     "editorPreview.lengthPending": "Længde TBD",
@@ -10585,17 +11053,21 @@ const localeExtrasSource = {
     "editorPreview.notSpecified": "Ikke specificeret",
     "how.kicker": "Sådan fungerer Boatstead",
     "how.title": "Tillid starter før nogen træder ombord.",
-    "how.subtitle": "En båd er et hjem og et levende system. Boatstead hjælper begge sider med at matche de detaljer, der betyder noget.",
+    "how.subtitle":
+      "En båd er et hjem og et levende system. Boatstead hjælper begge sider med at matche de detaljer, der betyder noget.",
     "how.stepProfileTitle": "Byg din besætningsprofil",
-    "how.stepProfileText": "Del referencer, certificeringer, fartøjserfaring og de systemer, du er fortrolig med.",
+    "how.stepProfileText":
+      "Del referencer, certificeringer, fartøjserfaring og de systemer, du er fortrolig med.",
     "how.stepFindTitle": "Find den rigtige båd",
-    "how.stepFindText": "Filtrer efter placering, fartøjstype, datoer, kæledyr ombord og ønsket erfaring.",
+    "how.stepFindText":
+      "Filtrer efter placering, fartøjstype, datoer, kæledyr ombord og ønsket erfaring.",
     "how.stepMeetTitle": "Mød og match",
-    "how.stepMeetText": "Tal med ejere, stil praktiske spørgsmål og aftal ansvar, før du bekræfter.",
+    "how.stepMeetText":
+      "Tal med ejere, stil praktiske spørgsmål og aftal ansvar, før du bekræfter.",
     "how.stepHandoverTitle": "Fuldfør overdragelsen",
     "how.stepHandoverText": "Gå gennem båden sammen, fra lænse og batterier til vejr og nødplaner.",
     "how.briefKicker": "The Boatstead båd brief",
-    "how.briefTitle": "Ingen vagt \"hold øje med hende.\"",
+    "how.briefTitle": 'Ingen vagt "hold øje med hende."',
     "how.briefMooring": "Fortøjning, liner & fendere",
     "how.briefBilges": "Lænse og søhaner",
     "how.briefBattery": "Batteri & landstrøm",
@@ -10606,12 +11078,16 @@ const localeExtrasSource = {
     "how.briefContacts": "Marina kontakter",
     "how.storiesKicker": "Historier fra kajen",
     "how.storiesTitle": "Betroet på begge sider af overdragelsen",
-    "how.storiesText": "Ejere får erfaren pleje. Sittere får ærlige trusser og bemærkelsesværdige steder at ringe hjem til.",
-    "how.testimonialOneQuote": "For første gang forlod vi Sunbird i tre uger uden at tjekke marinaens kameraer hver time. Claire forstod båden, sendte tankevækkende opdateringer og gav hende pletfri tilbage.",
+    "how.storiesText":
+      "Ejere får erfaren pleje. Sittere får ærlige trusser og bemærkelsesværdige steder at ringe hjem til.",
+    "how.testimonialOneQuote":
+      "For første gang forlod vi Sunbird i tre uger uden at tjekke marinaens kameraer hver time. Claire forstod båden, sendte tankevækkende opdateringer og gav hende pletfri tilbage.",
     "how.testimonialOneDetail": "Ejere af Sunbird · Antibes",
-    "how.testimonialTwoQuote": "Boatstead matchede mig med en båd, der passede til min faktiske oplevelse, ikke bare en smuk beliggenhed. Overdragelsen betød, at der ikke var nogen overraskelser, når ejerne tog afsted.",
+    "how.testimonialTwoQuote":
+      "Boatstead matchede mig med en båd, der passede til min faktiske oplevelse, ikke bare en smuk beliggenhed. Overdragelsen betød, at der ikke var nogen overraskelser, når ejerne tog afsted.",
     "how.testimonialTwoDetail": "RYA Yachtmaster · 11 gennemførte sits",
-    "how.testimonialThreeQuote": "Vores sitter bemærkede et lille landstrømsproblem, før det blev et dyrt. At have nogen ombord, der vidste, hvad de skulle kigge efter, gjorde hele forskellen.",
+    "how.testimonialThreeQuote":
+      "Vores sitter bemærkede et lille landstrømsproblem, før det blev et dyrt. At have nogen ombord, der vidste, hvad de skulle kigge efter, gjorde hele forskellen.",
     "how.testimonialThreeDetail": "Ejer af Northbound · Vancouver",
     "role.owner": "Bådejer",
     "role.sitter": "Bådsitter",
@@ -10624,15 +11100,18 @@ const localeExtrasSource = {
     "sits.withOwner": "Med {{owner}}",
     "sits.withdrawInterest": "Træk renter",
     "sits.withdrawConfirmTitle": "trække din interesse tilbage?",
-    "sits.withdrawConfirmText": "Dette fjerner din applikation til {{boat}}. Du kan ansøge igen senere, hvis siten stadig er åben.",
-    "sits.withdrawAcceptedConfirmText": "Du er i øjeblikket accepteret til {{boat}}. Tilbagetrækning afslutter denne bekræftelse, så ejeren kan vælge en anden.",
+    "sits.withdrawConfirmText":
+      "Dette fjerner din applikation til {{boat}}. Du kan ansøge igen senere, hvis siten stadig er åben.",
+    "sits.withdrawAcceptedConfirmText":
+      "Du er i øjeblikket accepteret til {{boat}}. Tilbagetrækning afslutter denne bekræftelse, så ejeren kan vælge en anden.",
     "sits.withdrawConfirmAction": "Ja, træk tilbage",
     "role.vesselOwner": "{{type}} ejer",
     "notFound.title": "Tabt på havet?",
     "notFound.text": "Den side er ikke på vores diagram.",
     "notFound.back": "Tilbage til havnen",
     "errorBoundary.title": "Noget gik galt",
-    "errorBoundary.text": "Vi ramte et uventet problem. Prøv igen, eller gå tilbage til startsiden.",
+    "errorBoundary.text":
+      "Vi ramte et uventet problem. Prøv igen, eller gå tilbage til startsiden.",
     "errorBoundary.tryAgain": "Prøv igen",
     "errorBoundary.goHome": "Gå hjem",
     "profile.settings": "Offentlig profil",
@@ -10641,7 +11120,8 @@ const localeExtrasSource = {
     "profile.photo": "Profilbillede",
     "profile.photoPreviewAlt": "Aktuelt profilbillede",
     "profile.replacePhoto": "Upload eller erstat billede",
-    "profile.photoUploadHint": "JPG, PNG eller WebP op til 10 MB. Store billeder ændres størrelse, før de gemmes.",
+    "profile.photoUploadHint":
+      "JPG, PNG eller WebP op til 10 MB. Store billeder ændres størrelse, før de gemmes.",
     "profile.coverImage": "Forsidebillede",
     "profile.coverHint": "Valgfri. Erstatter standardbanneret bag dit billede.",
     "profile.coverPreviewAlt": "Nuværende forsidebillede",
@@ -10650,7 +11130,8 @@ const localeExtrasSource = {
     "profile.location": "Hjemmehavn/sted",
     "profile.locationPlaceholder": "Begynd at skrive en by",
     "profile.aboutYou": "Om dig",
-    "profile.aboutPlaceholder": "Del din bådoplevelse, tilgang og hvad der gør dig til et godt match...",
+    "profile.aboutPlaceholder":
+      "Del din bådoplevelse, tilgang og hvad der gør dig til et godt match...",
     "profile.qualifications": "Erfaring og kvalifikationer",
     "profile.qualificationsPlaceholder": "En per linje, for eksempel RYA Day Skipper",
     "profile.spokenLanguages": "Sprog du taler",
@@ -10665,8 +11146,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identitet bekræftet",
     "verification.identityVerified": "Identitet bekræftet",
     "verification.confirmIdentity": "Bekræft din identitet",
-    "verification.verifiedHint": "Boatstead bekræftede offentligt ID, e-mail og telefon for dette medlem.",
-    "verification.selfHint": "Udfyld hvert punkt nedenfor, så ejere og brugere kan stole på din profil.",
+    "verification.verifiedHint":
+      "Boatstead bekræftede offentligt ID, e-mail og telefon for dette medlem.",
+    "verification.selfHint":
+      "Udfyld hvert punkt nedenfor, så ejere og brugere kan stole på din profil.",
     "verification.partialHint": "{{count}} af {{total}} kontroller bekræftet indtil videre.",
     "verification.governmentId": "Regerings-id",
     "verification.email": "E-mailadresse",
@@ -10674,7 +11157,8 @@ const localeExtrasSource = {
     "verification.statusVerified": "verificeret",
     "verification.statusMissing": "ikke verificeret",
     "verification.verifyGovernmentId": "Bekræft stats-id",
-    "verification.addEmailAndPhone": "Tilføj en e-mailadresse og et telefonnummer i din profil for at afslutte bekræftelsen.",
+    "verification.addEmailAndPhone":
+      "Tilføj en e-mailadresse og et telefonnummer i din profil for at afslutte bekræftelsen.",
     "verification.addPhone": "Tilføj et telefonnummer i din profil for at afslutte bekræftelsen.",
     "verification.addEmail": "Tilføj en e-mailadresse i din profil for at afslutte bekræftelsen.",
     "member.verificationNeeded": "Bekræftelse påkrævet",
@@ -10709,14 +11193,16 @@ const localeExtrasSource = {
     "owner.backToBoats": "Tilbage til bådene",
     "owner.dashboard": "Båds instrumentbræt",
     "owner.manage": "Administrer både og sidder",
-    "owner.dashboardHint": "Hold fartøjsoplysninger adskilt fra hver periode, du har brug for en sitter.",
+    "owner.dashboardHint":
+      "Hold fartøjsoplysninger adskilt fra hver periode, du har brug for en sitter.",
     "owner.tab.boats": "Både",
     "owner.tab.sits": "Sidder",
     "owner.sitPeriods_one": "1 siddeperiode",
     "owner.sitPeriods_other": "{{count}} siddeperioder",
     "owner.sitSummary": "{{duration}} · {{applicants}} ansøgere · {{tasks}} plejeopgaver",
     "owner.sitPhaseFilter": "Filter sidder efter fase",
-    "owner.sitPhaseFilterHint": "Sidder er grupperet efter fase. Brug filteret til at fokusere på én fase.",
+    "owner.sitPhaseFilterHint":
+      "Sidder er grupperet efter fase. Brug filteret til at fokusere på én fase.",
     "owner.sitPhaseFilterAll": "Alle faser",
     "owner.sitPhaseEmpty": "Ingen sidder i denne fase",
     "owner.sitPhaseCount_one": "1 sidde",
@@ -10724,14 +11210,19 @@ const localeExtrasSource = {
     "owner.firstBoat": "Tilføj din første båd",
     "owner.firstSit": "Opret din første sit",
     "owner.sitsEmptyTitle": "Ingen sidder endnu",
-    "owner.sitsEmptyHintWithBoats": "Udgiv datoer for en af dine både, eller gennemse åbne sits for at finde din første plejemulighed.",
-    "owner.sitsEmptyHintNoBoats": "Tilføj en båd for at være vært for en sit, eller gennemse åbne sits for at finde din første plejemulighed.",
+    "owner.sitsEmptyHintWithBoats":
+      "Udgiv datoer for en af dine både, eller gennemse åbne sits for at finde din første plejemulighed.",
+    "owner.sitsEmptyHintNoBoats":
+      "Tilføj en båd for at være vært for en sit, eller gennemse åbne sits for at finde din første plejemulighed.",
     "owner.browseOpenSits": "Gennemse åbne sidder",
-    "owner.firstBoatHint": "Tilføj fartøjet én gang, og lav derefter separate siddepladser, når du rejser.",
-    "owner.firstSitHint": "Vælg en båd og offentliggør de datoer, du skal bruge en person ombord på.",
+    "owner.firstBoatHint":
+      "Tilføj fartøjet én gang, og lav derefter separate siddepladser, når du rejser.",
+    "owner.firstSitHint":
+      "Vælg en båd og offentliggør de datoer, du skal bruge en person ombord på.",
     "owner.boatBeforeSit": "Tilføj en båd, før du laver en sit.",
     "owner.sitRequiresBoatTooltip": "Opret en båd først. Klik her for at tilføje din første båd.",
-    "owner.sitRequiresVerificationTooltip": "Bekræft din identitet, før du opretter en sit. Åbn din profil for at fuldføre bekræftelsen.",
+    "owner.sitRequiresVerificationTooltip":
+      "Bekræft din identitet, før du opretter en sit. Åbn din profil for at fuldføre bekræftelsen.",
     "owner.deleteBoatLabel": "Slet {{boat}}",
     "owner.deleteBoatTitle": "Vil du slette {{boat}}?",
     "owner.deleteBoatConfirm": "Dette fjerner båden permanent og kan ikke fortrydes.",
@@ -10745,15 +11236,21 @@ const localeExtrasSource = {
     "owner.sitDeleteLocked": "Denne sit har en accepteret ansøger og kan ikke længere slettes",
     "owner.deleteError": "Båden kunne ikke slettes. Prøv venligst igen.",
     "owner.deleteSitError": "Denne sit kunne ikke slettes. Prøv venligst igen.",
-    "owner.deleteSitAcceptedError": "Denne sit har en accepteret ansøger og kan ikke længere slettes.",
-    "owner.sitDeleteUnderway": "Denne sit er i gang og kan ikke slettes. Kontakt support, hvis du har brug for hjælp til problemer.",
-    "owner.deleteSitApplicantsWarning_one": "Denne sit har 1 ansøger lige nu. Sletning fjerner fortegnelsen for alle, der har ansøgt.",
-    "owner.deleteSitApplicantsWarning_other": "Dette møde har {{count}} ansøgere lige nu. Sletning fjerner fortegnelsen for alle, der har ansøgt.",
-    "owner.deleteSitAcceptedWarning": "Nogen er allerede blevet accepteret til dette møde. Informer dem venligst, før du sletter det.",
+    "owner.deleteSitAcceptedError":
+      "Denne sit har en accepteret ansøger og kan ikke længere slettes.",
+    "owner.sitDeleteUnderway":
+      "Denne sit er i gang og kan ikke slettes. Kontakt support, hvis du har brug for hjælp til problemer.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Denne sit har 1 ansøger lige nu. Sletning fjerner fortegnelsen for alle, der har ansøgt.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Dette møde har {{count}} ansøgere lige nu. Sletning fjerner fortegnelsen for alle, der har ansøgt.",
+    "owner.deleteSitAcceptedWarning":
+      "Nogen er allerede blevet accepteret til dette møde. Informer dem venligst, før du sletter det.",
     "owner.deleteSitCompletedError": "Fuldførte sits kan ikke slettes. Arkivér dem i stedet.",
     "owner.archiveSitLabel": "Arkiv {{boat}} sit",
     "owner.archiveSitTitle": "Arkiver dette møde?",
-    "owner.archiveSitConfirm": "Vil du arkivere {{dates}} sit til {{boat}}? Du kan finde den senere under Arkiveret.",
+    "owner.archiveSitConfirm":
+      "Vil du arkivere {{dates}} sit til {{boat}}? Du kan finde den senere under Arkiveret.",
     "owner.archiveSitAction": "Ja, arkiv",
     "owner.unarchiveSit": "Flyt til aktive siddepladser",
     "owner.unarchiveSitLabel": "Gendan {{boat}} sit",
@@ -10780,9 +11277,11 @@ const localeExtrasSource = {
     "vesselEditor.country": "Land",
     "vesselEditor.countryPlaceholder": "for eksempel Grækenland",
     "vesselEditor.homePort": "Hjemmehavn",
-    "vesselEditor.homePortHint": "Hvor båden normalt holdes. Hver sit kan bruge en anden placering.",
+    "vesselEditor.homePortHint":
+      "Hvor båden normalt holdes. Hver sit kan bruge en anden placering.",
     "sitEditor.sameAsHomePort": "Samme som hjemmeport: {{homePort}}",
-    "sitEditor.sameAsHomePortHint": "Fjern markeringen af dette, hvis båden vil være et andet sted for denne sit.",
+    "sitEditor.sameAsHomePortHint":
+      "Fjern markeringen af dette, hvis båden vil være et andet sted for denne sit.",
     "sitEditor.location": "Sidde sted",
     "sitEditor.locationPlaceholder": "Søg efter by",
     "sitEditor.country": "Land",
@@ -10792,7 +11291,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Forhåndsvisning af båddæksel",
     "vesselEditor.noCover": "Intet forsidebillede endnu",
     "vesselEditor.gallery": "Flere billeder",
-    "vesselEditor.galleryHint": "Upload yderligere billeder af båden, marinaen og livet ombord. Billedtekster er valgfrie.",
+    "vesselEditor.galleryHint":
+      "Upload yderligere billeder af båden, marinaen og livet ombord. Billedtekster er valgfrie.",
     "vesselEditor.galleryCaption": "Billedtekst",
     "vesselEditor.galleryCaptionPlaceholder": "Valgfri billedtekst",
     "vesselEditor.galleryEmpty": "Ingen yderligere billeder endnu",
@@ -10810,7 +11310,8 @@ const localeExtrasSource = {
     "vesselEditor.featuresTitle": "Hvad er tilgængeligt?",
     "vesselEditor.featuresHint": "Vælg alt, hvad siddere kan bruge ombord på eller ved marinaen.",
     "vesselEditor.privateAccessTitle": "Privat adgangsoplysninger",
-    "vesselEditor.privateAccessHint": "Deles kun med bekræftede siddende efter du har accepteret deres ansøgning. Gem Wi-Fi-adgangskoder, gatekoder og lignende detaljer her.",
+    "vesselEditor.privateAccessHint":
+      "Deles kun med bekræftede siddende efter du har accepteret deres ansøgning. Gem Wi-Fi-adgangskoder, gatekoder og lignende detaljer her.",
     "vesselEditor.wifiNetwork": "Wi-Fi netværk",
     "vesselEditor.wifiNetworkPlaceholder": "Netværksnavn",
     "vesselEditor.wifiPassword": "Wi-Fi adgangskode",
@@ -10818,7 +11319,8 @@ const localeExtrasSource = {
     "vesselEditor.accessCodes": "Adgangskoder",
     "vesselEditor.accessCodesPlaceholder": "Marinaport, låseboks, ledsagergang, alarm...",
     "vesselEditor.otherPrivateNotes": "Andre private noter",
-    "vesselEditor.otherPrivateNotesPlaceholder": "Ekstra nøgleplacering, kajdetaljer, nødkontakter ombord...",
+    "vesselEditor.otherPrivateNotesPlaceholder":
+      "Ekstra nøgleplacering, kajdetaljer, nødkontakter ombord...",
     "privateAccess.title": "Detaljer om bådadgang",
     "privateAccess.intro": "Deles kun med dig som bekræftet sitter.",
     "privateAccess.introOwner": "Synlig for bekræftede sittere for denne båd.",
@@ -10839,18 +11341,22 @@ const localeExtrasSource = {
     "upload.replace": "Udskift billede",
     "upload.upload": "Upload billede",
     "upload.remove": "Fjern billede",
-    "upload.hint": "JPG, PNG eller WebP op til 10 MB. Store billeder ændres størrelse, før de gemmes.",
+    "upload.hint":
+      "JPG, PNG eller WebP op til 10 MB. Store billeder ændres størrelse, før de gemmes.",
     "upload.uploadMultiple": "Upload billeder",
     "upload.processingMultiple": "Behandler billeder...",
-    "upload.hintMultiple": "JPG, PNG eller WebP op til 10 MB hver. Store billeder ændres størrelse, før de gemmes.",
+    "upload.hintMultiple":
+      "JPG, PNG eller WebP op til 10 MB hver. Store billeder ændres størrelse, før de gemmes.",
     "sitEditor.kicker": "Sidde tilgængelighed",
     "sitEditor.editTitle": "Rediger båd sit",
     "sitEditor.lockedBannerTitle": "Redigering er låst",
-    "sitEditor.lockedBanner": "Dette møde har modtaget ansøgere, så dets detaljer kan ikke længere ændres. Du kan stadig gennemgå ansøgninger og beskedsittere.",
+    "sitEditor.lockedBanner":
+      "Dette møde har modtaget ansøgere, så dets detaljer kan ikke længere ændres. Du kan stadig gennemgå ansøgninger og beskedsittere.",
     "sitEditor.createTitle": "Opret en bådsit",
     "sitEditor.createShort": "Opret en sit",
     "sitEditor.createEditLimitTitle": "Kan redigeres, indtil nogen ansøger",
-    "sitEditor.createEditLimit": "Du kan ændre sit detaljer, indtil den første ansøgning ankommer. Derefter er redigering låst, så ansøgere ser en stabil liste.",
+    "sitEditor.createEditLimit":
+      "Du kan ændre sit detaljer, indtil den første ansøgning ankommer. Derefter er redigering låst, så ansøgere ser en stabil liste.",
     "sitEditor.hint": "En båd kan have så mange separate siddeperioder som nødvendigt.",
     "sitEditor.boat": "Båd",
     "sitEditor.boatOnlySelected": "Din eneste båd er valgt til denne sit.",
@@ -10861,9 +11367,11 @@ const localeExtrasSource = {
     "sitType.liveaboardHint": "Sidderen bor og sover ombord under alle daterne.",
     "sitType.daytimeChecks": "Dagstjek",
     "sitType.daytimeChecksShort": "Dagtimerne",
-    "sitType.daytimeChecksHint": "Sitteren besøger dagligt for at tjekke båden, men overnatter ikke.",
+    "sitType.daytimeChecksHint":
+      "Sitteren besøger dagligt for at tjekke båden, men overnatter ikke.",
     "sitEditor.responsibilities": "Plejeansvar",
-    "sitEditor.responsibilitiesPlaceholder": "En opgave pr. linje, f.eks. tjek lænsninger hver morgen",
+    "sitEditor.responsibilitiesPlaceholder":
+      "En opgave pr. linje, f.eks. tjek lænsninger hver morgen",
     "sitEditor.requirementsKicker": "Sitter krav",
     "sitEditor.requirementsTitle": "Hvem passer godt til denne siddeplads?",
     "sitEditor.minimumYears": "Minimum års erfaring med sejlsport",
@@ -10883,7 +11391,8 @@ const localeExtrasSource = {
     "sitEditor.publish": "Udgiv sit",
     "sitEditor.publishBlocked": "Stadig brug for: {{items}}",
     "sitEditor.verificationRequiredTitle": "Bekræft din identitet for at oprette en sit",
-    "sitEditor.verificationRequiredText": "Bekræft dit offentlige id, din e-mail-adresse og dit telefonnummer, før du offentliggør en bådsit.",
+    "sitEditor.verificationRequiredText":
+      "Bekræft dit offentlige id, din e-mail-adresse og dit telefonnummer, før du offentliggør en bådsit.",
     "sitEditor.verificationRequiredCta": "Fuldfør verifikation på din profil",
     "sitEditor.verificationChecking": "Tjek din bekræftelse...",
     "auth.kicker": "Velkommen ombord",
@@ -10925,15 +11434,18 @@ const localeExtrasSource = {
     "settings.language": "Interface sprog",
     "settings.languageHint": "Datoer og talformater følger dit grænsefladesprog.",
     "settings.measurementSystem": "Målesystem",
-    "settings.measurementHint": "Din browserregion indstiller den oprindelige standard. Bådformer lader dig stadig vælge begge enheder.",
+    "settings.measurementHint":
+      "Din browserregion indstiller den oprindelige standard. Bådformer lader dig stadig vælge begge enheder.",
     "settings.sitDefaultsTitle": "Standardindstillinger for sit-oprettelse",
-    "settings.sitDefaultsHint": "Disse valg er forudvalgt, når du opretter en ny sit. Du kan stadig ændre dem på hver sit.",
+    "settings.sitDefaultsHint":
+      "Disse valg er forudvalgt, når du opretter en ny sit. Du kan stadig ændre dem på hver sit.",
     "settings.sitDefaults.nonSmoker": "Kræv ikke-rygere som standard",
     "settings.sitDefaults.nonSmokerHint": "Nye sits starter med Skal være ikke-ryger tændt.",
     "settings.metric": "Metrisk (meter)",
     "settings.imperial": "Imperial (fødder)",
     "settings.personalTitle": "Personlige oplysninger",
-    "settings.personalHint": "Dit juridiske navn og kontaktoplysninger bruges til verifikation og sit-aftaler.",
+    "settings.personalHint":
+      "Dit juridiske navn og kontaktoplysninger bruges til verifikation og sit-aftaler.",
     "settings.legalName": "Fuldt juridisk navn",
     "settings.legalNameHint": "Som det fremgår af dit statslige ID.",
     "settings.displayNameHint": "Vises på din offentlige profil og i beskeder.",
@@ -10941,7 +11453,8 @@ const localeExtrasSource = {
     "settings.savePersonal": "Gem personlige oplysninger",
     "settings.personalSaved": "Personlige oplysninger gemt",
     "settings.accountTitle": "Konto",
-    "settings.accountHint": "Din login-e-mail vises her. Brug knapperne til at ændre din e-mail eller adgangskode i en sikker dialogboks.",
+    "settings.accountHint":
+      "Din login-e-mail vises her. Brug knapperne til at ændre din e-mail eller adgangskode i en sikker dialogboks.",
     "settings.currentEmail": "Nuværende e-mail",
     "settings.newEmail": "Ny e-mail",
     "settings.currentPassword": "Nuværende adgangskode",
@@ -10957,9 +11470,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Adgangskode opdateret",
     "settings.passwordMismatch": "Nye adgangskoder stemmer ikke overens.",
     "settings.sameEmail": "Indtast en anden e-mailadresse.",
-    "settings.accountCredentialsUnavailable": "Adgangskodeændringer kræver en e-mail-registreringskonto. Tilmeld dig med e-mail, og prøv derefter igen.",
+    "settings.accountCredentialsUnavailable":
+      "Adgangskodeændringer kræver en e-mail-registreringskonto. Tilmeld dig med e-mail, og prøv derefter igen.",
     "settings.emailsTitle": "E-mail notifikationer",
-    "settings.emailsHint": "Vælg, hvilke begivenheder der sender dig en e-mail. Du kan til enhver tid ændre disse.",
+    "settings.emailsHint":
+      "Vælg, hvilke begivenheder der sender dig en e-mail. Du kan til enhver tid ændre disse.",
     "settings.email.newApplications": "Nye sit-applikationer på mine både",
     "settings.email.applicationUpdates": "Opdateringer på sits jeg ansøgte om",
     "settings.email.messages": "Nye beskeder i mine samtaler",
@@ -10969,33 +11484,39 @@ const localeExtrasSource = {
     "safetyActions.block": "Blok",
     "safetyActions.unblock": "Fjern blokering",
     "safetyActions.reportTitle": "Rapportere {{name}}?",
-    "safetyActions.reportText": "Fortæl os, hvad der skete. Rapporter gennemgås af Boatstead og deles ikke med det rapporterede medlem.",
+    "safetyActions.reportText":
+      "Fortæl os, hvad der skete. Rapporter gennemgås af Boatstead og deles ikke med det rapporterede medlem.",
     "safetyActions.reportReason": "Årsag",
     "safetyActions.reportDetails": "Detaljer",
     "safetyActions.reportDetailsPlaceholder": "Tilføj enhver nyttig kontekst",
     "safetyActions.reportDetailsRequired": "Tilføj venligst en kort beskrivelse af denne grund.",
     "safetyActions.reportSubmit": "Indsend rapport",
     "safetyActions.reportThanksTitle": "Rapport fremsendt",
-    "safetyActions.reportThanksText": "Tak. Vi har modtaget din rapport om {{name}} og vil gennemgå den.",
+    "safetyActions.reportThanksText":
+      "Tak. Vi har modtaget din rapport om {{name}} og vil gennemgå den.",
     "safetyActions.blockTitle": "Bloker {{name}}?",
-    "safetyActions.blockText": "De vil ikke længere være i stand til nemt at kontakte dig, og du kan til enhver tid fjerne blokeringen af dem i Indstillinger.",
+    "safetyActions.blockText":
+      "De vil ikke længere være i stand til nemt at kontakte dig, og du kan til enhver tid fjerne blokeringen af dem i Indstillinger.",
     "safetyActions.blockConfirm": "Ja, blokere",
     "safetyActions.blockedBannerTitle": "Du blokerede dette medlem",
-    "safetyActions.blockedBannerText": "{{name}} er på din blokerede liste. Du kan fjerne blokeringen af dem her eller i Indstillinger.",
+    "safetyActions.blockedBannerText":
+      "{{name}} er på din blokerede liste. Du kan fjerne blokeringen af dem her eller i Indstillinger.",
     "safetyActions.reason.spam": "Spam eller uønsket kontakt",
     "safetyActions.reason.harassment": "Chikane eller misbrug",
     "safetyActions.reason.scam": "Fidus eller bedrageri",
     "safetyActions.reason.inappropriate": "Upassende indhold eller adfærd",
     "safetyActions.reason.other": "Noget andet",
     "settings.blockedUsersTitle": "Blokerede konti",
-    "settings.blockedUsersHint": "Medlemmer du har blokeret. Fjernelse af blokering genopretter normal kontakt.",
+    "settings.blockedUsersHint":
+      "Medlemmer du har blokeret. Fjernelse af blokering genopretter normal kontakt.",
     "settings.blockedUsersEmpty": "Du har ikke blokeret nogen endnu.",
     "settings.blockedOn": "Blokeret {{date}}",
     "settings.dangerZone": "Farezone",
     "settings.deleteAccount": "Slet konto",
     "settings.deleteAccountHint": "Slet din profil, gemte sits og lokale kontodata permanent.",
     "settings.deleteConfirmTitle": "Vil du slette din konto?",
-    "settings.deleteConfirmText": "Denne handling kan ikke fortrydes. Du bliver meldt ud med det samme.",
+    "settings.deleteConfirmText":
+      "Denne handling kan ikke fortrydes. Du bliver meldt ud med det samme.",
     "settings.deleteConfirmationLabel": "Skriv {{term}} for at bekræfte sletning af konto",
     "settings.deletingAccount": "Sletter...",
     "settings.deleteConfirm": "Ja, slet min konto",
@@ -11133,32 +11654,45 @@ const localeExtrasSource = {
     "safety.title": "Sikker bådsidning starter med forberedelse",
     "safety.intro": "Brug disse praktiske kontroller før, under og efter hver bådsejlads.",
     "safety.verification.title": "Identitet og verifikation",
-    "safety.verification.text": "Gennemfør tilgængelige identitetstjek og bekræft, at navne og kontaktoplysninger stemmer overens, før du accepterer en sit.",
+    "safety.verification.text":
+      "Gennemfør tilgængelige identitetstjek og bekræft, at navne og kontaktoplysninger stemmer overens, før du accepterer en sit.",
     "safety.profiles.title": "Gennemgå profiler og historie",
-    "safety.profiles.text": "Læs referencer, anmeldelser og erfaringer omhyggeligt. Stil opfølgende spørgsmål om huller eller ukendte systemer.",
+    "safety.profiles.text":
+      "Læs referencer, anmeldelser og erfaringer omhyggeligt. Stil opfølgende spørgsmål om huller eller ukendte systemer.",
     "safety.video.title": "Mød via video",
-    "safety.video.text": "Arranger et videoopkald, involver alle, der vil blive ombord, og gå gennem fartøjet live, når det er praktisk muligt.",
+    "safety.video.text":
+      "Arranger et videoopkald, involver alle, der vil blive ombord, og gå gennem fartøjet live, når det er praktisk muligt.",
     "safety.expectations.title": "Sæt forventninger på skrift",
-    "safety.expectations.text": "Registrer datoer, ansvar, adgang, udgifter, opdateringer, besøgende og afbestillingsplaner skriftligt.",
+    "safety.expectations.text":
+      "Registrer datoer, ansvar, adgang, udgifter, opdateringer, besøgende og afbestillingsplaner skriftligt.",
     "safety.handover.title": "Gennemfør en bådspecifik overdragelse",
-    "safety.handover.text": "Dæk systemer, søhaner, lænse, batterier, landstrøm, motorer, vejrpåvirkninger, nødkontakter og nedlukningsprocedurer.",
+    "safety.handover.text":
+      "Dæk systemer, søhaner, lænse, batterier, landstrøm, motorer, vejrpåvirkninger, nødkontakter og nedlukningsprocedurer.",
     "safety.insurance.title": "Tjek forsikring",
-    "safety.insurance.text": "Ejere og oppassere bør uafhængigt bekræfte gældende fartøj, marina, rejse, ansvar og personlig forsikring.",
+    "safety.insurance.text":
+      "Ejere og oppassere bør uafhængigt bekræfte gældende fartøj, marina, rejse, ansvar og personlig forsikring.",
     "safety.pets.title": "Plan for kæledyr",
-    "safety.pets.text": "Dokumenter fodring, medicin, motion, dyrlægekontakter, transport og sikker bevægelse rundt på dæk og kajer.",
+    "safety.pets.text":
+      "Dokumenter fodring, medicin, motion, dyrlægekontakter, transport og sikker bevægelse rundt på dæk og kajer.",
     "safety.marina.title": "Følg marinaens regler",
-    "safety.marina.text": "Bekræft gæsteregistrering, adgang, parkering, affald, støj, sikkerhed og nødprocedurer med marinaen.",
+    "safety.marina.text":
+      "Bekræft gæsteregistrering, adgang, parkering, affald, støj, sikkerhed og nødprocedurer med marinaen.",
     "safety.redFlags.title": "Genkend røde flag",
-    "safety.redFlags.text": "Sæt pause, hvis nogen presser dig, undgår video, anmoder om usædvanlige betalinger, tilbageholder dokumentation, ændrer nøglefakta eller prøver at flytte samtalen væk fra platformen med det samme.",
+    "safety.redFlags.text":
+      "Sæt pause, hvis nogen presser dig, undgår video, anmoder om usædvanlige betalinger, tilbageholder dokumentation, ændrer nøglefakta eller prøver at flytte samtalen væk fra platformen med det samme.",
     "safety.reporting.title": "Rapportér hændelser",
-    "safety.reporting.text": "Gem beskeder, billeder, datoer og kvitteringer. Rapportér sikkerhedsproblemer til Boatstead-support og relevante forsikringsselskaber eller myndigheder.",
+    "safety.reporting.text":
+      "Gem beskeder, billeder, datoer og kvitteringer. Rapportér sikkerhedsproblemer til Boatstead-support og relevante forsikringsselskaber eller myndigheder.",
     "safety.emergency.title": "I en nødsituation",
-    "safety.emergency.text": "Beskyt livet først. Kontakt lokale beredskabs- eller maritime redningstjenester, derefter ejeren, lystbådehavnen og forsikringsselskabet efter behov.",
+    "safety.emergency.text":
+      "Beskyt livet først. Kontakt lokale beredskabs- eller maritime redningstjenester, derefter ejeren, lystbådehavnen og forsikringsselskabet efter behov.",
     "safety.disclaimerTitle": "Vigtig begrænsning",
-    "safety.disclaimerText": "Boatstead erstatter ikke nødtjenester, forsikringsselskaber, kvalificerede marinefagfolk eller professionel maritim rådgivning.",
+    "safety.disclaimerText":
+      "Boatstead erstatter ikke nødtjenester, forsikringsselskaber, kvalificerede marinefagfolk eller professionel maritim rådgivning.",
     "support.kicker": "Hjælpecenter",
     "support.title": "Hvordan kan vi hjælpe?",
-    "support.intro": "Vælg en kategori og send en besked. Denne prototype gemmer anmodninger lokalt og sender ikke e-mail.",
+    "support.intro":
+      "Vælg en kategori og send en besked. Denne prototype gemmer anmodninger lokalt og sender ikke e-mail.",
     "support.categories": "Support kategorier",
     "support.topic": "Emne",
     "support.chooseTopic": "Vælg et emne",
@@ -11182,52 +11716,74 @@ const localeExtrasSource = {
     "terms.kicker": "Legal",
     "terms.title": "Servicevilkår",
     "terms.updated": "Sidst opdateret: 21. juli 2026",
-    "terms.reviewNotice": "Meddelelse før lancering: kvalificeret juridisk rådgiver skal gennemgå og tilpasse disse vilkår før produktionslancering.",
+    "terms.reviewNotice":
+      "Meddelelse før lancering: kvalificeret juridisk rådgiver skal gennemgå og tilpasse disse vilkår før produktionslancering.",
     "terms.eligibility.title": "Berettigelse",
-    "terms.eligibility.text": "Du skal være juridisk i stand til at indgå aftaler og give nøjagtige oplysninger for at bruge Boatstead.",
+    "terms.eligibility.text":
+      "Du skal være juridisk i stand til at indgå aftaler og give nøjagtige oplysninger for at bruge Boatstead.",
     "terms.accounts.title": "Regnskaber",
-    "terms.accounts.text": "Du er ansvarlig for din konto, loginoplysninger og aktivitet. Fortæl os straks om uautoriseret adgang.",
+    "terms.accounts.text":
+      "Du er ansvarlig for din konto, loginoplysninger og aktivitet. Fortæl os straks om uautoriseret adgang.",
     "terms.platform.title": "Platform rolle",
-    "terms.platform.text": "Boatstead letter kun introduktioner mellem bådejere og sittere. Ethvert siddearrangement er en kontrakt mellem ejeren og sitteren. Boatstead ejer ikke skibe, ansætter ikke medlemmer, fører tilsyn med sits eller bliver en part i disse arrangementer.",
+    "terms.platform.text":
+      "Boatstead letter kun introduktioner mellem bådejere og sittere. Ethvert siddearrangement er en kontrakt mellem ejeren og sitteren. Boatstead ejer ikke skibe, ansætter ikke medlemmer, fører tilsyn med sits eller bliver en part i disse arrangementer.",
     "terms.listings.title": "Fortegnelser og applikationer",
-    "terms.listings.text": "Fortegnelser og ansøgninger skal være nøjagtige, aktuelle og fuldstændige. Medlemmerne beslutter, om de vil indgå i en siddeordning.",
+    "terms.listings.text":
+      "Fortegnelser og ansøgninger skal være nøjagtige, aktuelle og fuldstændige. Medlemmerne beslutter, om de vil indgå i en siddeordning.",
     "terms.responsibilities.title": "Brugeransvar",
-    "terms.responsibilities.text": "Medlemmer skal handle lovligt, kommunikere ærligt, følge skriftlige forventninger og udvise rimelig omhu.",
+    "terms.responsibilities.text":
+      "Medlemmer skal handle lovligt, kommunikere ærligt, følge skriftlige forventninger og udvise rimelig omhu.",
     "terms.verification.title": "Verifikation",
-    "terms.verification.text": "Kontrol kan reducere risikoen, men garanterer ikke identitet, adfærd, kvalifikationer, sikkerhed eller egnethed.",
+    "terms.verification.text":
+      "Kontrol kan reducere risikoen, men garanterer ikke identitet, adfærd, kvalifikationer, sikkerhed eller egnethed.",
     "terms.prohibited.title": "Forbudt adfærd",
-    "terms.prohibited.text": "Begå ikke bedrageri, chikane, diskrimination, usikre handlinger, uautoriseret adgang, ulovlig aktivitet eller misbrug af platforme.",
+    "terms.prohibited.text":
+      "Begå ikke bedrageri, chikane, diskrimination, usikre handlinger, uautoriseret adgang, ulovlig aktivitet eller misbrug af platforme.",
     "terms.payments.title": "Betalinger og gebyrer",
-    "terms.payments.text": "Boatstead opkræver i øjeblikket ingen natlig gebyr. Hvis betalingsfunktioner introduceres, vil gældende vilkår og priser blive vist først.",
+    "terms.payments.text":
+      "Boatstead opkræver i øjeblikket ingen natlig gebyr. Hvis betalingsfunktioner introduceres, vil gældende vilkår og priser blive vist først.",
     "terms.cancellations.title": "Aflysninger",
-    "terms.cancellations.text": "Medlemmer bør acceptere afbestillingsplaner skriftligt og meddele ændringer omgående for at reducere skader og udgifter.",
+    "terms.cancellations.text":
+      "Medlemmer bør acceptere afbestillingsplaner skriftligt og meddele ændringer omgående for at reducere skader og udgifter.",
     "terms.insurance.title": "Forsikring",
-    "terms.insurance.text": "Medlemmer er ansvarlige for at bekræfte passende forsikring. Boatstead tilbyder ikke fartøjs-, rejse- eller ansvarsforsikring.",
+    "terms.insurance.text":
+      "Medlemmer er ansvarlige for at bekræfte passende forsikring. Boatstead tilbyder ikke fartøjs-, rejse- eller ansvarsforsikring.",
     "terms.damage.title": "Skader og krav",
-    "terms.damage.text": "Eventuelle skader, tyveri eller lignende krav er primært mellem ejeren og den siddende. Dokumentér hændelser omgående, bevar beviser og samarbejde med den anden part, lystbådehavne, forsikringsselskaber og myndigheder.",
+    "terms.damage.text":
+      "Eventuelle skader, tyveri eller lignende krav er primært mellem ejeren og den siddende. Dokumentér hændelser omgående, bevar beviser og samarbejde med den anden part, lystbådehavne, forsikringsselskaber og myndigheder.",
     "terms.intellectualProperty.title": "Intellektuel ejendomsret",
-    "terms.intellectualProperty.text": "Boatstead-indhold og branding er beskyttet. Du bevarer rettighederne til dit indhold og giver os tilladelse til at betjene tjenesten.",
+    "terms.intellectualProperty.text":
+      "Boatstead-indhold og branding er beskyttet. Du bevarer rettighederne til dit indhold og giver os tilladelse til at betjene tjenesten.",
     "terms.privacy.title": "Privatliv",
-    "terms.privacy.text": "Personoplysninger skal håndteres ansvarligt. En meddelelse om beskyttelse af personlige oplysninger i produktionen vil beskrive indsamling, brug, opbevaring og rettigheder.",
+    "terms.privacy.text":
+      "Personoplysninger skal håndteres ansvarligt. En meddelelse om beskyttelse af personlige oplysninger i produktionen vil beskrive indsamling, brug, opbevaring og rettigheder.",
     "terms.termination.title": "Suspension og opsigelse",
-    "terms.termination.text": "Vi kan begrænse eller afslutte adgangen for at beskytte medlemmer, undersøge bekymringer, håndhæve vilkår eller overholde loven.",
+    "terms.termination.text":
+      "Vi kan begrænse eller afslutte adgangen for at beskytte medlemmer, undersøge bekymringer, håndhæve vilkår eller overholde loven.",
     "terms.disclaimers.title": "Ansvarsfraskrivelser",
-    "terms.disclaimers.text": "Prototypen leveres som tilgængelig uden garantier for uafbrudt drift, egnethed, nøjagtighed eller resultater.",
+    "terms.disclaimers.text":
+      "Prototypen leveres som tilgængelig uden garantier for uafbrudt drift, egnethed, nøjagtighed eller resultater.",
     "terms.liability.title": "Ansvarsbegrænsning",
-    "terms.liability.text": "I det omfang loven tillader det, er Boatstead ikke ansvarlig for skader, tyveri, tab, kvæstelser, rejseforstyrrelser, ejendomskrav eller noget andet resultat, der opstår som følge af arrangementer mellem medlemmer. Medlemmer handler med hinanden på eget ansvar.",
+    "terms.liability.text":
+      "I det omfang loven tillader det, er Boatstead ikke ansvarlig for skader, tyveri, tab, kvæstelser, rejseforstyrrelser, ejendomskrav eller noget andet resultat, der opstår som følge af arrangementer mellem medlemmer. Medlemmer handler med hinanden på eget ansvar.",
     "terms.indemnity.title": "Godtgørelse",
-    "terms.indemnity.text": "Hvor det er lovligt tilladt, accepterer du at dække krav forårsaget af din ulovlige adfærd, indhold eller brud på disse vilkår.",
+    "terms.indemnity.text":
+      "Hvor det er lovligt tilladt, accepterer du at dække krav forårsaget af din ulovlige adfærd, indhold eller brud på disse vilkår.",
     "terms.disputes.title": "Tvister og gældende lov",
-    "terms.disputes.text": "Produktionsvilkårene skal specificere en virksomhedsenhed, jurisdiktion, gældende lov og tvistproces efter juridisk gennemgang.",
+    "terms.disputes.text":
+      "Produktionsvilkårene skal specificere en virksomhedsenhed, jurisdiktion, gældende lov og tvistproces efter juridisk gennemgang.",
     "terms.changes.title": "Ændringer af disse vilkår",
-    "terms.changes.text": "Vi kan opdatere disse vilkår og vil give passende meddelelse, før væsentlige ændringer træder i kraft.",
+    "terms.changes.text":
+      "Vi kan opdatere disse vilkår og vil give passende meddelelse, før væsentlige ændringer træder i kraft.",
     "terms.contact.title": "Kontakt og support",
-    "terms.contact.text": "Brug supportsiden til spørgsmål. Stol ikke på Boatstead-support til nødberedskab.",
+    "terms.contact.text":
+      "Brug supportsiden til spørgsmål. Stol ikke på Boatstead-support til nødberedskab.",
     "nav.admin": "Admin",
     "footer.admin": "Admin",
     "admin.kicker": "Platform operationer",
     "admin.title": "Admin",
-    "admin.subtitle": "Administrer medlemmer, roller og kontostatus. Hver ændring registreres i revisionssporet.",
+    "admin.subtitle":
+      "Administrer medlemmer, roller og kontostatus. Hver ændring registreres i revisionssporet.",
     "admin.tab.users": "Brugere",
     "admin.tab.audit": "Revisionsspor",
     "admin.signInTitle": "Log ind for at åbne Admin",
@@ -11246,7 +11802,8 @@ const localeExtrasSource = {
     "admin.editUser": "Rediger bruger",
     "admin.deleteUser": "Slet bruger",
     "admin.deleteConfirmTitle": "Vil du slette denne bruger?",
-    "admin.deleteConfirmText": "Dette fjerner {{name}} fra admin-mappen. Relaterede sits og meddelelser vises muligvis stadig i lokale demodata.",
+    "admin.deleteConfirmText":
+      "Dette fjerner {{name}} fra admin-mappen. Relaterede sits og meddelelser vises muligvis stadig i lokale demodata.",
     "admin.deleteConfirm": "Ja, slet bruger",
     "admin.deleting": "Sletter...",
     "admin.saveUser": "Gem bruger",
@@ -11273,7 +11830,8 @@ const localeExtrasSource = {
   },
   fi: {
     "meta.title": "Boatstead | Luotettava venehuolto",
-    "meta.description": "Boatstead yhdistää luotetut veneenvahdit omistajiin, jotka tarvitsevat kokeneita käsiä alukselleen.",
+    "meta.description":
+      "Boatstead yhdistää luotetut veneenvahdit omistajiin, jotka tarvitsevat kokeneita käsiä alukselleen.",
     "common.back": "Takaisin",
     "common.cancel": "Peruuttaa",
     "common.close": "Lähellä",
@@ -11283,7 +11841,8 @@ const localeExtrasSource = {
     "common.saving": "Tallennetaan…",
     "nav.logout": "Kirjaudu ulos",
     "nav.logoutConfirmTitle": "Haluatko varmasti kirjautua ulos?",
-    "nav.logoutConfirmText": "Sinun on kirjauduttava sisään uudelleen päästäksesi profiiliisi, viesteihin ja tallennettuihin istuntoihin.",
+    "nav.logoutConfirmText":
+      "Sinun on kirjauduttava sisään uudelleen päästäksesi profiiliisi, viesteihin ja tallennettuihin istuntoihin.",
     "nav.logoutConfirm": "Kyllä, kirjaudu ulos",
     "notifications.open": "Avaa ilmoitukset",
     "notifications.heading": "Ilmoitukset",
@@ -11324,15 +11883,18 @@ const localeExtrasSource = {
     "map.zoomOut": "Loitonna",
     "map.openInMaps": "Avaa Mapsissa",
     "map.openInMapsAriaLabel": "Avaa {{location}} Mapsissa",
-    "map.approximateLocationNote": "Tämä tappi merkitsee yleisen alueen. Tarkat makuupaikkatiedot jaetaan hakemuksen jättämisen jälkeen.",
+    "map.approximateLocationNote":
+      "Tämä tappi merkitsee yleisen alueen. Tarkat makuupaikkatiedot jaetaan hakemuksen jättämisen jälkeen.",
     "home.heroImageAlt": "Purjevene ankkuroituna selkeään lahteen",
-    "apply.defaultMessage": "Hei {{owner}}, haluaisin hoitaa {{boat}}. Minulla on kokemusta veneestä ja järjestän mielelläni videopuhelun.",
+    "apply.defaultMessage":
+      "Hei {{owner}}, haluaisin hoitaa {{boat}}. Minulla on kokemusta veneestä ja järjestän mielelläni videopuhelun.",
     "apply.successTitle": "Viesti lähetetty",
     "apply.successText": "{{owner}} vastaanottaa hakemuksesi {{boat}}.",
     "apply.viewInSits": "Katso istumapaikaltasi",
     "apply.kicker": "Esittele itsesi",
     "apply.title": "Hae {{boat}}",
-    "apply.hint": "Mainitse kokemuksesi {{type}}-veneistä ja selosteessa luetelluista laivan järjestelmistä.",
+    "apply.hint":
+      "Mainitse kokemuksesi {{type}}-veneistä ja selosteessa luetelluista laivan järjestelmistä.",
     "apply.sending": "Lähetetään…",
     "apply.send": "Lähetä hakemus",
     "detail.back": "Takaisin kaikkiin veneisiin",
@@ -11369,15 +11931,18 @@ const localeExtrasSource = {
     "saved.emptyHint": "Tallenna istuimet, jotka tarttuvat silmään, ja vertaa niitä täällä.",
     "saved.browse": "Selaa veneitä",
     "saved.signInTitle": "Kirjaudu sisään tallentaaksesi istuntoja",
-    "saved.signInText": "Kirjaudu sisään tai luo tili, jos haluat tallentaa istuntoja suosikkilistallesi ja löytää ne myöhemmin.",
+    "saved.signInText":
+      "Kirjaudu sisään tai luo tili, jos haluat tallentaa istuntoja suosikkilistallesi ja löytää ne myöhemmin.",
     "saved.showAll": "Näytä kaikki mukaan lukien valitut, valmiit hoitajat jne.",
     "saved.emptyFiltered": "Ei avoimia tallennettuja istuntoja",
-    "saved.emptyFilteredHint": "Suosikkilistallasi on vain istuntoja, joille on jo valittu hoitaja tai jotka on suoritettu. Valitse yllä oleva valintaruutu nähdäksesi ne.",
+    "saved.emptyFilteredHint":
+      "Suosikkilistallasi on vain istuntoja, joille on jo valittu hoitaja tai jotka on suoritettu. Valitse yllä oleva valintaruutu nähdäksesi ne.",
     "editorPreview.kicker": "Live-esikatselu",
     "editorPreview.title": "Miltä se tulee näyttämään",
     "editorPreview.label": "Live-esikatselu",
     "editorPreview.vesselHint": "Päivityksiä, kun muokkaat veneen tietoja.",
-    "editorPreview.sitHint": "Päivityksiä, kun muokkaat tätä istuinta. Tältä se näyttää, kun hoitajat selaavat.",
+    "editorPreview.sitHint":
+      "Päivityksiä, kun muokkaat tätä istuinta. Tältä se näyttää, kun hoitajat selaavat.",
     "editorPreview.untitledBoat": "Nimetön vene",
     "editorPreview.homePortPending": "Lisää kotiportti",
     "editorPreview.lengthPending": "Pituus TBD",
@@ -11386,17 +11951,22 @@ const localeExtrasSource = {
     "editorPreview.notSpecified": "Ei määritelty",
     "how.kicker": "Miten Boatstead toimii",
     "how.title": "Luottamus alkaa ennen kuin kukaan astuu kyytiin.",
-    "how.subtitle": "Vene on koti ja asumisjärjestelmä. Boatstead auttaa molempia osapuolia löytämään tärkeitä yksityiskohtia.",
+    "how.subtitle":
+      "Vene on koti ja asumisjärjestelmä. Boatstead auttaa molempia osapuolia löytämään tärkeitä yksityiskohtia.",
     "how.stepProfileTitle": "Rakenna miehistöprofiilisi",
-    "how.stepProfileText": "Jaa referenssejä, sertifikaatteja, aluskokemusta ja järjestelmiä, joihin olet tyytyväinen.",
+    "how.stepProfileText":
+      "Jaa referenssejä, sertifikaatteja, aluskokemusta ja järjestelmiä, joihin olet tyytyväinen.",
     "how.stepFindTitle": "Etsi oikea vene",
-    "how.stepFindText": "Suodata sijainnin, alustyypin, päivämäärien, kyydissä olevien lemmikkien ja vaaditun kokemuksen mukaan.",
+    "how.stepFindText":
+      "Suodata sijainnin, alustyypin, päivämäärien, kyydissä olevien lemmikkien ja vaaditun kokemuksen mukaan.",
     "how.stepMeetTitle": "Tapaa ja sovi",
-    "how.stepMeetText": "Keskustele omistajien kanssa, kysy käytännön kysymyksiä ja sovi vastuista ennen vahvistamista.",
+    "how.stepMeetText":
+      "Keskustele omistajien kanssa, kysy käytännön kysymyksiä ja sovi vastuista ennen vahvistamista.",
     "how.stepHandoverTitle": "Suorita luovutus loppuun",
-    "how.stepHandoverText": "Kävele yhdessä veneen esittelyn läpi pilssistä ja akuista sää- ja hätäsuunnitelmiin.",
+    "how.stepHandoverText":
+      "Kävele yhdessä veneen esittelyn läpi pilssistä ja akuista sää- ja hätäsuunnitelmiin.",
     "how.briefKicker": "Boatstead-vene alushousu",
-    "how.briefTitle": "Ei epämääräistä \"pidä häntä silmällä\".",
+    "how.briefTitle": 'Ei epämääräistä "pidä häntä silmällä".',
     "how.briefMooring": "Kiinnitys, köydet & lokasuojat",
     "how.briefBilges": "Pilssit & merihanat",
     "how.briefBattery": "Akku ja maavirta",
@@ -11407,12 +11977,16 @@ const localeExtrasSource = {
     "how.briefContacts": "Marinan yhteystiedot",
     "how.storiesKicker": "Tarinoita telakasta",
     "how.storiesTitle": "Luotettu molemmin puolin luovutusta",
-    "how.storiesText": "Omistajat saavat kokenutta hoitoa. Sitters saavat rehellisiä alushousuja ja merkittäviä paikkoja kutsua kotiin.",
-    "how.testimonialOneQuote": "Ensimmäistä kertaa lähdimme Sunbirdistä kolmeksi viikoksi tarkistamatta venesataman kameroita tunnin välein. Claire ymmärsi veneen, lähetti harkittuja päivityksiä ja ojensi hänet takaisin tahrattomana.",
+    "how.storiesText":
+      "Omistajat saavat kokenutta hoitoa. Sitters saavat rehellisiä alushousuja ja merkittäviä paikkoja kutsua kotiin.",
+    "how.testimonialOneQuote":
+      "Ensimmäistä kertaa lähdimme Sunbirdistä kolmeksi viikoksi tarkistamatta venesataman kameroita tunnin välein. Claire ymmärsi veneen, lähetti harkittuja päivityksiä ja ojensi hänet takaisin tahrattomana.",
     "how.testimonialOneDetail": "Sunbird · Antibes -yrityksen omistajat",
-    "how.testimonialTwoQuote": "Boatstead sovitti minulle veneen, joka sopi todelliseen kokemukseeni, ei vain kauniiseen sijaintiin. Luovutusohje tarkoitti, ettei omistajan lähtiessä tullut yllätyksiä.",
+    "how.testimonialTwoQuote":
+      "Boatstead sovitti minulle veneen, joka sopi todelliseen kokemukseeni, ei vain kauniiseen sijaintiin. Luovutusohje tarkoitti, ettei omistajan lähtiessä tullut yllätyksiä.",
     "how.testimonialTwoDetail": "RYA Yachtmaster · 11 suoritettua paikkaa",
-    "how.testimonialThreeQuote": "Sitterimme huomasi pienen maasähköongelman ennen kuin siitä tuli kallis. Se, että kyydissä oli joku, joka tiesi mitä etsiä, teki kaiken eron.",
+    "how.testimonialThreeQuote":
+      "Sitterimme huomasi pienen maasähköongelman ennen kuin siitä tuli kallis. Se, että kyydissä oli joku, joka tiesi mitä etsiä, teki kaiken eron.",
     "how.testimonialThreeDetail": "Northbound · Vancouverin omistaja",
     "role.owner": "Veneen omistaja",
     "role.sitter": "Venevahti",
@@ -11425,15 +11999,18 @@ const localeExtrasSource = {
     "sits.withOwner": "{{owner}}",
     "sits.withdrawInterest": "Nosta korko",
     "sits.withdrawConfirmTitle": "Peruuttaa kiinnostuksesi?",
-    "sits.withdrawConfirmText": "Tämä poistaa sovelluksesi {{boat}}. Voit hakea uudelleen myöhemmin, jos paikka on vielä auki.",
-    "sits.withdrawAcceptedConfirmText": "Olet tällä hetkellä hyväksytty koulutukseen {{boat}}. Peruuttaminen lopettaa vahvistuksen, jotta omistaja voi valita jonkun muun.",
+    "sits.withdrawConfirmText":
+      "Tämä poistaa sovelluksesi {{boat}}. Voit hakea uudelleen myöhemmin, jos paikka on vielä auki.",
+    "sits.withdrawAcceptedConfirmText":
+      "Olet tällä hetkellä hyväksytty koulutukseen {{boat}}. Peruuttaminen lopettaa vahvistuksen, jotta omistaja voi valita jonkun muun.",
     "sits.withdrawConfirmAction": "Kyllä, vetäydy",
     "role.vesselOwner": "{{type}} omistaja",
     "notFound.title": "eksynyt mereen?",
     "notFound.text": "Tämä sivu ei ole kaaviossamme.",
     "notFound.back": "Takaisin satamaan",
     "errorBoundary.title": "Jotain meni pieleen",
-    "errorBoundary.text": "Kohtasimme odottamattoman ongelman. Yritä uudelleen tai palaa etusivulle.",
+    "errorBoundary.text":
+      "Kohtasimme odottamattoman ongelman. Yritä uudelleen tai palaa etusivulle.",
     "errorBoundary.tryAgain": "Yritä uudelleen",
     "errorBoundary.goHome": "Mene kotiin",
     "profile.settings": "Julkinen profiili",
@@ -11442,7 +12019,8 @@ const localeExtrasSource = {
     "profile.photo": "Profiilikuva",
     "profile.photoPreviewAlt": "Nykyinen profiilikuva",
     "profile.replacePhoto": "Lataa tai vaihda kuva",
-    "profile.photoUploadHint": "JPG, PNG tai WebP jopa 10 Mt. Suurten kuvien kokoa muutetaan ennen tallentamista.",
+    "profile.photoUploadHint":
+      "JPG, PNG tai WebP jopa 10 Mt. Suurten kuvien kokoa muutetaan ennen tallentamista.",
     "profile.coverImage": "Kansikuva",
     "profile.coverHint": "Valinnainen. Korvaa valokuvasi takana olevan oletusbannerin.",
     "profile.coverPreviewAlt": "Nykyinen kansikuva",
@@ -11451,7 +12029,8 @@ const localeExtrasSource = {
     "profile.location": "Kotiportti / sijainti",
     "profile.locationPlaceholder": "Aloita kaupungin kirjoittaminen",
     "profile.aboutYou": "Sinusta",
-    "profile.aboutPlaceholder": "Jaa venekokemuksesi, lähestymistapasi ja se, mikä tekee sinusta hyvän parin…",
+    "profile.aboutPlaceholder":
+      "Jaa venekokemuksesi, lähestymistapasi ja se, mikä tekee sinusta hyvän parin…",
     "profile.qualifications": "Kokemus ja pätevyys",
     "profile.qualificationsPlaceholder": "Yksi riviä kohden, esimerkiksi RYA Day Skipper",
     "profile.spokenLanguages": "Kielet, joita puhut",
@@ -11466,8 +12045,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Henkilöllisyys vahvistettu",
     "verification.identityVerified": "Henkilöllisyys vahvistettu",
     "verification.confirmIdentity": "Vahvista henkilöllisyytesi",
-    "verification.verifiedHint": "Boatstead vahvisti tämän jäsenen henkilötodistuksen, sähköpostin ja puhelimen.",
-    "verification.selfHint": "Täytä jokainen alla oleva kohta, jotta omistajat ja hoitajat voivat luottaa profiiliisi.",
+    "verification.verifiedHint":
+      "Boatstead vahvisti tämän jäsenen henkilötodistuksen, sähköpostin ja puhelimen.",
+    "verification.selfHint":
+      "Täytä jokainen alla oleva kohta, jotta omistajat ja hoitajat voivat luottaa profiiliisi.",
     "verification.partialHint": "{{count}} / {{total}} tarkistukset on vahvistettu tähän mennessä.",
     "verification.governmentId": "Virallinen henkilöllisyystodistus",
     "verification.email": "Sähköpostiosoite",
@@ -11475,7 +12056,8 @@ const localeExtrasSource = {
     "verification.statusVerified": "vahvistettu",
     "verification.statusMissing": "ei vahvistettu",
     "verification.verifyGovernmentId": "Vahvista virallinen henkilöllisyystodistus",
-    "verification.addEmailAndPhone": "Viimeistele vahvistus lisäämällä sähköpostiosoite ja puhelinnumero profiiliisi.",
+    "verification.addEmailAndPhone":
+      "Viimeistele vahvistus lisäämällä sähköpostiosoite ja puhelinnumero profiiliisi.",
     "verification.addPhone": "Viimeistele vahvistus lisäämällä puhelinnumero profiiliisi.",
     "verification.addEmail": "Viimeistele vahvistus lisäämällä sähköpostiosoite profiiliisi.",
     "member.verificationNeeded": "Vahvistus tarvitaan",
@@ -11493,7 +12075,8 @@ const localeExtrasSource = {
     "member.sitsAsSitter_one": "1 istuu hoitajana",
     "member.sitsAsSitter_other": "{{count}} istuu hoitajana",
     "member.verifyTitle": "Vahvista henkilöllisyytesi",
-    "member.verifyText": "Rakenna luottamusta muihin jäseniin henkilöllisyyden tarkistuksen avulla.",
+    "member.verifyText":
+      "Rakenna luottamusta muihin jäseniin henkilöllisyyden tarkistuksen avulla.",
     "member.checking": "Tarkistetaan henkilöllisyyttä…",
     "member.startVerification": "Aloita valevarmennus",
     "member.providerDemo": "Palveluntarjoajavalmis esittelykulku",
@@ -11510,14 +12093,16 @@ const localeExtrasSource = {
     "owner.backToBoats": "Takaisin veneisiin",
     "owner.dashboard": "Veneen kojelauta",
     "owner.manage": "Hallitse veneitä ja istumia",
-    "owner.dashboardHint": "Pidä aluksen tiedot erillään jokaisesta jaksosta, jolloin tarvitset hoitajan.",
+    "owner.dashboardHint":
+      "Pidä aluksen tiedot erillään jokaisesta jaksosta, jolloin tarvitset hoitajan.",
     "owner.tab.boats": "Veneitä",
     "owner.tab.sits": "Istuu",
     "owner.sitPeriods_one": "1 istuntojakso",
     "owner.sitPeriods_other": "{{count}} istumajaksot",
     "owner.sitSummary": "{{duration}} · {{applicants}} hakijat · {{tasks}} hoitotehtävät",
     "owner.sitPhaseFilter": "Suodatin istuu vaiheittain",
-    "owner.sitPhaseFilterHint": "Istuimet on ryhmitelty vaiheittain. Käytä suodatinta keskittyäksesi yhteen vaiheeseen.",
+    "owner.sitPhaseFilterHint":
+      "Istuimet on ryhmitelty vaiheittain. Käytä suodatinta keskittyäksesi yhteen vaiheeseen.",
     "owner.sitPhaseFilterAll": "Kaikki vaiheet",
     "owner.sitPhaseEmpty": "Ei istuntoja tässä vaiheessa",
     "owner.sitPhaseCount_one": "1 istua",
@@ -11525,14 +12110,19 @@ const localeExtrasSource = {
     "owner.firstBoat": "Lisää ensimmäinen veneesi",
     "owner.firstSit": "Luo ensimmäinen istumasi",
     "owner.sitsEmptyTitle": "Ei istu vielä",
-    "owner.sitsEmptyHintWithBoats": "Julkaise päivämäärät jollekin veneellesi tai selaa avoimia paikkoja löytääksesi ensimmäisen hoitomahdollisuutesi.",
-    "owner.sitsEmptyHintNoBoats": "Lisää vene istumaan tai selaa avoimia istuntoja löytääksesi ensimmäisen hoitomahdollisuutesi.",
+    "owner.sitsEmptyHintWithBoats":
+      "Julkaise päivämäärät jollekin veneellesi tai selaa avoimia paikkoja löytääksesi ensimmäisen hoitomahdollisuutesi.",
+    "owner.sitsEmptyHintNoBoats":
+      "Lisää vene istumaan tai selaa avoimia istuntoja löytääksesi ensimmäisen hoitomahdollisuutesi.",
     "owner.browseOpenSits": "Selaa avoimia istuntoja",
-    "owner.firstBoatHint": "Lisää alus kerran ja luo sitten erilliset istuimet aina matkustaessasi.",
+    "owner.firstBoatHint":
+      "Lisää alus kerran ja luo sitten erilliset istuimet aina matkustaessasi.",
     "owner.firstSitHint": "Valitse vene ja julkaise päivämäärät, jolloin tarvitset jonkun kyytiin.",
     "owner.boatBeforeSit": "Lisää vene ennen istuimen luomista.",
-    "owner.sitRequiresBoatTooltip": "Luo ensin vene. Napsauta tästä lisätäksesi ensimmäisen veneesi.",
-    "owner.sitRequiresVerificationTooltip": "Vahvista henkilöllisyytesi ennen istunnon luomista. Viimeistele vahvistus avaamalla profiilisi.",
+    "owner.sitRequiresBoatTooltip":
+      "Luo ensin vene. Napsauta tästä lisätäksesi ensimmäisen veneesi.",
+    "owner.sitRequiresVerificationTooltip":
+      "Vahvista henkilöllisyytesi ennen istunnon luomista. Viimeistele vahvistus avaamalla profiilisi.",
     "owner.deleteBoatLabel": "Poista {{boat}}",
     "owner.deleteBoatTitle": "Poistetaanko {{boat}}?",
     "owner.deleteBoatConfirm": "Tämä poistaa veneen pysyvästi, eikä sitä voi kumota.",
@@ -11546,15 +12136,21 @@ const localeExtrasSource = {
     "owner.sitDeleteLocked": "Tällä istunnolla on hyväksytty hakija, eikä sitä voi enää poistaa",
     "owner.deleteError": "Venettä ei voitu poistaa. Yritä uudelleen.",
     "owner.deleteSitError": "Tätä istuntoa ei voitu poistaa. Yritä uudelleen.",
-    "owner.deleteSitAcceptedError": "Tällä istunnolla on hyväksytty hakija, eikä sitä voi enää poistaa.",
-    "owner.sitDeleteUnderway": "Tämä istunto on käynnissä, eikä sitä voi poistaa. Ota yhteyttä tukeen, jos tarvitset apua ongelmissa.",
-    "owner.deleteSitApplicantsWarning_one": "Tällä istunnolla on tällä hetkellä 1 hakija. Sen poistaminen poistaa tiedot kaikilta hakeneilta.",
-    "owner.deleteSitApplicantsWarning_other": "Tällä paikalla on {{count}} hakijaa juuri nyt. Sen poistaminen poistaa tiedot kaikilta hakeneilta.",
-    "owner.deleteSitAcceptedWarning": "Joku on jo hyväksytty tähän istuntoon. Ilmoita heille ennen kuin poistat sen.",
+    "owner.deleteSitAcceptedError":
+      "Tällä istunnolla on hyväksytty hakija, eikä sitä voi enää poistaa.",
+    "owner.sitDeleteUnderway":
+      "Tämä istunto on käynnissä, eikä sitä voi poistaa. Ota yhteyttä tukeen, jos tarvitset apua ongelmissa.",
+    "owner.deleteSitApplicantsWarning_one":
+      "Tällä istunnolla on tällä hetkellä 1 hakija. Sen poistaminen poistaa tiedot kaikilta hakeneilta.",
+    "owner.deleteSitApplicantsWarning_other":
+      "Tällä paikalla on {{count}} hakijaa juuri nyt. Sen poistaminen poistaa tiedot kaikilta hakeneilta.",
+    "owner.deleteSitAcceptedWarning":
+      "Joku on jo hyväksytty tähän istuntoon. Ilmoita heille ennen kuin poistat sen.",
     "owner.deleteSitCompletedError": "Valmiita istuntoja ei voi poistaa. Archive them instead.",
     "owner.archiveSitLabel": "Arkisto {{boat}} sit",
     "owner.archiveSitTitle": "Arkistoidaanko tämä istunto?",
-    "owner.archiveSitConfirm": "Arkistoidaanko {{dates}}-istunto kohteelle {{boat}}? Löydät sen myöhemmin kohdasta Arkistoitu.",
+    "owner.archiveSitConfirm":
+      "Arkistoidaanko {{dates}}-istunto kohteelle {{boat}}? Löydät sen myöhemmin kohdasta Arkistoitu.",
     "owner.archiveSitAction": "Kyllä, arkistoi",
     "owner.unarchiveSit": "Siirry aktiivisiin istuntoihin",
     "owner.unarchiveSitLabel": "Palauta {{boat}} sit",
@@ -11581,7 +12177,8 @@ const localeExtrasSource = {
     "vesselEditor.country": "Maa",
     "vesselEditor.countryPlaceholder": "esimerkiksi Kreikka",
     "vesselEditor.homePort": "Kotisatama",
-    "vesselEditor.homePortHint": "Missä venettä yleensä säilytetään. Jokainen istuin voi käyttää eri paikkaa.",
+    "vesselEditor.homePortHint":
+      "Missä venettä yleensä säilytetään. Jokainen istuin voi käyttää eri paikkaa.",
     "sitEditor.sameAsHomePort": "Sama kuin kotiportti: {{homePort}}",
     "sitEditor.sameAsHomePortHint": "Poista valinta, jos vene on muualla tämän istunnon aikana.",
     "sitEditor.location": "Istuinpaikka",
@@ -11593,7 +12190,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Veneen kannen esikatselu",
     "vesselEditor.noCover": "Ei vielä kansikuvaa",
     "vesselEditor.gallery": "Lisää kuvia",
-    "vesselEditor.galleryHint": "Lataa lisää kuvia veneestä, venesatamasta ja elämästä aluksella. Tekstitykset ovat valinnaisia.",
+    "vesselEditor.galleryHint":
+      "Lataa lisää kuvia veneestä, venesatamasta ja elämästä aluksella. Tekstitykset ovat valinnaisia.",
     "vesselEditor.galleryCaption": "Kuvateksti",
     "vesselEditor.galleryCaptionPlaceholder": "Valinnainen kuvateksti",
     "vesselEditor.galleryEmpty": "Ei vielä lisäkuvia",
@@ -11609,9 +12207,11 @@ const localeExtrasSource = {
     "vesselEditor.onePerLine": "Yksi per rivi",
     "vesselEditor.featuresKicker": "Veneen ja venesataman ominaisuudet",
     "vesselEditor.featuresTitle": "Mitä on saatavilla?",
-    "vesselEditor.featuresHint": "Valitse kaikki, mitä istujat voivat käyttää veneessä tai venesatamassa.",
+    "vesselEditor.featuresHint":
+      "Valitse kaikki, mitä istujat voivat käyttää veneessä tai venesatamassa.",
     "vesselEditor.privateAccessTitle": "Yksityiset pääsytiedot",
-    "vesselEditor.privateAccessHint": "Jaetaan vain vahvistettujen hoitajien kanssa, kun olet hyväksynyt heidän hakemuksensa. Säilytä Wi-Fi-salasanat, porttikoodit ja vastaavat tiedot täällä.",
+    "vesselEditor.privateAccessHint":
+      "Jaetaan vain vahvistettujen hoitajien kanssa, kun olet hyväksynyt heidän hakemuksensa. Säilytä Wi-Fi-salasanat, porttikoodit ja vastaavat tiedot täällä.",
     "vesselEditor.wifiNetwork": "Wi-Fi-verkko",
     "vesselEditor.wifiNetworkPlaceholder": "Verkon nimi",
     "vesselEditor.wifiPassword": "Wi-Fi-salasana",
@@ -11619,7 +12219,8 @@ const localeExtrasSource = {
     "vesselEditor.accessCodes": "Pääsykoodit",
     "vesselEditor.accessCodesPlaceholder": "Marinan portti, lukkolaatikko, kulkuväylä, hälytin…",
     "vesselEditor.otherPrivateNotes": "Muut yksityiset muistiinpanot",
-    "vesselEditor.otherPrivateNotesPlaceholder": "Vara-avaimen sijainti, laiturin tiedot, hätäyhteystiedot kyytiin…",
+    "vesselEditor.otherPrivateNotesPlaceholder":
+      "Vara-avaimen sijainti, laiturin tiedot, hätäyhteystiedot kyytiin…",
     "privateAccess.title": "Veneen pääsytiedot",
     "privateAccess.intro": "Jaettu vain sinulle vahvistettuna hoitajana.",
     "privateAccess.introOwner": "Näkyy tälle veneelle vahvistetuille istujille.",
@@ -11640,18 +12241,22 @@ const localeExtrasSource = {
     "upload.replace": "Vaihda kuva",
     "upload.upload": "Lataa kuva",
     "upload.remove": "Poista kuva",
-    "upload.hint": "JPG, PNG tai WebP jopa 10 Mt. Suurten kuvien kokoa muutetaan ennen tallentamista.",
+    "upload.hint":
+      "JPG, PNG tai WebP jopa 10 Mt. Suurten kuvien kokoa muutetaan ennen tallentamista.",
     "upload.uploadMultiple": "Lataa kuvia",
     "upload.processingMultiple": "Käsitellään kuvia…",
-    "upload.hintMultiple": "JPG, PNG tai WebP kukin enintään 10 Mt. Suurten kuvien kokoa muutetaan ennen tallentamista.",
+    "upload.hintMultiple":
+      "JPG, PNG tai WebP kukin enintään 10 Mt. Suurten kuvien kokoa muutetaan ennen tallentamista.",
     "sitEditor.kicker": "Istuin saatavuus",
     "sitEditor.editTitle": "Muokkaa veneen istumaa",
     "sitEditor.lockedBannerTitle": "Muokkaus on lukittu",
-    "sitEditor.lockedBanner": "Tämä istunto on vastaanottanut hakijoita, joten sen tietoja ei voi enää muuttaa. Voit edelleen tarkastella hakemuksia ja viestien välittäjiä.",
+    "sitEditor.lockedBanner":
+      "Tämä istunto on vastaanottanut hakijoita, joten sen tietoja ei voi enää muuttaa. Voit edelleen tarkastella hakemuksia ja viestien välittäjiä.",
     "sitEditor.createTitle": "Luo veneistuin",
     "sitEditor.createShort": "Luo istumapaikka",
     "sitEditor.createEditLimitTitle": "Muokattava, kunnes joku hakee",
-    "sitEditor.createEditLimit": "Voit muuttaa istunnon tietoja, kunnes ensimmäinen hakemus saapuu. Sen jälkeen muokkaus on lukittu, joten hakijat näkevät vakaan listauksen.",
+    "sitEditor.createEditLimit":
+      "Voit muuttaa istunnon tietoja, kunnes ensimmäinen hakemus saapuu. Sen jälkeen muokkaus on lukittu, joten hakijat näkevät vakaan listauksen.",
     "sitEditor.hint": "Veneellä voi olla niin monta erillistä istumajaksoa kuin tarvitaan.",
     "sitEditor.boat": "Vene",
     "sitEditor.boatOnlySelected": "Ainoa veneesi on valittu tälle istunnolle.",
@@ -11664,7 +12269,8 @@ const localeExtrasSource = {
     "sitType.daytimeChecksShort": "Päivällä",
     "sitType.daytimeChecksHint": "Sitter käy päivittäin tarkastamassa venettä, mutta ei jää yöksi.",
     "sitEditor.responsibilities": "Hoitovelvollisuudet",
-    "sitEditor.responsibilitiesPlaceholder": "Yksi tehtävä riviä kohden, esimerkiksi pilssien tarkistaminen joka aamu",
+    "sitEditor.responsibilitiesPlaceholder":
+      "Yksi tehtävä riviä kohden, esimerkiksi pilssien tarkistaminen joka aamu",
     "sitEditor.requirementsKicker": "Sittervaatimukset",
     "sitEditor.requirementsTitle": "Kuka sopii tähän istumaan?",
     "sitEditor.minimumYears": "Veneilykokemusta vähintään vuosia",
@@ -11674,17 +12280,20 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Sertifikaatit",
     "sitEditor.skills": "Käytännön taidot",
     "sitEditor.nonSmoker": "Täytyy olla tupakoimaton",
-    "sitEditor.nonSmokerHint": "Vaaditaan vahtimestareita, jotka eivät tupakoi laivalla tai oleskelun aikana.",
+    "sitEditor.nonSmokerHint":
+      "Vaaditaan vahtimestareita, jotka eivät tupakoi laivalla tai oleskelun aikana.",
     "requirement.nonSmoker": "Tupakoimaton",
     "sitEditor.additional": "Lisävahtivaatimukset",
-    "sitEditor.additionalPlaceholder": "Yksi riviä kohden, esimerkiksi kaksi viimeaikaista viittausta",
+    "sitEditor.additionalPlaceholder":
+      "Yksi riviä kohden, esimerkiksi kaksi viimeaikaista viittausta",
     "sitEditor.pets": "Lemmikit kyytiin (valinnainen)",
     "sitEditor.petsPlaceholder": "esimerkiksi Pip, merta rakastava terrieri",
     "sitEditor.save": "Tallenna istuma",
     "sitEditor.publish": "Julkaise istunto",
     "sitEditor.publishBlocked": "Vielä tarvitaan: {{items}}",
     "sitEditor.verificationRequiredTitle": "Vahvista henkilöllisyytesi luodaksesi istunnon",
-    "sitEditor.verificationRequiredText": "Vahvista virallinen henkilöllisyystodistus, sähköpostiosoitteesi ja puhelinnumerosi ennen kuin julkaiset veneen istunnon.",
+    "sitEditor.verificationRequiredText":
+      "Vahvista virallinen henkilöllisyystodistus, sähköpostiosoitteesi ja puhelinnumerosi ennen kuin julkaiset veneen istunnon.",
     "sitEditor.verificationRequiredCta": "Viimeistele profiilisi vahvistus",
     "sitEditor.verificationChecking": "Tarkistetaan vahvistusta…",
     "auth.kicker": "Tervetuloa kyytiin",
@@ -11726,15 +12335,19 @@ const localeExtrasSource = {
     "settings.language": "Käyttöliittymän kieli",
     "settings.languageHint": "Päivämäärät ja numeromuodot noudattavat käyttöliittymäsi kieltä.",
     "settings.measurementSystem": "Mittausjärjestelmä",
-    "settings.measurementHint": "Selainalue määrittää alkuperäisen oletusasetuksen. Venelomakkeilla voit silti valita jommankumman yksikön.",
+    "settings.measurementHint":
+      "Selainalue määrittää alkuperäisen oletusasetuksen. Venelomakkeilla voit silti valita jommankumman yksikön.",
     "settings.sitDefaultsTitle": "Istunnon luomisen oletusasetukset",
-    "settings.sitDefaultsHint": "Nämä vaihtoehdot on valittu valmiiksi, kun luot uuden istunnon. Voit silti vaihtaa niitä jokaisella istunnolla.",
+    "settings.sitDefaultsHint":
+      "Nämä vaihtoehdot on valittu valmiiksi, kun luot uuden istunnon. Voit silti vaihtaa niitä jokaisella istunnolla.",
     "settings.sitDefaults.nonSmoker": "Vaadi oletuksena tupakoimattomat",
-    "settings.sitDefaults.nonSmokerHint": "Uudet istunnot alkavat tekstillä On oltava tupakoimaton.",
+    "settings.sitDefaults.nonSmokerHint":
+      "Uudet istunnot alkavat tekstillä On oltava tupakoimaton.",
     "settings.metric": "Metri (metriä)",
     "settings.imperial": "Imperial (jalat)",
     "settings.personalTitle": "Henkilötiedot",
-    "settings.personalHint": "Virallista nimeäsi ja yhteystietojasi käytetään vahvistus- ja istuntosopimuksiin.",
+    "settings.personalHint":
+      "Virallista nimeäsi ja yhteystietojasi käytetään vahvistus- ja istuntosopimuksiin.",
     "settings.legalName": "Koko virallinen nimi",
     "settings.legalNameHint": "Kuten virallisessa henkilötodistuksessasi näkyy.",
     "settings.displayNameHint": "Näkyy julkisessa profiilissasi ja viesteissä.",
@@ -11742,7 +12355,8 @@ const localeExtrasSource = {
     "settings.savePersonal": "Tallenna henkilötiedot",
     "settings.personalSaved": "Henkilötiedot tallennettu",
     "settings.accountTitle": "Tili",
-    "settings.accountHint": "Kirjautumissähköpostiosoitteesi näkyy tässä. Käytä painikkeita vaihtaaksesi sähköpostiosoitteesi tai salasanasi suojatussa valintaikkunassa.",
+    "settings.accountHint":
+      "Kirjautumissähköpostiosoitteesi näkyy tässä. Käytä painikkeita vaihtaaksesi sähköpostiosoitteesi tai salasanasi suojatussa valintaikkunassa.",
     "settings.currentEmail": "Nykyinen sähköposti",
     "settings.newEmail": "Uusi sähköposti",
     "settings.currentPassword": "Nykyinen salasana",
@@ -11751,16 +12365,19 @@ const localeExtrasSource = {
     "settings.changeEmail": "Vaihda sähköpostiosoite",
     "settings.changePassword": "Vaihda salasana",
     "settings.changeEmailTitle": "Vaihda sähköpostiosoite",
-    "settings.changeEmailHint": "Kirjoita uusi sähköpostiosoite ja vahvista nykyisellä salasanallasi.",
+    "settings.changeEmailHint":
+      "Kirjoita uusi sähköpostiosoite ja vahvista nykyisellä salasanallasi.",
     "settings.changePasswordTitle": "Vaihda salasana",
     "settings.changePasswordHint": "Valitse uusi salasana kirjautuaksesi Boatsteadiin.",
     "settings.emailUpdated": "Sähköposti päivitetty",
     "settings.passwordUpdated": "Salasana päivitetty",
     "settings.passwordMismatch": "Uudet salasanat eivät täsmää.",
     "settings.sameEmail": "Anna toinen sähköpostiosoite.",
-    "settings.accountCredentialsUnavailable": "Salasanan muuttaminen vaatii sähköpostitilin. Rekisteröidy sähköpostilla ja yritä sitten uudelleen.",
+    "settings.accountCredentialsUnavailable":
+      "Salasanan muuttaminen vaatii sähköpostitilin. Rekisteröidy sähköpostilla ja yritä sitten uudelleen.",
     "settings.emailsTitle": "Sähköposti-ilmoitukset",
-    "settings.emailsHint": "Valitse, mitkä tapahtumat lähettävät sinulle sähköpostia. Voit muuttaa näitä milloin tahansa.",
+    "settings.emailsHint":
+      "Valitse, mitkä tapahtumat lähettävät sinulle sähköpostia. Voit muuttaa näitä milloin tahansa.",
     "settings.email.newApplications": "Uusia istumasovelluksia veneissäni",
     "settings.email.applicationUpdates": "Päivitykset istuntoihin, joihin hain",
     "settings.email.messages": "Uusia viestejä keskusteluissani",
@@ -11770,33 +12387,40 @@ const localeExtrasSource = {
     "safetyActions.block": "Lohko",
     "safetyActions.unblock": "Kumoa esto",
     "safetyActions.reportTitle": "Ilmoita {{name}}?",
-    "safetyActions.reportText": "Kerro meille mitä tapahtui. Boatstead tarkistaa raportit, eikä niitä jaeta raportoidulle jäsenelle.",
+    "safetyActions.reportText":
+      "Kerro meille mitä tapahtui. Boatstead tarkistaa raportit, eikä niitä jaeta raportoidulle jäsenelle.",
     "safetyActions.reportReason": "Syy",
     "safetyActions.reportDetails": "Yksityiskohdat",
     "safetyActions.reportDetailsPlaceholder": "Lisää mikä tahansa hyödyllinen konteksti",
     "safetyActions.reportDetailsRequired": "Ole hyvä ja lisää lyhyt kuvaus tästä syystä.",
     "safetyActions.reportSubmit": "Lähetä raportti",
     "safetyActions.reportThanksTitle": "Raportti lähetetty",
-    "safetyActions.reportThanksText": "Kiitos. Saimme raporttisi aiheesta {{name}} ja tarkistamme sen.",
+    "safetyActions.reportThanksText":
+      "Kiitos. Saimme raporttisi aiheesta {{name}} ja tarkistamme sen.",
     "safetyActions.blockTitle": "Estä {{name}}?",
-    "safetyActions.blockText": "He eivät voi enää ottaa sinuun yhteyttä helposti, ja voit milloin tahansa poistaa eston asetuksista.",
+    "safetyActions.blockText":
+      "He eivät voi enää ottaa sinuun yhteyttä helposti, ja voit milloin tahansa poistaa eston asetuksista.",
     "safetyActions.blockConfirm": "Kyllä, blokkaa",
     "safetyActions.blockedBannerTitle": "Olet estänyt tämän jäsenen",
-    "safetyActions.blockedBannerText": "{{name}} on estettyjen luettelossasi. Voit poistaa eston täällä tai asetuksista.",
+    "safetyActions.blockedBannerText":
+      "{{name}} on estettyjen luettelossasi. Voit poistaa eston täällä tai asetuksista.",
     "safetyActions.reason.spam": "Roskapostia tai ei-toivottuja kontakteja",
     "safetyActions.reason.harassment": "Häirintä tai hyväksikäyttö",
     "safetyActions.reason.scam": "Huijaus tai petos",
     "safetyActions.reason.inappropriate": "Sopimaton sisältö tai käyttäytyminen",
     "safetyActions.reason.other": "Jotain muuta",
     "settings.blockedUsersTitle": "Estetyt tilit",
-    "settings.blockedUsersHint": "Estämäsi jäsenet. Eston poistaminen palauttaa normaalin yhteyden.",
+    "settings.blockedUsersHint":
+      "Estämäsi jäsenet. Eston poistaminen palauttaa normaalin yhteyden.",
     "settings.blockedUsersEmpty": "Et ole vielä estänyt ketään.",
     "settings.blockedOn": "Estetty {{date}}",
     "settings.dangerZone": "Vaaravyöhyke",
     "settings.deleteAccount": "Poista tili",
-    "settings.deleteAccountHint": "Poista pysyvästi profiilisi, tallennetut istunnot ja paikalliset tilitiedot.",
+    "settings.deleteAccountHint":
+      "Poista pysyvästi profiilisi, tallennetut istunnot ja paikalliset tilitiedot.",
     "settings.deleteConfirmTitle": "Poistetaanko tilisi?",
-    "settings.deleteConfirmText": "Tätä toimintoa ei voi kumota. Sinut kirjataan ulos välittömästi.",
+    "settings.deleteConfirmText":
+      "Tätä toimintoa ei voi kumota. Sinut kirjataan ulos välittömästi.",
     "settings.deleteConfirmationLabel": "Vahvista tilin poistaminen kirjoittamalla {{term}}",
     "settings.deletingAccount": "Poistetaan...",
     "settings.deleteConfirm": "Kyllä, poista tilini",
@@ -11932,34 +12556,48 @@ const localeExtrasSource = {
     "skill.tenderHandling": "Tarjousten käsittely",
     "safety.kicker": "Luottamus & turvallisuus",
     "safety.title": "Turvallisempi veneistuminen alkaa valmistautumisesta",
-    "safety.intro": "Käytä näitä käytännön tarkistuksia ennen jokaista veneistuntoa, sen aikana ja sen jälkeen.",
+    "safety.intro":
+      "Käytä näitä käytännön tarkistuksia ennen jokaista veneistuntoa, sen aikana ja sen jälkeen.",
     "safety.verification.title": "Henkilöllisyys ja vahvistus",
-    "safety.verification.text": "Suorita saatavilla olevat henkilöllisyyden tarkistukset ja varmista, että nimet ja yhteystiedot täsmäävät ennen kuin hyväksyt istunnon.",
+    "safety.verification.text":
+      "Suorita saatavilla olevat henkilöllisyyden tarkistukset ja varmista, että nimet ja yhteystiedot täsmäävät ennen kuin hyväksyt istunnon.",
     "safety.profiles.title": "Tarkista profiilit ja historia",
-    "safety.profiles.text": "Lue viitteet, arvostelut ja kokemukset huolellisesti. Esitä jatkokysymyksiä aukoista tai tuntemattomista järjestelmistä.",
+    "safety.profiles.text":
+      "Lue viitteet, arvostelut ja kokemukset huolellisesti. Esitä jatkokysymyksiä aukoista tai tuntemattomista järjestelmistä.",
     "safety.video.title": "Tapaa videolla",
-    "safety.video.text": "Järjestä videopuhelu, ota kaikki kyytiin jäävät ja kävele aluksen läpi livenä, kun se on mahdollista.",
+    "safety.video.text":
+      "Järjestä videopuhelu, ota kaikki kyytiin jäävät ja kävele aluksen läpi livenä, kun se on mahdollista.",
     "safety.expectations.title": "Laita odotukset kirjallisesti",
-    "safety.expectations.text": "Kirjaa päivämäärät, vastuut, pääsy, kulut, päivitykset, vierailijat ja peruutussuunnitelmat kirjallisesti.",
+    "safety.expectations.text":
+      "Kirjaa päivämäärät, vastuut, pääsy, kulut, päivitykset, vierailijat ja peruutussuunnitelmat kirjallisesti.",
     "safety.handover.title": "Suorita venekohtainen luovutus",
-    "safety.handover.text": "Peitejärjestelmät, pohjahanat, pilssit, akut, maasähkö, moottorit, säätoiminnot, hätäkoskettimet ja sammutustoimenpiteet.",
+    "safety.handover.text":
+      "Peitejärjestelmät, pohjahanat, pilssit, akut, maasähkö, moottorit, säätoiminnot, hätäkoskettimet ja sammutustoimenpiteet.",
     "safety.insurance.title": "Tarkista vakuutus",
-    "safety.insurance.text": "Omistajan ja isännöitsijän tulee itsenäisesti vahvistaa soveltuva alus-, venesatama-, matka-, vastuu- ja henkilövakuutus.",
+    "safety.insurance.text":
+      "Omistajan ja isännöitsijän tulee itsenäisesti vahvistaa soveltuva alus-, venesatama-, matka-, vastuu- ja henkilövakuutus.",
     "safety.pets.title": "Suunnittele lemmikkieläimiä",
-    "safety.pets.text": "Dokumentoi ruokinta, lääkitys, liikunta, eläinlääkärikontaktit, kuljetus ja turvallinen liikkuminen kansien ja laiturien ympärillä.",
+    "safety.pets.text":
+      "Dokumentoi ruokinta, lääkitys, liikunta, eläinlääkärikontaktit, kuljetus ja turvallinen liikkuminen kansien ja laiturien ympärillä.",
     "safety.marina.title": "Noudata venesataman sääntöjä",
-    "safety.marina.text": "Vahvista vieraiden rekisteröinti, sisäänpääsy, pysäköinti, jätteet, melu, turvallisuus ja hätätoimenpiteet venesatamasta.",
+    "safety.marina.text":
+      "Vahvista vieraiden rekisteröinti, sisäänpääsy, pysäköinti, jätteet, melu, turvallisuus ja hätätoimenpiteet venesatamasta.",
     "safety.redFlags.title": "Tunnista punaiset liput",
-    "safety.redFlags.text": "Keskeytä, jos joku painostaa sinua, välttelee videota, pyytää epätavallisia maksuja, pidättelee asiakirjoja, muuttaa keskeisiä tosiasioita tai yrittää siirtää keskustelun heti pois alustalta.",
+    "safety.redFlags.text":
+      "Keskeytä, jos joku painostaa sinua, välttelee videota, pyytää epätavallisia maksuja, pidättelee asiakirjoja, muuttaa keskeisiä tosiasioita tai yrittää siirtää keskustelun heti pois alustalta.",
     "safety.reporting.title": "Ilmoita tapahtumista",
-    "safety.reporting.text": "Säilytä viestit, valokuvat, päivämäärät ja kuitit. Ilmoita turvallisuusongelmista Boatstead-tukeen ja asiaankuuluville vakuutusyhtiöille tai viranomaisille.",
+    "safety.reporting.text":
+      "Säilytä viestit, valokuvat, päivämäärät ja kuitit. Ilmoita turvallisuusongelmista Boatstead-tukeen ja asiaankuuluville vakuutusyhtiöille tai viranomaisille.",
     "safety.emergency.title": "Hätätilanteessa",
-    "safety.emergency.text": "Suojaa elämä ensin. Ota yhteyttä paikalliseen pelastus- tai meripelastuspalveluun, sitten omistajaan, venesatamaan ja vakuutusyhtiöön tarpeen mukaan.",
+    "safety.emergency.text":
+      "Suojaa elämä ensin. Ota yhteyttä paikalliseen pelastus- tai meripelastuspalveluun, sitten omistajaan, venesatamaan ja vakuutusyhtiöön tarpeen mukaan.",
     "safety.disclaimerTitle": "Tärkeä rajoitus",
-    "safety.disclaimerText": "Boatstead ei korvaa hätäpalveluja, vakuutusyhtiöitä, päteviä merenkulkualan ammattilaisia tai ammattimaisia merenkulkuneuvoja.",
+    "safety.disclaimerText":
+      "Boatstead ei korvaa hätäpalveluja, vakuutusyhtiöitä, päteviä merenkulkualan ammattilaisia tai ammattimaisia merenkulkuneuvoja.",
     "support.kicker": "Ohjekeskus",
     "support.title": "Miten voimme auttaa?",
-    "support.intro": "Valitse luokka ja lähetä viesti. Tämä prototyyppi tallentaa pyynnöt paikallisesti eikä lähetä sähköpostia.",
+    "support.intro":
+      "Valitse luokka ja lähetä viesti. Tämä prototyyppi tallentaa pyynnöt paikallisesti eikä lähetä sähköpostia.",
     "support.categories": "Tukiluokat",
     "support.topic": "Aihe",
     "support.chooseTopic": "Valitse aihe",
@@ -11983,56 +12621,79 @@ const localeExtrasSource = {
     "terms.kicker": "Laillinen",
     "terms.title": "Palveluehdot",
     "terms.updated": "Viimeksi päivitetty: 21. heinäkuuta 2026",
-    "terms.reviewNotice": "Julkaisua edeltävä huomautus: pätevän lakimiehen on tarkistettava ja mukautettava nämä ehdot ennen tuotannon käynnistämistä.",
+    "terms.reviewNotice":
+      "Julkaisua edeltävä huomautus: pätevän lakimiehen on tarkistettava ja mukautettava nämä ehdot ennen tuotannon käynnistämistä.",
     "terms.eligibility.title": "Kelpoisuus",
-    "terms.eligibility.text": "Sinun on voitava laillisesti tehdä sopimuksia ja antaa oikeat tiedot käyttääksesi Boatsteadia.",
+    "terms.eligibility.text":
+      "Sinun on voitava laillisesti tehdä sopimuksia ja antaa oikeat tiedot käyttääksesi Boatsteadia.",
     "terms.accounts.title": "Tilit",
-    "terms.accounts.text": "Olet vastuussa tilistäsi, kirjautumistiedoistasi ja toiminnasta. Kerro meille nopeasti luvattomasta käytöstä.",
+    "terms.accounts.text":
+      "Olet vastuussa tilistäsi, kirjautumistiedoistasi ja toiminnasta. Kerro meille nopeasti luvattomasta käytöstä.",
     "terms.platform.title": "Alustan rooli",
-    "terms.platform.text": "Boatstead helpottaa vain tutustumista veneen omistajien ja istujien välillä. Kaikki istumajärjestelyt ovat omistajan ja hoitajan välinen sopimus. Boatstead ei omista aluksia, työllistä jäseniä, valvo istuntoja tai osallistu näihin järjestelyihin.",
+    "terms.platform.text":
+      "Boatstead helpottaa vain tutustumista veneen omistajien ja istujien välillä. Kaikki istumajärjestelyt ovat omistajan ja hoitajan välinen sopimus. Boatstead ei omista aluksia, työllistä jäseniä, valvo istuntoja tai osallistu näihin järjestelyihin.",
     "terms.listings.title": "Listaukset ja sovellukset",
-    "terms.listings.text": "Tietojen ja hakemusten on oltava tarkkoja, ajankohtaisia ja täydellisiä. Jäsenet päättävät osallistuvatko istuntojärjestelyyn.",
+    "terms.listings.text":
+      "Tietojen ja hakemusten on oltava tarkkoja, ajankohtaisia ja täydellisiä. Jäsenet päättävät osallistuvatko istuntojärjestelyyn.",
     "terms.responsibilities.title": "Käyttäjien velvollisuudet",
-    "terms.responsibilities.text": "Jäsenten tulee toimia laillisesti, kommunikoida rehellisesti, noudattaa kirjallisia odotuksia ja noudattaa kohtuullista huolellisuutta.",
+    "terms.responsibilities.text":
+      "Jäsenten tulee toimia laillisesti, kommunikoida rehellisesti, noudattaa kirjallisia odotuksia ja noudattaa kohtuullista huolellisuutta.",
     "terms.verification.title": "Vahvistus",
-    "terms.verification.text": "Tarkastukset voivat vähentää riskiä, mutta eivät takaa henkilöllisyyttä, käyttäytymistä, pätevyyttä, turvallisuutta tai soveltuvuutta.",
+    "terms.verification.text":
+      "Tarkastukset voivat vähentää riskiä, mutta eivät takaa henkilöllisyyttä, käyttäytymistä, pätevyyttä, turvallisuutta tai soveltuvuutta.",
     "terms.prohibited.title": "Kielletty toiminta",
-    "terms.prohibited.text": "Älä harjoita petoksia, häirintää, syrjintää, vaarallisia toimia, luvatonta käyttöä, laitonta toimintaa tai alustan väärinkäyttöä.",
+    "terms.prohibited.text":
+      "Älä harjoita petoksia, häirintää, syrjintää, vaarallisia toimia, luvatonta käyttöä, laitonta toimintaa tai alustan väärinkäyttöä.",
     "terms.payments.title": "Maksut ja maksut",
-    "terms.payments.text": "Boatstead ei tällä hetkellä veloita yökohtaista maksua. Jos maksullisia ominaisuuksia otetaan käyttöön, sovellettavat ehdot ja hinnat näytetään ensin.",
+    "terms.payments.text":
+      "Boatstead ei tällä hetkellä veloita yökohtaista maksua. Jos maksullisia ominaisuuksia otetaan käyttöön, sovellettavat ehdot ja hinnat näytetään ensin.",
     "terms.cancellations.title": "Peruutukset",
-    "terms.cancellations.text": "Jäsenten tulee sopia peruutussuunnitelmista kirjallisesti ja ilmoittaa muutoksista viipymättä haittojen ja kulujen vähentämiseksi.",
+    "terms.cancellations.text":
+      "Jäsenten tulee sopia peruutussuunnitelmista kirjallisesti ja ilmoittaa muutoksista viipymättä haittojen ja kulujen vähentämiseksi.",
     "terms.insurance.title": "Vakuutus",
-    "terms.insurance.text": "Jäsenet ovat vastuussa sopivan vakuutuksen vahvistamisesta. Boatstead ei tarjoa alus-, matka- tai vastuuvakuutusta.",
+    "terms.insurance.text":
+      "Jäsenet ovat vastuussa sopivan vakuutuksen vahvistamisesta. Boatstead ei tarjoa alus-, matka- tai vastuuvakuutusta.",
     "terms.damage.title": "Vahinko ja korvausvaatimukset",
-    "terms.damage.text": "Vahinko, varkaus tai vastaava vaatimus on ensisijaisesti omistajan ja hoitajan välinen. Dokumentoi tapahtumat ripeästi, säilytä todisteet ja tee yhteistyötä toisen osapuolen, venesatamien, vakuutusyhtiöiden ja viranomaisten kanssa.",
+    "terms.damage.text":
+      "Vahinko, varkaus tai vastaava vaatimus on ensisijaisesti omistajan ja hoitajan välinen. Dokumentoi tapahtumat ripeästi, säilytä todisteet ja tee yhteistyötä toisen osapuolen, venesatamien, vakuutusyhtiöiden ja viranomaisten kanssa.",
     "terms.intellectualProperty.title": "Henkinen omaisuus",
-    "terms.intellectualProperty.text": "Boatsteadin sisältö ja brändäys ovat suojattuja. Säilytät oikeudet sisältöösi ja annat meille luvan käyttää palvelua.",
+    "terms.intellectualProperty.text":
+      "Boatsteadin sisältö ja brändäys ovat suojattuja. Säilytät oikeudet sisältöösi ja annat meille luvan käyttää palvelua.",
     "terms.privacy.title": "Yksityisyys",
-    "terms.privacy.text": "Henkilötietoja tulee käsitellä vastuullisesti. Tuotannon tietosuojailmoituksessa kuvataan kerääminen, käyttö, säilyttäminen ja oikeudet.",
+    "terms.privacy.text":
+      "Henkilötietoja tulee käsitellä vastuullisesti. Tuotannon tietosuojailmoituksessa kuvataan kerääminen, käyttö, säilyttäminen ja oikeudet.",
     "terms.termination.title": "Keskeyttäminen ja lopettaminen",
-    "terms.termination.text": "Voimme rajoittaa tai lopettaa pääsyn suojellaksemme jäseniä, tutkiaksemme huolenaiheita, pannaksemme täytäntöön ehtoja tai noudattaaksemme lakia.",
+    "terms.termination.text":
+      "Voimme rajoittaa tai lopettaa pääsyn suojellaksemme jäseniä, tutkiaksemme huolenaiheita, pannaksemme täytäntöön ehtoja tai noudattaaksemme lakia.",
     "terms.disclaimers.title": "Vastuuvapauslausekkeet",
-    "terms.disclaimers.text": "Prototyyppi toimitetaan sellaisena kuin se on saatavilla ilman takuita keskeytymättömästä toiminnasta, soveltuvuudesta, tarkkuudesta tai tuloksista.",
+    "terms.disclaimers.text":
+      "Prototyyppi toimitetaan sellaisena kuin se on saatavilla ilman takuita keskeytymättömästä toiminnasta, soveltuvuudesta, tarkkuudesta tai tuloksista.",
     "terms.liability.title": "Vastuun rajoitus",
-    "terms.liability.text": "Lain sallimissa rajoissa Boatstead ei ole vastuussa vahingoista, varkauksista, menetyksistä, loukkaantumisista, matkan häiriöistä, omaisuusvaatimuksista tai mistään muista jäsenten välisistä järjestelyistä johtuvista seurauksista. Jäsenet käsittelevät toisiaan omalla vastuullaan.",
+    "terms.liability.text":
+      "Lain sallimissa rajoissa Boatstead ei ole vastuussa vahingoista, varkauksista, menetyksistä, loukkaantumisista, matkan häiriöistä, omaisuusvaatimuksista tai mistään muista jäsenten välisistä järjestelyistä johtuvista seurauksista. Jäsenet käsittelevät toisiaan omalla vastuullaan.",
     "terms.indemnity.title": "Korvaus",
-    "terms.indemnity.text": "Sitoudut kattamaan lainvastaisesta käytöksestäsi, sisällöstäsi tai näiden ehtojen rikkomisesta aiheutuvat vaatimukset, jos se on lain sallimaa.",
+    "terms.indemnity.text":
+      "Sitoudut kattamaan lainvastaisesta käytöksestäsi, sisällöstäsi tai näiden ehtojen rikkomisesta aiheutuvat vaatimukset, jos se on lain sallimaa.",
     "terms.disputes.title": "Riidat ja sovellettava laki",
-    "terms.disputes.text": "Tuotantoehdoissa on määritettävä yrityksen kokonaisuus, lainkäyttöalue, sovellettava laki ja kiistaprosessi oikeudellisen tarkastelun jälkeen.",
+    "terms.disputes.text":
+      "Tuotantoehdoissa on määritettävä yrityksen kokonaisuus, lainkäyttöalue, sovellettava laki ja kiistaprosessi oikeudellisen tarkastelun jälkeen.",
     "terms.changes.title": "Muutokset näihin ehtoihin",
-    "terms.changes.text": "Saatamme päivittää näitä ehtoja ja ilmoitamme asiasta asianmukaisesti ennen kuin olennaiset muutokset tulevat voimaan.",
+    "terms.changes.text":
+      "Saatamme päivittää näitä ehtoja ja ilmoitamme asiasta asianmukaisesti ennen kuin olennaiset muutokset tulevat voimaan.",
     "terms.contact.title": "Ota yhteyttä ja tuki",
-    "terms.contact.text": "Käytä tukisivua kysymyksiin. Älä luota Boatsteadin tukeen hätätilanteissa.",
+    "terms.contact.text":
+      "Käytä tukisivua kysymyksiin. Älä luota Boatsteadin tukeen hätätilanteissa.",
     "nav.admin": "Admin",
     "footer.admin": "Admin",
     "admin.kicker": "Alustan toiminnot",
     "admin.title": "Admin",
-    "admin.subtitle": "Hallinnoi jäseniä, rooleja ja tilin tilaa. Jokainen muutos kirjataan kirjausketjuun.",
+    "admin.subtitle":
+      "Hallinnoi jäseniä, rooleja ja tilin tilaa. Jokainen muutos kirjataan kirjausketjuun.",
     "admin.tab.users": "Käyttäjät",
     "admin.tab.audit": "Kirjausketju",
     "admin.signInTitle": "Kirjaudu sisään avataksesi järjestelmänvalvojan",
-    "admin.signInText": "Järjestelmänvalvojan työkalut ovat vain kirjautuneiden superkäyttäjien käytettävissä.",
+    "admin.signInText":
+      "Järjestelmänvalvojan työkalut ovat vain kirjautuneiden superkäyttäjien käytettävissä.",
     "admin.deniedTitle": "Järjestelmänvalvojan käyttöoikeudet vaaditaan",
     "admin.deniedText": "Tililläsi ei ole oikeutta hallita käyttäjiä.",
     "admin.usersEmpty": "Yksikään käyttäjä ei vastaa tätä hakua.",
@@ -12047,7 +12708,8 @@ const localeExtrasSource = {
     "admin.editUser": "Muokkaa käyttäjää",
     "admin.deleteUser": "Poista käyttäjä",
     "admin.deleteConfirmTitle": "Poistetaanko tämä käyttäjä?",
-    "admin.deleteConfirmText": "Tämä poistaa tiedoston {{name}} admin-hakemistosta. Aiheeseen liittyvät istunnot ja viestit voivat silti näkyä paikallisissa esittelytiedoissa.",
+    "admin.deleteConfirmText":
+      "Tämä poistaa tiedoston {{name}} admin-hakemistosta. Aiheeseen liittyvät istunnot ja viestit voivat silti näkyä paikallisissa esittelytiedoissa.",
     "admin.deleteConfirm": "Kyllä, poista käyttäjä",
     "admin.deleting": "Poistetaan…",
     "admin.saveUser": "Tallenna käyttäjä",
@@ -12074,7 +12736,8 @@ const localeExtrasSource = {
   },
   ja: {
     "meta.title": "Boatstead | 信頼できるボートケア",
-    "meta.description": "Boatsteadは、信頼できるボートシッターと、経験ある手を必要とするオーナーをつなぎます。",
+    "meta.description":
+      "Boatsteadは、信頼できるボートシッターと、経験ある手を必要とするオーナーをつなぎます。",
     "common.back": "戻る",
     "common.cancel": "キャンセル",
     "common.close": "近い",
@@ -12084,7 +12747,8 @@ const localeExtrasSource = {
     "common.saving": "保存中…",
     "nav.logout": "ログアウト",
     "nav.logoutConfirmTitle": "ログアウトしてもよろしいですか?",
-    "nav.logoutConfirmText": "プロフィール、メッセージ、保存された座席にアクセスするには、再度ログインする必要があります。",
+    "nav.logoutConfirmText":
+      "プロフィール、メッセージ、保存された座席にアクセスするには、再度ログインする必要があります。",
     "nav.logoutConfirm": "はい、ログアウトします",
     "notifications.open": "通知を開く",
     "notifications.heading": "通知",
@@ -12125,15 +12789,18 @@ const localeExtrasSource = {
     "map.zoomOut": "ズームアウト",
     "map.openInMaps": "マップで開く",
     "map.openInMapsAriaLabel": "マップで {{location}} を開く",
-    "map.approximateLocationNote": "このピンは一般的な領域をマークします。正確な寝台詳細は、お申し込み後に共有されます。",
+    "map.approximateLocationNote":
+      "このピンは一般的な領域をマークします。正確な寝台詳細は、お申し込み後に共有されます。",
     "home.heroImageAlt": "澄んだ湾に停泊する帆船",
-    "apply.defaultMessage": "こんにちは {{owner}}、{{boat}} の世話をしたいと思っています。私にはボートの経験があり、喜んでビデオ通話を手配させていただきます。",
+    "apply.defaultMessage":
+      "こんにちは {{owner}}、{{boat}} の世話をしたいと思っています。私にはボートの経験があり、喜んでビデオ通話を手配させていただきます。",
     "apply.successTitle": "メッセージが送信されました",
     "apply.successText": "{{owner}} は、{{boat}} の申請を受け取ります。",
     "apply.viewInSits": "座ったまま見る",
     "apply.kicker": "自己紹介",
     "apply.title": "{{boat}} に申し込む",
-    "apply.hint": "概要に記載されている{{type}} ボートと船内システムに関するあなたの経験について言及してください。",
+    "apply.hint":
+      "概要に記載されている{{type}} ボートと船内システムに関するあなたの経験について言及してください。",
     "apply.sending": "送信中…",
     "apply.send": "申請書の送信",
     "detail.back": "すべてのボートに戻る",
@@ -12170,15 +12837,18 @@ const localeExtrasSource = {
     "saved.emptyHint": "気になるシートを保存して、ここで比較してください。",
     "saved.browse": "ボートを閲覧する",
     "saved.signInTitle": "ログインして座席を保存する",
-    "saved.signInText": "ログインするかアカウントを作成して、候補リストに候補を保存し、後で検索してください。",
+    "saved.signInText":
+      "ログインするかアカウントを作成して、候補リストに候補を保存し、後で検索してください。",
     "saved.showAll": "選択したシッター、完了したシッターなどを含むすべてを表示します。",
     "saved.emptyFiltered": "開いている保存済みの座席はありません",
-    "saved.emptyFilteredHint": "最終候補リストには、シッターがすでに選ばれているか、完了しているシットのみが含まれます。それらを表示するには、上のボックスにチェックを入れてください。",
+    "saved.emptyFilteredHint":
+      "最終候補リストには、シッターがすでに選ばれているか、完了しているシットのみが含まれます。それらを表示するには、上のボックスにチェックを入れてください。",
     "editorPreview.kicker": "ライブプレビュー",
     "editorPreview.title": "どのように見えるか",
     "editorPreview.label": "ライブプレビュー",
     "editorPreview.vesselHint": "ボートの詳細を編集すると更新されます。",
-    "editorPreview.sitHint": "このシートを編集すると更新されます。シッターが閲覧するとこのように表示されます。",
+    "editorPreview.sitHint":
+      "このシートを編集すると更新されます。シッターが閲覧するとこのように表示されます。",
     "editorPreview.untitledBoat": "無題の船",
     "editorPreview.homePortPending": "ホームポートを追加する",
     "editorPreview.lengthPending": "長さ未定",
@@ -12187,15 +12857,19 @@ const localeExtrasSource = {
     "editorPreview.notSpecified": "指定されていない",
     "how.kicker": "Boatsteadの仕組み",
     "how.title": "信頼は誰かが乗り込む前から始まります。",
-    "how.subtitle": "ボートは家であり、生活システムです。 Boatstead は、重要な詳細について双方が一致するよう支援します。",
+    "how.subtitle":
+      "ボートは家であり、生活システムです。 Boatstead は、重要な詳細について双方が一致するよう支援します。",
     "how.stepProfileTitle": "乗組員のプロフィールを作成する",
     "how.stepProfileText": "参考資料、認定資格、船舶の経験、使い慣れたシステムを共有します。",
     "how.stepFindTitle": "適切なボートを見つける",
-    "how.stepFindText": "場所、船舶の種類、日付、乗船中のペット、およびリクエストされた体験によってフィルタリングします。",
+    "how.stepFindText":
+      "場所、船舶の種類、日付、乗船中のペット、およびリクエストされた体験によってフィルタリングします。",
     "how.stepMeetTitle": "出会ってマッチングする",
-    "how.stepMeetText": "確認する前に、所有者と話し、実際的な質問をし、責任について同意してください。",
+    "how.stepMeetText":
+      "確認する前に、所有者と話し、実際的な質問をし、責任について同意してください。",
     "how.stepHandoverTitle": "引き継ぎを完了する",
-    "how.stepHandoverText": "ビルジやバッテリーから天気や緊急時の計画まで、ボートの概要を一緒に説明します。",
+    "how.stepHandoverText":
+      "ビルジやバッテリーから天気や緊急時の計画まで、ボートの概要を一緒に説明します。",
     "how.briefKicker": "Boatsteadのボートブリーフ",
     "how.briefTitle": "漠然とした「彼女に注目してください」という言葉はありません。",
     "how.briefMooring": "係留、ライン、フェンダー",
@@ -12208,12 +12882,16 @@ const localeExtrasSource = {
     "how.briefContacts": "マリーナの連絡先",
     "how.storiesKicker": "波止場からの物語",
     "how.storiesTitle": "ハンドオーバーの両側で信頼される",
-    "how.storiesText": "オーナーは経験豊富なケアを受けられます。シッターたちは正直な説明と、家と呼べる素晴らしい場所を手に入れることができます。",
-    "how.testimonialOneQuote": "私たちは初めて、マリーナのカメラを毎時間チェックせずに 3 週間サンバードを離れました。クレアはボートを理解し、思慮深い最新情報を送り、きれいな状態でボートを返しました。",
+    "how.storiesText":
+      "オーナーは経験豊富なケアを受けられます。シッターたちは正直な説明と、家と呼べる素晴らしい場所を手に入れることができます。",
+    "how.testimonialOneQuote":
+      "私たちは初めて、マリーナのカメラを毎時間チェックせずに 3 週間サンバードを離れました。クレアはボートを理解し、思慮深い最新情報を送り、きれいな状態でボートを返しました。",
     "how.testimonialOneDetail": "サンバード・アンティーブのオーナー",
-    "how.testimonialTwoQuote": "Boatstead は、美しい場所だけでなく、私の実際の経験に合ったボートを私にマッチングしてくれました。引き渡し概要書では、所有者が去った後は驚くべきことは何もないことを意味していました。",
+    "how.testimonialTwoQuote":
+      "Boatstead は、美しい場所だけでなく、私の実際の経験に合ったボートを私にマッチングしてくれました。引き渡し概要書では、所有者が去った後は驚くべきことは何もないことを意味していました。",
     "how.testimonialTwoDetail": "RYA ヨットマスター · 11 着座完了",
-    "how.testimonialThreeQuote": "私たちのシッターは、陸上電力の問題が高額になる前に、小さな問題に気づきました。何を探せばよいかを知っている人が乗船していたことで、すべてが変わりました。",
+    "how.testimonialThreeQuote":
+      "私たちのシッターは、陸上電力の問題が高額になる前に、小さな問題に気づきました。何を探せばよいかを知っている人が乗船していたことで、すべてが変わりました。",
     "how.testimonialThreeDetail": "ノースバウンド・バンクーバーのオーナー",
     "role.owner": "ボートオーナー",
     "role.sitter": "ボートシッター",
@@ -12226,15 +12904,18 @@ const localeExtrasSource = {
     "sits.withOwner": "{{owner}}付き",
     "sits.withdrawInterest": "利息を引き出す",
     "sits.withdrawConfirmTitle": "利息を取り下げますか？",
-    "sits.withdrawConfirmText": "これにより、{{boat}} のアプリケーションが削除されます。席がまだ開いている場合は、後で再度申請することができます。",
-    "sits.withdrawAcceptedConfirmText": "現在、{{boat}} を受け入れています。撤回すると確認が終了し、所有者は他の人を選択できるようになります。",
+    "sits.withdrawConfirmText":
+      "これにより、{{boat}} のアプリケーションが削除されます。席がまだ開いている場合は、後で再度申請することができます。",
+    "sits.withdrawAcceptedConfirmText":
+      "現在、{{boat}} を受け入れています。撤回すると確認が終了し、所有者は他の人を選択できるようになります。",
     "sits.withdrawConfirmAction": "はい、撤退します",
     "role.vesselOwner": "{{type}} オーナー",
     "notFound.title": "海で迷った？",
     "notFound.text": "そのページは私たちのチャートに載っていません。",
     "notFound.back": "港に戻る",
     "errorBoundary.title": "何か問題が発生しました",
-    "errorBoundary.text": "予期せぬ問題に遭遇しました。もう一度試すか、ホームページに戻ってください。",
+    "errorBoundary.text":
+      "予期せぬ問題に遭遇しました。もう一度試すか、ホームページに戻ってください。",
     "errorBoundary.tryAgain": "もう一度やり直してください",
     "errorBoundary.goHome": "家に帰れ",
     "profile.settings": "公開プロフィール",
@@ -12243,7 +12924,8 @@ const localeExtrasSource = {
     "profile.photo": "プロフィール写真",
     "profile.photoPreviewAlt": "現在のプロフィール写真",
     "profile.replacePhoto": "写真をアップロードまたは置き換える",
-    "profile.photoUploadHint": "JPG、PNG、または WebP は最大 10 MB。大きな画像は保存する前にサイズ変更されます。",
+    "profile.photoUploadHint":
+      "JPG、PNG、または WebP は最大 10 MB。大きな画像は保存する前にサイズ変更されます。",
     "profile.coverImage": "表紙画像",
     "profile.coverHint": "オプション。写真の後ろにあるデフォルトのバナーを置き換えます。",
     "profile.coverPreviewAlt": "現在の表紙画像",
@@ -12252,7 +12934,8 @@ const localeExtrasSource = {
     "profile.location": "母港・所在地",
     "profile.locationPlaceholder": "都市の入力を開始します",
     "profile.aboutYou": "あなたについて",
-    "profile.aboutPlaceholder": "あなたのボートの経験、アプローチ、そしてあなたとの相性の良さを共有してください…",
+    "profile.aboutPlaceholder":
+      "あなたのボートの経験、アプローチ、そしてあなたとの相性の良さを共有してください…",
     "profile.qualifications": "経験と資格",
     "profile.qualificationsPlaceholder": "1 行に 1 つ、例: RYA Day Skipper",
     "profile.spokenLanguages": "あなたが話す言語",
@@ -12262,21 +12945,26 @@ const localeExtrasSource = {
     "profile.save": "プロファイルの保存",
     "member.member": "Boatsteadのメンバー",
     "member.signInTitle": "サインインしてプロフィールを表示",
-    "member.signInText": "メンバーのプロフィールは、サインインした Boatstead メンバーのみに表示されます。",
+    "member.signInText":
+      "メンバーのプロフィールは、サインインした Boatstead メンバーのみに表示されます。",
     "member.message": "メッセージ",
     "member.identityVerified": "本人確認済み",
     "verification.identityVerified": "本人確認済み",
     "verification.confirmIdentity": "本人確認をする",
-    "verification.verifiedHint": "Boatsteadはこの会員の政府ID、メールアドレス、電話番号を確認した。",
-    "verification.selfHint": "オーナーやシッターがあなたのプロフィールを信頼できるように、以下の各項目を入力してください。",
-    "verification.partialHint": "これまでのところ、{{total}} チェックの {{count}} が確認されています。",
+    "verification.verifiedHint":
+      "Boatsteadはこの会員の政府ID、メールアドレス、電話番号を確認した。",
+    "verification.selfHint":
+      "オーナーやシッターがあなたのプロフィールを信頼できるように、以下の各項目を入力してください。",
+    "verification.partialHint":
+      "これまでのところ、{{total}} チェックの {{count}} が確認されています。",
     "verification.governmentId": "政府ID",
     "verification.email": "電子メールアドレス",
     "verification.phone": "電話番号",
     "verification.statusVerified": "検証済み",
     "verification.statusMissing": "未検証",
     "verification.verifyGovernmentId": "政府IDを確認する",
-    "verification.addEmailAndPhone": "プロフィールに電子メール アドレスと電話番号を追加して、認証を完了します。",
+    "verification.addEmailAndPhone":
+      "プロフィールに電子メール アドレスと電話番号を追加して、認証を完了します。",
     "verification.addPhone": "プロフィールに電話番号を追加して認証を完了します。",
     "verification.addEmail": "プロフィールに電子メール アドレスを追加して、検証を完了します。",
     "member.verificationNeeded": "検証が必要です",
@@ -12318,7 +13006,8 @@ const localeExtrasSource = {
     "owner.sitPeriods_other": "{{count}} お座り期間",
     "owner.sitSummary": "{{duration}} · {{applicants}} 応募者 · {{tasks}} ケアタスク",
     "owner.sitPhaseFilter": "フィルターはフェーズごとに設定されます",
-    "owner.sitPhaseFilterHint": "シットはフェーズごとにグループ化されています。フィルターを使用して 1 つのステージに焦点を当てます。",
+    "owner.sitPhaseFilterHint":
+      "シットはフェーズごとにグループ化されています。フィルターを使用して 1 つのステージに焦点を当てます。",
     "owner.sitPhaseFilterAll": "全フェーズ",
     "owner.sitPhaseEmpty": "このフェーズでは座っていません",
     "owner.sitPhaseCount_one": "1 座る",
@@ -12326,14 +13015,18 @@ const localeExtrasSource = {
     "owner.firstBoat": "最初のボートを追加する",
     "owner.firstSit": "最初の座席を作成する",
     "owner.sitsEmptyTitle": "まだ座っていません",
-    "owner.sitsEmptyHintWithBoats": "ボートの日程を公開したり、空き状況を閲覧して最初のケアの機会を見つけてください。",
-    "owner.sitsEmptyHintNoBoats": "シットを主催するボートを追加するか、オープンシットを閲覧して最初のケアの機会を見つけてください。",
+    "owner.sitsEmptyHintWithBoats":
+      "ボートの日程を公開したり、空き状況を閲覧して最初のケアの機会を見つけてください。",
+    "owner.sitsEmptyHintNoBoats":
+      "シットを主催するボートを追加するか、オープンシットを閲覧して最初のケアの機会を見つけてください。",
     "owner.browseOpenSits": "オープンシットを閲覧する",
     "owner.firstBoatHint": "一度容器を追加すれば、旅行するたびに別の座席を作成できます。",
     "owner.firstSitHint": "ボートを選択し、誰かが乗船する必要がある日付を公開します。",
     "owner.boatBeforeSit": "座席を作成する前にボートを追加します。",
-    "owner.sitRequiresBoatTooltip": "まずはボートを作ります。最初のボートを追加するにはここをクリックしてください。",
-    "owner.sitRequiresVerificationTooltip": "シットを作成する前に本人確認を行ってください。プロフィールを開いて認証を完了します。",
+    "owner.sitRequiresBoatTooltip":
+      "まずはボートを作ります。最初のボートを追加するにはここをクリックしてください。",
+    "owner.sitRequiresVerificationTooltip":
+      "シットを作成する前に本人確認を行ってください。プロフィールを開いて認証を完了します。",
     "owner.deleteBoatLabel": "{{boat}}を削除",
     "owner.deleteBoatTitle": "{{boat}}を削除しますか?",
     "owner.deleteBoatConfirm": "これによりボートが永久に削除され、元に戻すことはできません。",
@@ -12347,15 +13040,22 @@ const localeExtrasSource = {
     "owner.sitDeleteLocked": "このシートには承認された申請者がおり、削除できなくなりました",
     "owner.deleteError": "ボートを削除できませんでした。もう一度試してください。",
     "owner.deleteSitError": "この座席は削除できませんでした。もう一度試してください。",
-    "owner.deleteSitAcceptedError": "このシートには承認された申請者がおり、削除できなくなりました。",
-    "owner.sitDeleteUnderway": "この座り込みは進行中のため削除できません。問題についてサポートが必要な場合は、サポートにお問い合わせください。",
-    "owner.deleteSitApplicantsWarning_one": "このシートには現在 1 人の応募者がいます。削除すると、申請した全員のリストが削除されます。",
-    "owner.deleteSitApplicantsWarning_other": "現在、この座席には {{count}} 人の応募者がいます。削除すると、申請した全員のリストが削除されます。",
-    "owner.deleteSitAcceptedWarning": "すでに誰かがこの座席への参加を受け入れています。削除する前にその旨を伝えてください。",
-    "owner.deleteSitCompletedError": "完了したシートは削除できません。代わりにアーカイブしてください。",
+    "owner.deleteSitAcceptedError":
+      "このシートには承認された申請者がおり、削除できなくなりました。",
+    "owner.sitDeleteUnderway":
+      "この座り込みは進行中のため削除できません。問題についてサポートが必要な場合は、サポートにお問い合わせください。",
+    "owner.deleteSitApplicantsWarning_one":
+      "このシートには現在 1 人の応募者がいます。削除すると、申請した全員のリストが削除されます。",
+    "owner.deleteSitApplicantsWarning_other":
+      "現在、この座席には {{count}} 人の応募者がいます。削除すると、申請した全員のリストが削除されます。",
+    "owner.deleteSitAcceptedWarning":
+      "すでに誰かがこの座席への参加を受け入れています。削除する前にその旨を伝えてください。",
+    "owner.deleteSitCompletedError":
+      "完了したシートは削除できません。代わりにアーカイブしてください。",
     "owner.archiveSitLabel": "アーカイブ {{boat}} 座る",
     "owner.archiveSitTitle": "この席をアーカイブしますか?",
-    "owner.archiveSitConfirm": "{{dates}} を {{boat}} までアーカイブしますか?後で「アーカイブ済み」の下に表示されます。",
+    "owner.archiveSitConfirm":
+      "{{dates}} を {{boat}} までアーカイブしますか?後で「アーカイブ済み」の下に表示されます。",
     "owner.archiveSitAction": "はい、アーカイブします",
     "owner.unarchiveSit": "アクティブな座り方に移行する",
     "owner.unarchiveSitLabel": "{{boat}} 座るを復元する",
@@ -12382,9 +13082,11 @@ const localeExtrasSource = {
     "vesselEditor.country": "国",
     "vesselEditor.countryPlaceholder": "たとえばギリシャ",
     "vesselEditor.homePort": "母港",
-    "vesselEditor.homePortHint": "普段ボートが保管されている場所。各座席は異なる場所を使用できます。",
+    "vesselEditor.homePortHint":
+      "普段ボートが保管されている場所。各座席は異なる場所を使用できます。",
     "sitEditor.sameAsHomePort": "母港と同じ: {{homePort}}",
-    "sitEditor.sameAsHomePortHint": "この座席でボートが別の場所にある場合は、このチェックを外します。",
+    "sitEditor.sameAsHomePortHint":
+      "この座席でボートが別の場所にある場合は、このチェックを外します。",
     "sitEditor.location": "座る場所",
     "sitEditor.locationPlaceholder": "都市を検索",
     "sitEditor.country": "国",
@@ -12394,7 +13096,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "ボート カバーのプレビュー",
     "vesselEditor.noCover": "表紙画像はまだありません",
     "vesselEditor.gallery": "写真をもっと見る",
-    "vesselEditor.galleryHint": "ボート、マリーナ、船上での生活の写真を追加アップロードします。キャプションはオプションです。",
+    "vesselEditor.galleryHint":
+      "ボート、マリーナ、船上での生活の写真を追加アップロードします。キャプションはオプションです。",
     "vesselEditor.galleryCaption": "キャプション",
     "vesselEditor.galleryCaptionPlaceholder": "オプションのキャプション",
     "vesselEditor.galleryEmpty": "追加の写真はまだありません",
@@ -12410,17 +13113,21 @@ const localeExtrasSource = {
     "vesselEditor.onePerLine": "1 行に 1 つ",
     "vesselEditor.featuresKicker": "ボート＆マリーナの特徴",
     "vesselEditor.featuresTitle": "何が利用可能ですか?",
-    "vesselEditor.featuresHint": "シッターが船上またはマリーナで使用できるすべてのものを選択してください。",
+    "vesselEditor.featuresHint":
+      "シッターが船上またはマリーナで使用できるすべてのものを選択してください。",
     "vesselEditor.privateAccessTitle": "プライベートアクセスの詳細",
-    "vesselEditor.privateAccessHint": "あなたが申し込みを受け入れた後、承認されたシッターとのみ共有されます。 Wi-Fi パスワード、ゲート コード、および同様の詳細をここに保管します。",
+    "vesselEditor.privateAccessHint":
+      "あなたが申し込みを受け入れた後、承認されたシッターとのみ共有されます。 Wi-Fi パスワード、ゲート コード、および同様の詳細をここに保管します。",
     "vesselEditor.wifiNetwork": "Wi-Fiネットワーク",
     "vesselEditor.wifiNetworkPlaceholder": "ネットワーク名",
     "vesselEditor.wifiPassword": "Wi-Fiパスワード",
     "vesselEditor.wifiPasswordPlaceholder": "パスワード",
     "vesselEditor.accessCodes": "アクセスコード",
-    "vesselEditor.accessCodesPlaceholder": "マリーナゲート、ロックボックス、コンパニオンウェイ、警報器…",
+    "vesselEditor.accessCodesPlaceholder":
+      "マリーナゲート、ロックボックス、コンパニオンウェイ、警報器…",
     "vesselEditor.otherPrivateNotes": "その他の個人的なメモ",
-    "vesselEditor.otherPrivateNotesPlaceholder": "スペアキーの場所、バースの詳細、船内の緊急連絡先…",
+    "vesselEditor.otherPrivateNotesPlaceholder":
+      "スペアキーの場所、バースの詳細、船内の緊急連絡先…",
     "privateAccess.title": "ボートアクセスの詳細",
     "privateAccess.intro": "確認されたシッターであるあなたとのみ共有されます。",
     "privateAccess.introOwner": "このボートの確認済みの乗船者に表示されます。",
@@ -12441,18 +13148,22 @@ const localeExtrasSource = {
     "upload.replace": "画像を置き換える",
     "upload.upload": "画像をアップロードする",
     "upload.remove": "画像を削除",
-    "upload.hint": "JPG、PNG、または WebP は最大 10 MB。大きな画像は保存する前にサイズ変更されます。",
+    "upload.hint":
+      "JPG、PNG、または WebP は最大 10 MB。大きな画像は保存する前にサイズ変更されます。",
     "upload.uploadMultiple": "写真をアップロードする",
     "upload.processingMultiple": "写真を処理中…",
-    "upload.hintMultiple": "JPG、PNG、または WebP はそれぞれ最大 10 MB。大きな画像は保存する前にサイズ変更されます。",
+    "upload.hintMultiple":
+      "JPG、PNG、または WebP はそれぞれ最大 10 MB。大きな画像は保存する前にサイズ変更されます。",
     "sitEditor.kicker": "座席の空き状況",
     "sitEditor.editTitle": "ボートシットを編集する",
     "sitEditor.lockedBannerTitle": "編集はロックされています",
-    "sitEditor.lockedBanner": "このシートは応募者を受け付けているため、詳細を変更することはできません。アプリケーションを確認したり、シッターにメッセージを送信したりすることはできます。",
+    "sitEditor.lockedBanner":
+      "このシートは応募者を受け付けているため、詳細を変更することはできません。アプリケーションを確認したり、シッターにメッセージを送信したりすることはできます。",
     "sitEditor.createTitle": "ボートの座席を作成する",
     "sitEditor.createShort": "座る場所を作成する",
     "sitEditor.createEditLimitTitle": "誰かが申請するまで編集可能",
-    "sitEditor.createEditLimit": "最初のアプリケーションが到着するまでは、座席の詳細を変更できます。その後、編集はロックされるため、応募者には安定したリストが表示されます。",
+    "sitEditor.createEditLimit":
+      "最初のアプリケーションが到着するまでは、座席の詳細を変更できます。その後、編集はロックされるため、応募者には安定したリストが表示されます。",
     "sitEditor.hint": "ボートには、必要な数だけ個別の着座期間を設けることができます。",
     "sitEditor.boat": "ボート",
     "sitEditor.boatOnlySelected": "この座席にはあなたの唯一のボートが選ばれています。",
@@ -12465,7 +13176,8 @@ const localeExtrasSource = {
     "sitType.daytimeChecksShort": "昼間",
     "sitType.daytimeChecksHint": "シッターは毎日訪問してボートをチェックしますが、宿泊はしません。",
     "sitEditor.responsibilities": "介護の責任",
-    "sitEditor.responsibilitiesPlaceholder": "1 行に 1 つのタスク。たとえば、毎朝ビルジをチェックします。",
+    "sitEditor.responsibilitiesPlaceholder":
+      "1 行に 1 つのタスク。たとえば、毎朝ビルジをチェックします。",
     "sitEditor.requirementsKicker": "シッターの要件",
     "sitEditor.requirementsTitle": "この座り方に適しているのは誰ですか?",
     "sitEditor.minimumYears": "ボート経験の最低年数",
@@ -12485,7 +13197,8 @@ const localeExtrasSource = {
     "sitEditor.publish": "座るを公開する",
     "sitEditor.publishBlocked": "まだ必要です: {{items}}",
     "sitEditor.verificationRequiredTitle": "座席を作成するには身元を確認してください",
-    "sitEditor.verificationRequiredText": "ボートシットを公開する前に、政府 ID、電子メール アドレス、電話番号を確認してください。",
+    "sitEditor.verificationRequiredText":
+      "ボートシットを公開する前に、政府 ID、電子メール アドレス、電話番号を確認してください。",
     "sitEditor.verificationRequiredCta": "プロフィールの認証を完了する",
     "sitEditor.verificationChecking": "認証を確認しています…",
     "auth.kicker": "ようこそ",
@@ -12527,11 +13240,14 @@ const localeExtrasSource = {
     "settings.language": "インターフェース言語",
     "settings.languageHint": "日付と数値の形式はインターフェイス言語に従います。",
     "settings.measurementSystem": "測定システム",
-    "settings.measurementHint": "ブラウザの地域によって初期デフォルトが設定されます。ボートのフォームでは引き続きどちらかのユニットを選択できます。",
+    "settings.measurementHint":
+      "ブラウザの地域によって初期デフォルトが設定されます。ボートのフォームでは引き続きどちらかのユニットを選択できます。",
     "settings.sitDefaultsTitle": "座る作成のデフォルト",
-    "settings.sitDefaultsHint": "これらの選択肢は、新しい座席を作成するときに事前に選択されています。座るたびに変更することもできます。",
+    "settings.sitDefaultsHint":
+      "これらの選択肢は、新しい座席を作成するときに事前に選択されています。座るたびに変更することもできます。",
     "settings.sitDefaults.nonSmoker": "デフォルトで非喫煙者を義務付ける",
-    "settings.sitDefaults.nonSmokerHint": "新しい座席は、「非喫煙者であること」がオンになった状態で開始されます。",
+    "settings.sitDefaults.nonSmokerHint":
+      "新しい座席は、「非喫煙者であること」がオンになった状態で開始されます。",
     "settings.metric": "メートル法 (メートル)",
     "settings.imperial": "インペリアル (フィート)",
     "settings.personalTitle": "個人情報",
@@ -12539,11 +13255,13 @@ const localeExtrasSource = {
     "settings.legalName": "正式な正式名",
     "settings.legalNameHint": "政府IDに記載されているとおりです。",
     "settings.displayNameHint": "あなたの公開プロフィールとメッセージに表示されます。",
-    "settings.emailReadOnlyHint": "以下のアカウントセクションからメールアドレスを変更してください。",
+    "settings.emailReadOnlyHint":
+      "以下のアカウントセクションからメールアドレスを変更してください。",
     "settings.savePersonal": "個人情報を保存する",
     "settings.personalSaved": "個人情報の保存",
     "settings.accountTitle": "アカウント",
-    "settings.accountHint": "サインイン電子メールがここに表示されます。ボタンを使用して、安全なダイアログで電子メールまたはパスワードを変更します。",
+    "settings.accountHint":
+      "サインイン電子メールがここに表示されます。ボタンを使用して、安全なダイアログで電子メールまたはパスワードを変更します。",
     "settings.currentEmail": "現在のメールアドレス",
     "settings.newEmail": "新しいメール",
     "settings.currentPassword": "現在のパスワード",
@@ -12559,9 +13277,11 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "パスワードが更新されました",
     "settings.passwordMismatch": "新しいパスワードが一致しません。",
     "settings.sameEmail": "別のメールアドレスを入力してください。",
-    "settings.accountCredentialsUnavailable": "パスワードの変更には電子メールのサインアップ アカウントが必要です。メールで登録してから、もう一度お試しください。",
+    "settings.accountCredentialsUnavailable":
+      "パスワードの変更には電子メールのサインアップ アカウントが必要です。メールで登録してから、もう一度お試しください。",
     "settings.emailsTitle": "電子メール通知",
-    "settings.emailsHint": "どのイベントがメールを送信するかを選択します。これらはいつでも変更できます。",
+    "settings.emailsHint":
+      "どのイベントがメールを送信するかを選択します。これらはいつでも変更できます。",
     "settings.email.newApplications": "私のボートの新しい着席アプリケーション",
     "settings.email.applicationUpdates": "申し込んだシートの最新情報",
     "settings.email.messages": "会話内の新しいメッセージ",
@@ -12571,33 +13291,40 @@ const localeExtrasSource = {
     "safetyActions.block": "ブロック",
     "safetyActions.unblock": "ブロックを解除する",
     "safetyActions.reportTitle": "{{name}} を報告しますか?",
-    "safetyActions.reportText": "何が起こったのか教えてください。レポートは Boatstead によって確認され、報告されたメンバーとは共有されません。",
+    "safetyActions.reportText":
+      "何が起こったのか教えてください。レポートは Boatstead によって確認され、報告されたメンバーとは共有されません。",
     "safetyActions.reportReason": "理由",
     "safetyActions.reportDetails": "詳細",
     "safetyActions.reportDetailsPlaceholder": "有用なコンテキストを追加します",
     "safetyActions.reportDetailsRequired": "この理由について、短い説明を追加してください。",
     "safetyActions.reportSubmit": "レポートの提出",
     "safetyActions.reportThanksTitle": "レポート提出",
-    "safetyActions.reportThanksText": "ありがとう。 {{name}} に関するご報告を受け取りましたので、検討させていただきます。",
+    "safetyActions.reportThanksText":
+      "ありがとう。 {{name}} に関するご報告を受け取りましたので、検討させていただきます。",
     "safetyActions.blockTitle": "{{name}}をブロックしますか？",
-    "safetyActions.blockText": "彼らはあなたに簡単に連絡できなくなり、設定でいつでもブロックを解除できます。",
+    "safetyActions.blockText":
+      "彼らはあなたに簡単に連絡できなくなり、設定でいつでもブロックを解除できます。",
     "safetyActions.blockConfirm": "はい、ブロックします",
     "safetyActions.blockedBannerTitle": "このメンバーをブロックしました",
-    "safetyActions.blockedBannerText": "{{name}} はブロックリストにあります。ここまたは設定でブロックを解除できます。",
+    "safetyActions.blockedBannerText":
+      "{{name}} はブロックリストにあります。ここまたは設定でブロックを解除できます。",
     "safetyActions.reason.spam": "スパムまたは迷惑な連絡",
     "safetyActions.reason.harassment": "ハラスメントまたは虐待",
     "safetyActions.reason.scam": "詐欺または詐欺",
     "safetyActions.reason.inappropriate": "不適切なコンテンツまたは行為",
     "safetyActions.reason.other": "何か他のもの",
     "settings.blockedUsersTitle": "ブロックされたアカウント",
-    "settings.blockedUsersHint": "あなたがブロックしたメンバー。ブロックを解除すると、通常の接続が回復します。",
+    "settings.blockedUsersHint":
+      "あなたがブロックしたメンバー。ブロックを解除すると、通常の接続が回復します。",
     "settings.blockedUsersEmpty": "まだ誰もブロックしていません。",
     "settings.blockedOn": "ブロックされました {{date}}",
     "settings.dangerZone": "危険地帯",
     "settings.deleteAccount": "アカウントを削除する",
-    "settings.deleteAccountHint": "プロフィール、保存された座席、ローカル アカウント データを完全に削除します。",
+    "settings.deleteAccountHint":
+      "プロフィール、保存された座席、ローカル アカウント データを完全に削除します。",
     "settings.deleteConfirmTitle": "アカウントを削除しますか?",
-    "settings.deleteConfirmText": "この操作は元に戻すことができません。すぐにサインアウトされます。",
+    "settings.deleteConfirmText":
+      "この操作は元に戻すことができません。すぐにサインアウトされます。",
     "settings.deleteConfirmationLabel": "{{term}} と入力してアカウントの削除を確認します",
     "settings.deletingAccount": "削除中...",
     "settings.deleteConfirm": "はい、アカウントを削除します",
@@ -12733,34 +13460,48 @@ const localeExtrasSource = {
     "skill.tenderHandling": "入札の取り扱い",
     "safety.kicker": "信頼と安全",
     "safety.title": "安全なボート座りは準備から始まります",
-    "safety.intro": "ボートが着座する前、着座中、着座した後にこれらの実践的なチェックを行ってください。",
+    "safety.intro":
+      "ボートが着座する前、着座中、着座した後にこれらの実践的なチェックを行ってください。",
     "safety.verification.title": "本人確認と検証",
-    "safety.verification.text": "座席に同意する前に、利用可能な本人確認を完了し、名前と連絡先の詳細が一致していることを確認してください。",
+    "safety.verification.text":
+      "座席に同意する前に、利用可能な本人確認を完了し、名前と連絡先の詳細が一致していることを確認してください。",
     "safety.profiles.title": "プロフィールと履歴を確認する",
-    "safety.profiles.text": "参考文献、レビュー、体験談を注意深く読んでください。ギャップや不慣れなシステムについてフォローアップの質問をしてください。",
+    "safety.profiles.text":
+      "参考文献、レビュー、体験談を注意深く読んでください。ギャップや不慣れなシステムについてフォローアップの質問をしてください。",
     "safety.video.title": "ビデオで会う",
-    "safety.video.text": "ビデオ通話を手配し、可能であれば船に滞在する全員を参加させ、船内をライブで歩き回ります。",
+    "safety.video.text":
+      "ビデオ通話を手配し、可能であれば船に滞在する全員を参加させ、船内をライブで歩き回ります。",
     "safety.expectations.title": "期待を書面で伝える",
-    "safety.expectations.text": "日付、責任、アクセス、経費、最新情報、訪問者、キャンセル計画を書面で記録します。",
+    "safety.expectations.text":
+      "日付、責任、アクセス、経費、最新情報、訪問者、キャンセル計画を書面で記録します。",
     "safety.handover.title": "ボート固有の引き継ぎを完了する",
-    "safety.handover.text": "システム、シーコック、ビルジ、バッテリー、陸上電力、エンジン、気象対策、緊急連絡先、停止手順をカバーします。",
+    "safety.handover.text":
+      "システム、シーコック、ビルジ、バッテリー、陸上電力、エンジン、気象対策、緊急連絡先、停止手順をカバーします。",
     "safety.insurance.title": "保険を確認する",
-    "safety.insurance.text": "所有者とシッターは、該当する船舶、マリーナ、旅行、賠償責任、および個人保険を個別に確認する必要があります。",
+    "safety.insurance.text":
+      "所有者とシッターは、該当する船舶、マリーナ、旅行、賠償責任、および個人保険を個別に確認する必要があります。",
     "safety.pets.title": "ペットのためのプラン",
-    "safety.pets.text": "文書の給紙、投薬、運動、獣医師との連絡、輸送、デッキやドック周辺での安全な移動。",
+    "safety.pets.text":
+      "文書の給紙、投薬、運動、獣医師との連絡、輸送、デッキやドック周辺での安全な移動。",
     "safety.marina.title": "マリーナのルールを守る",
-    "safety.marina.text": "ゲスト登録、アクセス、駐車場、廃棄物、騒音、セキュリティ、緊急時の手順をマリーナに確認してください。",
+    "safety.marina.text":
+      "ゲスト登録、アクセス、駐車場、廃棄物、騒音、セキュリティ、緊急時の手順をマリーナに確認してください。",
     "safety.redFlags.title": "危険信号を認識する",
-    "safety.redFlags.text": "誰かがあなたに圧力をかけたり、ビデオを避けたり、通常とは異なる支払いを要求したり、文書を保留したり、重要な事実を変更したり、会話をプラットフォームからすぐに移動させようとしたりした場合は、一時停止してください。",
+    "safety.redFlags.text":
+      "誰かがあなたに圧力をかけたり、ビデオを避けたり、通常とは異なる支払いを要求したり、文書を保留したり、重要な事実を変更したり、会話をプラットフォームからすぐに移動させようとしたりした場合は、一時停止してください。",
     "safety.reporting.title": "インシデントを報告する",
-    "safety.reporting.text": "メッセージ、写真、日付、領収書を保存します。安全上の懸念をBoatsteadのサポートおよび関連する保険会社または当局に報告してください。",
+    "safety.reporting.text":
+      "メッセージ、写真、日付、領収書を保存します。安全上の懸念をBoatsteadのサポートおよび関連する保険会社または当局に報告してください。",
     "safety.emergency.title": "緊急時",
-    "safety.emergency.text": "まずは命を守りましょう。地域の緊急サービスまたは海上救助サービスに連絡し、必要に応じて所有者、マリーナ、保険会社に連絡します。",
+    "safety.emergency.text":
+      "まずは命を守りましょう。地域の緊急サービスまたは海上救助サービスに連絡し、必要に応じて所有者、マリーナ、保険会社に連絡します。",
     "safety.disclaimerTitle": "重要な制限事項",
-    "safety.disclaimerText": "Boatsteadは、緊急サービス、保険会社、資格のある海事専門家、または専門的な海事アドバイスに代わるものではありません。",
+    "safety.disclaimerText":
+      "Boatsteadは、緊急サービス、保険会社、資格のある海事専門家、または専門的な海事アドバイスに代わるものではありません。",
     "support.kicker": "ヘルプセンター",
     "support.title": "どうすれば助けられるでしょうか？",
-    "support.intro": "カテゴリを選択してメッセージを送信してください。このプロトタイプはリクエストをローカルに保存し、電子メールは送信しません。",
+    "support.intro":
+      "カテゴリを選択してメッセージを送信してください。このプロトタイプはリクエストをローカルに保存し、電子メールは送信しません。",
     "support.categories": "サポートカテゴリー",
     "support.topic": "トピック",
     "support.chooseTopic": "トピックを選択してください",
@@ -12784,52 +13525,74 @@ const localeExtrasSource = {
     "terms.kicker": "法律上の",
     "terms.title": "利用規約",
     "terms.updated": "最終更新日: 2026 年 7 月 21 日",
-    "terms.reviewNotice": "発売前の通知: 資格のある法律顧問は、製品の発売前にこれらの規約を確認し、修正する必要があります。",
+    "terms.reviewNotice":
+      "発売前の通知: 資格のある法律顧問は、製品の発売前にこれらの規約を確認し、修正する必要があります。",
     "terms.eligibility.title": "資格",
-    "terms.eligibility.text": "Boatstead を使用するには、法的に契約を締結し、正確な情報を提供できる必要があります。",
+    "terms.eligibility.text":
+      "Boatstead を使用するには、法的に契約を締結し、正確な情報を提供できる必要があります。",
     "terms.accounts.title": "アカウント",
-    "terms.accounts.text": "あなたは自分のアカウント、サインインの詳細、アクティビティに対して責任を負います。不正アクセスがあった場合は速やかにご連絡ください。",
+    "terms.accounts.text":
+      "あなたは自分のアカウント、サインインの詳細、アクティビティに対して責任を負います。不正アクセスがあった場合は速やかにご連絡ください。",
     "terms.platform.title": "プラットフォームの役割",
-    "terms.platform.text": "Boatstead は、ボート所有者とシッターの間の紹介のみを促進します。シッターの手配はオーナーとシッターの間の契約となります。Boatsteadは船舶を所有したり、メンバーを雇用したり、座席を監督したり、それらの取り決めの当事者になったりすることはありません。",
+    "terms.platform.text":
+      "Boatstead は、ボート所有者とシッターの間の紹介のみを促進します。シッターの手配はオーナーとシッターの間の契約となります。Boatsteadは船舶を所有したり、メンバーを雇用したり、座席を監督したり、それらの取り決めの当事者になったりすることはありません。",
     "terms.listings.title": "リストとアプリケーション",
-    "terms.listings.text": "リストと申請書は正確、最新、完全なものでなければなりません。着席するかどうかはメンバーが決定します。",
+    "terms.listings.text":
+      "リストと申請書は正確、最新、完全なものでなければなりません。着席するかどうかはメンバーが決定します。",
     "terms.responsibilities.title": "ユーザーの責任",
-    "terms.responsibilities.text": "メンバーは合法的に行動し、正直にコミュニケーションし、書面による期待に従い、合理的な注意を払わなければなりません。",
+    "terms.responsibilities.text":
+      "メンバーは合法的に行動し、正直にコミュニケーションし、書面による期待に従い、合理的な注意を払わなければなりません。",
     "terms.verification.title": "検証",
-    "terms.verification.text": "チェックによりリスクは軽減されますが、身元、行為、資格、安全性、または適合性が保証されるものではありません。",
+    "terms.verification.text":
+      "チェックによりリスクは軽減されますが、身元、行為、資格、安全性、または適合性が保証されるものではありません。",
     "terms.prohibited.title": "禁止行為",
-    "terms.prohibited.text": "詐欺、嫌がらせ、差別、危険行為、不正アクセス、違法行為、プラットフォームの悪用を行わないでください。",
+    "terms.prohibited.text":
+      "詐欺、嫌がらせ、差別、危険行為、不正アクセス、違法行為、プラットフォームの悪用を行わないでください。",
     "terms.payments.title": "支払いと手数料",
-    "terms.payments.text": "Boatsteadでは現在、一泊料金を請求していません。有料機能が導入される場合は、適用される条件と価格が最初に表示されます。",
+    "terms.payments.text":
+      "Boatsteadでは現在、一泊料金を請求していません。有料機能が導入される場合は、適用される条件と価格が最初に表示されます。",
     "terms.cancellations.title": "キャンセル",
-    "terms.cancellations.text": "損害と出費を軽減するために、メンバーはキャンセル計画に書面で同意し、変更を速やかに通知する必要があります。",
+    "terms.cancellations.text":
+      "損害と出費を軽減するために、メンバーはキャンセル計画に書面で同意し、変更を速やかに通知する必要があります。",
     "terms.insurance.title": "保険",
-    "terms.insurance.text": "会員は適切な保険を確認する責任を負います。 Boatstead は船舶保険、旅行保険、賠償責任保険を提供していません。",
+    "terms.insurance.text":
+      "会員は適切な保険を確認する責任を負います。 Boatstead は船舶保険、旅行保険、賠償責任保険を提供していません。",
     "terms.damage.title": "損害と賠償請求",
-    "terms.damage.text": "損害、盗難、または同様の請求は、主に所有者とシッターの間で行われます。事件を迅速に文書化し、証拠を保存し、相手方、マリーナ、保険会社、当局と協力します。",
+    "terms.damage.text":
+      "損害、盗難、または同様の請求は、主に所有者とシッターの間で行われます。事件を迅速に文書化し、証拠を保存し、相手方、マリーナ、保険会社、当局と協力します。",
     "terms.intellectualProperty.title": "知的財産",
-    "terms.intellectualProperty.text": "Boatstead のコンテンツとブランドは保護されます。あなたは自分のコンテンツに対する権利を保持し、サービスを運営する許可を当社に与えます。",
+    "terms.intellectualProperty.text":
+      "Boatstead のコンテンツとブランドは保護されます。あなたは自分のコンテンツに対する権利を保持し、サービスを運営する許可を当社に与えます。",
     "terms.privacy.title": "プライバシー",
-    "terms.privacy.text": "個人情報は責任を持って取り扱わなければなりません。制作時のプライバシー通知には、収集、使用、保持、および権利が記載されます。",
+    "terms.privacy.text":
+      "個人情報は責任を持って取り扱わなければなりません。制作時のプライバシー通知には、収集、使用、保持、および権利が記載されます。",
     "terms.termination.title": "一時停止と終了",
-    "terms.termination.text": "当社は、メンバーの保護、懸念事項の調査、規約の強制、または法律の遵守を目的として、アクセスを制限または終了する場合があります。",
+    "terms.termination.text":
+      "当社は、メンバーの保護、懸念事項の調査、規約の強制、または法律の遵守を目的として、アクセスを制限または終了する場合があります。",
     "terms.disclaimers.title": "免責事項",
-    "terms.disclaimers.text": "プロトタイプは利用可能な状態で提供されており、中断のない動作、適合性、精度、結果の保証はありません。",
+    "terms.disclaimers.text":
+      "プロトタイプは利用可能な状態で提供されており、中断のない動作、適合性、精度、結果の保証はありません。",
     "terms.liability.title": "責任の制限",
-    "terms.liability.text": "法律で認められる範囲において、Boatsteadは、会員間の取り決めから生じる損害、盗難、紛失、傷害、旅行の中断、財産の請求、またはその他の結果に対して責任を負いません。メンバーは各自の責任で相互に対処します。",
+    "terms.liability.text":
+      "法律で認められる範囲において、Boatsteadは、会員間の取り決めから生じる損害、盗難、紛失、傷害、旅行の中断、財産の請求、またはその他の結果に対して責任を負いません。メンバーは各自の責任で相互に対処します。",
     "terms.indemnity.title": "補償",
-    "terms.indemnity.text": "法的に許可されている場合、お客様は、お客様の違法な行為、内容、または本規約の違反によって生じた請求を補償することに同意するものとします。",
+    "terms.indemnity.text":
+      "法的に許可されている場合、お客様は、お客様の違法な行為、内容、または本規約の違反によって生じた請求を補償することに同意するものとします。",
     "terms.disputes.title": "紛争と準拠法",
-    "terms.disputes.text": "制作条件には、会社の実体、管轄区域、準拠法、および法的審査後の紛争プロセスを指定する必要があります。",
+    "terms.disputes.text":
+      "制作条件には、会社の実体、管轄区域、準拠法、および法的審査後の紛争プロセスを指定する必要があります。",
     "terms.changes.title": "本規約の変更",
-    "terms.changes.text": "当社はこれらの規約を更新する場合があり、重大な変更が発効する前に適切な通知を提供します。",
+    "terms.changes.text":
+      "当社はこれらの規約を更新する場合があり、重大な変更が発効する前に適切な通知を提供します。",
     "terms.contact.title": "お問い合わせとサポート",
-    "terms.contact.text": "質問がある場合はサポートページをご利用ください。緊急対応については Boatstead のサポートに依存しないでください。",
+    "terms.contact.text":
+      "質問がある場合はサポートページをご利用ください。緊急対応については Boatstead のサポートに依存しないでください。",
     "nav.admin": "管理者",
     "footer.admin": "管理者",
     "admin.kicker": "プラットフォームの運用",
     "admin.title": "管理者",
-    "admin.subtitle": "メンバー、役割、アカウントのステータスを管理します。すべての変更は監査証跡に記録されます。",
+    "admin.subtitle":
+      "メンバー、役割、アカウントのステータスを管理します。すべての変更は監査証跡に記録されます。",
     "admin.tab.users": "ユーザー",
     "admin.tab.audit": "監査証跡",
     "admin.signInTitle": "サインインして管理者を開きます",
@@ -12848,7 +13611,8 @@ const localeExtrasSource = {
     "admin.editUser": "ユーザーの編集",
     "admin.deleteUser": "ユーザーの削除",
     "admin.deleteConfirmTitle": "このユーザーを削除しますか?",
-    "admin.deleteConfirmText": "これにより、管理ディレクトリから {{name}} が削除されます。関連する座席とメッセージは引き続きローカル デモ データに表示される場合があります。",
+    "admin.deleteConfirmText":
+      "これにより、管理ディレクトリから {{name}} が削除されます。関連する座席とメッセージは引き続きローカル デモ データに表示される場合があります。",
     "admin.deleteConfirm": "はい、ユーザーを削除します",
     "admin.deleting": "削除中…",
     "admin.saveUser": "ユーザーの保存",
@@ -12980,12 +13744,14 @@ const localeExtrasSource = {
       "Log in or create an account to save sits to your shortlist and find them later.",
     "saved.showAll": "Show all including sitter chosen, completed, etc.",
     "saved.emptyFiltered": "No open saved sits",
-    "saved.emptyFilteredHint": "Your shortlist only has sits that already have a sitter chosen or are completed. Check the box above to see them.",
+    "saved.emptyFilteredHint":
+      "Your shortlist only has sits that already have a sitter chosen or are completed. Check the box above to see them.",
     "editorPreview.kicker": "Live preview",
     "editorPreview.title": "How it will look",
     "editorPreview.label": "Live preview",
     "editorPreview.vesselHint": "Updates as you edit your boat details.",
-    "editorPreview.sitHint": "Updates as you edit this sit. This is how it appears when sitters browse.",
+    "editorPreview.sitHint":
+      "Updates as you edit this sit. This is how it appears when sitters browse.",
     "editorPreview.untitledBoat": "Untitled boat",
     "editorPreview.homePortPending": "Add a home port",
     "editorPreview.lengthPending": "Length TBD",
@@ -13087,8 +13853,10 @@ const localeExtrasSource = {
     "member.identityVerified": "Identity verified",
     "verification.identityVerified": "Identity verified",
     "verification.confirmIdentity": "Confirm your identity",
-    "verification.verifiedHint": "Boatstead confirmed government ID, email, and phone for this member.",
-    "verification.selfHint": "Complete each item below so owners and sitters can trust your profile.",
+    "verification.verifiedHint":
+      "Boatstead confirmed government ID, email, and phone for this member.",
+    "verification.selfHint":
+      "Complete each item below so owners and sitters can trust your profile.",
     "verification.partialHint": "{{count}} of {{total}} checks confirmed so far.",
     "verification.governmentId": "Government ID",
     "verification.email": "Email address",
@@ -13096,7 +13864,8 @@ const localeExtrasSource = {
     "verification.statusVerified": "verified",
     "verification.statusMissing": "not verified",
     "verification.verifyGovernmentId": "Verify government ID",
-    "verification.addEmailAndPhone": "Add an email address and phone number in your profile to finish verification.",
+    "verification.addEmailAndPhone":
+      "Add an email address and phone number in your profile to finish verification.",
     "verification.addPhone": "Add a phone number in your profile to finish verification.",
     "verification.addEmail": "Add an email address in your profile to finish verification.",
     "member.verificationNeeded": "Verification needed",
@@ -13155,7 +13924,8 @@ const localeExtrasSource = {
     "owner.firstSitHint": "Choose a boat and publish the dates you need someone aboard.",
     "owner.boatBeforeSit": "Add a boat before creating a sit.",
     "owner.sitRequiresBoatTooltip": "Create a boat first. Click here to add your first boat.",
-    "owner.sitRequiresVerificationTooltip": "Verify your identity before creating a sit. Open your profile to complete verification.",
+    "owner.sitRequiresVerificationTooltip":
+      "Verify your identity before creating a sit. Open your profile to complete verification.",
     "owner.deleteBoatLabel": "Delete {{boat}}",
     "owner.deleteBoatTitle": "Delete {{boat}}?",
     "owner.deleteBoatConfirm": "This permanently removes the boat and cannot be undone.",
@@ -13171,14 +13941,19 @@ const localeExtrasSource = {
     "owner.deleteSitError": "This sit could not be deleted. Please try again.",
     "owner.deleteSitAcceptedError":
       "This sit has an accepted applicant and can no longer be deleted.",
-    "owner.sitDeleteUnderway": "This sit is under way and cannot be deleted. Contact support if you need help with any issues.",
-    "owner.deleteSitApplicantsWarning_one": "This sit has 1 applicant right now. Deleting it removes the listing for everyone who applied.",
-    "owner.deleteSitApplicantsWarning_other": "This sit has {{count}} applicants right now. Deleting it removes the listing for everyone who applied.",
-    "owner.deleteSitAcceptedWarning": "Someone has already been accepted for this sit. Please inform them before you delete it.",
+    "owner.sitDeleteUnderway":
+      "This sit is under way and cannot be deleted. Contact support if you need help with any issues.",
+    "owner.deleteSitApplicantsWarning_one":
+      "This sit has 1 applicant right now. Deleting it removes the listing for everyone who applied.",
+    "owner.deleteSitApplicantsWarning_other":
+      "This sit has {{count}} applicants right now. Deleting it removes the listing for everyone who applied.",
+    "owner.deleteSitAcceptedWarning":
+      "Someone has already been accepted for this sit. Please inform them before you delete it.",
     "owner.deleteSitCompletedError": "Completed sits cannot be deleted. Archive them instead.",
     "owner.archiveSitLabel": "Archive {{boat}} sit",
     "owner.archiveSitTitle": "Archive this sit?",
-    "owner.archiveSitConfirm": "Archive the {{dates}} sit for {{boat}}? You can find it later under Archived.",
+    "owner.archiveSitConfirm":
+      "Archive the {{dates}} sit for {{boat}}? You can find it later under Archived.",
     "owner.archiveSitAction": "Yes, archive",
     "owner.unarchiveSit": "Move to active sits",
     "owner.unarchiveSitLabel": "Restore {{boat}} sit",
@@ -13218,7 +13993,8 @@ const localeExtrasSource = {
     "vesselEditor.coverPreviewAlt": "Boat cover preview",
     "vesselEditor.noCover": "No cover image yet",
     "vesselEditor.gallery": "More photos",
-    "vesselEditor.galleryHint": "Upload additional photos of the boat, marina, and life aboard. Captions are optional.",
+    "vesselEditor.galleryHint":
+      "Upload additional photos of the boat, marina, and life aboard. Captions are optional.",
     "vesselEditor.galleryCaption": "Caption",
     "vesselEditor.galleryCaptionPlaceholder": "Optional caption",
     "vesselEditor.galleryEmpty": "No additional photos yet",
@@ -13270,11 +14046,13 @@ const localeExtrasSource = {
     "upload.hint": "JPG, PNG or WebP up to 10 MB. Large images are resized before saving.",
     "upload.uploadMultiple": "Upload photos",
     "upload.processingMultiple": "Processing photos…",
-    "upload.hintMultiple": "JPG, PNG or WebP up to 10 MB each. Large images are resized before saving.",
+    "upload.hintMultiple":
+      "JPG, PNG or WebP up to 10 MB each. Large images are resized before saving.",
     "sitEditor.kicker": "Sit availability",
     "sitEditor.editTitle": "Edit boat sit",
     "sitEditor.lockedBannerTitle": "Editing is locked",
-    "sitEditor.lockedBanner": "This sit has received applicants, so its details can no longer be changed. You can still review applications and message sitters.",
+    "sitEditor.lockedBanner":
+      "This sit has received applicants, so its details can no longer be changed. You can still review applications and message sitters.",
     "sitEditor.createTitle": "Create a boat sit",
     "sitEditor.createShort": "Create a sit",
     "sitEditor.createEditLimitTitle": "Editable until someone applies",
@@ -13287,8 +14065,7 @@ const localeExtrasSource = {
     "sitEditor.sitType": "Sit type",
     "sitType.liveaboard": "Accommodation",
     "sitType.liveaboardShort": "Accommodation",
-    "sitType.liveaboardHint":
-      "The sitter lives and sleeps aboard throughout the dates.",
+    "sitType.liveaboardHint": "The sitter lives and sleeps aboard throughout the dates.",
     "sitType.daytimeChecks": "Daytime checks",
     "sitType.daytimeChecksShort": "Daytime",
     "sitType.daytimeChecksHint":
@@ -13305,12 +14082,10 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Certifications",
     "sitEditor.skills": "Practical skills",
     "sitEditor.nonSmoker": "Must be a non-smoker",
-    "sitEditor.nonSmokerHint":
-      "Require sitters who do not smoke aboard or during the stay.",
+    "sitEditor.nonSmokerHint": "Require sitters who do not smoke aboard or during the stay.",
     "requirement.nonSmoker": "Non-smoker",
     "sitEditor.additional": "Additional sitter requirements",
-    "sitEditor.additionalPlaceholder":
-      "One per line, for example two recent references",
+    "sitEditor.additionalPlaceholder": "One per line, for example two recent references",
     "sitEditor.pets": "Pets aboard (optional)",
     "sitEditor.petsPlaceholder": "for example Pip, a sea-loving terrier",
     "sitEditor.save": "Save sit",
@@ -13380,7 +14155,8 @@ const localeExtrasSource = {
     "settings.savePersonal": "Save personal details",
     "settings.personalSaved": "Personal details saved",
     "settings.accountTitle": "Account",
-    "settings.accountHint": "Your sign-in email is shown here. Use the buttons to change your email or password in a secure dialog.",
+    "settings.accountHint":
+      "Your sign-in email is shown here. Use the buttons to change your email or password in a secure dialog.",
     "settings.currentEmail": "Current email",
     "settings.newEmail": "New email",
     "settings.currentPassword": "Current password",
@@ -13396,7 +14172,8 @@ const localeExtrasSource = {
     "settings.passwordUpdated": "Password updated",
     "settings.passwordMismatch": "New passwords do not match.",
     "settings.sameEmail": "Enter a different email address.",
-    "settings.accountCredentialsUnavailable": "Password changes need an email sign-up account. Sign up with email, then try again.",
+    "settings.accountCredentialsUnavailable":
+      "Password changes need an email sign-up account. Sign up with email, then try again.",
     "settings.emailsTitle": "Email notifications",
     "settings.emailsHint": "Choose which events send you an email. You can change these anytime.",
     "settings.email.newApplications": "New sit applications on my boats",
@@ -13408,19 +14185,23 @@ const localeExtrasSource = {
     "safetyActions.block": "Block",
     "safetyActions.unblock": "Unblock",
     "safetyActions.reportTitle": "Report {{name}}?",
-    "safetyActions.reportText": "Tell us what happened. Reports are reviewed by Boatstead and are not shared with the reported member.",
+    "safetyActions.reportText":
+      "Tell us what happened. Reports are reviewed by Boatstead and are not shared with the reported member.",
     "safetyActions.reportReason": "Reason",
     "safetyActions.reportDetails": "Details",
     "safetyActions.reportDetailsPlaceholder": "Add any useful context",
     "safetyActions.reportDetailsRequired": "Please add a short description for this reason.",
     "safetyActions.reportSubmit": "Submit report",
     "safetyActions.reportThanksTitle": "Report submitted",
-    "safetyActions.reportThanksText": "Thanks. We received your report about {{name}} and will review it.",
+    "safetyActions.reportThanksText":
+      "Thanks. We received your report about {{name}} and will review it.",
     "safetyActions.blockTitle": "Block {{name}}?",
-    "safetyActions.blockText": "They will no longer be able to contact you easily, and you can unblock them anytime in Settings.",
+    "safetyActions.blockText":
+      "They will no longer be able to contact you easily, and you can unblock them anytime in Settings.",
     "safetyActions.blockConfirm": "Yes, block",
     "safetyActions.blockedBannerTitle": "You blocked this member",
-    "safetyActions.blockedBannerText": "{{name}} is on your blocked list. You can unblock them here or in Settings.",
+    "safetyActions.blockedBannerText":
+      "{{name}} is on your blocked list. You can unblock them here or in Settings.",
     "safetyActions.reason.spam": "Spam or unwanted contact",
     "safetyActions.reason.harassment": "Harassment or abuse",
     "safetyActions.reason.scam": "Scam or fraud",
@@ -13623,8 +14404,7 @@ const localeExtrasSource = {
     "support.topic.other": "Other",
     "support.formTitle": "Contact support",
     "support.accountDetails": "Your account",
-    "support.accountDetailsHint":
-      "We’ll use this name and email for your support request.",
+    "support.accountDetailsHint": "We’ll use this name and email for your support request.",
     "support.name": "Name",
     "support.email": "Email",
     "support.message": "Message",
@@ -13703,7 +14483,8 @@ const localeExtrasSource = {
     "footer.admin": "Admin",
     "admin.kicker": "Platform operations",
     "admin.title": "Admin",
-    "admin.subtitle": "Manage members, roles, and account status. Every change is recorded in the audit trail.",
+    "admin.subtitle":
+      "Manage members, roles, and account status. Every change is recorded in the audit trail.",
     "admin.tab.users": "Users",
     "admin.tab.audit": "Audit trail",
     "admin.signInTitle": "Sign in to open Admin",

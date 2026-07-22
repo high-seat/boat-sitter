@@ -13,16 +13,12 @@ test.describe("return to accepted applicant", () => {
 
     await page.getByRole("button", { name: /Theo Janssen/i }).click();
     await expect(page.getByRole("heading", { name: "Theo Janssen" })).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /Back to Alex Morgan/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /Back to Alex Morgan/i })).toBeVisible();
 
     await page.getByRole("button", { name: /Back to Alex Morgan/i }).click();
     await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
     await expect(page.getByText("Viewing details")).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /Back to Alex Morgan/i }),
-    ).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Back to Alex Morgan/i })).toHaveCount(0);
   });
 
   test("banner restores accepted applicant details", async ({ page }) => {

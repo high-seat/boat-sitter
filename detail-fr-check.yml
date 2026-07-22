@@ -1,135 +1,135 @@
 - generic [ref=f200e3]:
-  - banner [ref=f200e4]:
-    - generic [ref=f200e5]:
-      - link "Boatstead" [ref=f200e6] [cursor=pointer]:
-        - /url: /
-      - generic [ref=f200e59]:
-        - button "Open notifications" [ref=f200e60] [cursor=pointer]:
-          - generic [ref=f200e64]: "3"
-        - tooltip "Notifications"
-      - button "Menu" [ref=f200e65] [cursor=pointer]
-  - main [ref=f200e67]:
-    - generic [ref=f200e68]:
-      - button "Back to all boats" [ref=f200e69] [cursor=pointer]
-      - generic [ref=f200e73]:
-        - button "View photo 1" [ref=f200e74] [cursor=pointer]:
-          - img "Azure Tide" [ref=f200e75]
-        - button "View photos" [ref=f200e76] [cursor=pointer]
-      - generic [ref=f200e77]:
-        - generic [ref=f200e78]:
-          - generic [ref=f200e79]:
-            - generic [ref=f200e80]:
-              - paragraph [ref=f200e81]: Sailing yacht · 9.1 m
-              - heading "Azure Tide" [level=1] [ref=f200e82]
-              - paragraph [ref=f200e83]: Antibes, France
-            - button "Save boat sit" [ref=f200e87] [cursor=pointer]
-          - link [ref=f200e91] [cursor=pointer]:
-            - /url: /members/generated-sit-1
-            - img "Amelia & Noah" [ref=f200e92]
-            - generic [ref=f200e93]:
-              - heading "Hosted by Amelia & Noah" [level=2] [ref=f200e94]
-              - paragraph [ref=f200e95]: 4.5 · 3 owner reviews
-              - paragraph [ref=f200e98]: Usually responds within 24 hours
-          - generic [ref=f200e101]:
-            - heading "About this boat sit" [level=2] [ref=f200e102]
-            - paragraph [ref=f200e103]: "Home port: Antibes, France"
-            - paragraph [ref=f200e107]: Azure Tide is a well-cared-for sailing yacht set up for comfortable stays aboard. The owners are looking for a dependable sitter to keep an eye on her while they are away.
-            - paragraph [ref=f200e108]: A comfortable cabin, equipped galley, reliable shore power and easy access to marina facilities.
-            - generic [ref=f200e109]: "Also aboard: One friendly dog aboard"
-          - generic [ref=f200e113]:
-            - heading "The boat brief" [level=2] [ref=f200e114]
-            - generic [ref=f200e115]:
-              - generic [ref=f200e121]:
-                - generic [ref=f200e122]: Engine type
-                - text: Inboard diesel
-              - generic [ref=f200e129]:
-                - generic [ref=f200e130]: DC system voltage
-                - text: 24 V DC
-              - generic [ref=f200e135]:
-                - generic [ref=f200e136]: Stove fuel type
-                - text: Electric / induction
-              - generic [ref=f200e137]: Diesel engine
-              - generic [ref=f200e143]: Shore power
-              - generic [ref=f200e150]: Battery monitor
-              - generic [ref=f200e156]: Fresh-water system
-          - generic [ref=f200e161]:
-            - heading "What you’ll take care of" [level=2] [ref=f200e162]
-            - list [ref=f200e163]:
-              - listitem [ref=f200e164]: Check lines, fenders and bilges each day
-              - listitem [ref=f200e167]: Monitor shore power and battery levels
-              - listitem [ref=f200e170]: Air the cabins and inspect for leaks
-              - listitem [ref=f200e173]: Send the owner a short weekly update
-          - generic [ref=f200e176]:
-            - heading "Experience requested" [level=2] [ref=f200e177]
-            - generic [ref=f200e178]:
-              - generic [ref=f200e179]: 2+ years of boating experience
-              - generic [ref=f200e180]: Basic systems knowledge
-              - generic [ref=f200e181]: Non-smoker
-              - generic [ref=f200e182]: 2+ years boating experience
-            - heading "Life aboard" [level=2] [ref=f200e183]
-            - generic [ref=f200e184]:
-              - generic [ref=f200e185]: Bathroom
-              - generic [ref=f200e189]: Full kitchen
-              - generic [ref=f200e194]: Wi-Fi
-              - generic [ref=f200e199]: Shore power
-              - generic [ref=f200e202]: On-site bathrooms & showers
-              - generic [ref=f200e206]: Gated access
-              - generic [ref=f200e210]: On-site laundry
-              - generic [ref=f200e215]: Outdoor BBQ
-        - complementary [ref=f200e218]:
-          - generic [ref=f200e219]:
-            - paragraph [ref=f200e220]: Available dates
-            - generic [ref=f200e221]: Happening soon
-            - paragraph [ref=f200e222]: Aug 4 – Aug 11
-            - paragraph [ref=f200e223]: 7 nights aboard
-            - generic [ref=f200e225]:
-              - paragraph [ref=f200e226]: Arrival can shift by one day
-              - paragraph [ref=f200e229]: Handover call included
-              - paragraph [ref=f200e232]: Emergency contacts verified
-              - paragraph [ref=f200e236]: Maximum 2 people
-            - button "Apply to boat sit" [ref=f200e242] [cursor=pointer]
-            - paragraph [ref=f200e243]: 1 sitters have applied · No nightly fee
-      - generic [ref=f200e244]:
-        - paragraph [ref=f200e245]: Sit location
-        - heading "Where the boat will be" [level=2] [ref=f200e246]
-        - paragraph [ref=f200e247]: Antibes, France is the location for this sit.
-        - region "Where the boat will be" [ref=f200e249]:
-          - generic [ref=f200e250]:
-            - button "⚓" [ref=f200e251] [cursor=pointer]
-            - generic:
-              - generic [ref=f200e253]:
-                - button "Zoom in" [ref=f200e254] [cursor=pointer]: +
-                - button "Zoom out" [ref=f200e255] [cursor=pointer]: −
-              - generic [ref=f200e256]:
-                - link "Leaflet" [ref=f200e257] [cursor=pointer]:
-                  - /url: https://leafletjs.com
-                - text: "| ©"
-                - link "OpenStreetMap" [ref=f200e262] [cursor=pointer]:
-                  - /url: https://www.openstreetmap.org/copyright
-  - contentinfo [ref=f200e36]:
-    - generic [ref=f200e37]:
-      - link "Boatstead" [ref=f200e38] [cursor=pointer]:
-        - /url: /
-      - paragraph [ref=f200e44]: Trusted care for boats, wherever they’re moored.
-      - generic [ref=f200e45]:
-        - generic [ref=f200e46]:
-          - link "Safety" [ref=f200e47] [cursor=pointer]:
-            - /url: /safety
-          - link "Support" [ref=f200e48] [cursor=pointer]:
-            - /url: /support
-          - link "Terms" [ref=f200e49] [cursor=pointer]:
-            - /url: /terms
-        - generic [ref=f200e50]:
-          - generic [ref=f200e55]: Language
-          - combobox "Language" [ref=f200e56] [cursor=pointer]:
-            - option "🇺🇸 English (US)" [selected]
-            - option "🇬🇧 English (UK)"
-            - option "🇫🇷 Français"
-            - option "🇪🇸 Español"
-            - option "🇮🇹 Italiano"
-            - option "🇩🇪 Deutsch"
-            - option "🇳🇱 Nederlands"
-            - option "🇵🇹 Português"
-            - option "🇬🇷 Ελληνικά"
-            - option "🇭🇷 Hrvatski"
-            - option "🇹🇷 Türkçe"
+    - banner [ref=f200e4]:
+        - generic [ref=f200e5]:
+            - link "Boatstead" [ref=f200e6] [cursor=pointer]:
+                - /url: /
+            - generic [ref=f200e59]:
+                - button "Open notifications" [ref=f200e60] [cursor=pointer]:
+                    - generic [ref=f200e64]: "3"
+                - tooltip "Notifications"
+            - button "Menu" [ref=f200e65] [cursor=pointer]
+    - main [ref=f200e67]:
+        - generic [ref=f200e68]:
+            - button "Back to all boats" [ref=f200e69] [cursor=pointer]
+            - generic [ref=f200e73]:
+                - button "View photo 1" [ref=f200e74] [cursor=pointer]:
+                    - img "Azure Tide" [ref=f200e75]
+                - button "View photos" [ref=f200e76] [cursor=pointer]
+            - generic [ref=f200e77]:
+                - generic [ref=f200e78]:
+                    - generic [ref=f200e79]:
+                        - generic [ref=f200e80]:
+                            - paragraph [ref=f200e81]: Sailing yacht · 9.1 m
+                            - heading "Azure Tide" [level=1] [ref=f200e82]
+                            - paragraph [ref=f200e83]: Antibes, France
+                        - button "Save boat sit" [ref=f200e87] [cursor=pointer]
+                    - link [ref=f200e91] [cursor=pointer]:
+                        - /url: /members/generated-sit-1
+                        - img "Amelia & Noah" [ref=f200e92]
+                        - generic [ref=f200e93]:
+                            - heading "Hosted by Amelia & Noah" [level=2] [ref=f200e94]
+                            - paragraph [ref=f200e95]: 4.5 · 3 owner reviews
+                            - paragraph [ref=f200e98]: Usually responds within 24 hours
+                    - generic [ref=f200e101]:
+                        - heading "About this boat sit" [level=2] [ref=f200e102]
+                        - paragraph [ref=f200e103]: "Home port: Antibes, France"
+                        - paragraph [ref=f200e107]: Azure Tide is a well-cared-for sailing yacht set up for comfortable stays aboard. The owners are looking for a dependable sitter to keep an eye on her while they are away.
+                        - paragraph [ref=f200e108]: A comfortable cabin, equipped galley, reliable shore power and easy access to marina facilities.
+                        - generic [ref=f200e109]: "Also aboard: One friendly dog aboard"
+                    - generic [ref=f200e113]:
+                        - heading "The boat brief" [level=2] [ref=f200e114]
+                        - generic [ref=f200e115]:
+                            - generic [ref=f200e121]:
+                                - generic [ref=f200e122]: Engine type
+                                - text: Inboard diesel
+                            - generic [ref=f200e129]:
+                                - generic [ref=f200e130]: DC system voltage
+                                - text: 24 V DC
+                            - generic [ref=f200e135]:
+                                - generic [ref=f200e136]: Stove fuel type
+                                - text: Electric / induction
+                            - generic [ref=f200e137]: Diesel engine
+                            - generic [ref=f200e143]: Shore power
+                            - generic [ref=f200e150]: Battery monitor
+                            - generic [ref=f200e156]: Fresh-water system
+                    - generic [ref=f200e161]:
+                        - heading "What you’ll take care of" [level=2] [ref=f200e162]
+                        - list [ref=f200e163]:
+                            - listitem [ref=f200e164]: Check lines, fenders and bilges each day
+                            - listitem [ref=f200e167]: Monitor shore power and battery levels
+                            - listitem [ref=f200e170]: Air the cabins and inspect for leaks
+                            - listitem [ref=f200e173]: Send the owner a short weekly update
+                    - generic [ref=f200e176]:
+                        - heading "Experience requested" [level=2] [ref=f200e177]
+                        - generic [ref=f200e178]:
+                            - generic [ref=f200e179]: 2+ years of boating experience
+                            - generic [ref=f200e180]: Basic systems knowledge
+                            - generic [ref=f200e181]: Non-smoker
+                            - generic [ref=f200e182]: 2+ years boating experience
+                        - heading "Life aboard" [level=2] [ref=f200e183]
+                        - generic [ref=f200e184]:
+                            - generic [ref=f200e185]: Bathroom
+                            - generic [ref=f200e189]: Full kitchen
+                            - generic [ref=f200e194]: Wi-Fi
+                            - generic [ref=f200e199]: Shore power
+                            - generic [ref=f200e202]: On-site bathrooms & showers
+                            - generic [ref=f200e206]: Gated access
+                            - generic [ref=f200e210]: On-site laundry
+                            - generic [ref=f200e215]: Outdoor BBQ
+                - complementary [ref=f200e218]:
+                    - generic [ref=f200e219]:
+                        - paragraph [ref=f200e220]: Available dates
+                        - generic [ref=f200e221]: Happening soon
+                        - paragraph [ref=f200e222]: Aug 4 – Aug 11
+                        - paragraph [ref=f200e223]: 7 nights aboard
+                        - generic [ref=f200e225]:
+                            - paragraph [ref=f200e226]: Arrival can shift by one day
+                            - paragraph [ref=f200e229]: Handover call included
+                            - paragraph [ref=f200e232]: Emergency contacts verified
+                            - paragraph [ref=f200e236]: Maximum 2 people
+                        - button "Apply to boat sit" [ref=f200e242] [cursor=pointer]
+                        - paragraph [ref=f200e243]: 1 sitters have applied · No nightly fee
+            - generic [ref=f200e244]:
+                - paragraph [ref=f200e245]: Sit location
+                - heading "Where the boat will be" [level=2] [ref=f200e246]
+                - paragraph [ref=f200e247]: Antibes, France is the location for this sit.
+                - region "Where the boat will be" [ref=f200e249]:
+                    - generic [ref=f200e250]:
+                        - button "⚓" [ref=f200e251] [cursor=pointer]
+                        - generic:
+                            - generic [ref=f200e253]:
+                                - button "Zoom in" [ref=f200e254] [cursor=pointer]: +
+                                - button "Zoom out" [ref=f200e255] [cursor=pointer]: −
+                            - generic [ref=f200e256]:
+                                - link "Leaflet" [ref=f200e257] [cursor=pointer]:
+                                    - /url: https://leafletjs.com
+                                - text: "| ©"
+                                - link "OpenStreetMap" [ref=f200e262] [cursor=pointer]:
+                                    - /url: https://www.openstreetmap.org/copyright
+    - contentinfo [ref=f200e36]:
+        - generic [ref=f200e37]:
+            - link "Boatstead" [ref=f200e38] [cursor=pointer]:
+                - /url: /
+            - paragraph [ref=f200e44]: Trusted care for boats, wherever they’re moored.
+            - generic [ref=f200e45]:
+                - generic [ref=f200e46]:
+                    - link "Safety" [ref=f200e47] [cursor=pointer]:
+                        - /url: /safety
+                    - link "Support" [ref=f200e48] [cursor=pointer]:
+                        - /url: /support
+                    - link "Terms" [ref=f200e49] [cursor=pointer]:
+                        - /url: /terms
+                - generic [ref=f200e50]:
+                    - generic [ref=f200e55]: Language
+                    - combobox "Language" [ref=f200e56] [cursor=pointer]:
+                        - option "🇺🇸 English (US)" [selected]
+                        - option "🇬🇧 English (UK)"
+                        - option "🇫🇷 Français"
+                        - option "🇪🇸 Español"
+                        - option "🇮🇹 Italiano"
+                        - option "🇩🇪 Deutsch"
+                        - option "🇳🇱 Nederlands"
+                        - option "🇵🇹 Português"
+                        - option "🇬🇷 Ελληνικά"
+                        - option "🇭🇷 Hrvatski"
+                        - option "🇹🇷 Türkçe"

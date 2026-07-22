@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { applicationMessages, applications, sits, supportRequests, vessels } from "../db/schema";
 import { seedApplications, seedSits, seedVessels } from "../db/seed-data";
@@ -11,7 +12,7 @@ import { devConsoleHtml } from "./dev-console-html";
  * The whole router 404s when ENVIRONMENT === "production", so it cannot be
  * reached on a real deploy even if someone guesses the path.
  */
-export const devRouter = new Hono<{ Bindings: Env }>();
+export const devRouter = new Hono<AppEnv>();
 
 devRouter.use("*", async (c, next) => {
   if (c.env.ENVIRONMENT === "production") {

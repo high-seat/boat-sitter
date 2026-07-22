@@ -4,10 +4,7 @@ import { useTranslation } from "react-i18next";
 
 type ConfirmTone = "default" | "danger" | "warning";
 
-const toneStyles: Record<
-  ConfirmTone,
-  { icon: string; confirm: string }
-> = {
+const toneStyles: Record<ConfirmTone, { icon: string; confirm: string }> = {
   default: {
     icon: "bg-seafoam text-teal",
     confirm: "bg-navy text-white hover:bg-ink",

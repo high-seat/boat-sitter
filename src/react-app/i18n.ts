@@ -812,7 +812,11 @@ const tr = messages({
   "feature.beddingLinens": "Yatak takımı ve nevresimler",
 });
 
-function mapMessages(base: Messages, transform: (value: string) => string, overrides: Partial<Messages> = {}): Messages {
+function mapMessages(
+  base: Messages,
+  transform: (value: string) => string,
+  overrides: Partial<Messages> = {},
+): Messages {
   const next = { ...base };
   for (const key of Object.keys(base) as (keyof Messages)[]) {
     next[key] = overrides[key] ?? transform(base[key]);
@@ -911,13 +915,15 @@ const sv = messages({
   "home.kicker": "Communityn för båtsitting",
   "home.titleOne": "Bra händer.",
   "home.titleTwo": "Glada båtar.",
-  "home.subtitle": "Pålitliga båtälskare tar hand om fartyg medan ägare är borta. I utbyte får de njuta av en unik vistelse på vattnet.",
+  "home.subtitle":
+    "Pålitliga båtälskare tar hand om fartyg medan ägare är borta. I utbyte får de njuta av en unik vistelse på vattnet.",
   "home.verified": "Verifierade medlemmar",
   "home.noFees": "Inga nattavgifter",
   "home.marine": "Marint sinnade",
   "home.handovers": "1 200+ lyckade överlämningar",
   "home.trustTitle": "Inbyggt förtroende",
-  "home.trustText": "ID-kontroller, referenser och båtspecifik erfarenhet hjälper dig att hitta rätt matchning.",
+  "home.trustText":
+    "ID-kontroller, referenser och båtspecifik erfarenhet hjälper dig att hitta rätt matchning.",
   "home.boatTitle": "Mer än att sitta hemma",
   "home.boatText": "Matcha om fartygssystem, sjömanskap, husdjur, väderrutiner och marinakunskap.",
   "home.handoverTitle": "En ordentlig överlämning",
@@ -927,7 +933,8 @@ const sv = messages({
   "home.explore": "Utforska varje båt",
   "home.ownerKicker": "För båtägare",
   "home.ownerTitle": "Lämna dockan utan att behöva oroa dig.",
-  "home.ownerText": "Hitta någon som förstår din båt, inte bara dina nycklar. Håll systemen tränade, linjer kontrollerade och husdjuren bekväma när du är borta.",
+  "home.ownerText":
+    "Hitta någon som förstår din båt, inte bara dina nycklar. Håll systemen tränade, linjer kontrollerade och husdjuren bekväma när du är borta.",
   "home.list": "Lista din båt gratis",
   "boats.kicker": "Hitta din nästa sittning",
   "boats.title": "Båtar söker bra händer",
@@ -986,13 +993,15 @@ const nb = messages({
   "home.kicker": "Fellesskapet for båtsitting",
   "home.titleOne": "Gode hender.",
   "home.titleTwo": "Glade båter.",
-  "home.subtitle": "Betrodde båtelskere tar vare på fartøyer mens eiere er borte. Til gjengjeld nyter de et unikt opphold på vannet.",
+  "home.subtitle":
+    "Betrodde båtelskere tar vare på fartøyer mens eiere er borte. Til gjengjeld nyter de et unikt opphold på vannet.",
   "home.verified": "Verifiserte medlemmer",
   "home.noFees": "Ingen nattlige avgifter",
   "home.marine": "Marinesinnet",
   "home.handovers": "1200+ glade overleveringer",
   "home.trustTitle": "Innebygd tillit",
-  "home.trustText": "ID-sjekker, referanser og båtspesifikk erfaring hjelper deg med å finne den rette matchen.",
+  "home.trustText":
+    "ID-sjekker, referanser og båtspesifikk erfaring hjelper deg med å finne den rette matchen.",
   "home.boatTitle": "Mer enn hussitting",
   "home.boatText": "Match på fartøysystemer, sjømannskap, kjæledyr, værrutiner og marinakunnskap.",
   "home.handoverTitle": "En skikkelig overlevering",
@@ -1002,7 +1011,8 @@ const nb = messages({
   "home.explore": "Utforsk hver båt",
   "home.ownerKicker": "For båteiere",
   "home.ownerTitle": "Forlat kaien uten å bekymre deg.",
-  "home.ownerText": "Finn noen som forstår båten din, ikke bare nøklene dine. Hold systemene trene, linjer sjekket og kjæledyr komfortable mens du er borte.",
+  "home.ownerText":
+    "Finn noen som forstår båten din, ikke bare nøklene dine. Hold systemene trene, linjer sjekket og kjæledyr komfortable mens du er borte.",
   "home.list": "List opp båten din gratis",
   "boats.kicker": "Finn din neste sitteplass",
   "boats.title": "Båter på jakt etter gode hender",
@@ -1061,13 +1071,15 @@ const da = messages({
   "home.kicker": "Fællesskabet for bådsitting",
   "home.titleOne": "Gode hænder.",
   "home.titleTwo": "Glade både.",
-  "home.subtitle": "Betroede bådelskere passer skibe, mens ejerne er væk. Til gengæld får de et enestående ophold på vandet.",
+  "home.subtitle":
+    "Betroede bådelskere passer skibe, mens ejerne er væk. Til gengæld får de et enestående ophold på vandet.",
   "home.verified": "Verificerede medlemmer",
   "home.noFees": "Ingen natlige gebyrer",
   "home.marine": "Marinesindet",
   "home.handovers": "1.200+ glade overdragelser",
   "home.trustTitle": "Tillid indbygget",
-  "home.trustText": "ID-tjek, referencer og bådspecifik erfaring hjælper dig med at finde det rigtige match.",
+  "home.trustText":
+    "ID-tjek, referencer og bådspecifik erfaring hjælper dig med at finde det rigtige match.",
   "home.boatTitle": "Mere end hussiddende",
   "home.boatText": "Match på fartøjssystemer, sømandskab, kæledyr, vejrrutiner og marina knowhow.",
   "home.handoverTitle": "En ordentlig overdragelse",
@@ -1077,7 +1089,8 @@ const da = messages({
   "home.explore": "Udforsk hver båd",
   "home.ownerKicker": "For bådejere",
   "home.ownerTitle": "Forlad docken uden bekymringer.",
-  "home.ownerText": "Find en, der forstår din båd, ikke kun dine nøgler. Hold systemerne motionerede, linjer kontrolleret og kæledyr komfortable, mens du er væk.",
+  "home.ownerText":
+    "Find en, der forstår din båd, ikke kun dine nøgler. Hold systemerne motionerede, linjer kontrolleret og kæledyr komfortable, mens du er væk.",
   "home.list": "Liste din båd gratis",
   "boats.kicker": "Find din næste sit",
   "boats.title": "Både på udkig efter gode hænder",
@@ -1136,15 +1149,18 @@ const fi = messages({
   "home.kicker": "Veneenvahdin yhteisö",
   "home.titleOne": "Hyvät kädet.",
   "home.titleTwo": "Onnellisia veneitä.",
-  "home.subtitle": "Luotetut veneenharrastajat huolehtivat aluksista omistajien ollessa poissa. Vastineeksi he nauttivat ainutlaatuisesta oleskelusta vedessä.",
+  "home.subtitle":
+    "Luotetut veneenharrastajat huolehtivat aluksista omistajien ollessa poissa. Vastineeksi he nauttivat ainutlaatuisesta oleskelusta vedessä.",
   "home.verified": "Vahvistetut jäsenet",
   "home.noFees": "Ei iltamaksuja",
   "home.marine": "Merimielinen",
   "home.handovers": "Yli 1 200 onnellista luovutusta",
   "home.trustTitle": "Luottamus sisäänrakennettu",
-  "home.trustText": "Henkilöllisyystarkastukset, referenssit ja venekohtainen kokemus auttavat sinua löytämään oikean parin.",
+  "home.trustText":
+    "Henkilöllisyystarkastukset, referenssit ja venekohtainen kokemus auttavat sinua löytämään oikean parin.",
   "home.boatTitle": "Enemmän kuin kotona istuminen",
-  "home.boatText": "Vastaa alusjärjestelmiin, merenkulkuun, lemmikkeihin, säärutiineihin ja venesataman tietotaitoon.",
+  "home.boatText":
+    "Vastaa alusjärjestelmiin, merenkulkuun, lemmikkeihin, säärutiineihin ja venesataman tietotaitoon.",
   "home.handoverTitle": "Asiallinen luovutus",
   "home.handoverText": "Peitä pohjahanat, pilssit, akut, moottorit ja hätäkoskettimet.",
   "home.open": "Avoimet luukut",
@@ -1152,7 +1168,8 @@ const fi = messages({
   "home.explore": "Tutustu jokaiseen veneeseen",
   "home.ownerKicker": "Veneen omistajille",
   "home.ownerTitle": "Poistu telakasta huoletta.",
-  "home.ownerText": "Etsi joku, joka ymmärtää veneesi, ei vain avaimia. Pidä järjestelmät kuntoisina, linjat tarkastettuina ja lemmikit mukavana ollessasi poissa.",
+  "home.ownerText":
+    "Etsi joku, joka ymmärtää veneesi, ei vain avaimia. Pidä järjestelmät kuntoisina, linjat tarkastettuina ja lemmikit mukavana ollessasi poissa.",
   "home.list": "Listaa veneesi ilmaiseksi",
   "boats.kicker": "Etsi seuraava istumasi",
   "boats.title": "Veneet etsivät hyviä käsiä",
@@ -1211,15 +1228,18 @@ const ja = messages({
   "home.kicker": "ボートシッティングのコミュニティ",
   "home.titleOne": "確かな手に。",
   "home.titleTwo": "幸せなボート。",
-  "home.subtitle": "信頼できるボート愛好家が、オーナー不在中に船の世話をします。その代わりに、水の上での特別な滞在を楽しめます。",
+  "home.subtitle":
+    "信頼できるボート愛好家が、オーナー不在中に船の世話をします。その代わりに、水の上での特別な滞在を楽しめます。",
   "home.verified": "本人確認済みメンバー",
   "home.noFees": "宿泊費なし",
   "home.marine": "マリン志向",
   "home.handovers": "1,200件以上の引き継ぎ",
   "home.trustTitle": "信頼を組み込み",
-  "home.trustText": "ID チェック、リファレンス、ボート固有の経験が、適切な相手を見つけるのに役立ちます。",
+  "home.trustText":
+    "ID チェック、リファレンス、ボート固有の経験が、適切な相手を見つけるのに役立ちます。",
   "home.boatTitle": "ハウスシッティング以上",
-  "home.boatText": "船舶システム、操船術、ペット、気象ルーチン、マリーナのノウハウを組み合わせます。",
+  "home.boatText":
+    "船舶システム、操船術、ペット、気象ルーチン、マリーナのノウハウを組み合わせます。",
   "home.handoverTitle": "きちんとした引き継ぎ",
   "home.handoverText": "シーコック、ビルジ、バッテリー、エンジン、緊急連絡先をカバーします。",
   "home.open": "ハッチを開ける",
@@ -1227,7 +1247,8 @@ const ja = messages({
   "home.explore": "すべてのボートを見る",
   "home.ownerKicker": "ボートオーナー向け",
   "home.ownerTitle": "心配なく桟橋を離れる。",
-  "home.ownerText": "キーだけでなく、あなたのボートを理解できる人を見つけてください。外出中もシステムを動かし、ラインをチェックし、ペットを快適に保ちます。",
+  "home.ownerText":
+    "キーだけでなく、あなたのボートを理解できる人を見つけてください。外出中もシステムを動かし、ラインをチェックし、ペットを快適に保ちます。",
   "home.list": "無料でボートを掲載",
   "boats.kicker": "次のシットを探す",
   "boats.title": "良い手を求めるボート",
@@ -1314,7 +1335,10 @@ export function normalizeLanguageCode(value: string) {
   if (normalized === "en" || normalized.startsWith("en-")) return "en-US";
 
   if (normalized === "es-es" || normalized.startsWith("es-es-")) return "es-ES";
-  if (LATIN_AMERICAN_SPANISH.has(normalized) || LATIN_AMERICAN_SPANISH.has(normalized.split("-").slice(0, 2).join("-"))) {
+  if (
+    LATIN_AMERICAN_SPANISH.has(normalized) ||
+    LATIN_AMERICAN_SPANISH.has(normalized.split("-").slice(0, 2).join("-"))
+  ) {
     return "es-419";
   }
   if (normalized === "es" || normalized.startsWith("es-")) return "es-ES";
@@ -1323,7 +1347,14 @@ export function normalizeLanguageCode(value: string) {
   if (normalized === "pt-pt" || normalized.startsWith("pt-pt-")) return "pt-PT";
   if (normalized === "pt" || normalized.startsWith("pt-")) return "pt-PT";
 
-  if (normalized === "nb" || normalized.startsWith("nb-") || normalized === "no" || normalized.startsWith("no-") || normalized === "nn" || normalized.startsWith("nn-")) {
+  if (
+    normalized === "nb" ||
+    normalized.startsWith("nb-") ||
+    normalized === "no" ||
+    normalized.startsWith("no-") ||
+    normalized === "nn" ||
+    normalized.startsWith("nn-")
+  ) {
     return "nb";
   }
   if (normalized === "ja" || normalized.startsWith("ja-")) return "ja";

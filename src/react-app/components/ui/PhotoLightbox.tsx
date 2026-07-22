@@ -79,10 +79,7 @@ export function PhotoLightbox({
 
       <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 pb-3 sm:px-20">
         <img
-          alt={
-            caption ||
-            t("lightbox.photoAlt", { boat: boatName, number: index + 1 })
-          }
+          alt={caption || t("lightbox.photoAlt", { boat: boatName, number: index + 1 })}
           className="max-h-[min(100%,calc(100%-3rem))] max-w-full rounded-xl object-contain shadow-2xl"
           src={current?.url}
         />

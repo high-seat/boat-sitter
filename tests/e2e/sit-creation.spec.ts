@@ -37,7 +37,7 @@ test.describe("sit creation flow", () => {
     await publish.hover();
     await expect(page.getByRole("tooltip", { name: /Still needed:.*Sit dates/i })).toBeVisible();
     await expect(modal.getByRole("complementary", { name: /Live preview/i })).toBeVisible();
-    await expect(modal.getByText(/How it will look/i )).toBeVisible();
+    await expect(modal.getByText(/How it will look/i)).toBeVisible();
     await expect(modal.getByText(/Solstice/i).first()).toBeVisible();
   });
 
@@ -129,7 +129,7 @@ test.describe("sit creation flow", () => {
     await expect(page).toHaveURL(/\/owner\/sits\/new/);
     const editor = sitEditorPage(page);
     await expect(editor.getByRole("heading", { name: /Create a boat sit/i })).toBeVisible();
-    await expect(editor.getByText(/Verify your identity to create a sit/i )).toBeVisible();
+    await expect(editor.getByText(/Verify your identity to create a sit/i)).toBeVisible();
     await expect(editor.getByRole("button", { name: /Publish sit/i })).toHaveCount(0);
   });
 });

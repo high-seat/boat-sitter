@@ -14,9 +14,7 @@ export function IconTooltip({
   side?: "top" | "bottom";
 }) {
   const positionClass =
-    side === "top"
-      ? "bottom-[calc(100%+0.4rem)] top-auto"
-      : "top-[calc(100%+0.4rem)]";
+    side === "top" ? "bottom-[calc(100%+0.4rem)] top-auto" : "top-[calc(100%+0.4rem)]";
 
   return (
     <span className="group relative inline-flex">

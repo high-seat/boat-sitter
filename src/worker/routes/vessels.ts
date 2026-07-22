@@ -2,18 +2,19 @@ import { zValidator } from "@hono/zod-validator";
 import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { sits, vessels } from "../db/schema";
+import { requireUser } from "../middleware/auth";
 
 /**
  * Owner-managed vessels (the boats themselves).
  *
- * SECURITY (staged): these write endpoints currently trust the `owner` in the
- * payload — there is no per-user auth yet. The auth stage (see AUTH.md) must
- * derive the acting user from a session and enforce that they own the vessel.
- * Do not treat this as production-ready authorization.
+ * Writes require a logged-in user. A vessel is owned by the user who created it
+ * (`ownerUserId`); only that user may update or delete it. Seed/legacy rows have
+ * a null owner and are therefore read-only through the API.
  */
-export const vesselsRouter = new Hono<{ Bindings: Env }>();
+export const vesselsRouter = new Hono<AppEnv>();
 
 const vesselSchema = z.object({
   id: z.string().min(1).max(120),
@@ -53,32 +54,55 @@ vesselsRouter.get("/:id", async (c) => {
 });
 
 /** PUT = upsert, matching the frontend's saveVessel (create or update). */
-vesselsRouter.put("/:id", zValidator("json", vesselSchema), async (c) => {
+vesselsRouter.put("/:id", requireUser, zValidator("json", vesselSchema), async (c) => {
   const id = c.req.param("id");
   const body = c.req.valid("json");
   if (body.id !== id) return c.json({ error: "Body id does not match URL" }, 400);
 
   const db = getDb(c.env);
+  const user = c.get("user")!;
+
+  const existing = await db.query.vessels.findFirst({ where: eq(vessels.id, id) });
+  if (existing && existing.ownerUserId !== user.id) {
+    // Either someone else's vessel, or a null-owner seed row: not yours to edit.
+    return c.json({ error: "You do not own this vessel" }, 403);
+  }
+
+  // Owner display fields come from the session, not the client, so they can't
+  // be spoofed. ownerUserId is stamped on create and preserved on update.
+  const values = {
+    ...body,
+    owner: user.name,
+    ownerImage: user.image ?? body.ownerImage,
+    ownerUserId: user.id,
+  };
+
   const [row] = await db
     .insert(vessels)
-    .values(body)
+    .values(values)
     .onConflictDoUpdate({
       target: vessels.id,
-      set: { ...body, updatedAt: sql`CURRENT_TIMESTAMP` },
+      set: { ...values, updatedAt: sql`CURRENT_TIMESTAMP` },
     })
     .returning();
 
   return c.json({ data: row });
 });
 
-vesselsRouter.delete("/:id", async (c) => {
+vesselsRouter.delete("/:id", requireUser, async (c) => {
   const db = getDb(c.env);
   const id = c.req.param("id");
+  const user = c.get("user")!;
+
+  const existing = await db.query.vessels.findFirst({ where: eq(vessels.id, id) });
+  if (!existing) return c.json({ error: "Vessel not found" }, 404);
+  if (existing.ownerUserId !== user.id) {
+    return c.json({ error: "You do not own this vessel" }, 403);
+  }
 
   const dependent = await db.query.sits.findFirst({ where: eq(sits.vesselId, id) });
   if (dependent) return c.json({ error: "VESSEL_HAS_SITS" }, 409);
 
   const [row] = await db.delete(vessels).where(eq(vessels.id, id)).returning();
-  if (!row) return c.json({ error: "Vessel not found" }, 404);
   return c.json({ data: { id: row.id, deleted: true } });
 });

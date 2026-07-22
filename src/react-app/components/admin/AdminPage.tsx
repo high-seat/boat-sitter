@@ -48,10 +48,7 @@ export function AdminPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (input: {
-      id: string;
-      patch: Parameters<typeof updateAdminUser>[1];
-    }) =>
+    mutationFn: (input: { id: string; patch: Parameters<typeof updateAdminUser>[1] }) =>
       updateAdminUser(input.id, input.patch, {
         email: user!.email,
         name: user!.name,
@@ -193,11 +190,7 @@ export function AdminPage() {
                   className="flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-white p-4 shadow-card"
                   key={entry.id}
                 >
-                  <img
-                    alt=""
-                    className="size-12 rounded-full object-cover"
-                    src={entry.image}
-                  />
+                  <img alt="" className="size-12 rounded-full object-cover" src={entry.image} />
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-navy">{entry.name}</p>
                     <p className="truncate text-sm text-slate">{entry.email}</p>
@@ -210,9 +203,7 @@ export function AdminPage() {
                   </span>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
-                      entry.status === "active"
-                        ? "bg-cream text-navy"
-                        : "bg-coral/10 text-coral"
+                      entry.status === "active" ? "bg-cream text-navy" : "bg-coral/10 text-coral"
                     }`}
                   >
                     {t(`admin.status.${entry.status}`)}
@@ -256,9 +247,7 @@ export function AdminPage() {
           {auditQuery.data!.map((entry) => (
             <li className="rounded-2xl border border-line bg-white p-4 shadow-card" key={entry.id}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-bold text-navy">
-                  {t(`admin.audit.action.${entry.action}`)}
-                </p>
+                <p className="font-bold text-navy">{t(`admin.audit.action.${entry.action}`)}</p>
                 <time className="text-sm text-slate" dateTime={entry.at}>
                   {new Date(entry.at).toLocaleString(locale)}
                 </time>
@@ -292,9 +281,7 @@ export function AdminPage() {
       {deleting ? (
         <ConfirmDialog
           cancelLabel={t("common.cancel")}
-          confirmLabel={
-            deleteMutation.isPending ? t("admin.deleting") : t("admin.deleteConfirm")
-          }
+          confirmLabel={deleteMutation.isPending ? t("admin.deleting") : t("admin.deleteConfirm")}
           onCancel={() => {
             if (!deleteMutation.isPending) setDeleting(null);
           }}
@@ -406,7 +393,9 @@ function AdminUserEditModal({
         </label>
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-bold text-navy">{t("admin.field.role")}</span>
+            <span className="mb-1.5 block text-sm font-bold text-navy">
+              {t("admin.field.role")}
+            </span>
             <Select
               onChange={(event) => setRole(event.target.value as UserRole)}
               value={role}

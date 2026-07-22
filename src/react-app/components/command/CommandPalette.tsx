@@ -27,16 +27,18 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
-import { FEATURE_FLAG_KEYS, FEATURE_FLAGS, useFeatureFlag, type FeatureFlagKey } from "@/featureFlags";
+import {
+  FEATURE_FLAG_KEYS,
+  FEATURE_FLAGS,
+  useFeatureFlag,
+  type FeatureFlagKey,
+} from "@/featureFlags";
 import { useFeatureFlagStore } from "@/featureFlagStore";
 import { createDevRandomSit, createDevRandomVessel } from "@/mockApi";
 import { getOwnerDashboardTab } from "@/ownerDashboardDev";
 import { isAdminUser } from "@/adminAccess";
 import { useAppStore } from "@/store";
-import {
-  getVerificationStatusSync,
-  setMockVerificationStatus,
-} from "@/verificationService";
+import { getVerificationStatusSync, setMockVerificationStatus } from "@/verificationService";
 
 const DEMO_PHONE = "5550100100";
 const DEMO_PHONE_COUNTRY = "+1";
@@ -233,10 +235,7 @@ export function CommandPalette() {
       const ownerTab = getOwnerDashboardTab();
       if (ownerTab === "boats") {
         contextualItems.push(
-          <CommandItem
-            key="add-boat"
-            onSelect={() => run(() => navigate("/owner/boats/new"))}
-          >
+          <CommandItem key="add-boat" onSelect={() => run(() => navigate("/owner/boats/new"))}>
             <Plus className="size-4" />
             Add a boat
           </CommandItem>,
@@ -306,10 +305,7 @@ export function CommandPalette() {
 
     if (onOwnerNewBoat) {
       contextualItems.push(
-        <CommandItem
-          key="back-owner"
-          onSelect={() => run(() => navigate("/owner/boats"))}
-        >
+        <CommandItem key="back-owner" onSelect={() => run(() => navigate("/owner/boats"))}>
           <Anchor className="size-4" />
           Back to boat dashboard
         </CommandItem>,
@@ -320,9 +316,7 @@ export function CommandPalette() {
       contextualItems.push(
         <CommandItem
           key="view-listing"
-          onSelect={() =>
-            run(() => navigate(`/boats/${applicationBoatId ?? applicationSitId}`))
-          }
+          onSelect={() => run(() => navigate(`/boats/${applicationBoatId ?? applicationSitId}`))}
         >
           <MapPin className="size-4" />
           View public listing
@@ -677,7 +671,9 @@ function FeatureFlagCommandItem({ flagKey }: { flagKey: FeatureFlagKey }) {
       <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
         <span className="min-w-0">
           <span className="block truncate">{definition.label}</span>
-          <span className="block truncate text-xs font-normal text-slate">{definition.description}</span>
+          <span className="block truncate text-xs font-normal text-slate">
+            {definition.description}
+          </span>
         </span>
         <StatusBadge tone={enabled ? "on" : "off"}>{enabled ? "On" : "Off"}</StatusBadge>
       </span>

@@ -15,7 +15,10 @@ export type AdminUser = {
 };
 
 export type AdminUserPatch = Partial<
-  Pick<AdminUser, "name" | "email" | "image" | "location" | "bio" | "role" | "status" | "memberSince">
+  Pick<
+    AdminUser,
+    "name" | "email" | "image" | "location" | "bio" | "role" | "status" | "memberSince"
+  >
 >;
 
 export type AdminAuditAction =
@@ -50,7 +53,7 @@ function wait(ms = 220) {
 
 function readJson<T>(key: string, fallback: T): T {
   try {
-    return JSON.parse(localStorage.getItem(key) ?? "null") as T ?? fallback;
+    return (JSON.parse(localStorage.getItem(key) ?? "null") as T) ?? fallback;
   } catch {
     return fallback;
   }
@@ -174,7 +177,9 @@ function collectDirectoryUsers(): AdminUser[] {
       id,
       email,
       name: vessel.owner,
-      image: vessel.ownerImage || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(vessel.owner)}`,
+      image:
+        vessel.ownerImage ||
+        `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(vessel.owner)}`,
       location: vessel.homePort || "",
       bio: "",
       role: "member",
@@ -186,7 +191,13 @@ function collectDirectoryUsers(): AdminUser[] {
   const applications = readJson<
     Array<{
       ownerName?: string;
-      applicant?: { name: string; image?: string; location?: string; bio?: string; memberSince?: number };
+      applicant?: {
+        name: string;
+        image?: string;
+        location?: string;
+        bio?: string;
+        memberSince?: number;
+      };
     }>
   >(APPLICATIONS_KEY, []);
   for (const application of applications) {
@@ -316,8 +327,7 @@ export async function updateAdminUser(
       action: merged.status === "disabled" ? "user.disable" : "user.enable",
       targetEmail: nextEmail,
       targetName: merged.name ?? current.name,
-      summary:
-        merged.status === "disabled" ? "Disabled user account" : "Re-enabled user account",
+      summary: merged.status === "disabled" ? "Disabled user account" : "Re-enabled user account",
     });
   }
   appendAudit({

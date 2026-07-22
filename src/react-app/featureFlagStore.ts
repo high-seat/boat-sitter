@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import {
-  FEATURE_FLAG_KEYS,
-  FEATURE_FLAGS,
-  type FeatureFlagKey,
-} from "@/featureFlags";
+import { FEATURE_FLAG_KEYS, FEATURE_FLAGS, type FeatureFlagKey } from "@/featureFlags";
 
 type FeatureFlagStore = {
   overrides: Partial<Record<FeatureFlagKey, boolean>>;
@@ -29,8 +25,7 @@ export const useFeatureFlagStore = create<FeatureFlagStore>()(
           },
         })),
       toggleFlag: (key) => {
-        const current =
-          get().overrides[key] ?? FEATURE_FLAGS[key].default;
+        const current = get().overrides[key] ?? FEATURE_FLAGS[key].default;
         set((state) => ({
           overrides: {
             ...state.overrides,

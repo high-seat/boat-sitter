@@ -15,10 +15,7 @@ export type MockAccount = {
 const STORAGE_KEY = "harbourly-mock-accounts";
 const TERMS_VERSION = "2026-07-21";
 
-const SOCIAL_PROFILES: Record<
-  SocialProvider,
-  { email: string; name: string; image: string }
-> = {
+const SOCIAL_PROFILES: Record<SocialProvider, { email: string; name: string; image: string }> = {
   apple: {
     email: "alex.apple@icloud.mock",
     name: "Alex Apple",
@@ -65,11 +62,7 @@ function fallbackHash(value: string) {
     .padStart(8, "0")}`;
 }
 
-async function hashPassword(
-  password: string,
-  salt: string,
-  algorithm: "fnv1a" | "sha256",
-) {
+async function hashPassword(password: string, salt: string, algorithm: "fnv1a" | "sha256") {
   const value = `${salt}:${password}`;
   if (algorithm === "sha256") {
     if (!supportsSha256()) throw new Error("auth.secureLoginRequired");

@@ -44,8 +44,8 @@ test("listing modal stays above the map", async ({ page }) => {
 
   const stacking = await page.evaluate(() => {
     const mapElement = document.querySelector<HTMLElement>(".leaflet-container");
-    const modal = [...document.querySelectorAll<HTMLElement>("div.fixed.inset-0")].find(
-      (element) => element.textContent?.includes("Apply for Little Wren"),
+    const modal = [...document.querySelectorAll<HTMLElement>("div.fixed.inset-0")].find((element) =>
+      element.textContent?.includes("Apply for Little Wren"),
     );
 
     if (!mapElement || !modal) {

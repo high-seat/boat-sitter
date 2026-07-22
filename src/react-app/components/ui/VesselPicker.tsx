@@ -21,13 +21,7 @@ function vesselTypeLabel(t: (key: string) => string, type: string) {
   return key ? t(key) : type;
 }
 
-function VesselOptionContent({
-  vessel,
-  compact = false,
-}: {
-  vessel: Vessel;
-  compact?: boolean;
-}) {
+function VesselOptionContent({ vessel, compact = false }: { vessel: Vessel; compact?: boolean }) {
   const { t } = useTranslation();
   const measurementSystem =
     useAppStore((state) => state.user?.measurementSystem) ?? detectMeasurementSystem();
@@ -38,9 +32,7 @@ function VesselOptionContent({
     <div className={`flex min-w-0 items-center gap-3 ${compact ? "" : "gap-4"}`}>
       <img
         alt={t("boat.imageAlt", { name: vessel.name, type: typeLabel })}
-        className={`shrink-0 rounded-xl object-cover ${
-          compact ? "size-14" : "size-16 sm:size-18"
-        }`}
+        className={`shrink-0 rounded-xl object-cover ${compact ? "size-14" : "size-16 sm:size-18"}`}
         src={optimizePhotoUrl(vessel.image, 320)}
       />
       <div className="min-w-0 flex-1">

@@ -2,14 +2,17 @@ import { zValidator } from "@hono/zod-validator";
 import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { sits, vessels } from "../db/schema";
+import { requireUser } from "../middleware/auth";
 
 /**
  * Owner-managed sits (the listing periods for a vessel).
- * Same staged-auth caveat as vessels: identity is not yet enforced.
+ * Writes require login; a sit may only be created/edited/deleted by the owner
+ * of its vessel (`vessels.ownerUserId`).
  */
-export const sitsRouter = new Hono<{ Bindings: Env }>();
+export const sitsRouter = new Hono<AppEnv>();
 
 const sitSchema = z.object({
   id: z.string().min(1).max(120),
@@ -46,16 +49,20 @@ sitsRouter.get("/", async (c) => {
   return c.json({ data: rows.map(({ vesselId, ...s }) => ({ ...s, boatId: vesselId })) });
 });
 
-sitsRouter.put("/:id", zValidator("json", sitSchema), async (c) => {
+sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => {
   const id = c.req.param("id");
   const body = c.req.valid("json");
   if (body.id !== id) return c.json({ error: "Body id does not match URL" }, 400);
 
   const db = getDb(c.env);
+  const user = c.get("user")!;
 
   // Guard the foreign key so we return a clean 400 rather than a raw FK error.
   const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, body.boatId) });
   if (!vessel) return c.json({ error: "Referenced vessel does not exist" }, 400);
+  if (vessel.ownerUserId !== user.id) {
+    return c.json({ error: "You do not own this vessel" }, 403);
+  }
 
   const row = toRow(body);
   const [saved] = await db
@@ -68,12 +75,18 @@ sitsRouter.put("/:id", zValidator("json", sitSchema), async (c) => {
   return c.json({ data: { ...rest, boatId: vesselId } });
 });
 
-sitsRouter.delete("/:id", async (c) => {
+sitsRouter.delete("/:id", requireUser, async (c) => {
   const db = getDb(c.env);
-  const [row] = await db
-    .delete(sits)
-    .where(eq(sits.id, c.req.param("id")))
-    .returning();
-  if (!row) return c.json({ error: "Sit not found" }, 404);
+  const user = c.get("user")!;
+
+  const existing = await db.query.sits.findFirst({ where: eq(sits.id, c.req.param("id")) });
+  if (!existing) return c.json({ error: "Sit not found" }, 404);
+
+  const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, existing.vesselId) });
+  if (vessel?.ownerUserId !== user.id) {
+    return c.json({ error: "You do not own this listing" }, 403);
+  }
+
+  const [row] = await db.delete(sits).where(eq(sits.id, existing.id)).returning();
   return c.json({ data: { id: row.id, deleted: true } });
 });

@@ -57,10 +57,7 @@ export function isPendingVideoCallProposal(message: ApplicationMessage) {
 export function getLatestPendingVideoCallProposal(messages: ApplicationMessage[]) {
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index];
-    if (
-      message.systemKind === "videoCallAccepted" ||
-      message.systemKind === "videoCallDeclined"
-    ) {
+    if (message.systemKind === "videoCallAccepted" || message.systemKind === "videoCallDeclined") {
       return null;
     }
     if (isPendingVideoCallProposal(message)) {

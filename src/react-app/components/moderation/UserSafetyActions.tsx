@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Ban, Flag, TriangleAlert } from "lucide-react";
-import {
-  REPORT_REASONS,
-  useAppStore,
-  type ReportReason,
-} from "@/store";
+import { REPORT_REASONS, useAppStore, type ReportReason } from "@/store";
 import { Select } from "@/components/ui/Select";
 
 export function UserSafetyActions({
@@ -70,11 +66,7 @@ export function UserSafetyActions({
           </span>
         </button>
         {isBlocked ? (
-          <button
-            className={buttonClass}
-            onClick={() => unblockUser(name)}
-            type="button"
-          >
+          <button className={buttonClass} onClick={() => unblockUser(name)} type="button">
             <span className="flex items-center gap-2">
               <Ban size={16} /> {t("safetyActions.unblock")}
             </span>

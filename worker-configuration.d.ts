@@ -10,6 +10,13 @@ declare namespace Cloudflare {
     ENVIRONMENT: string;
     /** Set via: wrangler secret put ADMIN_TOKEN */
     ADMIN_TOKEN: string;
+    /** Better Auth — set via wrangler secret put / .dev.vars */
+    BETTER_AUTH_SECRET: string;
+    BETTER_AUTH_URL: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    /** Optional comma-separated sign-up allowlist; empty = open sign-up */
+    ALLOWED_EMAILS?: string;
   }
 }
 interface Env extends Cloudflare.Env {}

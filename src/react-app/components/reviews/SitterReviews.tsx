@@ -258,7 +258,13 @@ export function LeaveReviewForm({
       >
         <div>
           <p className="form-label">{t("reviews.yourRating")}</p>
-          <StarRating interactive label={t("reviews.yourRating")} onChange={setRating} rating={rating} size={22} />
+          <StarRating
+            interactive
+            label={t("reviews.yourRating")}
+            onChange={setRating}
+            rating={rating}
+            size={22}
+          />
         </div>
         <label className="block">
           <span className="form-label">{t("reviews.yourReview")}</span>

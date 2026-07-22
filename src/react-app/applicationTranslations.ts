@@ -1,7 +1,6 @@
 const en = {
   "messages.aboutBoat": "About {{boat}}",
-  "auth.secureLoginRequired":
-    "Open Boatstead over HTTPS to sign in to this existing demo account.",
+  "auth.secureLoginRequired": "Open Boatstead over HTTPS to sign in to this existing demo account.",
   "auth.termsAgreement": "I agree to Boatstead’s <terms>Terms of Service</terms>.",
   "auth.termsRequired": "You must agree to the Terms of Service to create an account.",
   "auth.continueWithGoogle": "Continue with Google",
@@ -65,7 +64,8 @@ const en = {
   "applications.systemMessage.accepted": "You were accepted for this sit",
   "applications.systemMessage.acceptedOwner": "You accepted {{name}} for this sit",
   "applications.systemMessage.declined": "You are no longer being considered for this sit",
-  "applications.systemMessage.applicantsClosed": "The owner is no longer considering applicants for this sit",
+  "applications.systemMessage.applicantsClosed":
+    "The owner is no longer considering applicants for this sit",
   "applications.systemMessage.videoCallRequestTitle": "Video call proposed",
   "applications.systemMessage.videoCallRequest": "{{name}} proposed a video call.",
   "applications.systemMessage.videoCallCounterTitle": "New time suggested",
@@ -111,8 +111,7 @@ const en = {
     "Include yourself and any partner or companion. This sit allows up to {{count}} people.",
   "apply.termsAgreement":
     "I agree to Boatstead’s <terms>Terms of Service</terms> for this sit application.",
-  "apply.termsRequired":
-    "You must agree to the Terms of Service before sending this application.",
+  "apply.termsRequired": "You must agree to the Terms of Service before sending this application.",
   "apply.verificationRequiredTitle": "Verify your identity to apply",
   "apply.verificationRequiredText":
     "Confirm your government ID, email address, and phone number before applying to stay on a boat.",
@@ -128,8 +127,7 @@ const en = {
   "detail.confirmedSitConflictHint":
     "You are already confirmed for {{boat}} at the same time, so you cannot request this sit.",
   "detail.applicationsClosed": "Applications closed",
-  "detail.applicationsClosedHint":
-    "The owner is not accepting new applications for this sit.",
+  "detail.applicationsClosedHint": "The owner is not accepting new applications for this sit.",
   "owner.applicationsClosed": "Applicants paused",
   "owner.closeRequests": "Pause new applicants",
   "owner.openRequests": "Resume new applicants",
@@ -142,12 +140,10 @@ const en = {
     "Sitters will no longer be able to apply. Existing conversations stay available, and you can resume anytime.",
   "applications.confirm.closeRequestsAction": "Yes, pause applicants",
   "sitEditor.maxGuests": "Maximum number of people",
-  "sitEditor.maxGuestsHint":
-    "Set the total number who may live aboard, including the applicant.",
+  "sitEditor.maxGuestsHint": "Set the total number who may live aboard, including the applicant.",
   "sitEditor.termsAgreement":
     "I agree to Boatstead’s <terms>Terms of Service</terms> for this sit listing.",
-  "sitEditor.termsRequired":
-    "You must agree to the Terms of Service before publishing this sit.",
+  "sitEditor.termsRequired": "You must agree to the Terms of Service before publishing this sit.",
   "applications.partySize": "People staying",
   "detail.maxGuests_one": "Maximum 1 person",
   "detail.maxGuests_other": "Maximum {{count}} people",
@@ -163,8 +159,7 @@ const en = {
     "Engines can corrode, develop fuel problems, or seize after prolonged inactivity.",
   "how.risks.power":
     "Batteries can discharge and shore-power breakers can trip, disabling pumps and alarms.",
-  "how.risks.mooring":
-    "Mooring lines can chafe or part, and fenders can shift as weather changes.",
+  "how.risks.mooring": "Mooring lines can chafe or part, and fenders can shift as weather changes.",
   "how.risks.leaks": "Deck, hatch, plumbing, and seacock leaks can develop or worsen.",
   "how.risks.ventilation":
     "Condensation and poor ventilation can cause mold, mildew, and interior damage.",
@@ -176,8 +171,7 @@ const en = {
   "terms.liveaboard.text":
     "Listings must offer a vessel that is safe, legal, and reasonably habitable for the sitter to live and sleep aboard. Every sit is a liveaboard arrangement, not a day-check service. During the agreed dates, the sitter may use the vessel only as temporary accommodation and to perform agreed care. Unless the owner gives explicit written permission, the sitter must not navigate, relocate, charter, lend, sublet, commercially use, or host unauthorized overnight guests aboard the vessel. Safety and emergency instructions take priority.",
   "notifications.items.sitAccepted": "{{actor}} accepted your invitation to sit {{boat}}.",
-  "notifications.items.applicationAccepted":
-    "{{actor}} accepted your application for {{boat}}.",
+  "notifications.items.applicationAccepted": "{{actor}} accepted your application for {{boat}}.",
   "notifications.items.newApplication": "{{actor}} applied to sit {{boat}}.",
   "notifications.items.newMessage": "{{actor}} sent you a new message about {{boat}}.",
   "notifications.items.sitReminder": "Your sit on {{boat}} starts soon.",
@@ -193,8 +187,7 @@ const en = {
   "applications.acceptedView": "View accepted applicant",
   "applications.acceptedViewing": "Viewing details",
   "applications.returnToAccepted": "Back to {{name}}",
-  "applications.acceptedListHint":
-    "Accepted applicants appear in the highlighted box above.",
+  "applications.acceptedListHint": "Accepted applicants appear in the highlighted box above.",
   "applications.videoCallBannerTitle": "Complete a video call before accepting",
   "applications.videoCallBanner":
     "Video call shortlisted sitters before you accept anyone for the stay. Use it to confirm experience, availability, and fit.",
@@ -238,14 +231,13 @@ const en = {
   "messageReport.detailsRequired": "Please add a short description for this reason.",
   "messageReport.noExtraDetails": "No extra details provided.",
   "messageReport.escalatePrefix":
-    "Escalated message on {{boat}} from {{sender}}:\n\n\"{{message}}\"\n\nContext: {{details}}",
+    'Escalated message on {{boat}} from {{sender}}:\n\n"{{message}}"\n\nContext: {{details}}',
   "messageReport.escalateError": "Could not escalate this message. Please try again.",
   "messageReport.successTitle": "Report submitted",
   "messageReport.successText":
     "Thanks. We received your report about a message from {{name}} and will review it.",
   "messageReport.escalateSuccessTitle": "Escalated to Boatstead",
-  "messageReport.escalateSuccessText":
-    "Our team will review this message and follow up by email.",
+  "messageReport.escalateSuccessText": "Our team will review this message and follow up by email.",
   "applications.replyPlaceholder": "Write a reply...",
   "applications.sending": "Sending...",
   "applications.sendReply": "Send reply",
@@ -285,8 +277,7 @@ const en = {
   "spokenLanguages.polish": "Polish",
   "spokenLanguages.arabic": "Arabic",
   "applications.sharePhone": "Share my phone number with {{name}}",
-  "applications.sharePhoneUnavailable":
-    "Add a phone number in Settings before sharing it.",
+  "applications.sharePhoneUnavailable": "Add a phone number in Settings before sharing it.",
   "applications.phoneShared": "{{owner}} shared a phone number with you",
   "applications.confirm.acceptedTitle": "Accept {{name}}?",
   "applications.confirm.acceptedText":
@@ -356,7 +347,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.kicker": "Examen des candidatures",
     "applications.title": "Candidatures pour {{boat}}",
     "applications.subtitle_one": "1 personne a manifesté son intérêt pour cette garde.",
-    "applications.subtitle_other": "{{count}} personnes ont manifesté leur intérêt pour cette garde.",
+    "applications.subtitle_other":
+      "{{count}} personnes ont manifesté leur intérêt pour cette garde.",
     "applications.ownerOnly": "Seul le propriétaire peut examiner ces candidatures",
     "applications.backToSits": "Retour aux gardes",
     "applications.empty": "Aucune candidature pour cette garde",
@@ -398,15 +390,19 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Refuser",
     "applications.action.unaccept": "Retirer l'acceptation",
     "applications.anotherAcceptedBannerTitle": "Un autre candidat est confirmé",
-    "applications.anotherAcceptedBanner": "Ce candidat n'a pas été accepté. Vous pouvez toujours discuter avec lui ici, mais vous devez retirer l'acceptation de {{name}} avant de pouvoir accepter cette personne.",
+    "applications.anotherAcceptedBanner":
+      "Ce candidat n'a pas été accepté. Vous pouvez toujours discuter avec lui ici, mais vous devez retirer l'acceptation de {{name}} avant de pouvoir accepter cette personne.",
     "applications.confirm.unacceptTitle": "Retirer l'acceptation de {{name}} ?",
-    "applications.confirm.unacceptText": "{{name}} ne sera plus confirmé pour cette garde. Vous pourrez ensuite accepter un autre candidat.",
+    "applications.confirm.unacceptText":
+      "{{name}} ne sera plus confirmé pour cette garde. Vous pourrez ensuite accepter un autre candidat.",
     "applications.confirm.unacceptAction": "Oui, retirer l'acceptation",
     "applications.conversation": "Conversation",
     "applications.systemMessage.accepted": "Vous avez été accepté pour cette garde",
     "applications.systemMessage.acceptedOwner": "Vous avez accepté {{name}} pour cette garde",
-    "applications.systemMessage.declined": "Vous n’êtes plus pris en considération pour cette garde",
-    "applications.systemMessage.applicantsClosed": "Le propriétaire n’examine plus les candidatures pour cette garde",
+    "applications.systemMessage.declined":
+      "Vous n’êtes plus pris en considération pour cette garde",
+    "applications.systemMessage.applicantsClosed":
+      "Le propriétaire n’examine plus les candidatures pour cette garde",
     "applications.systemMessage.videoCallRequestTitle": "Appel vidéo proposé",
     "applications.systemMessage.videoCallRequest": "{{name}} a proposé un appel vidéo.",
     "applications.requestVideoCall": "Demander un appel vidéo",
@@ -417,7 +413,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Choisissez une date, une heure et une durée pour un appel avec {{name}}. Cette personne peut accepter ou suggérer un autre créneau.",
     "applications.requestVideoCallConfirmAction": "Envoyer la proposition",
     "applications.videoCall.adjustAction": "Envoyer le nouveau créneau",
-    "applications.videoCall.adjustText": "Proposez une nouvelle date, heure et durée pour l'appel avec {{name}}.",
+    "applications.videoCall.adjustText":
+      "Proposez une nouvelle date, heure et durée pour l'appel avec {{name}}.",
     "applications.videoCall.adjustTitle": "Suggérer un autre créneau",
     "applications.videoCall.incomplete": "Choisissez une date et une heure pour l'appel.",
     "applications.videoCall.pastError": "Choisissez une date et une heure dans le futur.",
@@ -430,9 +427,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.duration": "Durée",
     "applications.videoCall.time": "Heure",
     "applications.videoCall.date": "Date",
-    "applications.systemMessage.videoCallDeclined": "{{name}} a refusé la proposition d'appel vidéo.",
+    "applications.systemMessage.videoCallDeclined":
+      "{{name}} a refusé la proposition d'appel vidéo.",
     "applications.systemMessage.videoCallDeclinedTitle": "Appel vidéo refusé",
-    "applications.systemMessage.videoCallAccepted": "{{name}} a accepté l'horaire de l'appel vidéo.",
+    "applications.systemMessage.videoCallAccepted":
+      "{{name}} a accepté l'horaire de l'appel vidéo.",
     "applications.systemMessage.videoCallAcceptedTitle": "Appel vidéo confirmé",
     "applications.systemMessage.videoCallCounter": "{{name}} a suggéré un autre horaire.",
     "applications.systemMessage.videoCallCounterTitle": "Nouveau créneau suggéré",
@@ -515,8 +514,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "terms.liveaboard.title": "Utilisation du bateau comme hébergement à bord",
     "terms.liveaboard.text":
       "Les annonces doivent proposer un bateau sûr, légal et raisonnablement habitable afin que le gardien puisse y vivre et y dormir. Chaque garde implique de vivre à bord et ne constitue pas un simple service de visite quotidienne. Pendant les dates convenues, le gardien ne peut utiliser le bateau que comme hébergement temporaire et pour effectuer les soins convenus. Sans autorisation écrite explicite du propriétaire, il est interdit de naviguer, déplacer, louer, prêter, sous-louer ou utiliser commercialement le bateau, ainsi que d’héberger des invités non autorisés pour la nuit. Les consignes de sécurité et d’urgence sont prioritaires.",
-    "notifications.items.sitAccepted":
-      "{{actor}} a accepté votre invitation à garder {{boat}}.",
+    "notifications.items.sitAccepted": "{{actor}} a accepté votre invitation à garder {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} a accepté votre candidature pour {{boat}}.",
     "notifications.items.newApplication": "{{actor}} a proposé de garder {{boat}}.",
@@ -596,8 +594,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.translatedWithGoogle": "Traduit avec Google",
     "applications.hideTranslation": "Masquer la traduction",
     "applications.messageActions": "Actions du message",
-    "applications.translationFailed":
-      "La traduction est temporairement indisponible. Réessayez.",
+    "applications.translationFailed": "La traduction est temporairement indisponible. Réessayez.",
     "apply.noSharedLanguage":
       "Vous et {{owner}} n’indiquez aucune langue commune. Pensez à utiliser des outils de traduction et confirmez clairement les consignes importantes.",
     "apply.contactDetailsTerms":
@@ -656,10 +653,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} étoiles",
     "reviews.leaveKicker": "Laisser un avis",
     "reviews.leaveTitle": "Comment était {{name}} comme gardien ?",
-    "reviews.leaveHint": "Partagez le déroulement de la garde sur {{boat}}. Votre note aide les autres propriétaires.",
+    "reviews.leaveHint":
+      "Partagez le déroulement de la garde sur {{boat}}. Votre note aide les autres propriétaires.",
     "reviews.yourRating": "Votre note",
     "reviews.yourReview": "Votre avis",
-    "reviews.yourReviewPlaceholder": "Décrivez la communication, l’entretien du bateau et la passation...",
+    "reviews.yourReviewPlaceholder":
+      "Décrivez la communication, l’entretien du bateau et la passation...",
     "reviews.submit": "Envoyer l’avis",
     "reviews.submitting": "Envoi...",
     "reviews.textTooShort": "Écrivez au moins 20 caractères.",
@@ -683,8 +682,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.secureLoginRequired":
       "Abre Boatstead mediante HTTPS para iniciar sesión en esta cuenta de demostración.",
     "auth.termsAgreement": "Acepto los <terms>Términos del servicio</terms> de Boatstead.",
-    "auth.termsRequired":
-      "Debes aceptar los Términos del servicio para crear una cuenta.",
+    "auth.termsRequired": "Debes aceptar los Términos del servicio para crear una cuenta.",
     "auth.continueWithGoogle": "Continuar con Google",
     "auth.continueWithApple": "Continuar con Apple",
     "auth.continueWithFacebook": "Continuar con Facebook",
@@ -737,15 +735,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Rechazar",
     "applications.action.unaccept": "Retirar aceptación",
     "applications.anotherAcceptedBannerTitle": "Otro solicitante está confirmado",
-    "applications.anotherAcceptedBanner": "Este solicitante no fue aceptado. Aún puede chatear con él aquí, pero debe retirar la aceptación de {{name}} antes de poder aceptar a esta persona.",
+    "applications.anotherAcceptedBanner":
+      "Este solicitante no fue aceptado. Aún puede chatear con él aquí, pero debe retirar la aceptación de {{name}} antes de poder aceptar a esta persona.",
     "applications.confirm.unacceptTitle": "¿Retirar la aceptación de {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} ya no quedará confirmado para esta estancia. Después podrá aceptar a otro solicitante.",
+    "applications.confirm.unacceptText":
+      "{{name}} ya no quedará confirmado para esta estancia. Después podrá aceptar a otro solicitante.",
     "applications.confirm.unacceptAction": "Sí, retirar aceptación",
     "applications.conversation": "Conversación",
     "applications.systemMessage.accepted": "Fuiste aceptado para esta estancia",
     "applications.systemMessage.acceptedOwner": "Aceptaste a {{name}} para esta estancia",
     "applications.systemMessage.declined": "Ya no se te está considerando para esta estancia",
-    "applications.systemMessage.applicantsClosed": "El propietario ya no está considerando solicitantes para esta estancia",
+    "applications.systemMessage.applicantsClosed":
+      "El propietario ya no está considerando solicitantes para esta estancia",
     "applications.systemMessage.videoCallRequestTitle": "Videollamada propuesta",
     "applications.systemMessage.videoCallRequest": "{{name}} propuso una videollamada.",
     "applications.requestVideoCall": "Solicitar videollamada",
@@ -756,7 +757,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Elige una fecha, hora y duración para una llamada con {{name}}. Puede aceptar o sugerir otra hora.",
     "applications.requestVideoCallConfirmAction": "Enviar propuesta",
     "applications.videoCall.adjustAction": "Enviar nueva hora",
-    "applications.videoCall.adjustText": "Propón una nueva fecha, hora y duración para la llamada con {{name}}.",
+    "applications.videoCall.adjustText":
+      "Propón una nueva fecha, hora y duración para la llamada con {{name}}.",
     "applications.videoCall.adjustTitle": "Sugerir otra hora",
     "applications.videoCall.incomplete": "Elige una fecha y hora para la llamada.",
     "applications.videoCall.pastError": "Elige una fecha y hora en el futuro.",
@@ -769,7 +771,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.duration": "Duración",
     "applications.videoCall.time": "Hora",
     "applications.videoCall.date": "Fecha",
-    "applications.systemMessage.videoCallDeclined": "{{name}} rechazó la propuesta de videollamada.",
+    "applications.systemMessage.videoCallDeclined":
+      "{{name}} rechazó la propuesta de videollamada.",
     "applications.systemMessage.videoCallDeclinedTitle": "Videollamada rechazada",
     "applications.systemMessage.videoCallAccepted": "{{name}} aceptó la hora de la videollamada.",
     "applications.systemMessage.videoCallAcceptedTitle": "Videollamada confirmada",
@@ -854,13 +857,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "terms.liveaboard.title": "Uso de la embarcación como alojamiento a bordo",
     "terms.liveaboard.text":
       "Los anuncios deben ofrecer una embarcación segura, legal y razonablemente habitable para que el cuidador viva y duerma a bordo. Cada estancia exige vivir a bordo y no es un servicio de visitas diurnas. Durante las fechas acordadas, el cuidador solo puede usar la embarcación como alojamiento temporal y para realizar los cuidados acordados. Sin permiso escrito explícito del propietario, no puede navegar, trasladar, alquilar, prestar, subarrendar, usar comercialmente ni alojar invitados nocturnos no autorizados en la embarcación. Las instrucciones de seguridad y emergencia tienen prioridad.",
-    "notifications.items.sitAccepted":
-      "{{actor}} aceptó tu invitación para cuidar {{boat}}.",
+    "notifications.items.sitAccepted": "{{actor}} aceptó tu invitación para cuidar {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} aceptó tu solicitud para cuidar {{boat}}.",
     "notifications.items.newApplication": "{{actor}} solicitó cuidar {{boat}}.",
-    "notifications.items.newMessage":
-      "{{actor}} te envió un nuevo mensaje sobre {{boat}}.",
+    "notifications.items.newMessage": "{{actor}} te envió un nuevo mensaje sobre {{boat}}.",
     "notifications.items.sitReminder": "Tu estancia en {{boat}} empieza pronto.",
     "notifications.items.welcome":
       "Te damos la bienvenida a Boatstead. Completa tu perfil para empezar a conectar.",
@@ -995,10 +996,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} estrellas",
     "reviews.leaveKicker": "Dejar una opinión",
     "reviews.leaveTitle": "¿Cómo fue {{name}} como cuidador?",
-    "reviews.leaveHint": "Cuenta cómo fue la estancia en {{boat}}. Tu valoración ayuda a otros propietarios.",
+    "reviews.leaveHint":
+      "Cuenta cómo fue la estancia en {{boat}}. Tu valoración ayuda a otros propietarios.",
     "reviews.yourRating": "Tu valoración",
     "reviews.yourReview": "Tu opinión",
-    "reviews.yourReviewPlaceholder": "Describe la comunicación, el cuidado del barco y la entrega...",
+    "reviews.yourReviewPlaceholder":
+      "Describe la comunicación, el cuidado del barco y la entrega...",
     "reviews.submit": "Enviar opinión",
     "reviews.submitting": "Enviando...",
     "reviews.textTooShort": "Escribe al menos 20 caracteres.",
@@ -1022,8 +1025,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "auth.secureLoginRequired":
       "Apri Boatstead tramite HTTPS per accedere a questo account demo esistente.",
     "auth.termsAgreement": "Accetto i <terms>Termini di servizio</terms> di Boatstead.",
-    "auth.termsRequired":
-      "Devi accettare i Termini di servizio per creare un account.",
+    "auth.termsRequired": "Devi accettare i Termini di servizio per creare un account.",
     "auth.continueWithGoogle": "Continua con Google",
     "auth.continueWithApple": "Continua con Apple",
     "auth.continueWithFacebook": "Continua con Facebook",
@@ -1034,7 +1036,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.kicker": "Esame delle candidature",
     "applications.title": "Candidature per {{boat}}",
     "applications.subtitle_one": "1 persona ha mostrato interesse per questo soggiorno.",
-    "applications.subtitle_other": "{{count}} persone hanno mostrato interesse per questo soggiorno.",
+    "applications.subtitle_other":
+      "{{count}} persone hanno mostrato interesse per questo soggiorno.",
     "applications.ownerOnly": "Solo il proprietario può esaminare queste candidature",
     "applications.backToSits": "Torna ai soggiorni",
     "applications.empty": "Nessuna candidatura per questo soggiorno",
@@ -1076,15 +1079,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Rifiuta",
     "applications.action.unaccept": "Revoca accettazione",
     "applications.anotherAcceptedBannerTitle": "Un altro candidato è confermato",
-    "applications.anotherAcceptedBanner": "Questo candidato non è stato accettato. Puoi comunque chattare con lui qui, ma devi revocare l'accettazione di {{name}} prima di poter accettare questa persona.",
+    "applications.anotherAcceptedBanner":
+      "Questo candidato non è stato accettato. Puoi comunque chattare con lui qui, ma devi revocare l'accettazione di {{name}} prima di poter accettare questa persona.",
     "applications.confirm.unacceptTitle": "Revocare l'accettazione di {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} non sarà più confermato per questa permanenza. Potrai accettare un altro candidato in seguito.",
+    "applications.confirm.unacceptText":
+      "{{name}} non sarà più confermato per questa permanenza. Potrai accettare un altro candidato in seguito.",
     "applications.confirm.unacceptAction": "Sì, revoca accettazione",
     "applications.conversation": "Conversazione",
     "applications.systemMessage.accepted": "Sei stato accettato per questo soggiorno",
     "applications.systemMessage.acceptedOwner": "Hai accettato {{name}} per questo soggiorno",
     "applications.systemMessage.declined": "Non stai più venendo considerato per questo soggiorno",
-    "applications.systemMessage.applicantsClosed": "Il proprietario non sta più considerando candidati per questo soggiorno",
+    "applications.systemMessage.applicantsClosed":
+      "Il proprietario non sta più considerando candidati per questo soggiorno",
     "applications.systemMessage.videoCallRequestTitle": "Videochiamata proposta",
     "applications.systemMessage.videoCallRequest": "{{name}} ha proposto una videochiamata.",
     "applications.requestVideoCall": "Richiedi videochiamata",
@@ -1095,7 +1101,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Scegli una data, un'ora e una durata per una chiamata con {{name}}. Può accettare o suggerire un orario diverso.",
     "applications.requestVideoCallConfirmAction": "Invia proposta",
     "applications.videoCall.adjustAction": "Invia nuovo orario",
-    "applications.videoCall.adjustText": "Proponi una nuova data, ora e durata per la chiamata con {{name}}.",
+    "applications.videoCall.adjustText":
+      "Proponi una nuova data, ora e durata per la chiamata con {{name}}.",
     "applications.videoCall.adjustTitle": "Suggerisci un altro orario",
     "applications.videoCall.incomplete": "Scegli una data e un'ora per la chiamata.",
     "applications.videoCall.pastError": "Scegli una data e un'ora nel futuro.",
@@ -1108,9 +1115,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.duration": "Durata",
     "applications.videoCall.time": "Ora",
     "applications.videoCall.date": "Data",
-    "applications.systemMessage.videoCallDeclined": "{{name}} ha rifiutato la proposta di videochiamata.",
+    "applications.systemMessage.videoCallDeclined":
+      "{{name}} ha rifiutato la proposta di videochiamata.",
     "applications.systemMessage.videoCallDeclinedTitle": "Videochiamata rifiutata",
-    "applications.systemMessage.videoCallAccepted": "{{name}} ha accettato l'orario della videochiamata.",
+    "applications.systemMessage.videoCallAccepted":
+      "{{name}} ha accettato l'orario della videochiamata.",
     "applications.systemMessage.videoCallAcceptedTitle": "Videochiamata confermata",
     "applications.systemMessage.videoCallCounter": "{{name}} ha suggerito un orario diverso.",
     "applications.systemMessage.videoCallCounterTitle": "Nuovo orario suggerito",
@@ -1198,8 +1207,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationAccepted":
       "{{actor}} ha accettato la tua candidatura per {{boat}}.",
     "notifications.items.newApplication": "{{actor}} si è candidato per occuparsi di {{boat}}.",
-    "notifications.items.newMessage":
-      "{{actor}} ti ha inviato un nuovo messaggio su {{boat}}.",
+    "notifications.items.newMessage": "{{actor}} ti ha inviato un nuovo messaggio su {{boat}}.",
     "notifications.items.sitReminder": "Il tuo soggiorno su {{boat}} inizierà presto.",
     "notifications.items.welcome":
       "Ti diamo il benvenuto su Boatstead. Completa il profilo per iniziare a creare contatti.",
@@ -1234,8 +1242,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.bannerTitle": "Qualcosa non va durante il soggiorno?",
     "sitIssue.bannerHint": "Segnalalo a Boatstead così possiamo aiutarti a risolverlo.",
     "sitIssue.messageLabel": "Cosa è successo?",
-    "sitIssue.messagePlaceholder":
-      "Descrivi il problema, da quando e qualsiasi dettaglio utile.",
+    "sitIssue.messagePlaceholder": "Descrivi il problema, da quando e qualsiasi dettaglio utile.",
     "sitIssue.messageTooShort": "Scrivi almeno 20 caratteri.",
     "sitIssue.messagePrefix": "Problema durante il soggiorno su {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "Invia a Boatstead",
@@ -1274,8 +1281,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.translatedWithGoogle": "Tradotto con Google",
     "applications.hideTranslation": "Nascondi traduzione",
     "applications.messageActions": "Azioni messaggio",
-    "applications.translationFailed":
-      "La traduzione non è temporaneamente disponibile. Riprova.",
+    "applications.translationFailed": "La traduzione non è temporaneamente disponibile. Riprova.",
     "apply.noSharedLanguage":
       "Tu e {{owner}} non avete indicato una lingua in comune. Valuta l’uso di strumenti di traduzione e conferma chiaramente le istruzioni importanti.",
     "apply.contactDetailsTerms":
@@ -1334,7 +1340,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} stelle",
     "reviews.leaveKicker": "Lascia una recensione",
     "reviews.leaveTitle": "Com’è stato {{name}} come sitter?",
-    "reviews.leaveHint": "Racconta com’è andato il soggiorno su {{boat}}. La tua valutazione aiuta altri proprietari.",
+    "reviews.leaveHint":
+      "Racconta com’è andato il soggiorno su {{boat}}. La tua valutazione aiuta altri proprietari.",
     "reviews.yourRating": "La tua valutazione",
     "reviews.yourReview": "La tua recensione",
     "reviews.yourReviewPlaceholder": "Descrivi comunicazione, cura della barca e consegna...",
@@ -1360,8 +1367,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messages.aboutBoat": "Über {{boat}}",
     "auth.secureLoginRequired":
       "Öffnen Sie Boatstead über HTTPS, um sich bei diesem bestehenden Demokonto anzumelden.",
-    "auth.termsAgreement":
-      "Ich stimme den <terms>Nutzungsbedingungen</terms> von Boatstead zu.",
+    "auth.termsAgreement": "Ich stimme den <terms>Nutzungsbedingungen</terms> von Boatstead zu.",
     "auth.termsRequired":
       "Sie müssen den Nutzungsbedingungen zustimmen, um ein Konto zu erstellen.",
     "auth.continueWithGoogle": "Weiter mit Google",
@@ -1416,15 +1422,19 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Ablehnen",
     "applications.action.unaccept": "Annahme zurücknehmen",
     "applications.anotherAcceptedBannerTitle": "Ein anderer Bewerber ist bestätigt",
-    "applications.anotherAcceptedBanner": "Dieser Bewerber wurde nicht angenommen. Sie können hier weiter mit ihm chatten, müssen aber die Annahme von {{name}} zurücknehmen, bevor Sie diese Person annehmen können.",
+    "applications.anotherAcceptedBanner":
+      "Dieser Bewerber wurde nicht angenommen. Sie können hier weiter mit ihm chatten, müssen aber die Annahme von {{name}} zurücknehmen, bevor Sie diese Person annehmen können.",
     "applications.confirm.unacceptTitle": "Annahme von {{name}} zurücknehmen?",
-    "applications.confirm.unacceptText": "{{name}} ist danach nicht mehr für diesen Aufenthalt bestätigt. Sie können anschließend einen anderen Bewerber annehmen.",
+    "applications.confirm.unacceptText":
+      "{{name}} ist danach nicht mehr für diesen Aufenthalt bestätigt. Sie können anschließend einen anderen Bewerber annehmen.",
     "applications.confirm.unacceptAction": "Ja, Annahme zurücknehmen",
     "applications.conversation": "Unterhaltung",
     "applications.systemMessage.accepted": "Sie wurden für diesen Sit angenommen",
     "applications.systemMessage.acceptedOwner": "Sie haben {{name}} für diesen Sit angenommen",
-    "applications.systemMessage.declined": "Sie werden für diesen Aufenthalt nicht mehr in Betracht gezogen",
-    "applications.systemMessage.applicantsClosed": "Der Eigentümer prüft für diesen Aufenthalt keine Bewerber mehr",
+    "applications.systemMessage.declined":
+      "Sie werden für diesen Aufenthalt nicht mehr in Betracht gezogen",
+    "applications.systemMessage.applicantsClosed":
+      "Der Eigentümer prüft für diesen Aufenthalt keine Bewerber mehr",
     "applications.systemMessage.videoCallRequestTitle": "Videoanruf vorgeschlagen",
     "applications.systemMessage.videoCallRequest": "{{name}} hat einen Videoanruf vorgeschlagen.",
     "applications.requestVideoCall": "Videoanruf anfragen",
@@ -1435,7 +1445,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Wähle Datum, Uhrzeit und Dauer für einen Anruf mit {{name}}. Die andere Person kann akzeptieren oder eine andere Zeit vorschlagen.",
     "applications.requestVideoCallConfirmAction": "Vorschlag senden",
     "applications.videoCall.adjustAction": "Neue Zeit senden",
-    "applications.videoCall.adjustText": "Schlage ein neues Datum, eine neue Uhrzeit und Dauer für den Anruf mit {{name}} vor.",
+    "applications.videoCall.adjustText":
+      "Schlage ein neues Datum, eine neue Uhrzeit und Dauer für den Anruf mit {{name}} vor.",
     "applications.videoCall.adjustTitle": "Andere Zeit vorschlagen",
     "applications.videoCall.incomplete": "Wähle Datum und Uhrzeit für den Anruf.",
     "applications.videoCall.pastError": "Wähle Datum und Uhrzeit in der Zukunft.",
@@ -1448,7 +1459,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.duration": "Dauer",
     "applications.videoCall.time": "Uhrzeit",
     "applications.videoCall.date": "Datum",
-    "applications.systemMessage.videoCallDeclined": "{{name}} hat den Videoanrufvorschlag abgelehnt.",
+    "applications.systemMessage.videoCallDeclined":
+      "{{name}} hat den Videoanrufvorschlag abgelehnt.",
     "applications.systemMessage.videoCallDeclinedTitle": "Videoanruf abgelehnt",
     "applications.systemMessage.videoCallAccepted": "{{name}} hat die Videoanrufzeit akzeptiert.",
     "applications.systemMessage.videoCallAcceptedTitle": "Videoanruf bestätigt",
@@ -1577,7 +1589,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.messagePlaceholder":
       "Beschreibe das Problem, seit wann und alles, was uns helfen könnte.",
     "sitIssue.messageTooShort": "Bitte schreibe mindestens 20 Zeichen.",
-    "sitIssue.messagePrefix": "Problem während des Aufenthalts auf {{boat}} ({{sit}}):\n\n{{details}}",
+    "sitIssue.messagePrefix":
+      "Problem während des Aufenthalts auf {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "An Boatstead senden",
     "sitIssue.sending": "Wird gesendet…",
     "sitIssue.submitError": "Dein Bericht konnte nicht gesendet werden. Bitte erneut versuchen.",
@@ -1675,7 +1688,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} Sterne",
     "reviews.leaveKicker": "Bewertung abgeben",
     "reviews.leaveTitle": "Wie war {{name}} als Sitter?",
-    "reviews.leaveHint": "Berichten Sie, wie der Aufenthalt auf {{boat}} verlief. Ihre Bewertung hilft anderen Eigentümern.",
+    "reviews.leaveHint":
+      "Berichten Sie, wie der Aufenthalt auf {{boat}} verlief. Ihre Bewertung hilft anderen Eigentümern.",
     "reviews.yourRating": "Ihre Bewertung",
     "reviews.yourReview": "Ihre Rezension",
     "reviews.yourReviewPlaceholder": "Beschreiben Sie Kommunikation, Bootspflege und Übergabe...",
@@ -1685,7 +1699,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.alreadyExists": "Sie haben diesen Aufenthalt bereits bewertet.",
     "reviews.submitFailed": "Bewertung konnte nicht gesendet werden. Bitte erneut versuchen.",
     "reviews.respondLabel": "Ihre Antwort",
-    "reviews.respondPlaceholder": "Danken Sie dem Eigentümer und hinterlassen Sie eine kurze Notiz...",
+    "reviews.respondPlaceholder":
+      "Danken Sie dem Eigentümer und hinterlassen Sie eine kurze Notiz...",
     "reviews.respondOnce": "Antwort veröffentlichen",
     "reviews.responding": "Wird veröffentlicht...",
     "reviews.responseFrom": "Antwort von {{name}}",
@@ -1695,14 +1710,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.windowBanner":
       "Sie haben noch {{days}} Tage, um eine Bewertung abzugeben. Bewertungen bleiben 7 Tage nach Ende des Aufenthalts offen.",
     "reviews.windowClosed": "Die Bewertungsfrist für diesen Aufenthalt ist abgelaufen.",
-    "reviews.sitNotCompleted": "Sie können eine Bewertung abgeben, sobald der Aufenthalt beendet ist.",
+    "reviews.sitNotCompleted":
+      "Sie können eine Bewertung abgeben, sobald der Aufenthalt beendet ist.",
   },
   nl: {
     "messages.aboutBoat": "Over {{boat}}",
     "auth.secureLoginRequired":
       "Open Boatstead via HTTPS om je aan te melden bij dit bestaande demoaccount.",
-    "auth.termsAgreement":
-      "Ik ga akkoord met de <terms>Servicevoorwaarden</terms> van Boatstead.",
+    "auth.termsAgreement": "Ik ga akkoord met de <terms>Servicevoorwaarden</terms> van Boatstead.",
     "auth.termsRequired":
       "Je moet akkoord gaan met de Servicevoorwaarden om een account aan te maken.",
     "auth.continueWithGoogle": "Doorgaan met Google",
@@ -1757,15 +1772,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Afwijzen",
     "applications.action.unaccept": "Acceptatie intrekken",
     "applications.anotherAcceptedBannerTitle": "Een andere kandidaat is bevestigd",
-    "applications.anotherAcceptedBanner": "Deze kandidaat is niet geaccepteerd. U kunt hier nog steeds met hen chatten, maar u moet de acceptatie van {{name}} intrekken voordat u deze persoon kunt accepteren.",
+    "applications.anotherAcceptedBanner":
+      "Deze kandidaat is niet geaccepteerd. U kunt hier nog steeds met hen chatten, maar u moet de acceptatie van {{name}} intrekken voordat u deze persoon kunt accepteren.",
     "applications.confirm.unacceptTitle": "Acceptatie van {{name}} intrekken?",
-    "applications.confirm.unacceptText": "{{name}} is daarna niet meer bevestigd voor deze sit. U kunt daarna een andere kandidaat accepteren.",
+    "applications.confirm.unacceptText":
+      "{{name}} is daarna niet meer bevestigd voor deze sit. U kunt daarna een andere kandidaat accepteren.",
     "applications.confirm.unacceptAction": "Ja, acceptatie intrekken",
     "applications.conversation": "Gesprek",
     "applications.systemMessage.accepted": "Je bent geaccepteerd voor dit verblijf",
     "applications.systemMessage.acceptedOwner": "Je hebt {{name}} geaccepteerd voor dit verblijf",
     "applications.systemMessage.declined": "Je wordt niet langer overwogen voor dit verblijf",
-    "applications.systemMessage.applicantsClosed": "De eigenaar overweegt geen sollicitanten meer voor dit verblijf",
+    "applications.systemMessage.applicantsClosed":
+      "De eigenaar overweegt geen sollicitanten meer voor dit verblijf",
     "applications.systemMessage.videoCallRequestTitle": "Videogesprek voorgesteld",
     "applications.systemMessage.videoCallRequest": "{{name}} heeft een videogesprek voorgesteld.",
     "applications.requestVideoCall": "Videogesprek aanvragen",
@@ -1776,7 +1794,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Kies een datum, tijd en duur voor een gesprek met {{name}}. Die kan accepteren of een andere tijd voorstellen.",
     "applications.requestVideoCallConfirmAction": "Voorstel versturen",
     "applications.videoCall.adjustAction": "Nieuwe tijd versturen",
-    "applications.videoCall.adjustText": "Stel een nieuwe datum, tijd en duur voor voor het gesprek met {{name}}.",
+    "applications.videoCall.adjustText":
+      "Stel een nieuwe datum, tijd en duur voor voor het gesprek met {{name}}.",
     "applications.videoCall.adjustTitle": "Andere tijd voorstellen",
     "applications.videoCall.incomplete": "Kies een datum en tijd voor het gesprek.",
     "applications.videoCall.pastError": "Kies een datum en tijd in de toekomst.",
@@ -1789,9 +1808,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.duration": "Duur",
     "applications.videoCall.time": "Tijd",
     "applications.videoCall.date": "Datum",
-    "applications.systemMessage.videoCallDeclined": "{{name}} heeft het voorstel voor een videogesprek geweigerd.",
+    "applications.systemMessage.videoCallDeclined":
+      "{{name}} heeft het voorstel voor een videogesprek geweigerd.",
     "applications.systemMessage.videoCallDeclinedTitle": "Videogesprek geweigerd",
-    "applications.systemMessage.videoCallAccepted": "{{name}} heeft de tijd van het videogesprek geaccepteerd.",
+    "applications.systemMessage.videoCallAccepted":
+      "{{name}} heeft de tijd van het videogesprek geaccepteerd.",
     "applications.systemMessage.videoCallAcceptedTitle": "Videogesprek bevestigd",
     "applications.systemMessage.videoCallCounter": "{{name}} heeft een andere tijd voorgesteld.",
     "applications.systemMessage.videoCallCounterTitle": "Nieuwe tijd voorgesteld",
@@ -2014,7 +2035,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} sterren",
     "reviews.leaveKicker": "Beoordeling achterlaten",
     "reviews.leaveTitle": "Hoe was {{name}} als oppas?",
-    "reviews.leaveHint": "Vertel hoe het verblijf op {{boat}} ging. Jouw beoordeling helpt andere eigenaren.",
+    "reviews.leaveHint":
+      "Vertel hoe het verblijf op {{boat}} ging. Jouw beoordeling helpt andere eigenaren.",
     "reviews.yourRating": "Jouw beoordeling",
     "reviews.yourReview": "Jouw review",
     "reviews.yourReviewPlaceholder": "Beschrijf communicatie, zorg voor de boot en overdracht...",
@@ -2034,16 +2056,15 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.windowBanner":
       "Je hebt nog {{days}} dagen om een beoordeling achter te laten. Beoordelingen blijven 7 dagen open na afloop van het verblijf.",
     "reviews.windowClosed": "De beoordelingsperiode voor dit verblijf is gesloten.",
-    "reviews.sitNotCompleted": "Je kunt een beoordeling achterlaten nadat het verblijf is afgelopen.",
+    "reviews.sitNotCompleted":
+      "Je kunt een beoordeling achterlaten nadat het verblijf is afgelopen.",
   },
   "pt-PT": {
     "messages.aboutBoat": "Sobre {{boat}}",
     "auth.secureLoginRequired":
       "Abra o Boatstead através de HTTPS para iniciar sessão nesta conta de demonstração.",
-    "auth.termsAgreement":
-      "Aceito os <terms>Termos de Serviço</terms> da Boatstead.",
-    "auth.termsRequired":
-      "Tem de aceitar os Termos de Serviço para criar uma conta.",
+    "auth.termsAgreement": "Aceito os <terms>Termos de Serviço</terms> da Boatstead.",
+    "auth.termsRequired": "Tem de aceitar os Termos de Serviço para criar uma conta.",
     "auth.continueWithGoogle": "Continuar com o Google",
     "auth.continueWithApple": "Continuar com a Apple",
     "auth.continueWithFacebook": "Continuar com o Facebook",
@@ -2096,15 +2117,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Recusar",
     "applications.action.unaccept": "Retirar aceitação",
     "applications.anotherAcceptedBannerTitle": "Outro candidato está confirmado",
-    "applications.anotherAcceptedBanner": "Este candidato não foi aceite. Ainda pode conversar com ele aqui, mas tem de retirar a aceitação de {{name}} antes de poder aceitar esta pessoa.",
+    "applications.anotherAcceptedBanner":
+      "Este candidato não foi aceite. Ainda pode conversar com ele aqui, mas tem de retirar a aceitação de {{name}} antes de poder aceitar esta pessoa.",
     "applications.confirm.unacceptTitle": "Retirar a aceitação de {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} deixará de estar confirmado para esta estadia. Depois pode aceitar outro candidato.",
+    "applications.confirm.unacceptText":
+      "{{name}} deixará de estar confirmado para esta estadia. Depois pode aceitar outro candidato.",
     "applications.confirm.unacceptAction": "Sim, retirar aceitação",
     "applications.conversation": "Conversa",
     "applications.systemMessage.accepted": "Foste aceite para esta estadia",
     "applications.systemMessage.acceptedOwner": "Aceitou {{name}} para esta estadia",
     "applications.systemMessage.declined": "Já não está a ser considerado para esta estadia",
-    "applications.systemMessage.applicantsClosed": "O proprietário já não está a considerar candidatos para esta estadia",
+    "applications.systemMessage.applicantsClosed":
+      "O proprietário já não está a considerar candidatos para esta estadia",
     "applications.systemMessage.videoCallRequestTitle": "Videochamada proposta",
     "applications.systemMessage.videoCallRequest": "{{name}} propôs uma videochamada.",
     "applications.requestVideoCall": "Pedir videochamada",
@@ -2115,7 +2139,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Escolha uma data, hora e duração para uma chamada com {{name}}. Pode aceitar ou sugerir outro horário.",
     "applications.requestVideoCallConfirmAction": "Enviar proposta",
     "applications.videoCall.adjustAction": "Enviar novo horário",
-    "applications.videoCall.adjustText": "Proponha uma nova data, hora e duração para a chamada com {{name}}.",
+    "applications.videoCall.adjustText":
+      "Proponha uma nova data, hora e duração para a chamada com {{name}}.",
     "applications.videoCall.adjustTitle": "Sugerir outro horário",
     "applications.videoCall.incomplete": "Escolha uma data e hora para a chamada.",
     "applications.videoCall.pastError": "Escolha uma data e hora no futuro.",
@@ -2147,8 +2172,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Inclua-se a si e qualquer parceiro ou acompanhante. Esta estadia permite até {{count}} pessoas.",
     "apply.termsAgreement":
       "Aceito os <terms>Termos de Serviço</terms> da Boatstead para esta candidatura.",
-    "apply.termsRequired":
-      "Tem de aceitar os Termos de Serviço antes de enviar esta candidatura.",
+    "apply.termsRequired": "Tem de aceitar os Termos de Serviço antes de enviar esta candidatura.",
     "apply.verificationRequiredTitle": "Verifique a sua identidade para se candidatar",
     "apply.verificationRequiredText":
       "Confirme o documento de identidade, o e-mail e o número de telefone antes de se candidatar a uma estadia a bordo.",
@@ -2213,13 +2237,10 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "terms.liveaboard.title": "Uso da embarcação como alojamento a bordo",
     "terms.liveaboard.text":
       "Os anúncios devem oferecer uma embarcação segura, legal e razoavelmente habitável para o cuidador viver e dormir a bordo. Cada estadia exige permanência a bordo e não é um serviço apenas de visitas diurnas. Durante as datas acordadas, o cuidador só pode usar a embarcação como alojamento temporário e para prestar os cuidados acordados. Sem autorização escrita explícita do proprietário, não pode navegar, deslocar, alugar, emprestar, subalugar, usar comercialmente nem alojar convidados noturnos não autorizados. As instruções de segurança e emergência têm prioridade.",
-    "notifications.items.sitAccepted":
-      "{{actor}} aceitou o seu convite para cuidar de {{boat}}.",
-    "notifications.items.applicationAccepted":
-      "{{actor}} aceitou a sua candidatura para {{boat}}.",
+    "notifications.items.sitAccepted": "{{actor}} aceitou o seu convite para cuidar de {{boat}}.",
+    "notifications.items.applicationAccepted": "{{actor}} aceitou a sua candidatura para {{boat}}.",
     "notifications.items.newApplication": "{{actor}} candidatou-se para cuidar de {{boat}}.",
-    "notifications.items.newMessage":
-      "{{actor}} enviou-lhe uma nova mensagem sobre {{boat}}.",
+    "notifications.items.newMessage": "{{actor}} enviou-lhe uma nova mensagem sobre {{boat}}.",
     "notifications.items.sitReminder": "A sua estadia em {{boat}} começa em breve.",
     "notifications.items.welcome":
       "Bem-vindo ao Boatstead. Complete o seu perfil para começar a criar ligações.",
@@ -2233,8 +2254,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.acceptedViewing": "A ver detalhes",
     "applications.acceptedView": "Ver candidato aceite",
     "applications.returnToAccepted": "Voltar para {{name}}",
-    "applications.acceptedListHint":
-      "Os candidatos aceites aparecem na caixa destacada acima.",
+    "applications.acceptedListHint": "Os candidatos aceites aparecem na caixa destacada acima.",
     "applications.videoCallBannerTitle": "Conclua uma videochamada antes de aceitar",
     "applications.videoCallBanner":
       "Faça uma videochamada com os sitters pré-selecionados antes de aceitar alguém para a estadia. Confirme experiência, disponibilidade e adequação.",
@@ -2354,7 +2374,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} estrelas",
     "reviews.leaveKicker": "Deixar uma avaliação",
     "reviews.leaveTitle": "Como foi {{name}} como cuidador?",
-    "reviews.leaveHint": "Partilhe como correu a estadia em {{boat}}. A sua classificação ajuda outros proprietários.",
+    "reviews.leaveHint":
+      "Partilhe como correu a estadia em {{boat}}. A sua classificação ajuda outros proprietários.",
     "reviews.yourRating": "A sua classificação",
     "reviews.yourReview": "A sua avaliação",
     "reviews.yourReviewPlaceholder": "Descreva a comunicação, o cuidado do barco e a entrega...",
@@ -2380,8 +2401,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messages.aboutBoat": "Σχετικά με το {{boat}}",
     "auth.secureLoginRequired":
       "Ανοίξτε το Boatstead μέσω HTTPS για να συνδεθείτε σε αυτόν τον υπάρχοντα δοκιμαστικό λογαριασμό.",
-    "auth.termsAgreement":
-      "Αποδέχομαι τους <terms>Όρους Παροχής Υπηρεσιών</terms> του Boatstead.",
+    "auth.termsAgreement": "Αποδέχομαι τους <terms>Όρους Παροχής Υπηρεσιών</terms> του Boatstead.",
     "auth.termsRequired":
       "Πρέπει να αποδεχτείτε τους Όρους Παροχής Υπηρεσιών για να δημιουργήσετε λογαριασμό.",
     "auth.continueWithGoogle": "Συνέχεια με Google",
@@ -2436,15 +2456,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Απόρριψη",
     "applications.action.unaccept": "Ανάκληση αποδοχής",
     "applications.anotherAcceptedBannerTitle": "Ένας άλλος υποψήφιος έχει επιβεβαιωθεί",
-    "applications.anotherAcceptedBanner": "Αυτός ο υποψήφιος δεν έγινε αποδεκτός. Μπορείτε ακόμα να συνομιλήσετε μαζί του εδώ, αλλά πρέπει να ανακαλέσετε την αποδοχή του {{name}} πριν αποδεχθείτε αυτό το άτομο.",
+    "applications.anotherAcceptedBanner":
+      "Αυτός ο υποψήφιος δεν έγινε αποδεκτός. Μπορείτε ακόμα να συνομιλήσετε μαζί του εδώ, αλλά πρέπει να ανακαλέσετε την αποδοχή του {{name}} πριν αποδεχθείτε αυτό το άτομο.",
     "applications.confirm.unacceptTitle": "Ανάκληση αποδοχής του {{name}};",
-    "applications.confirm.unacceptText": "Ο/Η {{name}} δεν θα είναι πλέον επιβεβαιωμένος/η για αυτή τη φύλαξη. Μετά μπορείτε να αποδεχθείτε άλλον υποψήφιο.",
+    "applications.confirm.unacceptText":
+      "Ο/Η {{name}} δεν θα είναι πλέον επιβεβαιωμένος/η για αυτή τη φύλαξη. Μετά μπορείτε να αποδεχθείτε άλλον υποψήφιο.",
     "applications.confirm.unacceptAction": "Ναι, ανάκληση αποδοχής",
     "applications.conversation": "Συνομιλία",
     "applications.systemMessage.accepted": "Έχετε γίνει αποδεκτοί για αυτή τη διαμονή",
     "applications.systemMessage.acceptedOwner": "Αποδεχθήκατε τον/την {{name}} για αυτή τη διαμονή",
     "applications.systemMessage.declined": "Δεν εξετάζεστε πλέον για αυτή τη διαμονή",
-    "applications.systemMessage.applicantsClosed": "Ο ιδιοκτήτης δεν εξετάζει πλέον υποψηφίους για αυτή τη διαμονή",
+    "applications.systemMessage.applicantsClosed":
+      "Ο ιδιοκτήτης δεν εξετάζει πλέον υποψηφίους για αυτή τη διαμονή",
     "applications.systemMessage.videoCallRequestTitle": "Προτάθηκε βιντεοκλήση",
     "applications.systemMessage.videoCallRequest": "Ο/Η {{name}} πρότεινε βιντεοκλήση.",
     "applications.requestVideoCall": "Αίτημα βιντεοκλήσης",
@@ -2455,7 +2478,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Επιλέξτε ημερομηνία, ώρα και διάρκεια για κλήση με τον/την {{name}}. Μπορεί να αποδεχτεί ή να προτείνει άλλη ώρα.",
     "applications.requestVideoCallConfirmAction": "Αποστολή πρότασης",
     "applications.videoCall.adjustAction": "Αποστολή νέας ώρας",
-    "applications.videoCall.adjustText": "Προτείνετε νέα ημερομηνία, ώρα και διάρκεια για την κλήση με τον/την {{name}}.",
+    "applications.videoCall.adjustText":
+      "Προτείνετε νέα ημερομηνία, ώρα και διάρκεια για την κλήση με τον/την {{name}}.",
     "applications.videoCall.adjustTitle": "Πρόταση άλλης ώρας",
     "applications.videoCall.incomplete": "Επιλέξτε ημερομηνία και ώρα για την κλήση.",
     "applications.videoCall.pastError": "Επιλέξτε ημερομηνία και ώρα στο μέλλον.",
@@ -2468,9 +2492,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.duration": "Διάρκεια",
     "applications.videoCall.time": "Ώρα",
     "applications.videoCall.date": "Ημερομηνία",
-    "applications.systemMessage.videoCallDeclined": "Ο/Η {{name}} απέρριψε την πρόταση βιντεοκλήσης.",
+    "applications.systemMessage.videoCallDeclined":
+      "Ο/Η {{name}} απέρριψε την πρόταση βιντεοκλήσης.",
     "applications.systemMessage.videoCallDeclinedTitle": "Η βιντεοκλήση απορρίφθηκε",
-    "applications.systemMessage.videoCallAccepted": "Ο/Η {{name}} αποδέχτηκε την ώρα της βιντεοκλήσης.",
+    "applications.systemMessage.videoCallAccepted":
+      "Ο/Η {{name}} αποδέχτηκε την ώρα της βιντεοκλήσης.",
     "applications.systemMessage.videoCallAcceptedTitle": "Η βιντεοκλήση επιβεβαιώθηκε",
     "applications.systemMessage.videoCallCounter": "Ο/Η {{name}} πρότεινε διαφορετική ώρα.",
     "applications.systemMessage.videoCallCounterTitle": "Νέα ώρα προτάθηκε",
@@ -2504,8 +2530,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "detail.confirmedSitConflictHint":
       "Είστε ήδη επιβεβαιωμένοι για το {{boat}} την ίδια περίοδο, επομένως δεν μπορείτε να ζητήσετε αυτή τη φύλαξη.",
     "detail.applicationsClosed": "Οι αιτήσεις έκλεισαν",
-    "detail.applicationsClosedHint":
-      "Ο ιδιοκτήτης δεν δέχεται νέες αιτήσεις για αυτή τη φύλαξη.",
+    "detail.applicationsClosedHint": "Ο ιδιοκτήτης δεν δέχεται νέες αιτήσεις για αυτή τη φύλαξη.",
     "owner.applicationsClosed": "Υποψήφιοι σε παύση",
     "owner.closeRequests": "Παύση νέων υποψηφίων",
     "owner.openRequests": "Επανάληψη νέων υποψηφίων",
@@ -2574,8 +2599,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.acceptedViewing": "Προβολή λεπτομερειών",
     "applications.acceptedView": "Προβολή αποδεκτού υποψηφίου",
     "applications.returnToAccepted": "Επιστροφή στον/στην {{name}}",
-    "applications.acceptedListHint":
-      "Οι αποδεκτοί υποψήφιοι εμφανίζονται στο πλαίσιο επάνω.",
+    "applications.acceptedListHint": "Οι αποδεκτοί υποψήφιοι εμφανίζονται στο πλαίσιο επάνω.",
     "applications.videoCallBannerTitle": "Ολοκληρώστε βιντεοκλήση πριν την αποδοχή",
     "applications.videoCallBanner":
       "Κάντε βιντεοκλήση με τους προεπιλεγμένους φύλακες πριν αποδεχτείτε κάποιον για τη διαμονή. Επιβεβαιώστε εμπειρία, διαθεσιμότητα και καταλληλότητα.",
@@ -2620,7 +2644,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.noExtraDetails": "Δεν δόθηκαν επιπλέον λεπτομέρειες.",
     "messageReport.escalatePrefix":
       "Κλιμακωμένο μήνυμα στο {{boat}} από {{sender}}:\n\n«{{message}}»\n\nΠλαίσιο: {{details}}",
-    "messageReport.escalateError": "Δεν ήταν δυνατή η κλιμάκωση αυτού του μηνύματος. Δοκιμάστε ξανά.",
+    "messageReport.escalateError":
+      "Δεν ήταν δυνατή η κλιμάκωση αυτού του μηνύματος. Δοκιμάστε ξανά.",
     "messageReport.successTitle": "Η αναφορά υποβλήθηκε",
     "messageReport.successText":
       "Ευχαριστούμε. Λάβαμε την αναφορά σας για ένα μήνυμα από τον/την {{name}} και θα την εξετάσουμε.",
@@ -2635,8 +2660,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.translatedWithGoogle": "Μεταφράστηκε με το Google",
     "applications.hideTranslation": "Απόκρυψη μετάφρασης",
     "applications.messageActions": "Ενέργειες μηνύματος",
-    "applications.translationFailed":
-      "Η μετάφραση δεν είναι προσωρινά διαθέσιμη. Δοκιμάστε ξανά.",
+    "applications.translationFailed": "Η μετάφραση δεν είναι προσωρινά διαθέσιμη. Δοκιμάστε ξανά.",
     "apply.noSharedLanguage":
       "Εσείς και ο χρήστης {{owner}} δεν έχετε δηλώσει κοινή γλώσσα. Εξετάστε τη χρήση εργαλείων μετάφρασης και επιβεβαιώστε με σαφήνεια τις σημαντικές οδηγίες.",
     "apply.contactDetailsTerms":
@@ -2695,7 +2719,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} αστέρια",
     "reviews.leaveKicker": "Αφήστε μια κριτική",
     "reviews.leaveTitle": "Πώς ήταν ο/η {{name}} ως φύλακας;",
-    "reviews.leaveHint": "Μοιραστείτε πώς πήγε η διαμονή στο {{boat}}. Η βαθμολογία σας βοηθά άλλους ιδιοκτήτες.",
+    "reviews.leaveHint":
+      "Μοιραστείτε πώς πήγε η διαμονή στο {{boat}}. Η βαθμολογία σας βοηθά άλλους ιδιοκτήτες.",
     "reviews.yourRating": "Η βαθμολογία σας",
     "reviews.yourReview": "Η κριτική σας",
     "reviews.yourReviewPlaceholder": "Περιγράψτε επικοινωνία, φροντίδα σκάφους και παράδοση...",
@@ -2721,10 +2746,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messages.aboutBoat": "O brodu {{boat}}",
     "auth.secureLoginRequired":
       "Otvorite Boatstead putem HTTPS-a kako biste se prijavili na ovaj postojeći demo račun.",
-    "auth.termsAgreement":
-      "Prihvaćam Boatsteadove <terms>Uvjete pružanja usluge</terms>.",
-    "auth.termsRequired":
-      "Morate prihvatiti Uvjete pružanja usluge kako biste izradili račun.",
+    "auth.termsAgreement": "Prihvaćam Boatsteadove <terms>Uvjete pružanja usluge</terms>.",
+    "auth.termsRequired": "Morate prihvatiti Uvjete pružanja usluge kako biste izradili račun.",
     "auth.continueWithGoogle": "Nastavi s Googleom",
     "auth.continueWithApple": "Nastavi s Appleom",
     "auth.continueWithFacebook": "Nastavi s Facebookom",
@@ -2780,15 +2803,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Odbij",
     "applications.action.unaccept": "Poništi prihvaćanje",
     "applications.anotherAcceptedBannerTitle": "Drugi je kandidat potvrđen",
-    "applications.anotherAcceptedBanner": "Ovaj kandidat nije prihvaćen. I dalje možete razgovarati s njim ovdje, ali morate poništiti prihvaćanje osobe {{name}} prije nego što možete prihvatiti ovu osobu.",
+    "applications.anotherAcceptedBanner":
+      "Ovaj kandidat nije prihvaćen. I dalje možete razgovarati s njim ovdje, ali morate poništiti prihvaćanje osobe {{name}} prije nego što možete prihvatiti ovu osobu.",
     "applications.confirm.unacceptTitle": "Poništiti prihvaćanje osobe {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} više neće biti potvrđen za ovu čuvanje. Nakon toga možete prihvatiti drugog kandidata.",
+    "applications.confirm.unacceptText":
+      "{{name}} više neće biti potvrđen za ovu čuvanje. Nakon toga možete prihvatiti drugog kandidata.",
     "applications.confirm.unacceptAction": "Da, poništi prihvaćanje",
     "applications.conversation": "Razgovor",
     "applications.systemMessage.accepted": "Prihvaćeni ste za ovaj boravak",
     "applications.systemMessage.acceptedOwner": "Prihvatili ste {{name}} za ovaj boravak",
     "applications.systemMessage.declined": "Više se ne razmatrate za ovaj boravak",
-    "applications.systemMessage.applicantsClosed": "Vlasnik više ne razmatra prijave za ovaj boravak",
+    "applications.systemMessage.applicantsClosed":
+      "Vlasnik više ne razmatra prijave za ovaj boravak",
     "applications.systemMessage.videoCallRequestTitle": "Predložen video poziv",
     "applications.systemMessage.videoCallRequest": "{{name}} je predložio/la video poziv.",
     "applications.requestVideoCall": "Zatraži video poziv",
@@ -2799,7 +2825,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Odaberite datum, vrijeme i trajanje poziva s osobom {{name}}. Može prihvatiti ili predložiti drugo vrijeme.",
     "applications.requestVideoCallConfirmAction": "Pošalji prijedlog",
     "applications.videoCall.adjustAction": "Pošalji novo vrijeme",
-    "applications.videoCall.adjustText": "Predložite novi datum, vrijeme i trajanje poziva s osobom {{name}}.",
+    "applications.videoCall.adjustText":
+      "Predložite novi datum, vrijeme i trajanje poziva s osobom {{name}}.",
     "applications.videoCall.adjustTitle": "Predloži drugo vrijeme",
     "applications.videoCall.incomplete": "Odaberite datum i vrijeme za poziv.",
     "applications.videoCall.pastError": "Odaberite datum i vrijeme u budućnosti.",
@@ -2815,7 +2842,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.date": "Datum",
     "applications.systemMessage.videoCallDeclined": "{{name}} je odbio/la prijedlog video poziva.",
     "applications.systemMessage.videoCallDeclinedTitle": "Video poziv odbijen",
-    "applications.systemMessage.videoCallAccepted": "{{name}} je prihvatio/la vrijeme video poziva.",
+    "applications.systemMessage.videoCallAccepted":
+      "{{name}} je prihvatio/la vrijeme video poziva.",
     "applications.systemMessage.videoCallAcceptedTitle": "Video poziv potvrđen",
     "applications.systemMessage.videoCallCounter": "{{name}} je predložio/la drugo vrijeme.",
     "applications.systemMessage.videoCallCounterTitle": "Predloženo novo vrijeme",
@@ -2832,8 +2860,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Uključite sebe i partnera ili pratnju. Ovaj boravak dopušta najviše {{count}} osoba.",
     "apply.termsAgreement":
       "Prihvaćam Boatsteadove <terms>Uvjete pružanja usluge</terms> za ovu prijavu.",
-    "apply.termsRequired":
-      "Morate prihvatiti Uvjete pružanja usluge prije slanja ove prijave.",
+    "apply.termsRequired": "Morate prihvatiti Uvjete pružanja usluge prije slanja ove prijave.",
     "apply.verificationRequiredTitle": "Potvrdite identitet prije prijave",
     "apply.verificationRequiredText":
       "Potvrdite osobnu iskaznicu, e-mail adresu i broj telefona prije prijave za boravak na brodu.",
@@ -2849,8 +2876,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "detail.confirmedSitConflictHint":
       "Već ste potvrđeni za {{boat}} u isto vrijeme, pa ne možete zatražiti ovo čuvanje.",
     "detail.applicationsClosed": "Prijave zatvorene",
-    "detail.applicationsClosedHint":
-      "Vlasnik ne prima nove prijave za ovo čuvanje.",
+    "detail.applicationsClosedHint": "Vlasnik ne prima nove prijave za ovo čuvanje.",
     "owner.applicationsClosed": "Kandidati pauzirani",
     "owner.closeRequests": "Pauziraj nove kandidate",
     "owner.openRequests": "Nastavi nove kandidate",
@@ -2901,11 +2927,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Oglasi moraju nuditi sigurno, zakonito i razumno useljivo plovilo na kojem čuvar može živjeti i spavati. Svako čuvanje uključuje boravak na brodu i nije usluga samo dnevnih obilazaka. Tijekom dogovorenih datuma čuvar smije koristiti plovilo isključivo kao privremeni smještaj i za dogovorenu brigu. Bez izričite pisane dozvole vlasnika čuvar ne smije ploviti, premještati, iznajmljivati, posuđivati, davati u podnajam, komercijalno koristiti plovilo niti dopustiti neovlaštenim gostima da prespavaju. Upute za sigurnost i hitne slučajeve imaju prednost.",
     "notifications.items.sitAccepted":
       "{{actor}} je prihvatio vaš poziv za čuvanje broda {{boat}}.",
-    "notifications.items.applicationAccepted":
-      "{{actor}} je prihvatio vašu prijavu za {{boat}}.",
+    "notifications.items.applicationAccepted": "{{actor}} je prihvatio vašu prijavu za {{boat}}.",
     "notifications.items.newApplication": "{{actor}} se prijavio za čuvanje broda {{boat}}.",
-    "notifications.items.newMessage":
-      "{{actor}} vam je poslao novu poruku o brodu {{boat}}.",
+    "notifications.items.newMessage": "{{actor}} vam je poslao novu poruku o brodu {{boat}}.",
     "notifications.items.sitReminder": "Vaš boravak na brodu {{boat}} uskoro počinje.",
     "notifications.items.welcome":
       "Dobro došli na Boatstead. Ispunite profil kako biste počeli stvarati kontakte.",
@@ -2919,8 +2943,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.acceptedViewing": "Prikaz detalja",
     "applications.acceptedView": "Prikaži prihvaćenog kandidata",
     "applications.returnToAccepted": "Natrag na {{name}}",
-    "applications.acceptedListHint":
-      "Prihvaćeni kandidati prikazani su u istaknutom okviru iznad.",
+    "applications.acceptedListHint": "Prihvaćeni kandidati prikazani su u istaknutom okviru iznad.",
     "applications.videoCallBannerTitle": "Dovršite video poziv prije prihvaćanja",
     "applications.videoCallBanner":
       "Obavite video poziv s užim krugom kandidata prije nego što prihvatite nekoga za boravak. Potvrdite iskustvo, dostupnost i prikladnost.",
@@ -2970,8 +2993,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.successText":
       "Hvala. Primili smo vašu prijavu o poruci od {{name}} i pregledat ćemo je.",
     "messageReport.escalateSuccessTitle": "Eskalirano Boatsteadu",
-    "messageReport.escalateSuccessText":
-      "Naš tim će pregledati ovu poruku i javiti se e-poštom.",
+    "messageReport.escalateSuccessText": "Naš tim će pregledati ovu poruku i javiti se e-poštom.",
     "applications.replyPlaceholder": "Napišite odgovor...",
     "applications.sending": "Slanje...",
     "applications.sendReply": "Pošalji odgovor",
@@ -2992,8 +3014,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "profile.countrySearch": "Pretraži državu",
     "profile.countrySearchEmpty": "Nema pronađenih država",
     "profile.phonePlaceholder": "555 123 4567",
-    "profile.phoneHint":
-      "Ostaje privatan osim ako ga odlučite podijeliti pri prihvaćanju čuvara.",
+    "profile.phoneHint": "Ostaje privatan osim ako ga odlučite podijeliti pri prihvaćanju čuvara.",
     "spokenLanguages.english": "Engleski",
     "spokenLanguages.french": "Francuski",
     "spokenLanguages.spanish": "Španjolski",
@@ -3012,8 +3033,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "spokenLanguages.polish": "Poljski",
     "spokenLanguages.arabic": "Arapski",
     "applications.sharePhone": "Podijeli moj broj telefona s osobom {{name}}",
-    "applications.sharePhoneUnavailable":
-      "Dodajte broj telefona u Postavkama prije dijeljenja.",
+    "applications.sharePhoneUnavailable": "Dodajte broj telefona u Postavkama prije dijeljenja.",
     "applications.phoneShared": "{{owner}} je podijelio broj telefona s vama",
     "applications.confirm.acceptedTitle": "Prihvatiti osobu {{name}}?",
     "applications.confirm.acceptedText":
@@ -3042,7 +3062,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} zvjezdica",
     "reviews.leaveKicker": "Ostavi recenziju",
     "reviews.leaveTitle": "Kakav je bio {{name}} kao čuvar?",
-    "reviews.leaveHint": "Podijelite kako je prošao boravak na {{boat}}. Vaša ocjena pomaže drugim vlasnicima.",
+    "reviews.leaveHint":
+      "Podijelite kako je prošao boravak na {{boat}}. Vaša ocjena pomaže drugim vlasnicima.",
     "reviews.yourRating": "Vaša ocjena",
     "reviews.yourReview": "Vaša recenzija",
     "reviews.yourReviewPlaceholder": "Opišite komunikaciju, brigu o brodu i predaju...",
@@ -3068,16 +3089,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messages.aboutBoat": "{{boat}} hakkında",
     "auth.secureLoginRequired":
       "Bu mevcut demo hesabında oturum açmak için Boatstead’i HTTPS üzerinden açın.",
-    "auth.termsAgreement":
-      "Boatstead’in <terms>Hizmet Şartları</terms>nı kabul ediyorum.",
-    "auth.termsRequired":
-      "Hesap oluşturmak için Hizmet Şartları’nı kabul etmelisiniz.",
+    "auth.termsAgreement": "Boatstead’in <terms>Hizmet Şartları</terms>nı kabul ediyorum.",
+    "auth.termsRequired": "Hesap oluşturmak için Hizmet Şartları’nı kabul etmelisiniz.",
     "auth.continueWithGoogle": "Google ile devam et",
     "auth.continueWithApple": "Apple ile devam et",
     "auth.continueWithFacebook": "Facebook ile devam et",
     "auth.orEmail": "Veya e-posta kullan",
-    "auth.socialMockNotice":
-      "Sosyal giriş bu prototipte simüle edilir ve bu tarayıcıda kalır.",
+    "auth.socialMockNotice": "Sosyal giriş bu prototipte simüle edilir ve bu tarayıcıda kalır.",
     "applications.reviewCount": "Başvurular ({{count}})",
     "applications.kicker": "Başvuru incelemesi",
     "applications.title": "{{boat}} için başvurular",
@@ -3124,15 +3142,19 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Reddet",
     "applications.action.unaccept": "Kabulü geri al",
     "applications.anotherAcceptedBannerTitle": "Başka bir başvuran onaylandı",
-    "applications.anotherAcceptedBanner": "Bu başvuran kabul edilmedi. Burada onunla sohbet etmeye devam edebilirsiniz, ancak bu kişiyi kabul etmeden önce {{name}} için kabulü geri almalısınız.",
+    "applications.anotherAcceptedBanner":
+      "Bu başvuran kabul edilmedi. Burada onunla sohbet etmeye devam edebilirsiniz, ancak bu kişiyi kabul etmeden önce {{name}} için kabulü geri almalısınız.",
     "applications.confirm.unacceptTitle": "{{name}} için kabul geri alınsın mı?",
-    "applications.confirm.unacceptText": "{{name}} artık bu konaklama için onaylı olmayacak. Daha sonra başka bir başvuranı kabul edebilirsiniz.",
+    "applications.confirm.unacceptText":
+      "{{name}} artık bu konaklama için onaylı olmayacak. Daha sonra başka bir başvuranı kabul edebilirsiniz.",
     "applications.confirm.unacceptAction": "Evet, kabulü geri al",
     "applications.conversation": "Konuşma",
     "applications.systemMessage.accepted": "Bu konaklama için kabul edildiniz",
-    "applications.systemMessage.acceptedOwner": "Bu konaklama için {{name}} adlı kişiyi kabul ettiniz",
+    "applications.systemMessage.acceptedOwner":
+      "Bu konaklama için {{name}} adlı kişiyi kabul ettiniz",
     "applications.systemMessage.declined": "Bu konaklama için artık değerlendirilmiyorsunuz",
-    "applications.systemMessage.applicantsClosed": "Sahip bu konaklama için artık başvuranları değerlendirmiyor",
+    "applications.systemMessage.applicantsClosed":
+      "Sahip bu konaklama için artık başvuranları değerlendirmiyor",
     "applications.systemMessage.videoCallRequestTitle": "Görüntülü arama önerildi",
     "applications.systemMessage.videoCallRequest": "{{name}} görüntülü arama önerdi.",
     "applications.requestVideoCall": "Görüntülü görüşme iste",
@@ -3143,7 +3165,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{name}} ile bir arama için tarih, saat ve süre seçin. Kabul edebilir veya farklı bir saat önerebilir.",
     "applications.requestVideoCallConfirmAction": "Teklifi gönder",
     "applications.videoCall.adjustAction": "Yeni saati gönder",
-    "applications.videoCall.adjustText": "{{name}} ile arama için yeni bir tarih, saat ve süre önerin.",
+    "applications.videoCall.adjustText":
+      "{{name}} ile arama için yeni bir tarih, saat ve süre önerin.",
     "applications.videoCall.adjustTitle": "Farklı saat öner",
     "applications.videoCall.incomplete": "Arama için bir tarih ve saat seçin.",
     "applications.videoCall.pastError": "Gelecekte bir tarih ve saat seçin.",
@@ -3175,8 +3198,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Kendinizi ve eşinizi ya da refakatçinizi dahil edin. Bu konaklamada en fazla {{count}} kişi kalabilir.",
     "apply.termsAgreement":
       "Bu başvuru için Boatstead’in <terms>Hizmet Şartları</terms>nı kabul ediyorum.",
-    "apply.termsRequired":
-      "Bu başvuruyu göndermeden önce Hizmet Şartları’nı kabul etmelisiniz.",
+    "apply.termsRequired": "Bu başvuruyu göndermeden önce Hizmet Şartları’nı kabul etmelisiniz.",
     "apply.verificationRequiredTitle": "Başvurmak için kimliğinizi doğrulayın",
     "apply.verificationRequiredText":
       "Bir teknede kalmak için başvurmadan önce resmi kimliğinizi, e-posta adresinizi ve telefon numaranızı doğrulayın.",
@@ -3192,8 +3214,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "detail.confirmedSitConflictHint":
       "Aynı zamanda {{boat}} için zaten onaylandınız, bu nedenle bu bakıcılığı talep edemezsiniz.",
     "detail.applicationsClosed": "Başvurular kapalı",
-    "detail.applicationsClosedHint":
-      "Sahip bu bakıcılık için yeni başvuru kabul etmiyor.",
+    "detail.applicationsClosedHint": "Sahip bu bakıcılık için yeni başvuru kabul etmiyor.",
     "owner.applicationsClosed": "Adaylar duraklatıldı",
     "owner.closeRequests": "Yeni adayları duraklat",
     "owner.openRequests": "Yeni adayları sürdür",
@@ -3241,13 +3262,10 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "terms.liveaboard.title": "Teknenin konaklama amacıyla kullanımı",
     "terms.liveaboard.text":
       "İlanlar, bakıcının yaşayıp uyuyabileceği güvenli, yasal ve makul ölçüde yaşanabilir bir tekne sunmalıdır. Her bakıcılık teknede konaklamayı içerir ve yalnızca gündüz kontrolü hizmeti değildir. Kararlaştırılan tarihler boyunca bakıcı tekneyi sadece geçici konaklama ve kararlaştırılan bakım için kullanabilir. Sahibinin açık yazılı izni olmadan tekneyi seyir amacıyla kullanamaz, taşıyamaz, kiralayamaz, ödünç veremez, alt kiraya veremez, ticari amaçla kullanamaz veya yetkisiz gece misafirleri ağırlayamaz. Güvenlik ve acil durum talimatları önceliklidir.",
-    "notifications.items.sitAccepted":
-      "{{actor}}, {{boat}} için bakıcılık davetinizi kabul etti.",
-    "notifications.items.applicationAccepted":
-      "{{actor}}, {{boat}} için başvurunuzu kabul etti.",
+    "notifications.items.sitAccepted": "{{actor}}, {{boat}} için bakıcılık davetinizi kabul etti.",
+    "notifications.items.applicationAccepted": "{{actor}}, {{boat}} için başvurunuzu kabul etti.",
     "notifications.items.newApplication": "{{actor}}, {{boat}} için bakıcılık başvurusu yaptı.",
-    "notifications.items.newMessage":
-      "{{actor}}, {{boat}} hakkında size yeni bir mesaj gönderdi.",
+    "notifications.items.newMessage": "{{actor}}, {{boat}} hakkında size yeni bir mesaj gönderdi.",
     "notifications.items.sitReminder": "{{boat}} üzerindeki konaklamanız yakında başlıyor.",
     "notifications.items.welcome":
       "Boatstead’e hoş geldiniz. Bağlantı kurmaya başlamak için profilinizi tamamlayın.",
@@ -3261,8 +3279,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.acceptedViewing": "Ayrıntılar görüntüleniyor",
     "applications.acceptedView": "Kabul edilen başvuranı görüntüle",
     "applications.returnToAccepted": "{{name}} adlı kişiye dön",
-    "applications.acceptedListHint":
-      "Kabul edilen başvuranlar yukarıdaki vurgulu kutuda görünür.",
+    "applications.acceptedListHint": "Kabul edilen başvuranlar yukarıdaki vurgulu kutuda görünür.",
     "applications.videoCallBannerTitle": "Kabul etmeden önce görüntülü görüşmeyi tamamlayın",
     "applications.videoCallBanner":
       "Konaklama için birini kabul etmeden önce kısa listedeki bakıcılarla görüntülü görüşme yapın. Deneyimi, müsaitliği ve uyumu doğrulayın.",
@@ -3312,8 +3329,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.successText":
       "Teşekkürler. {{name}} adlı kişiden gelen bir mesaj hakkındaki bildiriminizi aldık ve inceleyeceğiz.",
     "messageReport.escalateSuccessTitle": "Boatstead’e yükseltildi",
-    "messageReport.escalateSuccessText":
-      "Ekibimiz bu mesajı inceleyip e-posta ile size dönecek.",
+    "messageReport.escalateSuccessText": "Ekibimiz bu mesajı inceleyip e-posta ile size dönecek.",
     "applications.replyPlaceholder": "Bir yanıt yazın...",
     "applications.sending": "Gönderiliyor...",
     "applications.sendReply": "Yanıt gönder",
@@ -3334,8 +3350,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "profile.countrySearch": "Ülke ara",
     "profile.countrySearchEmpty": "Ülke bulunamadı",
     "profile.phonePlaceholder": "555 123 4567",
-    "profile.phoneHint":
-      "Bir bakıcıyı kabul ederken paylaşmayı seçmediğiniz sürece gizli tutulur.",
+    "profile.phoneHint": "Bir bakıcıyı kabul ederken paylaşmayı seçmediğiniz sürece gizli tutulur.",
     "spokenLanguages.english": "İngilizce",
     "spokenLanguages.french": "Fransızca",
     "spokenLanguages.spanish": "İspanyolca",
@@ -3381,7 +3396,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} yıldız",
     "reviews.leaveKicker": "Değerlendirme yaz",
     "reviews.leaveTitle": "{{name}} bakıcı olarak nasıldı?",
-    "reviews.leaveHint": "{{boat}} konaklamasının nasıl geçtiğini paylaşın. Puanınız diğer sahiplerine yardımcı olur.",
+    "reviews.leaveHint":
+      "{{boat}} konaklamasının nasıl geçtiğini paylaşın. Puanınız diğer sahiplerine yardımcı olur.",
     "reviews.yourRating": "Puanınız",
     "reviews.yourReview": "Değerlendirmeniz",
     "reviews.yourReviewPlaceholder": "İletişim, tekne bakımı ve teslimi anlatın...",
@@ -3405,14 +3421,16 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
   },
   sv: {
     "messages.aboutBoat": "Om {{boat}}",
-    "auth.secureLoginRequired": "Öppna Boatstead över HTTPS för att logga in på detta befintliga demokonto.",
+    "auth.secureLoginRequired":
+      "Öppna Boatstead över HTTPS för att logga in på detta befintliga demokonto.",
     "auth.termsAgreement": "Jag godkänner Boatsteads <terms>Användarvillkor</terms>.",
     "auth.termsRequired": "Du måste godkänna användarvillkoren för att skapa ett konto.",
     "auth.continueWithGoogle": "Fortsätt med Google",
     "auth.continueWithApple": "Fortsätt med Apple",
     "auth.continueWithFacebook": "Fortsätt med Facebook",
     "auth.orEmail": "Eller använd e-post",
-    "auth.socialMockNotice": "Social inloggning hånas i den här prototypen och stannar i den här webbläsaren.",
+    "auth.socialMockNotice":
+      "Social inloggning hånas i den här prototypen och stannar i den här webbläsaren.",
     "applications.reviewCount": "Sökande ({{count}})",
     "applications.kicker": "Sökande granskning",
     "applications.title": "Ansökningar för {{boat}}",
@@ -3459,15 +3477,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Nedgång",
     "applications.action.unaccept": "Acceptera inte",
     "applications.anotherAcceptedBannerTitle": "Ytterligare en sökande är bekräftad",
-    "applications.anotherAcceptedBanner": "Denna sökande antogs inte. Du kan fortfarande chatta med dem här, men du måste inte acceptera {{name}} innan du kan acceptera den här personen.",
+    "applications.anotherAcceptedBanner":
+      "Denna sökande antogs inte. Du kan fortfarande chatta med dem här, men du måste inte acceptera {{name}} innan du kan acceptera den här personen.",
     "applications.confirm.unacceptTitle": "Vill du inte acceptera {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} kommer inte längre att bekräftas för denna sittning. Du kan acceptera en annan sökande efteråt.",
+    "applications.confirm.unacceptText":
+      "{{name}} kommer inte längre att bekräftas för denna sittning. Du kan acceptera en annan sökande efteråt.",
     "applications.confirm.unacceptAction": "Ja, inte acceptera",
     "applications.conversation": "Konversation",
     "applications.systemMessage.accepted": "Du blev accepterad för denna sittning",
     "applications.systemMessage.acceptedOwner": "Du accepterade {{name}} för denna sittning",
     "applications.systemMessage.declined": "Du övervägs inte längre för denna sittning",
-    "applications.systemMessage.applicantsClosed": "Ägaren överväger inte längre sökande till denna sitt",
+    "applications.systemMessage.applicantsClosed":
+      "Ägaren överväger inte längre sökande till denna sitt",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtal föreslagits",
     "applications.systemMessage.videoCallRequest": "{{name}} föreslog ett videosamtal.",
     "applications.systemMessage.videoCallCounterTitle": "Ny tid föreslås",
@@ -3475,11 +3496,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.videoCallAcceptedTitle": "Videosamtal bekräftat",
     "applications.systemMessage.videoCallAccepted": "{{name}} accepterade videosamtalstiden.",
     "applications.systemMessage.videoCallDeclinedTitle": "Videosamtal avvisades",
-    "applications.systemMessage.videoCallDeclined": "{{name}} tackade nej till videosamtalsförslaget.",
+    "applications.systemMessage.videoCallDeclined":
+      "{{name}} tackade nej till videosamtalsförslaget.",
     "applications.requestVideoCall": "Begär videosamtal",
-    "applications.requestVideoCallHint": "Föreslå ett datum, tid och längd innan du accepterar så att du kan bekräfta erfarenhet och passa ihop.",
+    "applications.requestVideoCallHint":
+      "Föreslå ett datum, tid och längd innan du accepterar så att du kan bekräfta erfarenhet och passa ihop.",
     "applications.requestVideoCallConfirmTitle": "Föreslå ett videosamtal",
-    "applications.requestVideoCallConfirmText": "Välj datum, tid och längd för ett samtal med {{name}}. De kan acceptera eller föreslå en annan tid.",
+    "applications.requestVideoCallConfirmText":
+      "Välj datum, tid och längd för ett samtal med {{name}}. De kan acceptera eller föreslå en annan tid.",
     "applications.requestVideoCallConfirmAction": "Skicka förslag",
     "applications.videoCall.date": "Datum",
     "applications.videoCall.time": "Tid",
@@ -3493,7 +3517,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.pastError": "Välj ett datum och en tid i framtiden.",
     "applications.videoCall.incomplete": "Välj datum och tid för samtalet.",
     "applications.videoCall.adjustTitle": "Föreslå en annan tid",
-    "applications.videoCall.adjustText": "Föreslå ett nytt datum, tid och längd för samtalet med {{name}}.",
+    "applications.videoCall.adjustText":
+      "Föreslå ett nytt datum, tid och längd för samtalet med {{name}}.",
     "applications.videoCall.adjustAction": "Skicka ny tid",
     "applications.isTyping": "{{name}} skriver...",
     "detail.respondsWithinDay": "Svarar vanligtvis inom 24 timmar",
@@ -3504,21 +3529,27 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "lightbox.next": "Nästa foto",
     "lightbox.viewPhoto": "Visa foto {{number}}",
     "apply.partySize": "Hur många människor kommer att stanna?",
-    "apply.partySizeHint_one": "Inkludera dig själv och någon partner eller följeslagare. Denna sittplats tillåter upp till 1 person.",
-    "apply.partySizeHint_other": "Inkludera dig själv och någon partner eller följeslagare. Denna sittning tillåter upp till {{count}} personer.",
-    "apply.termsAgreement": "Jag godkänner Boatsteads <terms>Användarvillkor</terms> för denna sittapplikation.",
+    "apply.partySizeHint_one":
+      "Inkludera dig själv och någon partner eller följeslagare. Denna sittplats tillåter upp till 1 person.",
+    "apply.partySizeHint_other":
+      "Inkludera dig själv och någon partner eller följeslagare. Denna sittning tillåter upp till {{count}} personer.",
+    "apply.termsAgreement":
+      "Jag godkänner Boatsteads <terms>Användarvillkor</terms> för denna sittapplikation.",
     "apply.termsRequired": "Du måste godkänna användarvillkoren innan du skickar denna ansökan.",
     "apply.verificationRequiredTitle": "Verifiera din identitet för att ansöka",
-    "apply.verificationRequiredText": "Bekräfta ditt statliga ID, din e-postadress och ditt telefonnummer innan du ansöker om att få stanna på en båt.",
+    "apply.verificationRequiredText":
+      "Bekräfta ditt statliga ID, din e-postadress och ditt telefonnummer innan du ansöker om att få stanna på en båt.",
     "apply.verificationRequiredCta": "Slutför verifieringen av din profil",
     "apply.verificationChecking": "Kontrollerar din verifiering...",
     "apply.sendFailed": "Det gick inte att skicka din ansökan. Försök igen.",
     "apply.applicationsClosed": "Denna sits tar inte längre emot ansökningar.",
     "apply.confirmedSitConflictTitle": "Du har redan en bekräftad sittning",
-    "apply.confirmedSitConflict": "Du är bekräftad för {{boat}} under överlappande datum, så du kan inte begära en ny sittning för denna period.",
+    "apply.confirmedSitConflict":
+      "Du är bekräftad för {{boat}} under överlappande datum, så du kan inte begära en ny sittning för denna period.",
     "apply.viewConfirmedSit": "Se bekräftad sittning",
     "detail.confirmedSitConflict": "Bekräftad för en sittning till",
-    "detail.confirmedSitConflictHint": "Du är redan bekräftad för {{boat}} samtidigt, så du kan inte begära denna sittning.",
+    "detail.confirmedSitConflictHint":
+      "Du är redan bekräftad för {{boat}} samtidigt, så du kan inte begära denna sittning.",
     "detail.applicationsClosed": "Ansökningar stängda",
     "detail.applicationsClosedHint": "Ägaren accepterar inte nya ansökningar för denna sits.",
     "owner.applicationsClosed": "Sökande pausade",
@@ -3526,52 +3557,71 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "owner.openRequests": "Återuppta nya sökande",
     "applications.closeRequests": "Pausa nya sökande",
     "applications.openRequests": "Återuppta nya sökande",
-    "applications.requestsClosedNotice": "Nya sökande är pausade för denna sittning. Befintliga konversationer förblir tillgängliga. Använd Återuppta nya sökande när du vill att folk ska ansöka igen.",
+    "applications.requestsClosedNotice":
+      "Nya sökande är pausade för denna sittning. Befintliga konversationer förblir tillgängliga. Använd Återuppta nya sökande när du vill att folk ska ansöka igen.",
     "applications.confirm.closeRequestsTitle": "Pausa nya sökande?",
-    "applications.confirm.closeRequestsText": "Sitter kommer inte längre att kunna ansöka. Befintliga konversationer förblir tillgängliga och du kan återuppta när som helst.",
+    "applications.confirm.closeRequestsText":
+      "Sitter kommer inte längre att kunna ansöka. Befintliga konversationer förblir tillgängliga och du kan återuppta när som helst.",
     "applications.confirm.closeRequestsAction": "Ja, pausa sökande",
     "sitEditor.maxGuests": "Max antal personer",
     "sitEditor.maxGuestsHint": "Ange det totala antalet som får bo ombord, inklusive den sökande.",
-    "sitEditor.termsAgreement": "Jag godkänner Boatsteads <terms>Användarvillkor</terms> för denna platsannons.",
-    "sitEditor.termsRequired": "Du måste godkänna användarvillkoren innan du publicerar den här sidan.",
+    "sitEditor.termsAgreement":
+      "Jag godkänner Boatsteads <terms>Användarvillkor</terms> för denna platsannons.",
+    "sitEditor.termsRequired":
+      "Du måste godkänna användarvillkoren innan du publicerar den här sidan.",
     "applications.partySize": "Folk som stannar",
     "detail.maxGuests_one": "Max 1 person",
     "detail.maxGuests_other": "Max {{count}} personer",
     "how.liveaboardTitle": "Varje sittning är liveaboard",
-    "how.liveaboardText": "Boatstead är för vistelser där den accepterade barnvakten bor och sover ombord under de överenskomna datumen. Fartyget är ett tillfälligt boende och ett skötselansvar, inte en båt att låna, chartra eller kryssa om inte ägaren ger uttryckliga skriftliga instruktioner.",
+    "how.liveaboardText":
+      "Boatstead är för vistelser där den accepterade barnvakten bor och sover ombord under de överenskomna datumen. Fartyget är ett tillfälligt boende och ett skötselansvar, inte en båt att låna, chartra eller kryssa om inte ägaren ger uttryckliga skriftliga instruktioner.",
     "how.risksKicker": "Varför liveaboard-vård är viktigt",
     "how.risksTitle": "En båt som lämnas ensam kan snabbt utveckla allvarliga problem",
-    "how.risksText": "En barnvakt ger regelbunden observation och följer ägarens överenskomna vårdplan. De bör kontakta ägaren, småbåtshamnen eller en kvalificerad fackman i stället för att försöka göra osäkra reparationer.",
-    "how.risks.bilge": "Länspumpar kan misslyckas, vilket tillåter obemärkt vatteninträngning och översvämning.",
-    "how.risks.engine": "Motorer kan korrodera, utveckla bränsleproblem eller kärva efter långvarig inaktivitet.",
-    "how.risks.power": "Batterier kan laddas ur och landströmsbrytare kan lösa ut, vilket inaktiverar pumpar och larm.",
-    "how.risks.mooring": "Förtöjningslinor kan skava eller dela, och fendrar kan förskjutas när vädret förändras.",
+    "how.risksText":
+      "En barnvakt ger regelbunden observation och följer ägarens överenskomna vårdplan. De bör kontakta ägaren, småbåtshamnen eller en kvalificerad fackman i stället för att försöka göra osäkra reparationer.",
+    "how.risks.bilge":
+      "Länspumpar kan misslyckas, vilket tillåter obemärkt vatteninträngning och översvämning.",
+    "how.risks.engine":
+      "Motorer kan korrodera, utveckla bränsleproblem eller kärva efter långvarig inaktivitet.",
+    "how.risks.power":
+      "Batterier kan laddas ur och landströmsbrytare kan lösa ut, vilket inaktiverar pumpar och larm.",
+    "how.risks.mooring":
+      "Förtöjningslinor kan skava eller dela, och fendrar kan förskjutas när vädret förändras.",
     "how.risks.leaks": "Läckor från däck, lucka, VVS och sjökranar kan utvecklas eller förvärras.",
-    "how.risks.ventilation": "Kondens och dålig ventilation kan orsaka mögel, mögel och invändiga skador.",
-    "how.risks.weather": "Stormar, vak, tidvatten och ändrade vattennivåer kan kräva snabba justeringar.",
-    "how.risks.security": "Säkerhetslarm, marinameddelanden, skadedjur eller husdjur ombord kan kräva omedelbar uppmärksamhet.",
+    "how.risks.ventilation":
+      "Kondens och dålig ventilation kan orsaka mögel, mögel och invändiga skador.",
+    "how.risks.weather":
+      "Stormar, vak, tidvatten och ändrade vattennivåer kan kräva snabba justeringar.",
+    "how.risks.security":
+      "Säkerhetslarm, marinameddelanden, skadedjur eller husdjur ombord kan kräva omedelbar uppmärksamhet.",
     "terms.liveaboard.title": "Liveaboard användning av fartyget",
-    "terms.liveaboard.text": "Listor måste erbjuda ett fartyg som är säkert, lagligt och rimligt beboeligt för sittaren att bo och sova ombord. Varje sittning är ett liveaboard-arrangemang, inte en dagkontrolltjänst. Under överenskomna datum får barnvakten endast använda fartyget som tillfälligt boende och för att utföra överenskommen vård. Såvida inte ägaren ger uttryckligt skriftligt tillstånd, får barnvakten inte navigera, flytta, chartra, låna ut, hyra ut i andra hand, använda kommersiellt eller ta emot obehöriga övernattande gäster ombord på fartyget. Säkerhets- och nödanvisningar har prioritet.",
+    "terms.liveaboard.text":
+      "Listor måste erbjuda ett fartyg som är säkert, lagligt och rimligt beboeligt för sittaren att bo och sova ombord. Varje sittning är ett liveaboard-arrangemang, inte en dagkontrolltjänst. Under överenskomna datum får barnvakten endast använda fartyget som tillfälligt boende och för att utföra överenskommen vård. Såvida inte ägaren ger uttryckligt skriftligt tillstånd, får barnvakten inte navigera, flytta, chartra, låna ut, hyra ut i andra hand, använda kommersiellt eller ta emot obehöriga övernattande gäster ombord på fartyget. Säkerhets- och nödanvisningar har prioritet.",
     "notifications.items.sitAccepted": "{{actor}} tackade ja till din inbjudan att sitta {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} accepterade din ansökan för {{boat}}.",
     "notifications.items.newApplication": "{{actor}} användes för att sitta {{boat}}.",
-    "notifications.items.newMessage": "{{actor}} skickade ett nytt meddelande till dig om {{boat}}.",
+    "notifications.items.newMessage":
+      "{{actor}} skickade ett nytt meddelande till dig om {{boat}}.",
     "notifications.items.sitReminder": "Din sittning på {{boat}} börjar snart.",
-    "notifications.items.welcome": "Välkommen till Boatstead. Fyll i din profil för att börja skapa kontakter.",
+    "notifications.items.welcome":
+      "Välkommen till Boatstead. Fyll i din profil för att börja skapa kontakter.",
     "applications.reply": "Svar",
     "applications.acceptedKicker": "Din barnvakt",
     "applications.acceptedTitle": "Godkänd sökande",
     "applications.acceptedTitlePlural": "Godkända sökande ({{count}})",
-    "applications.acceptedHint": "Denna person är bekräftad för sittningen. Meddela dem här för att ordna nyckelöverlämnandet, båtgenomgång och vistelsedetaljer.",
+    "applications.acceptedHint":
+      "Denna person är bekräftad för sittningen. Meddela dem här för att ordna nyckelöverlämnandet, båtgenomgång och vistelsedetaljer.",
     "applications.acceptedOpen": "Öppna konversation",
     "applications.acceptedView": "Se godkänd sökande",
     "applications.acceptedViewing": "Visa detaljer",
     "applications.returnToAccepted": "Tillbaka till {{name}}",
     "applications.acceptedListHint": "Godkända sökande visas i den markerade rutan ovan.",
     "applications.videoCallBannerTitle": "Slutför ett videosamtal innan du accepterar",
-    "applications.videoCallBanner": "Videoringa kortlistade barnvakter innan du accepterar någon för vistelsen. Använd den för att bekräfta upplevelse, tillgänglighet och passform.",
+    "applications.videoCallBanner":
+      "Videoringa kortlistade barnvakter innan du accepterar någon för vistelsen. Använd den för att bekräfta upplevelse, tillgänglighet och passform.",
     "applications.handoverBannerTitle": "Planera nyckelöverlämnandet och genomgången",
-    "applications.handoverBanner": "Ordna när och var du ska lämna över nycklar och gå igenom system, tillgång till kaj och nödkontakter innan vistelsen börjar.",
+    "applications.handoverBanner":
+      "Ordna när och var du ska lämna över nycklar och gå igenom system, tillgång till kaj och nödkontakter innan vistelsen börjar.",
     "sitPhase.step": "Steg {{number}}",
     "sitPhase.acceptingApplicants": "Ta emot sökande",
     "sitPhase.applicantChosen": "Väntar på bekräftelse",
@@ -3580,11 +3630,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.flagButton": "Flagga problem till Boatstead",
     "sitIssue.kicker": "Under vistelsen",
     "sitIssue.title": "Rapportera ett problem",
-    "sitIssue.hint": "Berätta för Boatstead om ett problem med vistelsen på {{boat}}. Vårt team kommer att följa upp.",
+    "sitIssue.hint":
+      "Berätta för Boatstead om ett problem med vistelsen på {{boat}}. Vårt team kommer att följa upp.",
     "sitIssue.bannerTitle": "Något fel under vistelsen?",
     "sitIssue.bannerHint": "Flagga det till Boatstead så att vi kan hjälpa till att lösa det.",
     "sitIssue.messageLabel": "Vad hände?",
-    "sitIssue.messagePlaceholder": "Beskriv problemet, när det började och allt vi borde veta för att hjälpa.",
+    "sitIssue.messagePlaceholder":
+      "Beskriv problemet, när det började och allt vi borde veta för att hjälpa.",
     "sitIssue.messageTooShort": "Skriv minst 20 tecken.",
     "sitIssue.messagePrefix": "Fortsätt problemet på {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "Skicka till Boatstead",
@@ -3595,21 +3647,26 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.report": "Rapportera meddelande",
     "messageReport.escalate": "Eskalera till Boatstead",
     "messageReport.title": "Rapportera detta meddelande?",
-    "messageReport.hint": "Berätta för oss varför det här meddelandet är ett problem. Rapporter granskas privat och delas inte med avsändaren.",
+    "messageReport.hint":
+      "Berätta för oss varför det här meddelandet är ett problem. Rapporter granskas privat och delas inte med avsändaren.",
     "messageReport.escalateTitle": "Vill du eskalera det här meddelandet?",
-    "messageReport.escalateHint": "Eskalera när du behöver Boatstead-support för att granska det här meddelandet och hjälpa dig att lösa problemet.",
+    "messageReport.escalateHint":
+      "Eskalera när du behöver Boatstead-support för att granska det här meddelandet och hjälpa dig att lösa problemet.",
     "messageReport.messageLabel": "Meddelande",
     "messageReport.submit": "Lämna rapport",
     "messageReport.escalateSubmit": "Eskalera till Boatstead",
     "messageReport.sending": "Sändning…",
     "messageReport.detailsRequired": "Lägg till en kort beskrivning av denna anledning.",
     "messageReport.noExtraDetails": "Inga extra detaljer tillhandahålls.",
-    "messageReport.escalatePrefix": "Eskalerat meddelande på {{boat}} från {{sender}}:\n\n\"{{message}}\"\n\nSammanhang: {{details}}",
+    "messageReport.escalatePrefix":
+      'Eskalerat meddelande på {{boat}} från {{sender}}:\n\n"{{message}}"\n\nSammanhang: {{details}}',
     "messageReport.escalateError": "Det gick inte att eskalera det här meddelandet. Försök igen.",
     "messageReport.successTitle": "Rapport inlämnad",
-    "messageReport.successText": "Tack. Vi har tagit emot din rapport om ett meddelande från {{name}} och kommer att granska det.",
+    "messageReport.successText":
+      "Tack. Vi har tagit emot din rapport om ett meddelande från {{name}} och kommer att granska det.",
     "messageReport.escalateSuccessTitle": "Eskalerade till Boatstead",
-    "messageReport.escalateSuccessText": "Vårt team kommer att granska detta meddelande och följa upp via e-post.",
+    "messageReport.escalateSuccessText":
+      "Vårt team kommer att granska detta meddelande och följa upp via e-post.",
     "applications.replyPlaceholder": "Skriv ett svar...",
     "applications.sending": "Sändning...",
     "applications.sendReply": "Skicka svar",
@@ -3618,16 +3675,21 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.translatedWithGoogle": "Översatt med Google",
     "applications.hideTranslation": "Dölj översättning",
     "applications.messageActions": "Meddelandeåtgärder",
-    "applications.translationFailed": "Översättning är inte tillgänglig för tillfället. Försök igen.",
-    "apply.noSharedLanguage": "Du och {{owner}} listar inte ett delat språk. Överväg att använda översättningsverktyg och bekräfta viktiga instruktioner tydligt.",
-    "apply.contactDetailsTerms": "Att dela kontaktuppgifter utanför plattformen nu strider mot våra användarvillkor.",
-    "apply.contactDetailsBlocked": "E-postadresser och telefonnummer kan inte delas i ett första meddelande. Håll kommunikationen på Boatstead tills ansökan godkänns.",
+    "applications.translationFailed":
+      "Översättning är inte tillgänglig för tillfället. Försök igen.",
+    "apply.noSharedLanguage":
+      "Du och {{owner}} listar inte ett delat språk. Överväg att använda översättningsverktyg och bekräfta viktiga instruktioner tydligt.",
+    "apply.contactDetailsTerms":
+      "Att dela kontaktuppgifter utanför plattformen nu strider mot våra användarvillkor.",
+    "apply.contactDetailsBlocked":
+      "E-postadresser och telefonnummer kan inte delas i ett första meddelande. Håll kommunikationen på Boatstead tills ansökan godkänns.",
     "profile.phoneNumber": "Telefonnummer",
     "profile.callingCode": "Landsnummer",
     "profile.countrySearch": "Sök land",
     "profile.countrySearchEmpty": "Inga länder hittades",
     "profile.phonePlaceholder": "555 123 4567",
-    "profile.phoneHint": "Förvaras privat om du inte väljer att dela det när du accepterar en barnvakt.",
+    "profile.phoneHint":
+      "Förvaras privat om du inte väljer att dela det när du accepterar en barnvakt.",
     "spokenLanguages.english": "engelska",
     "spokenLanguages.french": "franska",
     "spokenLanguages.spanish": "spanska",
@@ -3646,14 +3708,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "spokenLanguages.polish": "polska",
     "spokenLanguages.arabic": "arabiska",
     "applications.sharePhone": "Dela mitt telefonnummer med {{name}}",
-    "applications.sharePhoneUnavailable": "Lägg till ett telefonnummer i Inställningar innan du delar det.",
+    "applications.sharePhoneUnavailable":
+      "Lägg till ett telefonnummer i Inställningar innan du delar det.",
     "applications.phoneShared": "{{owner}} delade ett telefonnummer med dig",
     "applications.confirm.acceptedTitle": "Acceptera {{name}}?",
-    "applications.confirm.acceptedText": "Detta bekräftar {{name}} för denna båtsitt. Du kan fortsätta att koordinera nyckelöverlämnandet och genomgången i meddelanden.",
-    "applications.confirm.acceptedVideoCallNote": "Acceptera först efter att ni har slutfört ett videosamtal tillsammans.",
+    "applications.confirm.acceptedText":
+      "Detta bekräftar {{name}} för denna båtsitt. Du kan fortsätta att koordinera nyckelöverlämnandet och genomgången i meddelanden.",
+    "applications.confirm.acceptedVideoCallNote":
+      "Acceptera först efter att ni har slutfört ett videosamtal tillsammans.",
     "applications.confirm.acceptedAction": "Ja, acceptera",
     "applications.confirm.declinedTitle": "Avvisa {{name}}?",
-    "applications.confirm.declinedText": "{{name}} kommer inte längre att beaktas för denna sittning. Din konversationshistorik förblir tillgänglig.",
+    "applications.confirm.declinedText":
+      "{{name}} kommer inte längre att beaktas för denna sittning. Din konversationshistorik förblir tillgänglig.",
     "applications.confirm.declinedAction": "Ja, avböja",
     "reviews.title": "Recensioner",
     "reviews.recentTitle": "Senaste recensioner",
@@ -3686,20 +3752,23 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.responseTooShort": "Skriv minst 8 tecken.",
     "reviews.responseExists": "Du har redan svarat på den här recensionen.",
     "reviews.responseFailed": "Kunde inte lägga upp svaret. Försök igen.",
-    "reviews.windowBanner": "Du har {{days}} dagar kvar på dig att lämna en recension. Recensionerna är öppna i 7 dagar efter att en vistelse avslutats.",
+    "reviews.windowBanner":
+      "Du har {{days}} dagar kvar på dig att lämna en recension. Recensionerna är öppna i 7 dagar efter att en vistelse avslutats.",
     "reviews.windowClosed": "Granskningsfönstret för denna vistelse har stängt.",
     "reviews.sitNotCompleted": "Du kan lämna en recension efter att vistelsen är avslutad.",
   },
   nb: {
     "messages.aboutBoat": "Om {{boat}}",
-    "auth.secureLoginRequired": "Åpne Boatstead over HTTPS for å logge på denne eksisterende demokontoen.",
+    "auth.secureLoginRequired":
+      "Åpne Boatstead over HTTPS for å logge på denne eksisterende demokontoen.",
     "auth.termsAgreement": "Jeg godtar Boatsteads <terms>vilkår for bruk</terms>.",
     "auth.termsRequired": "Du må godta vilkårene for bruk for å opprette en konto.",
     "auth.continueWithGoogle": "Fortsett med Google",
     "auth.continueWithApple": "Fortsett med Apple",
     "auth.continueWithFacebook": "Fortsett med Facebook",
     "auth.orEmail": "Eller bruk e-post",
-    "auth.socialMockNotice": "Sosial pålogging blir hånet i denne prototypen og forblir i denne nettleseren.",
+    "auth.socialMockNotice":
+      "Sosial pålogging blir hånet i denne prototypen og forblir i denne nettleseren.",
     "applications.reviewCount": "Søkere ({{count}})",
     "applications.kicker": "Søkergjennomgang",
     "applications.title": "Søknader for {{boat}}",
@@ -3746,15 +3815,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Avslå",
     "applications.action.unaccept": "Ikke aksepter",
     "applications.anotherAcceptedBannerTitle": "En annen søker er bekreftet",
-    "applications.anotherAcceptedBanner": "Denne søkeren ble ikke akseptert. Du kan fortsatt chatte med dem her, men du må ikke godta {{name}} før du kan godta denne personen.",
+    "applications.anotherAcceptedBanner":
+      "Denne søkeren ble ikke akseptert. Du kan fortsatt chatte med dem her, men du må ikke godta {{name}} før du kan godta denne personen.",
     "applications.confirm.unacceptTitle": "Vil du ikke godta {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} vil ikke lenger bli bekreftet for dette setet. Du kan godta en annen søker etterpå.",
+    "applications.confirm.unacceptText":
+      "{{name}} vil ikke lenger bli bekreftet for dette setet. Du kan godta en annen søker etterpå.",
     "applications.confirm.unacceptAction": "Ja, ikke aksepterer",
     "applications.conversation": "Samtale",
     "applications.systemMessage.accepted": "Du ble akseptert for dette setet",
     "applications.systemMessage.acceptedOwner": "Du godtok {{name}} for dette setet",
     "applications.systemMessage.declined": "Du vurderes ikke lenger for dette setet",
-    "applications.systemMessage.applicantsClosed": "Eieren vurderer ikke lenger søkere til dette setet",
+    "applications.systemMessage.applicantsClosed":
+      "Eieren vurderer ikke lenger søkere til dette setet",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtale foreslått",
     "applications.systemMessage.videoCallRequest": "{{name}} foreslo en videosamtale.",
     "applications.systemMessage.videoCallCounterTitle": "Ny tid foreslått",
@@ -3764,9 +3836,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.videoCallDeclinedTitle": "Videosamtalen ble avvist",
     "applications.systemMessage.videoCallDeclined": "{{name}} avslo forslaget til videoanrop.",
     "applications.requestVideoCall": "Be om videosamtale",
-    "applications.requestVideoCallHint": "Foreslå en dato, tid og lengde før du godtar, slik at du kan bekrefte erfaring og passe sammen.",
+    "applications.requestVideoCallHint":
+      "Foreslå en dato, tid og lengde før du godtar, slik at du kan bekrefte erfaring og passe sammen.",
     "applications.requestVideoCallConfirmTitle": "Foreslå en videosamtale",
-    "applications.requestVideoCallConfirmText": "Velg dato, klokkeslett og lengde for en samtale med {{name}}. De kan godta eller foreslå et annet tidspunkt.",
+    "applications.requestVideoCallConfirmText":
+      "Velg dato, klokkeslett og lengde for en samtale med {{name}}. De kan godta eller foreslå et annet tidspunkt.",
     "applications.requestVideoCallConfirmAction": "Send forslag",
     "applications.videoCall.date": "Dato",
     "applications.videoCall.time": "Tid",
@@ -3780,7 +3854,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.pastError": "Velg en dato og et klokkeslett i fremtiden.",
     "applications.videoCall.incomplete": "Velg dato og klokkeslett for samtalen.",
     "applications.videoCall.adjustTitle": "Foreslå et annet tidspunkt",
-    "applications.videoCall.adjustText": "Foreslå en ny dato, klokkeslett og lengde for samtalen med {{name}}.",
+    "applications.videoCall.adjustText":
+      "Foreslå en ny dato, klokkeslett og lengde for samtalen med {{name}}.",
     "applications.videoCall.adjustAction": "Send ny tid",
     "applications.isTyping": "{{name}} skriver...",
     "detail.respondsWithinDay": "Svarer vanligvis innen 24 timer",
@@ -3791,21 +3866,27 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "lightbox.next": "Neste bilde",
     "lightbox.viewPhoto": "Se bilde {{number}}",
     "apply.partySize": "Hvor mange mennesker vil bli?",
-    "apply.partySizeHint_one": "Inkluder deg selv og enhver partner eller følgesvenn. Denne sitteplassen tillater opptil 1 person.",
-    "apply.partySizeHint_other": "Inkluder deg selv og enhver partner eller følgesvenn. Dette setet lar opptil {{count}} personer.",
-    "apply.termsAgreement": "Jeg godtar Boatsteads <terms>vilkår for bruk</terms> for denne sitteapplikasjonen.",
+    "apply.partySizeHint_one":
+      "Inkluder deg selv og enhver partner eller følgesvenn. Denne sitteplassen tillater opptil 1 person.",
+    "apply.partySizeHint_other":
+      "Inkluder deg selv og enhver partner eller følgesvenn. Dette setet lar opptil {{count}} personer.",
+    "apply.termsAgreement":
+      "Jeg godtar Boatsteads <terms>vilkår for bruk</terms> for denne sitteapplikasjonen.",
     "apply.termsRequired": "Du må godta vilkårene for bruk før du sender denne søknaden.",
     "apply.verificationRequiredTitle": "Bekreft identiteten din for å søke",
-    "apply.verificationRequiredText": "Bekreft offentlig ID, e-postadresse og telefonnummer før du søker om å bli på en båt.",
+    "apply.verificationRequiredText":
+      "Bekreft offentlig ID, e-postadresse og telefonnummer før du søker om å bli på en båt.",
     "apply.verificationRequiredCta": "Fullfør verifisering på profilen din",
     "apply.verificationChecking": "Kontrollerer bekreftelsen din …",
     "apply.sendFailed": "Kunne ikke sende søknaden din. Prøv igjen.",
     "apply.applicationsClosed": "Dette setet tar ikke lenger imot søknader.",
     "apply.confirmedSitConflictTitle": "Du har allerede en bekreftet sitting",
-    "apply.confirmedSitConflict": "Du er bekreftet for {{boat}} under overlappende datoer, så du kan ikke be om et nytt sitting for denne perioden.",
+    "apply.confirmedSitConflict":
+      "Du er bekreftet for {{boat}} under overlappende datoer, så du kan ikke be om et nytt sitting for denne perioden.",
     "apply.viewConfirmedSit": "Se bekreftet sitte",
     "detail.confirmedSitConflict": "Bekreftet for en ny sitting",
-    "detail.confirmedSitConflictHint": "Du er allerede bekreftet for {{boat}} samtidig, så du kan ikke be om dette setet.",
+    "detail.confirmedSitConflictHint":
+      "Du er allerede bekreftet for {{boat}} samtidig, så du kan ikke be om dette setet.",
     "detail.applicationsClosed": "Søknader stengt",
     "detail.applicationsClosedHint": "Eieren godtar ikke nye søknader for dette setet.",
     "owner.applicationsClosed": "Søkere stoppet",
@@ -3813,52 +3894,70 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "owner.openRequests": "Gjenoppta nye søkere",
     "applications.closeRequests": "Sett nye søkere på pause",
     "applications.openRequests": "Gjenoppta nye søkere",
-    "applications.requestsClosedNotice": "Nye søkere er satt på pause for dette møtet. Eksisterende samtaler forblir tilgjengelige. Bruk Gjenoppta nye søkere når du vil at folk skal søke på nytt.",
+    "applications.requestsClosedNotice":
+      "Nye søkere er satt på pause for dette møtet. Eksisterende samtaler forblir tilgjengelige. Bruk Gjenoppta nye søkere når du vil at folk skal søke på nytt.",
     "applications.confirm.closeRequestsTitle": "Pause nye søkere?",
-    "applications.confirm.closeRequestsText": "Sitter vil ikke lenger kunne søke. Eksisterende samtaler forblir tilgjengelige, og du kan fortsette når som helst.",
+    "applications.confirm.closeRequestsText":
+      "Sitter vil ikke lenger kunne søke. Eksisterende samtaler forblir tilgjengelige, og du kan fortsette når som helst.",
     "applications.confirm.closeRequestsAction": "Ja, pause søkere",
     "sitEditor.maxGuests": "Maks antall personer",
     "sitEditor.maxGuestsHint": "Angi det totale antallet som kan bo ombord, inkludert søkeren.",
-    "sitEditor.termsAgreement": "Jeg godtar Boatsteads <terms>vilkår for bruk</terms> for denne plassoppføringen.",
+    "sitEditor.termsAgreement":
+      "Jeg godtar Boatsteads <terms>vilkår for bruk</terms> for denne plassoppføringen.",
     "sitEditor.termsRequired": "Du må godta vilkårene for bruk før du publiserer denne siden.",
     "applications.partySize": "Folk som bor",
     "detail.maxGuests_one": "Maks 1 person",
     "detail.maxGuests_other": "Maksimalt {{count}} personer",
     "how.liveaboardTitle": "Hver sits er liveaboard",
-    "how.liveaboardText": "Boatstead er for opphold der den aksepterte sitter bor og sover ombord gjennom de avtalte datoene. Fartøyet er midlertidig innkvartering og et omsorgsansvar, ikke en båt å låne, leie eller cruise med mindre eieren gir uttrykkelige skriftlige instruksjoner.",
+    "how.liveaboardText":
+      "Boatstead er for opphold der den aksepterte sitter bor og sover ombord gjennom de avtalte datoene. Fartøyet er midlertidig innkvartering og et omsorgsansvar, ikke en båt å låne, leie eller cruise med mindre eieren gir uttrykkelige skriftlige instruksjoner.",
     "how.risksKicker": "Hvorfor liveaboard omsorg er viktig",
     "how.risksTitle": "En båt som står alene kan raskt utvikle alvorlige problemer",
-    "how.risksText": "En sitter sørger for regelmessig observasjon og følger eiers avtalte omsorgsplan. De bør kontakte eieren, marinaen eller en kvalifisert fagperson i stedet for å forsøke utrygge reparasjoner.",
-    "how.risks.bilge": "Lensepumper kan svikte, noe som tillater ubemerket vanninntrengning og flom.",
-    "how.risks.engine": "Motorer kan korrodere, utvikle drivstoffproblemer eller sette seg fast etter langvarig inaktivitet.",
-    "how.risks.power": "Batterier kan utlades og landstrømbrytere kan utløse, og deaktivere pumper og alarmer.",
-    "how.risks.mooring": "Fortøyningsliner kan gnage eller dele seg, og fendere kan skifte ettersom været endrer seg.",
-    "how.risks.leaks": "Lekkasjer på dekk, luke, rørleggerarbeid og sjøkrane kan utvikle seg eller forverres.",
-    "how.risks.ventilation": "Kondens og dårlig ventilasjon kan forårsake mugg, mugg og innvendige skader.",
-    "how.risks.weather": "Stormer, kjølvann, tidevann og skiftende vannstander kan kreve raske justeringer.",
-    "how.risks.security": "Sikkerhetsalarmer, marinameldinger, skadedyr eller kjæledyr ombord kan kreve umiddelbar oppmerksomhet.",
+    "how.risksText":
+      "En sitter sørger for regelmessig observasjon og følger eiers avtalte omsorgsplan. De bør kontakte eieren, marinaen eller en kvalifisert fagperson i stedet for å forsøke utrygge reparasjoner.",
+    "how.risks.bilge":
+      "Lensepumper kan svikte, noe som tillater ubemerket vanninntrengning og flom.",
+    "how.risks.engine":
+      "Motorer kan korrodere, utvikle drivstoffproblemer eller sette seg fast etter langvarig inaktivitet.",
+    "how.risks.power":
+      "Batterier kan utlades og landstrømbrytere kan utløse, og deaktivere pumper og alarmer.",
+    "how.risks.mooring":
+      "Fortøyningsliner kan gnage eller dele seg, og fendere kan skifte ettersom været endrer seg.",
+    "how.risks.leaks":
+      "Lekkasjer på dekk, luke, rørleggerarbeid og sjøkrane kan utvikle seg eller forverres.",
+    "how.risks.ventilation":
+      "Kondens og dårlig ventilasjon kan forårsake mugg, mugg og innvendige skader.",
+    "how.risks.weather":
+      "Stormer, kjølvann, tidevann og skiftende vannstander kan kreve raske justeringer.",
+    "how.risks.security":
+      "Sikkerhetsalarmer, marinameldinger, skadedyr eller kjæledyr ombord kan kreve umiddelbar oppmerksomhet.",
     "terms.liveaboard.title": "Liveaboard bruk av fartøyet",
-    "terms.liveaboard.text": "Oppføringer må tilby et fartøy som er trygt, lovlig og rimelig beboelig for sitteren å bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dagsjekk-tjeneste. På de avtalte datoene kan oppsitteren kun bruke fartøyet som midlertidig innkvartering og for å utføre avtalt stell. Med mindre eieren gir uttrykkelig skriftlig tillatelse, må sitteren ikke navigere, flytte, leie ut, låne ut, fremleie, bruke kommersielt eller være vert for uautoriserte overnattingsgjester ombord på fartøyet. Sikkerhets- og nødinstruksjoner har prioritet.",
+    "terms.liveaboard.text":
+      "Oppføringer må tilby et fartøy som er trygt, lovlig og rimelig beboelig for sitteren å bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dagsjekk-tjeneste. På de avtalte datoene kan oppsitteren kun bruke fartøyet som midlertidig innkvartering og for å utføre avtalt stell. Med mindre eieren gir uttrykkelig skriftlig tillatelse, må sitteren ikke navigere, flytte, leie ut, låne ut, fremleie, bruke kommersielt eller være vert for uautoriserte overnattingsgjester ombord på fartøyet. Sikkerhets- og nødinstruksjoner har prioritet.",
     "notifications.items.sitAccepted": "{{actor}} godtok invitasjonen din til å sitte {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} godtok søknaden din for {{boat}}.",
     "notifications.items.newApplication": "{{actor}} brukt for å sitte {{boat}}.",
     "notifications.items.newMessage": "{{actor}} sendte deg en ny melding om {{boat}}.",
     "notifications.items.sitReminder": "Sitt på {{boat}} starter snart.",
-    "notifications.items.welcome": "Velkommen til Boatstead. Fullfør profilen din for å begynne å opprette forbindelser.",
+    "notifications.items.welcome":
+      "Velkommen til Boatstead. Fullfør profilen din for å begynne å opprette forbindelser.",
     "applications.reply": "Svar",
     "applications.acceptedKicker": "Sitteren din",
     "applications.acceptedTitle": "Godkjent søker",
     "applications.acceptedTitlePlural": "Godkjente søkere ({{count}})",
-    "applications.acceptedHint": "Denne personen er bekreftet for siten. Send melding til dem her for å ordne nøkkeloverlevering, båtgjennomgang og oppholdsdetaljer.",
+    "applications.acceptedHint":
+      "Denne personen er bekreftet for siten. Send melding til dem her for å ordne nøkkeloverlevering, båtgjennomgang og oppholdsdetaljer.",
     "applications.acceptedOpen": "Åpen samtale",
     "applications.acceptedView": "Se akseptert søker",
     "applications.acceptedViewing": "Viser detaljer",
     "applications.returnToAccepted": "Tilbake til {{name}}",
     "applications.acceptedListHint": "Godkjente søkere vises i den uthevede boksen ovenfor.",
     "applications.videoCallBannerTitle": "Fullfør en videosamtale før du godtar",
-    "applications.videoCallBanner": "Videoring oppsittere på listen før du godtar noen for oppholdet. Bruk den til å bekrefte opplevelse, tilgjengelighet og passform.",
+    "applications.videoCallBanner":
+      "Videoring oppsittere på listen før du godtar noen for oppholdet. Bruk den til å bekrefte opplevelse, tilgjengelighet og passform.",
     "applications.handoverBannerTitle": "Planlegg nøkkeloverlevering og gjennomgang",
-    "applications.handoverBanner": "Avtal når og hvor du skal overlevere nøkler, og gå gjennom systemer, kaitilgang og nødkontakter før oppholdet starter.",
+    "applications.handoverBanner":
+      "Avtal når og hvor du skal overlevere nøkler, og gå gjennom systemer, kaitilgang og nødkontakter før oppholdet starter.",
     "sitPhase.step": "Trinn {{number}}",
     "sitPhase.acceptingApplicants": "Tar i mot søkere",
     "sitPhase.applicantChosen": "Venter på bekreftelse",
@@ -3867,11 +3966,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.flagButton": "Flaggutstedelse til Boatstead",
     "sitIssue.kicker": "Under oppholdet",
     "sitIssue.title": "Rapporter et problem",
-    "sitIssue.hint": "Fortell Boatstead om et problem med oppholdet på {{boat}}. Teamet vårt vil følge opp.",
+    "sitIssue.hint":
+      "Fortell Boatstead om et problem med oppholdet på {{boat}}. Teamet vårt vil følge opp.",
     "sitIssue.bannerTitle": "Noe galt under oppholdet?",
     "sitIssue.bannerHint": "Flagg det til Boatstead slik at vi kan hjelpe deg med å løse det.",
     "sitIssue.messageLabel": "Hva skjedde?",
-    "sitIssue.messagePlaceholder": "Beskriv problemet, når det startet, og alt vi burde vite for å hjelpe.",
+    "sitIssue.messagePlaceholder":
+      "Beskriv problemet, når det startet, og alt vi burde vite for å hjelpe.",
     "sitIssue.messageTooShort": "Skriv minst 20 tegn.",
     "sitIssue.messagePrefix": "Fortsett problemet på {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "Send til Boatstead",
@@ -3882,21 +3983,26 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.report": "Rapporter melding",
     "messageReport.escalate": "Eskalere til Boatstead",
     "messageReport.title": "Vil du rapportere denne meldingen?",
-    "messageReport.hint": "Fortell oss hvorfor denne meldingen er et problem. Rapporter gjennomgås privat og deles ikke med avsender.",
+    "messageReport.hint":
+      "Fortell oss hvorfor denne meldingen er et problem. Rapporter gjennomgås privat og deles ikke med avsender.",
     "messageReport.escalateTitle": "Vil du eskalere denne meldingen?",
-    "messageReport.escalateHint": "Eskaler når du trenger Boatstead-støtte for å se gjennom denne meldingen og hjelpe deg med å løse problemet.",
+    "messageReport.escalateHint":
+      "Eskaler når du trenger Boatstead-støtte for å se gjennom denne meldingen og hjelpe deg med å løse problemet.",
     "messageReport.messageLabel": "Beskjed",
     "messageReport.submit": "Send inn rapport",
     "messageReport.escalateSubmit": "Eskalere til Boatstead",
     "messageReport.sending": "Sender …",
     "messageReport.detailsRequired": "Vennligst legg til en kort beskrivelse av denne grunn.",
     "messageReport.noExtraDetails": "Ingen ekstra detaljer oppgitt.",
-    "messageReport.escalatePrefix": "Eskalert melding på {{boat}} fra {{sender}}:\n\n\"{{message}}\"\n\nKontekst: {{details}}",
+    "messageReport.escalatePrefix":
+      'Eskalert melding på {{boat}} fra {{sender}}:\n\n"{{message}}"\n\nKontekst: {{details}}',
     "messageReport.escalateError": "Kunne ikke eskalere denne meldingen. Vennligst prøv igjen.",
     "messageReport.successTitle": "Rapport levert",
-    "messageReport.successText": "Takk. Vi mottok rapporten din om en melding fra {{name}} og vil vurdere den.",
+    "messageReport.successText":
+      "Takk. Vi mottok rapporten din om en melding fra {{name}} og vil vurdere den.",
     "messageReport.escalateSuccessTitle": "Eskalert til Boatstead",
-    "messageReport.escalateSuccessText": "Teamet vårt vil vurdere denne meldingen og følge opp via e-post.",
+    "messageReport.escalateSuccessText":
+      "Teamet vårt vil vurdere denne meldingen og følge opp via e-post.",
     "applications.replyPlaceholder": "Skriv et svar...",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
@@ -3906,9 +4012,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.hideTranslation": "Skjul oversettelsen",
     "applications.messageActions": "Meldingshandlinger",
     "applications.translationFailed": "Oversettelse er midlertidig utilgjengelig. Prøv igjen.",
-    "apply.noSharedLanguage": "Du og {{owner}} viser ikke et delt språk. Vurder å bruke oversettelsesverktøy og bekreft viktige instruksjoner tydelig.",
-    "apply.contactDetailsTerms": "Å dele kontaktinformasjon utenfor plattformen nå er i strid med våre vilkår for bruk.",
-    "apply.contactDetailsBlocked": "E-postadresser og telefonnumre kan ikke deles i en første melding. Hold kommunikasjonen på Boatstead til søknaden er akseptert.",
+    "apply.noSharedLanguage":
+      "Du og {{owner}} viser ikke et delt språk. Vurder å bruke oversettelsesverktøy og bekreft viktige instruksjoner tydelig.",
+    "apply.contactDetailsTerms":
+      "Å dele kontaktinformasjon utenfor plattformen nå er i strid med våre vilkår for bruk.",
+    "apply.contactDetailsBlocked":
+      "E-postadresser og telefonnumre kan ikke deles i en første melding. Hold kommunikasjonen på Boatstead til søknaden er akseptert.",
     "profile.phoneNumber": "Telefonnummer",
     "profile.callingCode": "Landsnummer",
     "profile.countrySearch": "Søk etter land",
@@ -3933,14 +4042,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "spokenLanguages.polish": "polsk",
     "spokenLanguages.arabic": "arabisk",
     "applications.sharePhone": "Del telefonnummeret mitt med {{name}}",
-    "applications.sharePhoneUnavailable": "Legg til et telefonnummer i Innstillinger før du deler det.",
+    "applications.sharePhoneUnavailable":
+      "Legg til et telefonnummer i Innstillinger før du deler det.",
     "applications.phoneShared": "{{owner}} delte et telefonnummer med deg",
     "applications.confirm.acceptedTitle": "Godta {{name}}?",
-    "applications.confirm.acceptedText": "Dette bekrefter {{name}} for denne båtsitten. Du kan fortsette å koordinere nøkkeloverlevering og gjennomgang i meldinger.",
-    "applications.confirm.acceptedVideoCallNote": "Godta først etter at dere har fullført en videosamtale sammen.",
+    "applications.confirm.acceptedText":
+      "Dette bekrefter {{name}} for denne båtsitten. Du kan fortsette å koordinere nøkkeloverlevering og gjennomgang i meldinger.",
+    "applications.confirm.acceptedVideoCallNote":
+      "Godta først etter at dere har fullført en videosamtale sammen.",
     "applications.confirm.acceptedAction": "Ja, godta",
     "applications.confirm.declinedTitle": "Avslå {{name}}?",
-    "applications.confirm.declinedText": "{{name}} vil ikke lenger bli vurdert for dette møtet. Samtaleloggen din forblir tilgjengelig.",
+    "applications.confirm.declinedText":
+      "{{name}} vil ikke lenger bli vurdert for dette møtet. Samtaleloggen din forblir tilgjengelig.",
     "applications.confirm.declinedAction": "Ja, avslå",
     "reviews.title": "Anmeldelser",
     "reviews.recentTitle": "Nylige anmeldelser",
@@ -3973,20 +4086,23 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.responseTooShort": "Skriv minst 8 tegn.",
     "reviews.responseExists": "Du har allerede svart på denne anmeldelsen.",
     "reviews.responseFailed": "Kunne ikke legge ut svaret. Prøv igjen.",
-    "reviews.windowBanner": "Du har {{days}} dager igjen til å legge igjen en anmeldelse. Anmeldelser holder åpent i 7 dager etter et opphold avsluttes.",
+    "reviews.windowBanner":
+      "Du har {{days}} dager igjen til å legge igjen en anmeldelse. Anmeldelser holder åpent i 7 dager etter et opphold avsluttes.",
     "reviews.windowClosed": "Gjennomgangsvinduet for dette oppholdet er stengt.",
     "reviews.sitNotCompleted": "Du kan legge igjen en anmeldelse etter at oppholdet er ferdig.",
   },
   da: {
     "messages.aboutBoat": "Om {{boat}}",
-    "auth.secureLoginRequired": "Åbn Boatstead over HTTPS for at logge ind på denne eksisterende demokonto.",
+    "auth.secureLoginRequired":
+      "Åbn Boatstead over HTTPS for at logge ind på denne eksisterende demokonto.",
     "auth.termsAgreement": "Jeg accepterer Boatsteads <terms>Servicevilkår</terms>.",
     "auth.termsRequired": "Du skal acceptere servicevilkårene for at oprette en konto.",
     "auth.continueWithGoogle": "Fortsæt med Google",
     "auth.continueWithApple": "Fortsæt med Apple",
     "auth.continueWithFacebook": "Fortsæt med Facebook",
     "auth.orEmail": "Eller brug e-mail",
-    "auth.socialMockNotice": "Socialt login er hånet i denne prototype og forbliver i denne browser.",
+    "auth.socialMockNotice":
+      "Socialt login er hånet i denne prototype og forbliver i denne browser.",
     "applications.reviewCount": "Ansøgere ({{count}})",
     "applications.kicker": "Ansøgergennemgang",
     "applications.title": "Ansøgninger om {{boat}}",
@@ -4033,15 +4149,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Nedgang",
     "applications.action.unaccept": "Ikke acceptere",
     "applications.anotherAcceptedBannerTitle": "Endnu en ansøger er bekræftet",
-    "applications.anotherAcceptedBanner": "Denne ansøger blev ikke accepteret. Du kan stadig chatte med dem her, men du skal ikke acceptere {{name}}, før du kan acceptere denne person.",
+    "applications.anotherAcceptedBanner":
+      "Denne ansøger blev ikke accepteret. Du kan stadig chatte med dem her, men du skal ikke acceptere {{name}}, før du kan acceptere denne person.",
     "applications.confirm.unacceptTitle": "Vil du ikke acceptere {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} vil ikke længere blive bekræftet for dette møde. Du kan efterfølgende acceptere en anden ansøger.",
+    "applications.confirm.unacceptText":
+      "{{name}} vil ikke længere blive bekræftet for dette møde. Du kan efterfølgende acceptere en anden ansøger.",
     "applications.confirm.unacceptAction": "Ja, ikke acceptere",
     "applications.conversation": "Samtale",
     "applications.systemMessage.accepted": "Du blev accepteret til dette møde",
     "applications.systemMessage.acceptedOwner": "Du accepterede {{name}} til dette møde",
     "applications.systemMessage.declined": "Du kommer ikke længere i betragtning til dette møde",
-    "applications.systemMessage.applicantsClosed": "Ejeren overvejer ikke længere ansøgere til denne sit",
+    "applications.systemMessage.applicantsClosed":
+      "Ejeren overvejer ikke længere ansøgere til denne sit",
     "applications.systemMessage.videoCallRequestTitle": "Videoopkald foreslået",
     "applications.systemMessage.videoCallRequest": "{{name}} foreslog et videoopkald.",
     "applications.systemMessage.videoCallCounterTitle": "Nyt tidspunkt foreslået",
@@ -4051,9 +4170,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.videoCallDeclinedTitle": "Videoopkald afvist",
     "applications.systemMessage.videoCallDeclined": "{{name}} afviste videoopkaldsforslaget.",
     "applications.requestVideoCall": "Anmod om videoopkald",
-    "applications.requestVideoCallHint": "Foreslå en dato, tid og længde, før du accepterer, så du kan bekræfte oplevelsen og passe sammen.",
+    "applications.requestVideoCallHint":
+      "Foreslå en dato, tid og længde, før du accepterer, så du kan bekræfte oplevelsen og passe sammen.",
     "applications.requestVideoCallConfirmTitle": "Foreslå et videoopkald",
-    "applications.requestVideoCallConfirmText": "Vælg en dato, tid og længde for et opkald med {{name}}. De kan acceptere eller foreslå et andet tidspunkt.",
+    "applications.requestVideoCallConfirmText":
+      "Vælg en dato, tid og længde for et opkald med {{name}}. De kan acceptere eller foreslå et andet tidspunkt.",
     "applications.requestVideoCallConfirmAction": "Send forslag",
     "applications.videoCall.date": "Dato",
     "applications.videoCall.time": "Tid",
@@ -4067,7 +4188,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.pastError": "Vælg en dato og et klokkeslæt i fremtiden.",
     "applications.videoCall.incomplete": "Vælg en dato og et tidspunkt for opkaldet.",
     "applications.videoCall.adjustTitle": "Foreslå et andet tidspunkt",
-    "applications.videoCall.adjustText": "Foreslå en ny dato, tid og varighed for opkaldet med {{name}}.",
+    "applications.videoCall.adjustText":
+      "Foreslå en ny dato, tid og varighed for opkaldet med {{name}}.",
     "applications.videoCall.adjustAction": "Send ny tid",
     "applications.isTyping": "{{name}} skriver...",
     "detail.respondsWithinDay": "Svarer normalt inden for 24 timer",
@@ -4078,21 +4200,27 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "lightbox.next": "Næste billede",
     "lightbox.viewPhoto": "Se billede {{number}}",
     "apply.partySize": "Hvor mange mennesker bliver der?",
-    "apply.partySizeHint_one": "Inkluder dig selv og enhver partner eller ledsager. Denne siddeplads tillader op til 1 person.",
-    "apply.partySizeHint_other": "Inkluder dig selv og enhver partner eller ledsager. Denne sit tillader op til {{count}} personer.",
-    "apply.termsAgreement": "Jeg accepterer Boatsteads <terms>Servicevilkår</terms> for denne sit-applikation.",
+    "apply.partySizeHint_one":
+      "Inkluder dig selv og enhver partner eller ledsager. Denne siddeplads tillader op til 1 person.",
+    "apply.partySizeHint_other":
+      "Inkluder dig selv og enhver partner eller ledsager. Denne sit tillader op til {{count}} personer.",
+    "apply.termsAgreement":
+      "Jeg accepterer Boatsteads <terms>Servicevilkår</terms> for denne sit-applikation.",
     "apply.termsRequired": "Du skal acceptere servicevilkårene, før du sender denne ansøgning.",
     "apply.verificationRequiredTitle": "Bekræft din identitet for at ansøge",
-    "apply.verificationRequiredText": "Bekræft dit offentlige id, din e-mailadresse og dit telefonnummer, før du ansøger om at blive på en båd.",
+    "apply.verificationRequiredText":
+      "Bekræft dit offentlige id, din e-mailadresse og dit telefonnummer, før du ansøger om at blive på en båd.",
     "apply.verificationRequiredCta": "Fuldfør verifikation på din profil",
     "apply.verificationChecking": "Tjek din bekræftelse...",
     "apply.sendFailed": "Din ansøgning kunne ikke sendes. Prøv igen.",
     "apply.applicationsClosed": "Dette møde accepterer ikke længere ansøgninger.",
     "apply.confirmedSitConflictTitle": "Du har allerede en bekræftet sit",
-    "apply.confirmedSitConflict": "Du er bekræftet til {{boat}} under overlappende datoer, så du kan ikke anmode om et nyt møde i denne periode.",
+    "apply.confirmedSitConflict":
+      "Du er bekræftet til {{boat}} under overlappende datoer, så du kan ikke anmode om et nyt møde i denne periode.",
     "apply.viewConfirmedSit": "Se bekræftet sit",
     "detail.confirmedSitConflict": "Bekræftet til endnu et sit",
-    "detail.confirmedSitConflictHint": "Du er allerede bekræftet til {{boat}} på samme tid, så du kan ikke anmode om denne sit.",
+    "detail.confirmedSitConflictHint":
+      "Du er allerede bekræftet til {{boat}} på samme tid, så du kan ikke anmode om denne sit.",
     "detail.applicationsClosed": "Ansøgninger lukket",
     "detail.applicationsClosedHint": "Ejeren accepterer ikke nye ansøgninger til denne sit.",
     "owner.applicationsClosed": "Ansøgere holdt pause",
@@ -4100,52 +4228,70 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "owner.openRequests": "Genoptag nye ansøgere",
     "applications.closeRequests": "Sæt nye ansøgere på pause",
     "applications.openRequests": "Genoptag nye ansøgere",
-    "applications.requestsClosedNotice": "Nye ansøgere er sat på pause til dette møde. Eksisterende samtaler forbliver tilgængelige. Brug Genoptag nye ansøgere, når du ønsker, at folk skal ansøge igen.",
+    "applications.requestsClosedNotice":
+      "Nye ansøgere er sat på pause til dette møde. Eksisterende samtaler forbliver tilgængelige. Brug Genoptag nye ansøgere, når du ønsker, at folk skal ansøge igen.",
     "applications.confirm.closeRequestsTitle": "Pause nye ansøgere?",
-    "applications.confirm.closeRequestsText": "Sitter vil ikke længere kunne ansøge. Eksisterende samtaler forbliver tilgængelige, og du kan genoptage når som helst.",
+    "applications.confirm.closeRequestsText":
+      "Sitter vil ikke længere kunne ansøge. Eksisterende samtaler forbliver tilgængelige, og du kan genoptage når som helst.",
     "applications.confirm.closeRequestsAction": "Ja, pause ansøgere",
     "sitEditor.maxGuests": "Maksimalt antal personer",
     "sitEditor.maxGuestsHint": "Angiv det samlede antal, der må bo ombord, inklusive ansøgeren.",
-    "sitEditor.termsAgreement": "Jeg accepterer Boatsteads <terms>Servicevilkår</terms> for denne sit-fortegnelse.",
+    "sitEditor.termsAgreement":
+      "Jeg accepterer Boatsteads <terms>Servicevilkår</terms> for denne sit-fortegnelse.",
     "sitEditor.termsRequired": "Du skal acceptere servicevilkårene, før du udgiver denne side.",
     "applications.partySize": "Folk der bliver",
     "detail.maxGuests_one": "Max 1 person",
     "detail.maxGuests_other": "Maksimalt {{count}} personer",
     "how.liveaboardTitle": "Hver sit er liveaboard",
-    "how.liveaboardText": "Boatstead er til ophold, hvor den accepterede sitter bor og sover ombord på de aftalte datoer. Skibet er midlertidig indkvartering og et plejeansvar, ikke en båd til at låne, chartre eller sejle, medmindre ejeren giver udtrykkelige skriftlige instruktioner.",
+    "how.liveaboardText":
+      "Boatstead er til ophold, hvor den accepterede sitter bor og sover ombord på de aftalte datoer. Skibet er midlertidig indkvartering og et plejeansvar, ikke en båd til at låne, chartre eller sejle, medmindre ejeren giver udtrykkelige skriftlige instruktioner.",
     "how.risksKicker": "Hvorfor liveaboard-pleje betyder noget",
     "how.risksTitle": "En båd efterladt alene kan hurtigt udvikle alvorlige problemer",
-    "how.risksText": "En sitter sørger for regelmæssig observation og følger ejerens aftalte plejeplan. De bør kontakte ejeren, lystbådehavnen eller en kvalificeret fagmand i stedet for at forsøge sig med usikre reparationer.",
-    "how.risks.bilge": "Lænsepumper kan svigte, hvilket tillader ubemærket vandindtrængning og oversvømmelse.",
-    "how.risks.engine": "Motorer kan korrodere, udvikle brændstofproblemer eller sætte sig fast efter længere tids inaktivitet.",
-    "how.risks.power": "Batterier kan aflades, og landstrømsafbrydere kan udløse, hvilket deaktiverer pumper og alarmer.",
-    "how.risks.mooring": "Fortøjningsliner kan gnave eller skille sig, og fendere kan skifte, når vejret skifter.",
+    "how.risksText":
+      "En sitter sørger for regelmæssig observation og følger ejerens aftalte plejeplan. De bør kontakte ejeren, lystbådehavnen eller en kvalificeret fagmand i stedet for at forsøge sig med usikre reparationer.",
+    "how.risks.bilge":
+      "Lænsepumper kan svigte, hvilket tillader ubemærket vandindtrængning og oversvømmelse.",
+    "how.risks.engine":
+      "Motorer kan korrodere, udvikle brændstofproblemer eller sætte sig fast efter længere tids inaktivitet.",
+    "how.risks.power":
+      "Batterier kan aflades, og landstrømsafbrydere kan udløse, hvilket deaktiverer pumper og alarmer.",
+    "how.risks.mooring":
+      "Fortøjningsliner kan gnave eller skille sig, og fendere kan skifte, når vejret skifter.",
     "how.risks.leaks": "Lækager på dæk, luge, VVS og søhane kan udvikle sig eller forværres.",
-    "how.risks.ventilation": "Kondens og dårlig ventilation kan forårsage skimmelsvamp, meldug og indvendige skader.",
-    "how.risks.weather": "Storme, vågne, tidevand og skiftende vandstande kan kræve hurtige justeringer.",
-    "how.risks.security": "Sikkerhedsalarmer, marinameddelelser, skadedyr eller kæledyr ombord kan kræve øjeblikkelig opmærksomhed.",
+    "how.risks.ventilation":
+      "Kondens og dårlig ventilation kan forårsage skimmelsvamp, meldug og indvendige skader.",
+    "how.risks.weather":
+      "Storme, vågne, tidevand og skiftende vandstande kan kræve hurtige justeringer.",
+    "how.risks.security":
+      "Sikkerhedsalarmer, marinameddelelser, skadedyr eller kæledyr ombord kan kræve øjeblikkelig opmærksomhed.",
     "terms.liveaboard.title": "Liveaboard brug af fartøjet",
-    "terms.liveaboard.text": "Fortegnelser skal tilbyde et fartøj, der er sikkert, lovligt og rimeligt beboeligt, så den siddende kan bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dag-tjek-service. På de aftalte datoer må oppasseren kun bruge fartøjet som midlertidig bolig og til at udføre aftalt pleje. Medmindre ejeren giver udtrykkelig skriftlig tilladelse, må sitteren ikke navigere, flytte, chartre, udlåne, fremleje, bruge kommercielt eller være vært for uautoriserede overnattende gæster ombord på fartøjet. Sikkerheds- og nødinstruktioner har prioritet.",
-    "notifications.items.sitAccepted": "{{actor}} accepterede din invitation til at sidde {{boat}}.",
+    "terms.liveaboard.text":
+      "Fortegnelser skal tilbyde et fartøj, der er sikkert, lovligt og rimeligt beboeligt, så den siddende kan bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dag-tjek-service. På de aftalte datoer må oppasseren kun bruge fartøjet som midlertidig bolig og til at udføre aftalt pleje. Medmindre ejeren giver udtrykkelig skriftlig tilladelse, må sitteren ikke navigere, flytte, chartre, udlåne, fremleje, bruge kommercielt eller være vært for uautoriserede overnattende gæster ombord på fartøjet. Sikkerheds- og nødinstruktioner har prioritet.",
+    "notifications.items.sitAccepted":
+      "{{actor}} accepterede din invitation til at sidde {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} accepterede din ansøgning om {{boat}}.",
     "notifications.items.newApplication": "{{actor}} anvendt til at sidde {{boat}}.",
     "notifications.items.newMessage": "{{actor}} har sendt dig en ny besked om {{boat}}.",
     "notifications.items.sitReminder": "Din sit på {{boat}} starter snart.",
-    "notifications.items.welcome": "Velkommen til Boatstead. Fuldfør din profil for at begynde at skabe forbindelser.",
+    "notifications.items.welcome":
+      "Velkommen til Boatstead. Fuldfør din profil for at begynde at skabe forbindelser.",
     "applications.reply": "Svar",
     "applications.acceptedKicker": "Din sitter",
     "applications.acceptedTitle": "Accepteret ansøger",
     "applications.acceptedTitlePlural": "Accepterede ansøgere ({{count}})",
-    "applications.acceptedHint": "Denne person er bekræftet til sit. Send en besked til dem her for at arrangere nøgleoverdragelse, bådgennemgang og opholdsdetaljer.",
+    "applications.acceptedHint":
+      "Denne person er bekræftet til sit. Send en besked til dem her for at arrangere nøgleoverdragelse, bådgennemgang og opholdsdetaljer.",
     "applications.acceptedOpen": "Åben samtale",
     "applications.acceptedView": "Se godkendt ansøger",
     "applications.acceptedViewing": "Viser detaljer",
     "applications.returnToAccepted": "Tilbage til {{name}}",
     "applications.acceptedListHint": "Accepterede ansøgere vises i den fremhævede boks ovenfor.",
     "applications.videoCallBannerTitle": "Gennemfør et videoopkald, før du accepterer",
-    "applications.videoCallBanner": "Videoopkald til udvalgte sittere, før du accepterer nogen til opholdet. Brug den til at bekræfte oplevelse, tilgængelighed og pasform.",
+    "applications.videoCallBanner":
+      "Videoopkald til udvalgte sittere, før du accepterer nogen til opholdet. Brug den til at bekræfte oplevelse, tilgængelighed og pasform.",
     "applications.handoverBannerTitle": "Planlæg nøgleoverdragelsen og gennemgangen",
-    "applications.handoverBanner": "Aftal, hvornår og hvor du skal aflevere nøgler, og gå gennem systemer, køjeadgang og nødkontakter, før opholdet begynder.",
+    "applications.handoverBanner":
+      "Aftal, hvornår og hvor du skal aflevere nøgler, og gå gennem systemer, køjeadgang og nødkontakter, før opholdet begynder.",
     "sitPhase.step": "Trin {{number}}",
     "sitPhase.acceptingApplicants": "Modtagelse af ansøgere",
     "sitPhase.applicantChosen": "Venter på bekræftelse",
@@ -4154,11 +4300,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.flagButton": "Flagudstedelse til Boatstead",
     "sitIssue.kicker": "Under opholdet",
     "sitIssue.title": "Rapporter et problem",
-    "sitIssue.hint": "Fortæl Boatstead om et problem med opholdet på {{boat}}. Vores team vil følge op.",
+    "sitIssue.hint":
+      "Fortæl Boatstead om et problem med opholdet på {{boat}}. Vores team vil følge op.",
     "sitIssue.bannerTitle": "Er der noget galt under opholdet?",
     "sitIssue.bannerHint": "Flag det til Boatstead, så vi kan hjælpe med at løse det.",
     "sitIssue.messageLabel": "Hvad skete der?",
-    "sitIssue.messagePlaceholder": "Beskriv problemet, hvornår det startede, og alt hvad vi burde vide for at hjælpe.",
+    "sitIssue.messagePlaceholder":
+      "Beskriv problemet, hvornår det startede, og alt hvad vi burde vide for at hjælpe.",
     "sitIssue.messageTooShort": "Skriv venligst mindst 20 tegn.",
     "sitIssue.messagePrefix": "Forbliv problemet på {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "Send til Boatstead",
@@ -4169,21 +4317,26 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.report": "Rapportér besked",
     "messageReport.escalate": "Eskaler til Boatstead",
     "messageReport.title": "Vil du rapportere denne besked?",
-    "messageReport.hint": "Fortæl os, hvorfor denne besked er et problem. Rapporter gennemgås privat og deles ikke med afsenderen.",
+    "messageReport.hint":
+      "Fortæl os, hvorfor denne besked er et problem. Rapporter gennemgås privat og deles ikke med afsenderen.",
     "messageReport.escalateTitle": "Vil du eskalere denne besked?",
-    "messageReport.escalateHint": "Eskalér, når du har brug for Boatstead-support for at gennemgå denne meddelelse og hjælpe med at løse problemet.",
+    "messageReport.escalateHint":
+      "Eskalér, når du har brug for Boatstead-support for at gennemgå denne meddelelse og hjælpe med at løse problemet.",
     "messageReport.messageLabel": "Besked",
     "messageReport.submit": "Indsend rapport",
     "messageReport.escalateSubmit": "Eskaler til Boatstead",
     "messageReport.sending": "Sender...",
     "messageReport.detailsRequired": "Tilføj venligst en kort beskrivelse af denne grund.",
     "messageReport.noExtraDetails": "Ingen ekstra detaljer angivet.",
-    "messageReport.escalatePrefix": "Eskaleret besked på {{boat}} fra {{sender}}:\n\n\"{{message}}\"\n\nKontekst: {{details}}",
+    "messageReport.escalatePrefix":
+      'Eskaleret besked på {{boat}} fra {{sender}}:\n\n"{{message}}"\n\nKontekst: {{details}}',
     "messageReport.escalateError": "Kunne ikke eskalere denne besked. Prøv venligst igen.",
     "messageReport.successTitle": "Rapport fremsendt",
-    "messageReport.successText": "Tak. Vi har modtaget din rapport om en besked fra {{name}} og vil gennemgå den.",
+    "messageReport.successText":
+      "Tak. Vi har modtaget din rapport om en besked fra {{name}} og vil gennemgå den.",
     "messageReport.escalateSuccessTitle": "Eskaleret til Boatstead",
-    "messageReport.escalateSuccessText": "Vores team vil gennemgå denne meddelelse og følge op via e-mail.",
+    "messageReport.escalateSuccessText":
+      "Vores team vil gennemgå denne meddelelse og følge op via e-mail.",
     "applications.replyPlaceholder": "Skriv et svar...",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
@@ -4193,15 +4346,19 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.hideTranslation": "Skjul oversættelse",
     "applications.messageActions": "Beskedhandlinger",
     "applications.translationFailed": "Oversættelse er midlertidigt utilgængelig. Prøv igen.",
-    "apply.noSharedLanguage": "Du og {{owner}} angiver ikke et delt sprog. Overvej at bruge oversættelsesværktøjer og bekræft vigtige instruktioner tydeligt.",
-    "apply.contactDetailsTerms": "At dele kontaktoplysninger uden for platformen nu er i strid med vores servicevilkår.",
-    "apply.contactDetailsBlocked": "E-mailadresser og telefonnumre kan ikke deles i en indledende besked. Hold kommunikationen på Boatstead indtil ansøgningen er accepteret.",
+    "apply.noSharedLanguage":
+      "Du og {{owner}} angiver ikke et delt sprog. Overvej at bruge oversættelsesværktøjer og bekræft vigtige instruktioner tydeligt.",
+    "apply.contactDetailsTerms":
+      "At dele kontaktoplysninger uden for platformen nu er i strid med vores servicevilkår.",
+    "apply.contactDetailsBlocked":
+      "E-mailadresser og telefonnumre kan ikke deles i en indledende besked. Hold kommunikationen på Boatstead indtil ansøgningen er accepteret.",
     "profile.phoneNumber": "Telefonnummer",
     "profile.callingCode": "Landenummer",
     "profile.countrySearch": "Søg land",
     "profile.countrySearchEmpty": "Ingen lande fundet",
     "profile.phonePlaceholder": "555 123 4567",
-    "profile.phoneHint": "Holdes privat, medmindre du vælger at dele det, når du accepterer en sitter.",
+    "profile.phoneHint":
+      "Holdes privat, medmindre du vælger at dele det, når du accepterer en sitter.",
     "spokenLanguages.english": "engelsk",
     "spokenLanguages.french": "fransk",
     "spokenLanguages.spanish": "spansk",
@@ -4220,14 +4377,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "spokenLanguages.polish": "polsk",
     "spokenLanguages.arabic": "arabisk",
     "applications.sharePhone": "Del mit telefonnummer med {{name}}",
-    "applications.sharePhoneUnavailable": "Tilføj et telefonnummer i Indstillinger, før du deler det.",
+    "applications.sharePhoneUnavailable":
+      "Tilføj et telefonnummer i Indstillinger, før du deler det.",
     "applications.phoneShared": "{{owner}} delte et telefonnummer med dig",
     "applications.confirm.acceptedTitle": "Acceptere {{name}}?",
-    "applications.confirm.acceptedText": "Dette bekræfter {{name}} for denne båd. Du kan fortsætte med at koordinere nøgleoverdragelsen og gennemgangen i beskeder.",
-    "applications.confirm.acceptedVideoCallNote": "Accepter først, når I har gennemført et videoopkald sammen.",
+    "applications.confirm.acceptedText":
+      "Dette bekræfter {{name}} for denne båd. Du kan fortsætte med at koordinere nøgleoverdragelsen og gennemgangen i beskeder.",
+    "applications.confirm.acceptedVideoCallNote":
+      "Accepter først, når I har gennemført et videoopkald sammen.",
     "applications.confirm.acceptedAction": "Ja, accepter",
     "applications.confirm.declinedTitle": "Afvise {{name}}?",
-    "applications.confirm.declinedText": "{{name}} vil ikke længere komme i betragtning til dette møde. Din samtalehistorik forbliver tilgængelig.",
+    "applications.confirm.declinedText":
+      "{{name}} vil ikke længere komme i betragtning til dette møde. Din samtalehistorik forbliver tilgængelig.",
     "applications.confirm.declinedAction": "Ja, afslå",
     "reviews.title": "Anmeldelser",
     "reviews.recentTitle": "Seneste anmeldelser",
@@ -4260,20 +4421,23 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.responseTooShort": "Skriv venligst mindst 8 tegn.",
     "reviews.responseExists": "Du har allerede svaret på denne anmeldelse.",
     "reviews.responseFailed": "Svaret kunne ikke sendes. Prøv igen.",
-    "reviews.windowBanner": "Du har {{days}} dage tilbage til at skrive en anmeldelse. Anmeldelser forbliver åbne i 7 dage efter et ophold slutter.",
+    "reviews.windowBanner":
+      "Du har {{days}} dage tilbage til at skrive en anmeldelse. Anmeldelser forbliver åbne i 7 dage efter et ophold slutter.",
     "reviews.windowClosed": "Gennemgangsvinduet for dette ophold er lukket.",
     "reviews.sitNotCompleted": "Du kan skrive en anmeldelse efter opholdet er afsluttet.",
   },
   fi: {
     "messages.aboutBoat": "Tietoja {{boat}}",
-    "auth.secureLoginRequired": "Avaa Boatstead HTTPS:n kautta kirjautuaksesi sisään tähän olemassa olevaan demotiliin.",
+    "auth.secureLoginRequired":
+      "Avaa Boatstead HTTPS:n kautta kirjautuaksesi sisään tähän olemassa olevaan demotiliin.",
     "auth.termsAgreement": "Hyväksyn Boatsteadin <terms>käyttöehdot</terms>.",
     "auth.termsRequired": "Sinun on hyväksyttävä käyttöehdot tilin luomiseksi.",
     "auth.continueWithGoogle": "Jatka Googlella",
     "auth.continueWithApple": "Jatka Applella",
     "auth.continueWithFacebook": "Jatka Facebookissa",
     "auth.orEmail": "Tai käytä sähköpostia",
-    "auth.socialMockNotice": "Sosiaalista sisäänkirjautumista pilkataan tässä prototyypissä ja se pysyy tässä selaimessa.",
+    "auth.socialMockNotice":
+      "Sosiaalista sisäänkirjautumista pilkataan tässä prototyypissä ja se pysyy tässä selaimessa.",
     "applications.reviewCount": "Hakijat ({{count}})",
     "applications.kicker": "Hakijan arvostelu",
     "applications.title": "Hakemukset {{boat}}",
@@ -4320,15 +4484,18 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "Hylkää",
     "applications.action.unaccept": "Ei hyväksy",
     "applications.anotherAcceptedBannerTitle": "Toinen hakija on vahvistettu",
-    "applications.anotherAcceptedBanner": "Tätä hakijaa ei hyväksytty. Voit silti keskustella heidän kanssaan täällä, mutta sinun on peruutettava {{name}} hyväksyntä ennen kuin voit hyväksyä tämän henkilön.",
+    "applications.anotherAcceptedBanner":
+      "Tätä hakijaa ei hyväksytty. Voit silti keskustella heidän kanssaan täällä, mutta sinun on peruutettava {{name}} hyväksyntä ennen kuin voit hyväksyä tämän henkilön.",
     "applications.confirm.unacceptTitle": "Hylätäänkö {{name}}?",
-    "applications.confirm.unacceptText": "{{name}} ei enää vahvisteta tälle istunnolle. Voit hyväksyä toisen hakijan myöhemmin.",
+    "applications.confirm.unacceptText":
+      "{{name}} ei enää vahvisteta tälle istunnolle. Voit hyväksyä toisen hakijan myöhemmin.",
     "applications.confirm.unacceptAction": "Kyllä, ei hyväksytä",
     "applications.conversation": "Keskustelu",
     "applications.systemMessage.accepted": "Sinut hyväksyttiin tähän istuntoon",
     "applications.systemMessage.acceptedOwner": "Hyväksyit {{name}} tälle istunnolle",
     "applications.systemMessage.declined": "Sinua ei enää oteta huomioon tässä istunnossa",
-    "applications.systemMessage.applicantsClosed": "Omistaja ei enää harkitse hakijoita tälle paikalle",
+    "applications.systemMessage.applicantsClosed":
+      "Omistaja ei enää harkitse hakijoita tälle paikalle",
     "applications.systemMessage.videoCallRequestTitle": "Videopuhelu ehdotettu",
     "applications.systemMessage.videoCallRequest": "{{name}} ehdotti videopuhelua.",
     "applications.systemMessage.videoCallCounterTitle": "Uusi aika ehdotettu",
@@ -4338,9 +4505,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.videoCallDeclinedTitle": "Videopuhelu hylättiin",
     "applications.systemMessage.videoCallDeclined": "{{name}} hylkäsi videopuheluehdotuksen.",
     "applications.requestVideoCall": "Pyydä videopuhelua",
-    "applications.requestVideoCallHint": "Ehdota päivämäärä, aika ja pituus ennen hyväksymistä, jotta voit vahvistaa kokemuksesi ja sovittaa yhteen.",
+    "applications.requestVideoCallHint":
+      "Ehdota päivämäärä, aika ja pituus ennen hyväksymistä, jotta voit vahvistaa kokemuksesi ja sovittaa yhteen.",
     "applications.requestVideoCallConfirmTitle": "Ehdota videopuhelua",
-    "applications.requestVideoCallConfirmText": "Valitse puhelun päivämäärä, aika ja pituus painikkeella {{name}}. He voivat hyväksyä tai ehdottaa eri aikaa.",
+    "applications.requestVideoCallConfirmText":
+      "Valitse puhelun päivämäärä, aika ja pituus painikkeella {{name}}. He voivat hyväksyä tai ehdottaa eri aikaa.",
     "applications.requestVideoCallConfirmAction": "Lähetä ehdotus",
     "applications.videoCall.date": "Päivämäärä",
     "applications.videoCall.time": "Aika",
@@ -4354,7 +4523,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.pastError": "Valitse päivämäärä ja aika tulevaisuudessa.",
     "applications.videoCall.incomplete": "Valitse puhelun päivämäärä ja aika.",
     "applications.videoCall.adjustTitle": "Ehdota eri aikaa",
-    "applications.videoCall.adjustText": "Ehdota puhelulle uutta päivämäärää, kellonaikaa ja kestoa painamalla {{name}}.",
+    "applications.videoCall.adjustText":
+      "Ehdota puhelulle uutta päivämäärää, kellonaikaa ja kestoa painamalla {{name}}.",
     "applications.videoCall.adjustAction": "Lähetä uusi aika",
     "applications.isTyping": "{{name}} kirjoittaa...",
     "detail.respondsWithinDay": "Vastaa yleensä 24 tunnin sisällä",
@@ -4365,21 +4535,27 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "lightbox.next": "Seuraava kuva",
     "lightbox.viewPhoto": "Katso valokuva {{number}}",
     "apply.partySize": "Kuinka monta ihmistä jää?",
-    "apply.partySizeHint_one": "Ota mukaan itsesi ja mikä tahansa kumppani tai seuralainen. Tähän istumaan mahtuu 1 henkilö.",
-    "apply.partySizeHint_other": "Ota mukaan itsesi ja mikä tahansa kumppani tai seuralainen. Tähän istuntoon mahtuu jopa {{count}} henkilöä.",
-    "apply.termsAgreement": "Hyväksyn Boatsteadin <terms>Palveluehdot</terms> tälle istumasovellukselle.",
+    "apply.partySizeHint_one":
+      "Ota mukaan itsesi ja mikä tahansa kumppani tai seuralainen. Tähän istumaan mahtuu 1 henkilö.",
+    "apply.partySizeHint_other":
+      "Ota mukaan itsesi ja mikä tahansa kumppani tai seuralainen. Tähän istuntoon mahtuu jopa {{count}} henkilöä.",
+    "apply.termsAgreement":
+      "Hyväksyn Boatsteadin <terms>Palveluehdot</terms> tälle istumasovellukselle.",
     "apply.termsRequired": "Sinun on hyväksyttävä käyttöehdot ennen tämän hakemuksen lähettämistä.",
     "apply.verificationRequiredTitle": "Vahvista henkilöllisyytesi hakeaksesi",
-    "apply.verificationRequiredText": "Vahvista virallinen henkilöllisyystodistus, sähköpostiosoitteesi ja puhelinnumerosi ennen kuin haet veneelle oleskelua.",
+    "apply.verificationRequiredText":
+      "Vahvista virallinen henkilöllisyystodistus, sähköpostiosoitteesi ja puhelinnumerosi ennen kuin haet veneelle oleskelua.",
     "apply.verificationRequiredCta": "Viimeistele profiilisi vahvistus",
     "apply.verificationChecking": "Tarkistetaan vahvistusta…",
     "apply.sendFailed": "Hakemustasi ei voitu lähettää. Yritä uudelleen.",
     "apply.applicationsClosed": "Tämä istunto ei enää hyväksy hakemuksia.",
     "apply.confirmedSitConflictTitle": "Sinulla on jo vahvistettu istunto",
-    "apply.confirmedSitConflict": "Sinut on vahvistettu {{boat}} päällekkäisinä päivinä, joten et voi pyytää toista istuntoa tälle ajanjaksolle.",
+    "apply.confirmedSitConflict":
+      "Sinut on vahvistettu {{boat}} päällekkäisinä päivinä, joten et voi pyytää toista istuntoa tälle ajanjaksolle.",
     "apply.viewConfirmedSit": "Näytä vahvistettu istunto",
     "detail.confirmedSitConflict": "Vahvistettu toiselle istunnolle",
-    "detail.confirmedSitConflictHint": "Sinut on jo vahvistettu {{boat}} samaan aikaan, joten et voi pyytää tätä istuntoa.",
+    "detail.confirmedSitConflictHint":
+      "Sinut on jo vahvistettu {{boat}} samaan aikaan, joten et voi pyytää tätä istuntoa.",
     "detail.applicationsClosed": "Hakemukset suljettu",
     "detail.applicationsClosedHint": "Omistaja ei ota vastaan uusia hakemuksia tälle paikalle.",
     "owner.applicationsClosed": "Hakijat pysähtyivät",
@@ -4387,52 +4563,72 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "owner.openRequests": "Jatka uusia hakijoita",
     "applications.closeRequests": "Keskeytä uudet hakijat",
     "applications.openRequests": "Jatka uusia hakijoita",
-    "applications.requestsClosedNotice": "Uudet hakijat on keskeytetty tälle istunnolle. Olemassa olevat keskustelut pysyvät saatavilla. Käytä Jatka uusia hakijoita, kun haluat ihmisten hakevan uudelleen.",
+    "applications.requestsClosedNotice":
+      "Uudet hakijat on keskeytetty tälle istunnolle. Olemassa olevat keskustelut pysyvät saatavilla. Käytä Jatka uusia hakijoita, kun haluat ihmisten hakevan uudelleen.",
     "applications.confirm.closeRequestsTitle": "Keskeytetäänkö uudet hakijat?",
-    "applications.confirm.closeRequestsText": "Sitterit eivät voi enää hakea. Olemassa olevat keskustelut pysyvät saatavilla, ja voit jatkaa milloin tahansa.",
+    "applications.confirm.closeRequestsText":
+      "Sitterit eivät voi enää hakea. Olemassa olevat keskustelut pysyvät saatavilla, ja voit jatkaa milloin tahansa.",
     "applications.confirm.closeRequestsAction": "Kyllä, keskeytä hakijat",
     "sitEditor.maxGuests": "Henkilöiden enimmäismäärä",
-    "sitEditor.maxGuestsHint": "Aseta aluksella mahdollisesti asuvien kokonaismäärä, hakija mukaan lukien.",
-    "sitEditor.termsAgreement": "Hyväksyn Boatsteadin <terms>Palveluehdot</terms> tälle paikkalistalle.",
-    "sitEditor.termsRequired": "Sinun on hyväksyttävä käyttöehdot ennen tämän istunnon julkaisemista.",
+    "sitEditor.maxGuestsHint":
+      "Aseta aluksella mahdollisesti asuvien kokonaismäärä, hakija mukaan lukien.",
+    "sitEditor.termsAgreement":
+      "Hyväksyn Boatsteadin <terms>Palveluehdot</terms> tälle paikkalistalle.",
+    "sitEditor.termsRequired":
+      "Sinun on hyväksyttävä käyttöehdot ennen tämän istunnon julkaisemista.",
     "applications.partySize": "Ihmisiä jäämässä",
     "detail.maxGuests_one": "Enintään 1 henkilö",
     "detail.maxGuests_other": "Enintään {{count}} henkilöä",
     "how.liveaboardTitle": "Jokainen istunto on liveaboard",
-    "how.liveaboardText": "Boatstead on tarkoitettu majoituksiin, joissa hyväksytty lapsenvahti asuu ja nukkuu laivalla sovittuina päivinä. Alus on tilapäinen majoitus- ja hoitovastuu, ei laina-, vuokra- tai risteilyvene, ellei omistaja anna nimenomaisia kirjallisia ohjeita.",
+    "how.liveaboardText":
+      "Boatstead on tarkoitettu majoituksiin, joissa hyväksytty lapsenvahti asuu ja nukkuu laivalla sovittuina päivinä. Alus on tilapäinen majoitus- ja hoitovastuu, ei laina-, vuokra- tai risteilyvene, ellei omistaja anna nimenomaisia kirjallisia ohjeita.",
     "how.risksKicker": "Miksi liveaboard-hoidolla on merkitystä",
     "how.risksTitle": "Yksin jätetty vene voi aiheuttaa vakavia ongelmia nopeasti",
-    "how.risksText": "Siivooja tarkkailee säännöllisesti ja noudattaa omistajan sovittua hoitosuunnitelmaa. Heidän tulee ottaa yhteyttä omistajaan, venesatamaan tai pätevään ammattilaiseen sen sijaan, että he yrittäisivät tehdä vaarallisia korjauksia.",
-    "how.risks.bilge": "Pilssipumput voivat epäonnistua, jolloin vesi pääsee huomaamattomasti sisään ja tulva.",
-    "how.risks.engine": "Moottorit voivat syöpyä, aiheuttaa polttoaineongelmia tai takertua pitkäaikaisen käyttämättömyyden jälkeen.",
-    "how.risks.power": "Akut voivat purkaa ja maasähkökatkaisijat voivat laueta, mikä estää pumput ja hälyttimet.",
-    "how.risks.mooring": "Kiinnitysköydet voivat hiertyä tai jakautua, ja lokasuojat voivat siirtyä sään muuttuessa.",
-    "how.risks.leaks": "Kannen, luukun, putkiston ja pohjaventtiilin vuodot voivat kehittyä tai pahentua.",
-    "how.risks.ventilation": "Kondensoituminen ja huono ilmanvaihto voivat aiheuttaa hometta ja homevaurioita.",
-    "how.risks.weather": "Myrskyt, herätys, vuorovesi ja muuttuvat vedenpinnat voivat vaatia nopeaa säätöä.",
-    "how.risks.security": "Turvahälyttimet, venesataman ilmoitukset, tuholaiset tai laivan lemmikkieläimet voivat vaatia välitöntä huomiota.",
+    "how.risksText":
+      "Siivooja tarkkailee säännöllisesti ja noudattaa omistajan sovittua hoitosuunnitelmaa. Heidän tulee ottaa yhteyttä omistajaan, venesatamaan tai pätevään ammattilaiseen sen sijaan, että he yrittäisivät tehdä vaarallisia korjauksia.",
+    "how.risks.bilge":
+      "Pilssipumput voivat epäonnistua, jolloin vesi pääsee huomaamattomasti sisään ja tulva.",
+    "how.risks.engine":
+      "Moottorit voivat syöpyä, aiheuttaa polttoaineongelmia tai takertua pitkäaikaisen käyttämättömyyden jälkeen.",
+    "how.risks.power":
+      "Akut voivat purkaa ja maasähkökatkaisijat voivat laueta, mikä estää pumput ja hälyttimet.",
+    "how.risks.mooring":
+      "Kiinnitysköydet voivat hiertyä tai jakautua, ja lokasuojat voivat siirtyä sään muuttuessa.",
+    "how.risks.leaks":
+      "Kannen, luukun, putkiston ja pohjaventtiilin vuodot voivat kehittyä tai pahentua.",
+    "how.risks.ventilation":
+      "Kondensoituminen ja huono ilmanvaihto voivat aiheuttaa hometta ja homevaurioita.",
+    "how.risks.weather":
+      "Myrskyt, herätys, vuorovesi ja muuttuvat vedenpinnat voivat vaatia nopeaa säätöä.",
+    "how.risks.security":
+      "Turvahälyttimet, venesataman ilmoitukset, tuholaiset tai laivan lemmikkieläimet voivat vaatia välitöntä huomiota.",
     "terms.liveaboard.title": "Aluksen käyttö laivalla",
-    "terms.liveaboard.text": "Listausten on tarjottava alus, joka on turvallinen, laillinen ja kohtuullisen asumiskelpoinen, jotta hoitaja voi asua ja nukkua siinä. Jokainen istunto on liveaboard-järjestely, ei päivätarkastuspalvelu. Sitteri saa käyttää alusta sovittuna aikana vain tilapäisenä majoituksena ja sovitun hoidon suorittamiseen. Ellei omistaja anna nimenomaista kirjallista lupaa, vahtimestari ei saa navigoida, siirtää, vuokrata, lainata, edelleenvuokrata, käyttää kaupallisesti tai vastaanottaa luvattomia yöpyjiä aluksella. Turvallisuus- ja hätäohjeet ovat etusijalla.",
+    "terms.liveaboard.text":
+      "Listausten on tarjottava alus, joka on turvallinen, laillinen ja kohtuullisen asumiskelpoinen, jotta hoitaja voi asua ja nukkua siinä. Jokainen istunto on liveaboard-järjestely, ei päivätarkastuspalvelu. Sitteri saa käyttää alusta sovittuna aikana vain tilapäisenä majoituksena ja sovitun hoidon suorittamiseen. Ellei omistaja anna nimenomaista kirjallista lupaa, vahtimestari ei saa navigoida, siirtää, vuokrata, lainata, edelleenvuokrata, käyttää kaupallisesti tai vastaanottaa luvattomia yöpyjiä aluksella. Turvallisuus- ja hätäohjeet ovat etusijalla.",
     "notifications.items.sitAccepted": "{{actor}} hyväksyi kutsusi istua {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} hyväksyi hakemuksesi {{boat}}.",
     "notifications.items.newApplication": "{{actor}} sovellettu istumaan {{boat}}.",
     "notifications.items.newMessage": "{{actor}} lähetti sinulle uuden viestin aiheesta {{boat}}.",
     "notifications.items.sitReminder": "Istuksesi {{boat}} alkaa pian.",
-    "notifications.items.welcome": "Tervetuloa Boatsteadiin. Täytä profiilisi aloittaaksesi yhteyksien luomisen.",
+    "notifications.items.welcome":
+      "Tervetuloa Boatsteadiin. Täytä profiilisi aloittaaksesi yhteyksien luomisen.",
     "applications.reply": "Vastata",
     "applications.acceptedKicker": "Sinun hoitajasi",
     "applications.acceptedTitle": "Hyväksytty hakija",
     "applications.acceptedTitlePlural": "Hyväksytyt hakijat ({{count}})",
-    "applications.acceptedHint": "Tämä henkilö on vahvistettu istuntoon. Lähetä heille viesti täällä järjestääksesi avainten luovutuksen, veneen esittelyn ja oleskelun tiedot.",
+    "applications.acceptedHint":
+      "Tämä henkilö on vahvistettu istuntoon. Lähetä heille viesti täällä järjestääksesi avainten luovutuksen, veneen esittelyn ja oleskelun tiedot.",
     "applications.acceptedOpen": "Avaa keskustelu",
     "applications.acceptedView": "Katso hyväksytty hakija",
     "applications.acceptedViewing": "Tarkastelee tietoja",
     "applications.returnToAccepted": "Takaisin {{name}}",
     "applications.acceptedListHint": "Hyväksytyt hakijat näkyvät yllä korostetussa laatikossa.",
     "applications.videoCallBannerTitle": "Suorita videopuhelu ennen hyväksymistä",
-    "applications.videoCallBanner": "Soita videosoittolistalle valituille hoitajille ennen kuin hyväksyt kenenkään oleskeluun. Käytä sitä kokemuksen, saatavuuden ja sopivuuden vahvistamiseen.",
+    "applications.videoCallBanner":
+      "Soita videosoittolistalle valituille hoitajille ennen kuin hyväksyt kenenkään oleskeluun. Käytä sitä kokemuksen, saatavuuden ja sopivuuden vahvistamiseen.",
     "applications.handoverBannerTitle": "Suunnittele avainten luovutus ja läpikäynti",
-    "applications.handoverBanner": "Järjestä, milloin ja missä luovutat avaimet, ja käy läpi järjestelmät, laituripaikat ja hätäyhteystiedot ennen oleskelun alkamista.",
+    "applications.handoverBanner":
+      "Järjestä, milloin ja missä luovutat avaimet, ja käy läpi järjestelmät, laituripaikat ja hätäyhteystiedot ennen oleskelun alkamista.",
     "sitPhase.step": "Vaihe {{number}}",
     "sitPhase.acceptingApplicants": "Hakijoiden hyväksyminen",
     "sitPhase.applicantChosen": "Vahvistusta odotellessa",
@@ -4441,11 +4637,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.flagButton": "Ilmoita ongelma Boatsteadille",
     "sitIssue.kicker": "Oleskelun aikana",
     "sitIssue.title": "Ilmoita ongelmasta",
-    "sitIssue.hint": "Kerro Boatsteadille ongelmasta, joka liittyy oleskeluun {{boat}}. Tiimimme seuraa tilannetta.",
+    "sitIssue.hint":
+      "Kerro Boatsteadille ongelmasta, joka liittyy oleskeluun {{boat}}. Tiimimme seuraa tilannetta.",
     "sitIssue.bannerTitle": "Onko jotain vikaa oleskelun aikana?",
     "sitIssue.bannerHint": "Ilmoita se Boatsteadille, jotta voimme auttaa ratkaisemaan sen.",
     "sitIssue.messageLabel": "Mitä tapahtui?",
-    "sitIssue.messagePlaceholder": "Kuvaile ongelmaa, sen alkamisajankohtaa ja mitä meidän pitäisi tietää auttaaksemme.",
+    "sitIssue.messagePlaceholder":
+      "Kuvaile ongelmaa, sen alkamisajankohtaa ja mitä meidän pitäisi tietää auttaaksemme.",
     "sitIssue.messageTooShort": "Kirjoita vähintään 20 merkkiä.",
     "sitIssue.messagePrefix": "Pysy ongelma {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "Lähetä Boatsteadiin",
@@ -4456,21 +4654,26 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.report": "Ilmoita viestistä",
     "messageReport.escalate": "Eskaloi Boatsteadiin",
     "messageReport.title": "Ilmoitetaanko tämä viesti?",
-    "messageReport.hint": "Kerro meille, miksi tämä viesti on ongelma. Raportit tarkistetaan yksityisesti, eikä niitä jaeta lähettäjälle.",
+    "messageReport.hint":
+      "Kerro meille, miksi tämä viesti on ongelma. Raportit tarkistetaan yksityisesti, eikä niitä jaeta lähettäjälle.",
     "messageReport.escalateTitle": "Eskaloidaanko tämä viesti?",
-    "messageReport.escalateHint": "Ota yhteyttä, kun tarvitset Boatstead-tukea tarkistaaksesi tämän viestin ja auttaaksesi ratkaisemaan ongelman.",
+    "messageReport.escalateHint":
+      "Ota yhteyttä, kun tarvitset Boatstead-tukea tarkistaaksesi tämän viestin ja auttaaksesi ratkaisemaan ongelman.",
     "messageReport.messageLabel": "Viesti",
     "messageReport.submit": "Lähetä raportti",
     "messageReport.escalateSubmit": "Eskaloi Boatsteadiin",
     "messageReport.sending": "Lähetetään…",
     "messageReport.detailsRequired": "Ole hyvä ja lisää lyhyt kuvaus tästä syystä.",
     "messageReport.noExtraDetails": "Ei lisätietoa.",
-    "messageReport.escalatePrefix": "Eskaloitu viesti {{boat}} lähettäjältä {{sender}}:\n\n\"{{message}}\"\n\nKonteksti: {{details}}",
+    "messageReport.escalatePrefix":
+      'Eskaloitu viesti {{boat}} lähettäjältä {{sender}}:\n\n"{{message}}"\n\nKonteksti: {{details}}',
     "messageReport.escalateError": "Tätä viestiä ei voitu eskaloida. Yritä uudelleen.",
     "messageReport.successTitle": "Raportti lähetetty",
-    "messageReport.successText": "Kiitos. Saimme ilmoituksesi viestistä {{name}} ja tarkistamme sen.",
+    "messageReport.successText":
+      "Kiitos. Saimme ilmoituksesi viestistä {{name}} ja tarkistamme sen.",
     "messageReport.escalateSuccessTitle": "Eskaloitunut Boatsteadiin",
-    "messageReport.escalateSuccessText": "Tiimimme tarkistaa tämän viestin ja ottaa yhteyttä sähköpostitse.",
+    "messageReport.escalateSuccessText":
+      "Tiimimme tarkistaa tämän viestin ja ottaa yhteyttä sähköpostitse.",
     "applications.replyPlaceholder": "Kirjoita vastaus...",
     "applications.sending": "Lähetetään...",
     "applications.sendReply": "Lähetä vastaus",
@@ -4480,9 +4683,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.hideTranslation": "Piilota käännös",
     "applications.messageActions": "Viestitoiminnot",
     "applications.translationFailed": "Käännös ei ole tilapäisesti saatavilla. Yritä uudelleen.",
-    "apply.noSharedLanguage": "Sinä ja {{owner}} ette listaa jaettua kieltä. Harkitse käännöstyökalujen käyttöä ja vahvista tärkeät ohjeet selkeästi.",
-    "apply.contactDetailsTerms": "Yhteystietojen jakaminen alustan ulkopuolella on nyt käyttöehtojemme vastaista.",
-    "apply.contactDetailsBlocked": "Sähköpostiosoitteita ja puhelinnumeroita ei voi jakaa ensimmäisessä viestissä. Jatka viestintää Boatsteadissa, kunnes hakemus on hyväksytty.",
+    "apply.noSharedLanguage":
+      "Sinä ja {{owner}} ette listaa jaettua kieltä. Harkitse käännöstyökalujen käyttöä ja vahvista tärkeät ohjeet selkeästi.",
+    "apply.contactDetailsTerms":
+      "Yhteystietojen jakaminen alustan ulkopuolella on nyt käyttöehtojemme vastaista.",
+    "apply.contactDetailsBlocked":
+      "Sähköpostiosoitteita ja puhelinnumeroita ei voi jakaa ensimmäisessä viestissä. Jatka viestintää Boatsteadissa, kunnes hakemus on hyväksytty.",
     "profile.phoneNumber": "Puhelinnumero",
     "profile.callingCode": "Maanumero",
     "profile.countrySearch": "Hae maata",
@@ -4510,11 +4716,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sharePhoneUnavailable": "Lisää puhelinnumero asetuksiin ennen sen jakamista.",
     "applications.phoneShared": "{{owner}} jakoi puhelinnumeron kanssasi",
     "applications.confirm.acceptedTitle": "Hyväksytäänkö {{name}}?",
-    "applications.confirm.acceptedText": "Tämä vahvistaa {{name}} tälle veneelle. Voit jatkaa avainten luovutuksen ja läpikäynnin koordinointia viesteissä.",
-    "applications.confirm.acceptedVideoCallNote": "Hyväksy vasta, kun olette suorittaneet videopuhelun yhdessä.",
+    "applications.confirm.acceptedText":
+      "Tämä vahvistaa {{name}} tälle veneelle. Voit jatkaa avainten luovutuksen ja läpikäynnin koordinointia viesteissä.",
+    "applications.confirm.acceptedVideoCallNote":
+      "Hyväksy vasta, kun olette suorittaneet videopuhelun yhdessä.",
     "applications.confirm.acceptedAction": "Kyllä, hyväksy",
     "applications.confirm.declinedTitle": "Hylätäänkö {{name}}?",
-    "applications.confirm.declinedText": "{{name}} ei enää oteta huomioon tässä istunnossa. Keskusteluhistoriasi on edelleen käytettävissä.",
+    "applications.confirm.declinedText":
+      "{{name}} ei enää oteta huomioon tässä istunnossa. Keskusteluhistoriasi on edelleen käytettävissä.",
     "applications.confirm.declinedAction": "Kyllä, kieltäytyä",
     "reviews.title": "Arvostelut",
     "reviews.recentTitle": "Viimeaikaiset arvostelut",
@@ -4547,20 +4756,23 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.responseTooShort": "Kirjoita vähintään 8 merkkiä.",
     "reviews.responseExists": "Olet jo vastannut tähän arvosteluun.",
     "reviews.responseFailed": "Vastausta ei voitu lähettää. Yritä uudelleen.",
-    "reviews.windowBanner": "Sinulla on {{days}} päivää aikaa jättää arvostelu. Arvostelut pysyvät avoinna 7 päivää oleskelun päättymisen jälkeen.",
+    "reviews.windowBanner":
+      "Sinulla on {{days}} päivää aikaa jättää arvostelu. Arvostelut pysyvät avoinna 7 päivää oleskelun päättymisen jälkeen.",
     "reviews.windowClosed": "Tämän oleskelun tarkistusikkuna on suljettu.",
     "reviews.sitNotCompleted": "Voit jättää arvion majoittumisen päätyttyä.",
   },
   ja: {
     "messages.aboutBoat": "{{boat}}について",
-    "auth.secureLoginRequired": "HTTPS 経由で Boatstead を開いて、この既存のデモ アカウントにサインインします。",
+    "auth.secureLoginRequired":
+      "HTTPS 経由で Boatstead を開いて、この既存のデモ アカウントにサインインします。",
     "auth.termsAgreement": "Boatstead の <terms>利用規約</terms> に同意します。",
     "auth.termsRequired": "アカウントを作成するには、サービス利用規約に同意する必要があります。",
     "auth.continueWithGoogle": "Google を続ける",
     "auth.continueWithApple": "Apple で続行",
     "auth.continueWithFacebook": "Facebookを続ける",
     "auth.orEmail": "または電子メールを使用する",
-    "auth.socialMockNotice": "ソーシャル サインインはこのプロトタイプでは模擬されており、このブラウザーに留まります。",
+    "auth.socialMockNotice":
+      "ソーシャル サインインはこのプロトタイプでは模擬されており、このブラウザーに留まります。",
     "applications.reviewCount": "申請者 ({{count}})",
     "applications.kicker": "申請者の審査",
     "applications.title": "{{boat}} のアプリケーション",
@@ -4607,9 +4819,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.action.declined": "衰退",
     "applications.action.unaccept": "受け入れない",
     "applications.anotherAcceptedBannerTitle": "別の申請者が確認されました",
-    "applications.anotherAcceptedBanner": "この申請者は受理されませんでした。ここで彼らとチャットすることはできますが、この人を受け入れる前に {{name}} の受け入れを解除する必要があります。",
+    "applications.anotherAcceptedBanner":
+      "この申請者は受理されませんでした。ここで彼らとチャットすることはできますが、この人を受け入れる前に {{name}} の受け入れを解除する必要があります。",
     "applications.confirm.unacceptTitle": "{{name}} を受け入れませんか?",
-    "applications.confirm.unacceptText": "{{name}} はこの座席では確認されなくなります。その後、別の申請者を受け入れることができます。",
+    "applications.confirm.unacceptText":
+      "{{name}} はこの座席では確認されなくなります。その後、別の申請者を受け入れることができます。",
     "applications.confirm.unacceptAction": "はい、受け入れません",
     "applications.conversation": "会話",
     "applications.systemMessage.accepted": "あなたはこの席に受け入れられました",
@@ -4625,9 +4839,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.videoCallDeclinedTitle": "ビデオ通話が拒否されました",
     "applications.systemMessage.videoCallDeclined": "{{name}} はビデオ通話の提案を拒否しました。",
     "applications.requestVideoCall": "ビデオ通話をリクエストする",
-    "applications.requestVideoCallHint": "承諾する前に日付、時間、長さを提案して、経験と相性を確認してください。",
+    "applications.requestVideoCallHint":
+      "承諾する前に日付、時間、長さを提案して、経験と相性を確認してください。",
     "applications.requestVideoCallConfirmTitle": "ビデオ通話を提案する",
-    "applications.requestVideoCallConfirmText": "{{name}} で通話の日付、時刻、長さを選択します。受け入れたり、別の時間を提案したりすることができます。",
+    "applications.requestVideoCallConfirmText":
+      "{{name}} で通話の日付、時刻、長さを選択します。受け入れたり、別の時間を提案したりすることができます。",
     "applications.requestVideoCallConfirmAction": "提案を送信する",
     "applications.videoCall.date": "日付",
     "applications.videoCall.time": "時間",
@@ -4641,7 +4857,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.pastError": "将来の日付と時刻を選択してください。",
     "applications.videoCall.incomplete": "通話の日付と時刻を選択します。",
     "applications.videoCall.adjustTitle": "別の時間を提案する",
-    "applications.videoCall.adjustText": "{{name}} を使用して、新しい日付、時刻、通話時間を提案します。",
+    "applications.videoCall.adjustText":
+      "{{name}} を使用して、新しい日付、時刻、通話時間を提案します。",
     "applications.videoCall.adjustAction": "新しい時刻を送信する",
     "applications.isTyping": "{{name}} が入力中です...",
     "detail.respondsWithinDay": "通常 24 時間以内に返信します",
@@ -4652,21 +4869,28 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "lightbox.next": "次の写真",
     "lightbox.viewPhoto": "写真を見る {{number}}",
     "apply.partySize": "何人くらい滞在しますか？",
-    "apply.partySizeHint_one": "あなた自身とパートナーや同伴者を含めてください。こちらのお席は1名様までご利用いただけます。",
-    "apply.partySizeHint_other": "あなた自身とパートナーや同伴者を含めてください。この座席には {{count}} 名様までご利用いただけます。",
-    "apply.termsAgreement": "この座席アプリケーションに関する Boatstead の <terms>利用規約</terms> に同意します。",
-    "apply.termsRequired": "このアプリケーションを送信する前に、サービス利用規約に同意する必要があります。",
+    "apply.partySizeHint_one":
+      "あなた自身とパートナーや同伴者を含めてください。こちらのお席は1名様までご利用いただけます。",
+    "apply.partySizeHint_other":
+      "あなた自身とパートナーや同伴者を含めてください。この座席には {{count}} 名様までご利用いただけます。",
+    "apply.termsAgreement":
+      "この座席アプリケーションに関する Boatstead の <terms>利用規約</terms> に同意します。",
+    "apply.termsRequired":
+      "このアプリケーションを送信する前に、サービス利用規約に同意する必要があります。",
     "apply.verificationRequiredTitle": "申請するには本人確認を行ってください",
-    "apply.verificationRequiredText": "ボートでの滞在を申請する前に、政府 ID、電子メール アドレス、電話番号を確認してください。",
+    "apply.verificationRequiredText":
+      "ボートでの滞在を申請する前に、政府 ID、電子メール アドレス、電話番号を確認してください。",
     "apply.verificationRequiredCta": "プロフィールの認証を完了する",
     "apply.verificationChecking": "認証を確認しています…",
     "apply.sendFailed": "アプリケーションを送信できませんでした。もう一度やり直してください。",
     "apply.applicationsClosed": "この座はもう申請を受け付けていません。",
     "apply.confirmedSitConflictTitle": "すでに座席が確定しています",
-    "apply.confirmedSitConflict": "重複する日付では{{boat}}の座席が確認されているため、この期間に別の座席をリクエストすることはできません。",
+    "apply.confirmedSitConflict":
+      "重複する日付では{{boat}}の座席が確認されているため、この期間に別の座席をリクエストすることはできません。",
     "apply.viewConfirmedSit": "座って確認されたビュー",
     "detail.confirmedSitConflict": "別の座席を確認しました",
-    "detail.confirmedSitConflictHint": "すでに{{boat}}の座席が確定しているため、この座席をリクエストすることはできません。",
+    "detail.confirmedSitConflictHint":
+      "すでに{{boat}}の座席が確定しているため、この座席をリクエストすることはできません。",
     "detail.applicationsClosed": "申し込みは終了しました",
     "detail.applicationsClosedHint": "オーナーはこの座席への新規申し込みを受け付けていません。",
     "owner.applicationsClosed": "申請者は一時停止しました",
@@ -4674,52 +4898,73 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "owner.openRequests": "新規応募者の再開",
     "applications.closeRequests": "新規応募者を一時停止する",
     "applications.openRequests": "新規応募者の再開",
-    "applications.requestsClosedNotice": "このサイトでは新規申請者は一時停止されています。既存の会話は引き続き利用可能です。人々に再度応募してもらいたい場合は、「新規応募者の履歴書」を使用します。",
+    "applications.requestsClosedNotice":
+      "このサイトでは新規申請者は一時停止されています。既存の会話は引き続き利用可能です。人々に再度応募してもらいたい場合は、「新規応募者の履歴書」を使用します。",
     "applications.confirm.closeRequestsTitle": "新規応募者を一時停止しますか?",
-    "applications.confirm.closeRequestsText": "シッターの方は応募できなくなります。既存の会話は引き続き利用可能で、いつでも再開できます。",
+    "applications.confirm.closeRequestsText":
+      "シッターの方は応募できなくなります。既存の会話は引き続き利用可能で、いつでも再開できます。",
     "applications.confirm.closeRequestsAction": "はい、応募者を一時停止します",
     "sitEditor.maxGuests": "最大人数",
     "sitEditor.maxGuestsHint": "申請者を含めた居住可能な総人数を設定します。",
-    "sitEditor.termsAgreement": "このサイトのリストに関する Boatstead の <terms>利用規約</terms> に同意します。",
+    "sitEditor.termsAgreement":
+      "このサイトのリストに関する Boatstead の <terms>利用規約</terms> に同意します。",
     "sitEditor.termsRequired": "このサイトを公開する前に、利用規約に同意する必要があります。",
     "applications.partySize": "宿泊する人",
     "detail.maxGuests_one": "最大1名様",
     "detail.maxGuests_other": "最大{{count}}人",
     "how.liveaboardTitle": "すべての座席は船上に住んでいます",
-    "how.liveaboardText": "Boatsteadは、受け入れられたシッターが合意された期間中、船上で生活し、宿泊するための宿泊施設です。船は一時的な宿泊施設であり、管理責任があり、所有者が書面による明確な指示を出さない限り、借りたり、チャーターしたり、クルーズしたりするためのボートではありません。",
+    "how.liveaboardText":
+      "Boatsteadは、受け入れられたシッターが合意された期間中、船上で生活し、宿泊するための宿泊施設です。船は一時的な宿泊施設であり、管理責任があり、所有者が書面による明確な指示を出さない限り、借りたり、チャーターしたり、クルーズしたりするためのボートではありません。",
     "how.risksKicker": "なぜ住み込みケアが重要なのか",
     "how.risksTitle": "ボートを放っておくとすぐに深刻な問題が発生する可能性があります",
-    "how.risksText": "シッターは定期的に観察を行い、飼い主の同意したケアプランに従います。危険な修理を試みるのではなく、所有者、マリーナ、または資格のある専門家に連絡する必要があります。",
-    "how.risks.bilge": "ビルジポンプが故障し、気付かないうちに水が浸入して浸水する可能性があります。",
-    "how.risks.engine": "エンジンは長期間使用しないと腐食したり、燃料の問題が発生したり、焼き付きを起こしたりする可能性があります。",
-    "how.risks.power": "バッテリーが放電したり、陸上電力のブレーカーが落ちたりして、ポンプや警報器が作動しなくなる可能性があります。",
-    "how.risks.mooring": "係留索が擦れたり外れたりする可能性があり、天候の変化によってフェンダーがずれることもあります。",
-    "how.risks.leaks": "デッキ、ハッチ、配管、シーコックからの漏れが発生したり悪化したりする可能性があります。",
-    "how.risks.ventilation": "結露や換気不良は、カビ、カビ、内装の損傷を引き起こす可能性があります。",
-    "how.risks.weather": "嵐、航跡、潮汐、水位の変化などにより、迅速な調整が必要になる場合があります。",
-    "how.risks.security": "セキュリティアラーム、マリーナの通知、害虫、船内のペットなどには、直ちに対応が必要な場合があります。",
+    "how.risksText":
+      "シッターは定期的に観察を行い、飼い主の同意したケアプランに従います。危険な修理を試みるのではなく、所有者、マリーナ、または資格のある専門家に連絡する必要があります。",
+    "how.risks.bilge":
+      "ビルジポンプが故障し、気付かないうちに水が浸入して浸水する可能性があります。",
+    "how.risks.engine":
+      "エンジンは長期間使用しないと腐食したり、燃料の問題が発生したり、焼き付きを起こしたりする可能性があります。",
+    "how.risks.power":
+      "バッテリーが放電したり、陸上電力のブレーカーが落ちたりして、ポンプや警報器が作動しなくなる可能性があります。",
+    "how.risks.mooring":
+      "係留索が擦れたり外れたりする可能性があり、天候の変化によってフェンダーがずれることもあります。",
+    "how.risks.leaks":
+      "デッキ、ハッチ、配管、シーコックからの漏れが発生したり悪化したりする可能性があります。",
+    "how.risks.ventilation":
+      "結露や換気不良は、カビ、カビ、内装の損傷を引き起こす可能性があります。",
+    "how.risks.weather":
+      "嵐、航跡、潮汐、水位の変化などにより、迅速な調整が必要になる場合があります。",
+    "how.risks.security":
+      "セキュリティアラーム、マリーナの通知、害虫、船内のペットなどには、直ちに対応が必要な場合があります。",
     "terms.liveaboard.title": "船舶の居住用使用",
-    "terms.liveaboard.text": "出品には、安全かつ合法で、乗員が船上で居住および就寝するのに合理的に適した船舶を提供する必要があります。すべてのシットは乗船手配であり、デイチェックサービスではありません。合意された日付の間、シッターは一時的な宿泊施設として、および合意されたケアを行うためにのみ船舶を使用できます。所有者が書面による明示的な許可を与えない限り、シッターは船舶の航行、移転、チャーター、貸し出し、転貸、商業利用、または許可されていない宿泊客の船上での宿泊を受け入れてはなりません。安全と緊急時の指示が優先されます。",
-    "notifications.items.sitAccepted": "{{actor}} は、{{boat}} に座るというあなたの招待を受け入れました。",
+    "terms.liveaboard.text":
+      "出品には、安全かつ合法で、乗員が船上で居住および就寝するのに合理的に適した船舶を提供する必要があります。すべてのシットは乗船手配であり、デイチェックサービスではありません。合意された日付の間、シッターは一時的な宿泊施設として、および合意されたケアを行うためにのみ船舶を使用できます。所有者が書面による明示的な許可を与えない限り、シッターは船舶の航行、移転、チャーター、貸し出し、転貸、商業利用、または許可されていない宿泊客の船上での宿泊を受け入れてはなりません。安全と緊急時の指示が優先されます。",
+    "notifications.items.sitAccepted":
+      "{{actor}} は、{{boat}} に座るというあなたの招待を受け入れました。",
     "notifications.items.applicationAccepted": "{{actor}} が {{boat}} の申請を受理しました。",
     "notifications.items.newApplication": "{{actor}} は {{boat}} に座るのに適用されます。",
-    "notifications.items.newMessage": "{{actor}} さんが {{boat}} に関する新しいメッセージを送信しました。",
+    "notifications.items.newMessage":
+      "{{actor}} さんが {{boat}} に関する新しいメッセージを送信しました。",
     "notifications.items.sitReminder": "{{boat}} での座り込みがまもなく始まります。",
-    "notifications.items.welcome": "Boatsteadへようこそ。プロフィールを完成させてつながりを作り始めましょう。",
+    "notifications.items.welcome":
+      "Boatsteadへようこそ。プロフィールを完成させてつながりを作り始めましょう。",
     "applications.reply": "返事",
     "applications.acceptedKicker": "あなたのシッター",
     "applications.acceptedTitle": "受理された申請者",
     "applications.acceptedTitlePlural": "受理された応募者 ({{count}})",
-    "applications.acceptedHint": "この人は着席が確認されています。ここにメッセージを送って、鍵の受け渡し、ボートのウォークスルー、滞在の詳細を手配してください。",
+    "applications.acceptedHint":
+      "この人は着席が確認されています。ここにメッセージを送って、鍵の受け渡し、ボートのウォークスルー、滞在の詳細を手配してください。",
     "applications.acceptedOpen": "オープンな会話",
     "applications.acceptedView": "承認された申請者を表示する",
     "applications.acceptedViewing": "詳細の表示",
     "applications.returnToAccepted": "{{name}} に戻る",
-    "applications.acceptedListHint": "承認された応募者は、上の強調表示されたボックスに表示されます。",
+    "applications.acceptedListHint":
+      "承認された応募者は、上の強調表示されたボックスに表示されます。",
     "applications.videoCallBannerTitle": "ビデオ通話を完了してから応答してください",
-    "applications.videoCallBanner": "誰かを滞在に受け入れる前に、最終候補者リストに載っているシッターとビデオ通話をします。エクスペリエンス、可用性、適合性を確認するために使用してください。",
+    "applications.videoCallBanner":
+      "誰かを滞在に受け入れる前に、最終候補者リストに載っているシッターとビデオ通話をします。エクスペリエンス、可用性、適合性を確認するために使用してください。",
     "applications.handoverBannerTitle": "キーの引き継ぎとウォークスルーを計画する",
-    "applications.handoverBanner": "滞在が始まる前に、鍵をいつどこで渡すかを手配し、システム、バースへのアクセス、緊急連絡先を確認してください。",
+    "applications.handoverBanner":
+      "滞在が始まる前に、鍵をいつどこで渡すかを手配し、システム、バースへのアクセス、緊急連絡先を確認してください。",
     "sitPhase.step": "ステップ{{number}}",
     "sitPhase.acceptingApplicants": "応募者の受付",
     "sitPhase.applicantChosen": "確認待ち",
@@ -4728,7 +4973,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.flagButton": "Boatsteadに問題を報告する",
     "sitIssue.kicker": "滞在中",
     "sitIssue.title": "問題を報告する",
-    "sitIssue.hint": "{{boat}}での滞在に関する問題についてBoatsteadに伝えてください。私たちのチームがフォローアップします。",
+    "sitIssue.hint":
+      "{{boat}}での滞在に関する問題についてBoatsteadに伝えてください。私たちのチームがフォローアップします。",
     "sitIssue.bannerTitle": "滞在中に何か問題がありましたか？",
     "sitIssue.bannerHint": "Boatstead に報告して、問題の解決をお手伝いします。",
     "sitIssue.messageLabel": "どうしたの？",
@@ -4743,21 +4989,27 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.report": "レポートメッセージ",
     "messageReport.escalate": "Boatsteadにエスカレートする",
     "messageReport.title": "このメッセージを報告しますか?",
-    "messageReport.hint": "このメッセージが問題となる理由を教えてください。レポートは非公開で確認され、送信者と共有されることはありません。",
+    "messageReport.hint":
+      "このメッセージが問題となる理由を教えてください。レポートは非公開で確認され、送信者と共有されることはありません。",
     "messageReport.escalateTitle": "このメッセージをエスカレーションしますか?",
-    "messageReport.escalateHint": "Boatstead サポートが必要な場合は、このメッセージを確認して問題の解決を支援するためにエスカレーションしてください。",
+    "messageReport.escalateHint":
+      "Boatstead サポートが必要な場合は、このメッセージを確認して問題の解決を支援するためにエスカレーションしてください。",
     "messageReport.messageLabel": "メッセージ",
     "messageReport.submit": "レポートの提出",
     "messageReport.escalateSubmit": "Boatsteadにエスカレートする",
     "messageReport.sending": "送信中…",
     "messageReport.detailsRequired": "この理由について、短い説明を追加してください。",
     "messageReport.noExtraDetails": "追加の詳細は提供されません。",
-    "messageReport.escalatePrefix": "{{sender}} から {{boat}} にエスカレーションされたメッセージ:\n\n「{{message}}」\n\nコンテキスト: {{details}}",
-    "messageReport.escalateError": "このメッセージをエスカレーションできませんでした。もう一度試してください。",
+    "messageReport.escalatePrefix":
+      "{{sender}} から {{boat}} にエスカレーションされたメッセージ:\n\n「{{message}}」\n\nコンテキスト: {{details}}",
+    "messageReport.escalateError":
+      "このメッセージをエスカレーションできませんでした。もう一度試してください。",
     "messageReport.successTitle": "レポート提出",
-    "messageReport.successText": "ありがとう。 {{name}} からのメッセージに関するご報告を受け取りましたので、検討させていただきます。",
+    "messageReport.successText":
+      "ありがとう。 {{name}} からのメッセージに関するご報告を受け取りましたので、検討させていただきます。",
     "messageReport.escalateSuccessTitle": "Boatsteadにエスカレート",
-    "messageReport.escalateSuccessText": "私たちのチームがこのメッセージを確認し、電子メールでフォローアップします。",
+    "messageReport.escalateSuccessText":
+      "私たちのチームがこのメッセージを確認し、電子メールでフォローアップします。",
     "applications.replyPlaceholder": "返信を書いてください...",
     "applications.sending": "送信中...",
     "applications.sendReply": "返信を送信",
@@ -4767,9 +5019,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.hideTranslation": "翻訳を隠す",
     "applications.messageActions": "メッセージアクション",
     "applications.translationFailed": "翻訳は一時的に利用できません。もう一度やり直してください。",
-    "apply.noSharedLanguage": "あなたと {{owner}} は共有言語をリストしていません。翻訳ツールの使用を検討し、重要な指示を明確に確認してください。",
-    "apply.contactDetailsTerms": "現在、オフプラットフォームの連絡先詳細を共有することは、当社の利用規約に違反します。",
-    "apply.contactDetailsBlocked": "最初のメッセージではメール アドレスや電話番号を共有することはできません。申請が受理されるまでBoatsteadでコミュニケーションを続けてください。",
+    "apply.noSharedLanguage":
+      "あなたと {{owner}} は共有言語をリストしていません。翻訳ツールの使用を検討し、重要な指示を明確に確認してください。",
+    "apply.contactDetailsTerms":
+      "現在、オフプラットフォームの連絡先詳細を共有することは、当社の利用規約に違反します。",
+    "apply.contactDetailsBlocked":
+      "最初のメッセージではメール アドレスや電話番号を共有することはできません。申請が受理されるまでBoatsteadでコミュニケーションを続けてください。",
     "profile.phoneNumber": "電話番号",
     "profile.callingCode": "国別電話番号",
     "profile.countrySearch": "国を検索する",
@@ -4797,11 +5052,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sharePhoneUnavailable": "共有する前に、[設定] に電話番号を追加してください。",
     "applications.phoneShared": "{{owner}} があなたと電話番号を共有しました",
     "applications.confirm.acceptedTitle": "{{name}} を受け入れますか?",
-    "applications.confirm.acceptedText": "これにより、このボートの着座は {{name}} であることが確認されます。キーの引き継ぎとメッセージ内のウォークスルーの調整を続けることができます。",
-    "applications.confirm.acceptedVideoCallNote": "一緒にビデオ通話を完了した後にのみ承諾してください。",
+    "applications.confirm.acceptedText":
+      "これにより、このボートの着座は {{name}} であることが確認されます。キーの引き継ぎとメッセージ内のウォークスルーの調整を続けることができます。",
+    "applications.confirm.acceptedVideoCallNote":
+      "一緒にビデオ通話を完了した後にのみ承諾してください。",
     "applications.confirm.acceptedAction": "はい、受け入れます",
     "applications.confirm.declinedTitle": "{{name}} を拒否しますか?",
-    "applications.confirm.declinedText": "{{name}} はこの座席では考慮されなくなります。会話履歴は引き続き利用できます。",
+    "applications.confirm.declinedText":
+      "{{name}} はこの座席では考慮されなくなります。会話履歴は引き続き利用できます。",
     "applications.confirm.declinedAction": "はい、断ります",
     "reviews.title": "レビュー",
     "reviews.recentTitle": "最近のレビュー",
@@ -4817,10 +5075,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.starOption_other": "{{count}} 星",
     "reviews.leaveKicker": "レビューを残す",
     "reviews.leaveTitle": "シッターとしての{{name}}はどうでしたか？",
-    "reviews.leaveHint": "座る様子をシェアしてください{{boat}}。あなたの評価は他の所有者の助けになります。",
+    "reviews.leaveHint":
+      "座る様子をシェアしてください{{boat}}。あなたの評価は他の所有者の助けになります。",
     "reviews.yourRating": "あなたの評価",
     "reviews.yourReview": "あなたのレビュー",
-    "reviews.yourReviewPlaceholder": "コミュニケーション、ボートの手入れ、引き継ぎについて説明します...",
+    "reviews.yourReviewPlaceholder":
+      "コミュニケーション、ボートの手入れ、引き継ぎについて説明します...",
     "reviews.submit": "レビューを送信する",
     "reviews.submitting": "送信中...",
     "reviews.textTooShort": "20文字以上でご記入ください。",
@@ -4834,7 +5094,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.responseTooShort": "8文字以上でご記入ください。",
     "reviews.responseExists": "あなたはすでにこのレビューに返信しています。",
     "reviews.responseFailed": "応答を投稿できませんでした。もう一度やり直してください。",
-    "reviews.windowBanner": "レビューを残せる期限は残り {{days}} 日です。レビューは滞在終了後 7 日間公開されます。",
+    "reviews.windowBanner":
+      "レビューを残せる期限は残り {{days}} 日です。レビューは滞在終了後 7 日間公開されます。",
     "reviews.windowClosed": "この滞在のレビュー期間は終了しました。",
     "reviews.sitNotCompleted": "滞在終了後にレビューを残すことができます。",
   },

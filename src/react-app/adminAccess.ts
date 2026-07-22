@@ -1,10 +1,7 @@
 export type UserRole = "member" | "admin";
 
 /** Emails that always receive admin (super-user) privileges in this prototype. */
-export const ADMIN_EMAILS = [
-  "admin@boatstead.mock",
-  "harbourly.admin@boatstead.mock",
-] as const;
+export const ADMIN_EMAILS = ["admin@boatstead.mock", "harbourly.admin@boatstead.mock"] as const;
 
 export function normalizeEmail(email: string) {
   return email.trim().toLowerCase();

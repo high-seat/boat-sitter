@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, CalendarClock, CheckCircle2, MessageCircle, ShipWheel, UserPlus } from "lucide-react";
+import {
+  Bell,
+  CalendarClock,
+  CheckCircle2,
+  MessageCircle,
+  ShipWheel,
+  UserPlus,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -33,7 +40,9 @@ export function NotificationsMenu() {
     queryKey: ["notifications", user.name],
     queryFn: () => getNotificationsForUser(user.name),
   });
-  const unreadCount = notifications.filter((notification) => !seenIds.includes(notification.id)).length;
+  const unreadCount = notifications.filter(
+    (notification) => !seenIds.includes(notification.id),
+  ).length;
   const relativeTime = new Intl.RelativeTimeFormat(getIntlLocale(i18n.language), {
     numeric: "auto",
   });
@@ -60,10 +69,7 @@ export function NotificationsMenu() {
     if (seenIds.includes(id)) return;
     const nextSeenIds = [...seenIds, id];
     setSeenIds(nextSeenIds);
-    localStorage.setItem(
-      `boatstead-seen-notifications:${user.name}`,
-      JSON.stringify(nextSeenIds),
-    );
+    localStorage.setItem(`boatstead-seen-notifications:${user.name}`, JSON.stringify(nextSeenIds));
   }
 
   function markAllSeen() {
@@ -72,10 +78,7 @@ export function NotificationsMenu() {
       ...new Set([...seenIds, ...notifications.map((notification) => notification.id)]),
     ];
     setSeenIds(nextSeenIds);
-    localStorage.setItem(
-      `boatstead-seen-notifications:${user.name}`,
-      JSON.stringify(nextSeenIds),
-    );
+    localStorage.setItem(`boatstead-seen-notifications:${user.name}`, JSON.stringify(nextSeenIds));
   }
 
   useEffect(() => {

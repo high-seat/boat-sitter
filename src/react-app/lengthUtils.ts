@@ -5,7 +5,9 @@ export type LengthUnit = "m" | "ft";
 const METERS_PER_FOOT = 0.3048;
 
 export function parseBoatLength(length: string, fallbackUnit: LengthUnit = "m") {
-  const match = length.trim().match(/^(\d+(?:[.,]\d+)?)\s*(m|ft|feet|pieds?|pies|fu[ßs]|voet|πόδια|stope)?$/i);
+  const match = length
+    .trim()
+    .match(/^(\d+(?:[.,]\d+)?)\s*(m|ft|feet|pieds?|pies|fu[ßs]|voet|πόδια|stope)?$/i);
   const rawUnit = match?.[2]?.toLowerCase();
   let unit: LengthUnit = fallbackUnit;
   if (rawUnit === "m") unit = "m";
@@ -45,10 +47,7 @@ export function normalizeLengthToMetres(length: string): string {
   return `${precise} m`;
 }
 
-export function formatBoatLength(
-  length: string,
-  measurementSystem: MeasurementSystem,
-): string {
+export function formatBoatLength(length: string, measurementSystem: MeasurementSystem): string {
   const metres = lengthToMetres(length);
   if (!Number.isFinite(metres) || metres <= 0) return length;
   const unit: LengthUnit = measurementSystem === "imperial" ? "ft" : "m";

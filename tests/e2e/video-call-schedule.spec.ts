@@ -11,10 +11,7 @@ function futureDateIso(daysAhead: number) {
   ].join("-");
 }
 
-async function openAlexMessagesWithSharedData(
-  browser: Browser,
-  storage: Record<string, string>,
-) {
+async function openAlexMessagesWithSharedData(browser: Browser, storage: Record<string, string>) {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.addInitScript((shared) => {
@@ -74,7 +71,10 @@ test.describe("video call scheduling", () => {
     await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
 
     // Ensure Alex's accepted thread is selected.
-    await page.getByRole("button", { name: /Alex Morgan/i }).first().click();
+    await page
+      .getByRole("button", { name: /Alex Morgan/i })
+      .first()
+      .click();
     await page.getByRole("button", { name: /Request video call/i }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: /Propose a video call/i })).toBeVisible();
@@ -92,7 +92,10 @@ test.describe("video call scheduling", () => {
   test("other party can suggest a different time", async ({ page, browser }) => {
     await seedVerifiedOwner(page);
     await page.goto("/owner/sits/solstice/applications");
-    await page.getByRole("button", { name: /Alex Morgan/i }).first().click();
+    await page
+      .getByRole("button", { name: /Alex Morgan/i })
+      .first()
+      .click();
     await page.getByRole("button", { name: /Request video call/i }).click();
     const dialog = page.getByRole("dialog");
     await dialog.locator('input[type="date"]').fill(futureDateIso(2));
@@ -118,7 +121,10 @@ test.describe("video call scheduling", () => {
     const { context, page: sitterPage } = await openAlexMessagesWithSharedData(browser, shared);
     try {
       await expect(sitterPage.getByRole("heading", { name: /Messages/i })).toBeVisible();
-      await sitterPage.getByRole("button", { name: /Maya|Solstice/i }).first().click();
+      await sitterPage
+        .getByRole("button", { name: /Maya|Solstice/i })
+        .first()
+        .click();
       await expect(sitterPage.getByRole("button", { name: /Accept time/i })).toBeVisible();
       await sitterPage.getByRole("button", { name: /Suggest different time/i }).click();
       const adjust = sitterPage.getByRole("dialog");

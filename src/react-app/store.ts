@@ -254,7 +254,12 @@ export const useAppStore = create<AppStore>()(
           userReports: [],
           user: null,
         }),
-      logout: () => set({ user: null }),
+      logout: () => {
+        // End the Better Auth session server-side too, so a reload doesn't
+        // silently log the user back in from the session cookie.
+        void import("@/authClient").then((m) => m.signOut()).catch(() => {});
+        set({ user: null });
+      },
     }),
     {
       name: "harbourly",

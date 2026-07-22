@@ -37,7 +37,11 @@ for (const d of cities) {
 
 // Spot-check the row we just fixed.
 const la = lookupCoordinates("Los Angeles", "United States");
-check("Los Angeles latitude ~34", Math.abs((la?.latitude ?? 0) - 34.0522) < 0.01, JSON.stringify(la));
+check(
+  "Los Angeles latitude ~34",
+  Math.abs((la?.latitude ?? 0) - 34.0522) < 0.01,
+  JSON.stringify(la),
+);
 check("Los Angeles longitude ~-118", Math.abs((la?.longitude ?? 0) + 118.2437) < 0.01);
 
 // Curly-apostrophe city resolves.
@@ -46,7 +50,11 @@ check("St. George's resolves via curly apostrophe", grenada !== null, JSON.strin
 
 // Unknown place falls back to country, not null-island.
 const unknownCity = lookupCoordinates("Nowheresville", "France");
-check("unknown city falls back to country centroid", unknownCity !== null, JSON.stringify(unknownCity));
+check(
+  "unknown city falls back to country centroid",
+  unknownCity !== null,
+  JSON.stringify(unknownCity),
+);
 
 if (failures === 0) {
   console.log(`All coordinate checks passed (${cities.length} cities).`);

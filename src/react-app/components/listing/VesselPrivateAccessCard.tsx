@@ -1,9 +1,6 @@
 import { KeyRound, Lock, Wifi } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  hasVesselPrivateAccess,
-  type VesselPrivateAccess,
-} from "@/mockApi";
+import { hasVesselPrivateAccess, type VesselPrivateAccess } from "@/mockApi";
 
 export function VesselPrivateAccessCard({
   details,
@@ -67,7 +64,10 @@ export function VesselPrivateAccessCard({
       </div>
       <dl className="divide-y divide-teal/20">
         {rows.map((row) => (
-          <div className="grid gap-1 px-5 py-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4" key={row.key}>
+          <div
+            className="grid gap-1 px-5 py-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4"
+            key={row.key}
+          >
             <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal">
               {row.key.startsWith("wifi") ? (
                 <Wifi aria-hidden="true" size={14} />

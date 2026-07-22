@@ -13,6 +13,7 @@ import {
   signUpMockAccount,
   type SocialProvider,
 } from "@/mockAuth";
+import { signInWithGoogle } from "@/authClient";
 import { useAppStore } from "@/store";
 
 const socialButtonStyle = {
@@ -168,7 +169,12 @@ export function AuthModal() {
           <GoogleLoginButton
             activeStyle={socialButtonActiveStyle}
             disabled={pending}
-            onClick={() => void continueWith("google")}
+            onClick={() => {
+              // Real Google OAuth: redirects to Google, returns to the app with
+              // a Better Auth session cookie set.
+              setPending(true);
+              void signInWithGoogle().catch(() => setPending(false));
+            }}
             style={socialButtonStyle}
             text={t("auth.continueWithGoogle")}
             type="button"
@@ -191,7 +197,9 @@ export function AuthModal() {
             type="button"
           />
         </div>
-        <p className="mt-1 text-center text-xs leading-5 text-slate">{t("auth.socialMockNotice")}</p>
+        <p className="mt-1 text-center text-xs leading-5 text-slate">
+          {t("auth.socialMockNotice")}
+        </p>
 
         <div className="my-5 flex items-center gap-3">
           <span className="h-px flex-1 bg-line" />

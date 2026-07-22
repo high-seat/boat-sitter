@@ -267,7 +267,7 @@ export function DestinationAutocomplete({
                   <span className="block truncate text-sm font-semibold text-navy">
                     {destination.name}
                   </span>
-                  {(destination.kind === "City") && (
+                  {destination.kind === "City" && (
                     <span className="block truncate text-xs text-slate">{destination.detail}</span>
                   )}
                 </span>

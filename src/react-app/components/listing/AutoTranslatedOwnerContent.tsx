@@ -11,8 +11,7 @@ export function useAutoTranslatedOwnerContent(
   const autoTranslateEnabled = useFeatureFlag("autoTranslateListings");
   const targetLanguage = i18n.resolvedLanguage ?? i18n.language;
   const shouldTranslate = useMemo(
-    () =>
-      autoTranslateEnabled && !ownerSpeaksUiLanguage(ownerLanguages, targetLanguage),
+    () => autoTranslateEnabled && !ownerSpeaksUiLanguage(ownerLanguages, targetLanguage),
     [autoTranslateEnabled, ownerLanguages, targetLanguage],
   );
   const [showOriginal, setShowOriginal] = useState(false);
@@ -104,9 +103,7 @@ export function AutoTranslationAttribution({
       ) : null}
       {!pending && hasTranslations ? (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-          <span className="font-semibold text-teal">
-            {t("applications.translatedWithGoogle")}
-          </span>
+          <span className="font-semibold text-teal">{t("applications.translatedWithGoogle")}</span>
           <button
             className="font-bold text-teal underline-offset-2 hover:underline"
             onClick={onToggle}

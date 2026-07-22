@@ -1,7 +1,19 @@
 import type { MiddlewareHandler } from "hono";
+import type { AppEnv } from "../context";
 
 /**
- * Minimal bearer-token guard for write endpoints.
+ * Require a logged-in user (populated by the session middleware in index.ts).
+ * Use on any endpoint that mutates data.
+ */
+export const requireUser: MiddlewareHandler<AppEnv> = async (c, next) => {
+  if (!c.get("user")) {
+    return c.json({ error: "Sign in required" }, 401);
+  }
+  await next();
+};
+
+/**
+ * Minimal bearer-token guard, kept only for the destructive dev reset.
  *
  * This is a placeholder so the write routes are not open to the world during
  * development. Before you take real signups, replace it with Better Auth
@@ -10,7 +22,7 @@ import type { MiddlewareHandler } from "hono";
  *
  * Set the secret with:  wrangler secret put ADMIN_TOKEN
  */
-export const requireAdmin: MiddlewareHandler<{ Bindings: Env }> = async (c, next) => {
+export const requireAdmin: MiddlewareHandler<AppEnv> = async (c, next) => {
   const expected = c.env.ADMIN_TOKEN;
 
   if (!expected) {

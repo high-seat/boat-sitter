@@ -2,7 +2,10 @@ import { ShimmerBlock } from "@/components/ui/Shimmer";
 
 function UserRowSkeleton() {
   return (
-    <div aria-hidden="true" className="flex items-center gap-4 rounded-2xl border border-line bg-white p-4">
+    <div
+      aria-hidden="true"
+      className="flex items-center gap-4 rounded-2xl border border-line bg-white p-4"
+    >
       <ShimmerBlock className="size-12 shrink-0 rounded-full" />
       <div className="min-w-0 flex-1 space-y-2">
         <ShimmerBlock className="h-4 w-40 max-w-[55%]" />
@@ -37,11 +40,7 @@ export function AdminAuditSkeleton() {
   return (
     <div aria-busy="true" aria-live="polite" className="mt-8 space-y-3">
       {[0, 1, 2, 3, 4].map((index) => (
-        <div
-          aria-hidden="true"
-          className="rounded-2xl border border-line bg-white p-4"
-          key={index}
-        >
+        <div aria-hidden="true" className="rounded-2xl border border-line bg-white p-4" key={index}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <ShimmerBlock className="h-4 w-36 max-w-[50%]" />
             <ShimmerBlock className="h-3 w-28" />

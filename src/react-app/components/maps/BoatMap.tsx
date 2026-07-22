@@ -6,11 +6,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "leaflet/dist/leaflet.css";
 import type { Boat } from "@/mockApi";
-import {
-  formatMapLocationLabel,
-  isApproximateMapPin,
-  mapsSearchUrl,
-} from "@/mapUtils";
+import { formatMapLocationLabel, isApproximateMapPin, mapsSearchUrl } from "@/mapUtils";
 
 const markerIcon = divIcon({
   className: "boatstead-map-marker",
@@ -80,53 +76,55 @@ export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: b
           compact ? "h-96" : "h-[min(68vh,44rem)] min-h-112"
         }`}
       >
-      <MapContainer
-        center={center}
-        className="h-full w-full"
-        scrollWheelZoom
-        zoom={boats.length === 1 ? 12 : 3}
-        zoomControl={false}
-      >
-        <ZoomControl zoomInTitle={t("map.zoomIn")} zoomOutTitle={t("map.zoomOut")} />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapViewport boats={boats} />
-        {boats.map((boat) => (
-          <Marker
-            eventHandlers={{
-              popupopen: (event) => {
-                const close = event.popup
-                  .getElement()
-                  ?.querySelector<HTMLAnchorElement>(".leaflet-popup-close-button");
-                close?.setAttribute("aria-label", t("common.close"));
-                close?.setAttribute("title", t("common.close"));
-              },
-            }}
-            icon={markerIcon}
-            key={boat.id}
-            position={[boat.latitude, boat.longitude]}
-          >
-            <Popup>
-              <div className="w-52">
-                <img alt="" className="h-24 w-full rounded-lg object-cover" src={boat.image} />
-                <p className="mt-2 font-display text-base font-bold text-navy">{boat.name}</p>
-                <p className="mt-1 text-xs text-slate">
-                  {boat.location}
-                  {boat.country && !boat.location.includes(boat.country) ? `, ${boat.country}` : ""}
-                </p>
-                <Link
-                  className="boatstead-map-popup-link mt-3 block rounded-lg bg-coral px-3 py-2 text-center text-xs font-bold text-white no-underline hover:bg-coral-dark hover:text-white"
-                  to={`/boats/${boat.id}`}
-                >
-                  {t("map.viewSit")}
-                </Link>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+        <MapContainer
+          center={center}
+          className="h-full w-full"
+          scrollWheelZoom
+          zoom={boats.length === 1 ? 12 : 3}
+          zoomControl={false}
+        >
+          <ZoomControl zoomInTitle={t("map.zoomIn")} zoomOutTitle={t("map.zoomOut")} />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <MapViewport boats={boats} />
+          {boats.map((boat) => (
+            <Marker
+              eventHandlers={{
+                popupopen: (event) => {
+                  const close = event.popup
+                    .getElement()
+                    ?.querySelector<HTMLAnchorElement>(".leaflet-popup-close-button");
+                  close?.setAttribute("aria-label", t("common.close"));
+                  close?.setAttribute("title", t("common.close"));
+                },
+              }}
+              icon={markerIcon}
+              key={boat.id}
+              position={[boat.latitude, boat.longitude]}
+            >
+              <Popup>
+                <div className="w-52">
+                  <img alt="" className="h-24 w-full rounded-lg object-cover" src={boat.image} />
+                  <p className="mt-2 font-display text-base font-bold text-navy">{boat.name}</p>
+                  <p className="mt-1 text-xs text-slate">
+                    {boat.location}
+                    {boat.country && !boat.location.includes(boat.country)
+                      ? `, ${boat.country}`
+                      : ""}
+                  </p>
+                  <Link
+                    className="boatstead-map-popup-link mt-3 block rounded-lg bg-coral px-3 py-2 text-center text-xs font-bold text-white no-underline hover:bg-coral-dark hover:text-white"
+                    to={`/boats/${boat.id}`}
+                  >
+                    {t("map.viewSit")}
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </section>
       {compact && boats.length === 1 ? <SitMapFooter boat={boats[0]} /> : null}
     </div>

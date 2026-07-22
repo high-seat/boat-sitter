@@ -1,5 +1,11 @@
 import { feetToMetresString, normalizeLengthToMetres } from "@/lengthUtils";
-import { getSitPhase, isSitCompletedForReview, canLeaveReview, sitDateRangesOverlap, type SitPhase } from "@/dateUtils";
+import {
+  getSitPhase,
+  isSitCompletedForReview,
+  canLeaveReview,
+  sitDateRangesOverlap,
+  type SitPhase,
+} from "@/dateUtils";
 
 export type { SitPhase };
 export { getSitPhase, SIT_PHASES, sitDateRangesOverlap } from "@/dateUtils";
@@ -44,7 +50,9 @@ export function normalizeBoatPhoto(entry: string | BoatPhoto): BoatPhoto {
   };
 }
 
-export function normalizeGallery(gallery: Array<string | BoatPhoto> | undefined | null): BoatPhoto[] {
+export function normalizeGallery(
+  gallery: Array<string | BoatPhoto> | undefined | null,
+): BoatPhoto[] {
   return (gallery ?? []).map(normalizeBoatPhoto);
 }
 
@@ -137,9 +145,9 @@ export function hasVesselPrivateAccess(details?: VesselPrivateAccess | null) {
   if (!details) return false;
   return Boolean(
     details.wifiNetwork?.trim() ||
-      details.wifiPassword?.trim() ||
-      details.accessCodes?.trim() ||
-      details.otherNotes?.trim(),
+    details.wifiPassword?.trim() ||
+    details.accessCodes?.trim() ||
+    details.otherNotes?.trim(),
   );
 }
 
@@ -694,13 +702,7 @@ const generatedBoatNamePrefixes = [
   "Southern",
 ] as const;
 
-const generatedBoatNameSuffixes = [
-  "Tide",
-  "Compass",
-  "Lark",
-  "Horizon",
-  "Dolphin",
-] as const;
+const generatedBoatNameSuffixes = ["Tide", "Compass", "Lark", "Horizon", "Dolphin"] as const;
 
 const generatedBoatTypes = [
   "Sailing yacht",
@@ -739,11 +741,7 @@ const generatedOwnerLanguages = [
 function generatedDateDetails(index: number) {
   const absoluteMonth = 7 + index;
   const start = new Date(
-    Date.UTC(
-      2026 + Math.floor(absoluteMonth / 12),
-      absoluteMonth % 12,
-      4 + ((index * 7) % 21),
-    ),
+    Date.UTC(2026 + Math.floor(absoluteMonth / 12), absoluteMonth % 12, 4 + ((index * 7) % 21)),
   );
   const nights = 7 + ((index * 5) % 29);
   const end = new Date(start);
@@ -1046,13 +1044,8 @@ function readSits(): Sit[] {
       const vessels = readVessels();
       const storedSits = (
         JSON.parse(stored) as Array<
-          Omit<
-            Sit,
-            "location" | "country" | "latitude" | "longitude" | "maxGuests"
-          > &
-            Partial<
-              Pick<Sit, "location" | "country" | "latitude" | "longitude" | "maxGuests">
-            >
+          Omit<Sit, "location" | "country" | "latitude" | "longitude" | "maxGuests"> &
+            Partial<Pick<Sit, "location" | "country" | "latitude" | "longitude" | "maxGuests">>
         >
       ).map((sit) => {
         const vessel = vessels.find((item) => item.id === sit.boatId);
@@ -1446,7 +1439,10 @@ export async function deleteSit(id: string): Promise<void> {
     throw new Error("SIT_IS_COMPLETED");
   }
 
-  localStorage.setItem("harbourly-sits", JSON.stringify(readSits().filter((item) => item.id !== id)));
+  localStorage.setItem(
+    "harbourly-sits",
+    JSON.stringify(readSits().filter((item) => item.id !== id)),
+  );
   writeApplications(readApplications().filter((application) => application.sitId !== id));
 }
 
@@ -1973,9 +1969,7 @@ export async function sendApplication(
         },
       ],
     };
-    writeApplications(
-      applications.map((item) => (item.id === existing.id ? reopened : item)),
-    );
+    writeApplications(applications.map((item) => (item.id === existing.id ? reopened : item)));
     localStorage.setItem(
       "harbourly-sits",
       JSON.stringify(
@@ -2022,9 +2016,7 @@ export async function sendApplication(
   localStorage.setItem(
     "harbourly-sits",
     JSON.stringify(
-      sits.map((item) =>
-        item.id === sitId ? { ...item, applicants: item.applicants + 1 } : item,
-      ),
+      sits.map((item) => (item.id === sitId ? { ...item, applicants: item.applicants + 1 } : item)),
     ),
   );
   return application;
@@ -2065,9 +2057,7 @@ export async function updateApplicationStatus(
   if (status === "declined") {
     updated = ensureDeclinedSystemMessage(updated);
   }
-  let nextApplications = applications.map((item) =>
-    item.id === applicationId ? updated : item,
-  );
+  let nextApplications = applications.map((item) => (item.id === applicationId ? updated : item));
   if (status === "accepted") {
     nextApplications = nextApplications.map((item) => {
       if (item.id === applicationId || item.sitId !== application.sitId) return item;
@@ -2083,18 +2073,14 @@ export async function updateApplicationStatus(
       localStorage.setItem(
         "harbourly-sits",
         JSON.stringify(
-          sits.map((item) =>
-            item.id === sit.id ? { ...item, applicationsOpen: false } : item,
-          ),
+          sits.map((item) => (item.id === sit.id ? { ...item, applicationsOpen: false } : item)),
         ),
       );
     } else if (wasAccepted && status !== "accepted") {
       localStorage.setItem(
         "harbourly-sits",
         JSON.stringify(
-          sits.map((item) =>
-            item.id === sit.id ? { ...item, applicationsOpen: true } : item,
-          ),
+          sits.map((item) => (item.id === sit.id ? { ...item, applicationsOpen: true } : item)),
         ),
       );
     }
@@ -2146,8 +2132,7 @@ export async function withdrawApplication(
 
 export async function getNotificationsForUser(userName: string): Promise<MockNotification[]> {
   await wait(250);
-  const minutesAgo = (minutes: number) =>
-    new Date(Date.now() - minutes * 60 * 1_000).toISOString();
+  const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60 * 1_000).toISOString();
 
   if (userName === "Maya & Finn") {
     return [
@@ -2537,16 +2522,12 @@ export async function getSitterRatingSummary(sitterName: string): Promise<Sitter
   return summarizeSitterRating(reviews);
 }
 
-export async function getReviewForApplication(
-  applicationId: string,
-): Promise<SitReview | null> {
+export async function getReviewForApplication(applicationId: string): Promise<SitReview | null> {
   await wait(150);
   return readReviews().find((review) => review.applicationId === applicationId) ?? null;
 }
 
-export async function getPublicMemberProfile(
-  name: string,
-): Promise<PublicMemberProfile | null> {
+export async function getPublicMemberProfile(name: string): Promise<PublicMemberProfile | null> {
   await wait(200);
   const fromApplication = readApplications().find(
     (application) => application.applicant.name === name,

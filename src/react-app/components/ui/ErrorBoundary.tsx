@@ -10,13 +10,7 @@ type ErrorBoundaryState = {
   error: Error | null;
 };
 
-function ErrorFallback({
-  error,
-  onReset,
-}: {
-  error: Error;
-  onReset: () => void;
-}) {
+function ErrorFallback({ error, onReset }: { error: Error; onReset: () => void }) {
   const { t } = useTranslation();
 
   return (

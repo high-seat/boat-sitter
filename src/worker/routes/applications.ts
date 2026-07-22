@@ -2,14 +2,19 @@ import { zValidator } from "@hono/zod-validator";
 import { and, desc, eq, or } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { applicationMessages, applications, sits, vessels } from "../db/schema";
+import { requireUser } from "../middleware/auth";
 
 /**
  * Sitter applications and their message threads.
- * Staged-auth caveat applies: sender/applicant identity is client-supplied.
+ *
+ * Writes require login. The applicant's identity (name/image/user id) comes
+ * from the session, not the body, so it can't be spoofed. Status changes are
+ * restricted to the listing owner; messages to the two participants.
  */
-export const applicationsRouter = new Hono<{ Bindings: Env }>();
+export const applicationsRouter = new Hono<AppEnv>();
 
 const applicantSchema = z.object({
   name: z.string().min(1),
@@ -30,7 +35,6 @@ const createSchema = z.object({
 });
 
 const messageSchema = z.object({
-  senderName: z.string().min(1),
   text: z.string().min(1),
 });
 
@@ -100,22 +104,27 @@ applicationsRouter.get("/", async (c) => {
   return c.json({ data: rows.map((r) => shape(r, messages)) });
 });
 
-applicationsRouter.post("/", zValidator("json", createSchema), async (c) => {
+applicationsRouter.post("/", requireUser, zValidator("json", createSchema), async (c) => {
   const db = getDb(c.env);
   const { sitId, message, applicant } = c.req.valid("json");
+  const user = c.get("user")!;
 
-  // Idempotency: one application per (sit, applicant), matching the mock.
+  // Identity comes from the session, not the body — the client can only supply
+  // profile details (bio, skills, …), never who they are.
+  const applicantName = user.name;
+  const safeApplicant = { ...applicant, name: user.name, image: user.image ?? applicant.image };
+
+  // Idempotency: one application per (sit, user).
   const existing = await db
     .select()
     .from(applications)
-    .where(and(eq(applications.sitId, sitId), eq(applications.applicantName, applicant.name)))
+    .where(and(eq(applications.sitId, sitId), eq(applications.applicantUserId, user.id)))
     .limit(1);
   if (existing.length) {
     const msgs = await loadMessages(c.env, [existing[0].id]);
     return c.json({ data: shape(existing[0], msgs) });
   }
 
-  // Resolve the listing to snapshot boat + owner names.
   const listing = await db
     .select({ vessel: vessels, sit: sits })
     .from(sits)
@@ -133,8 +142,9 @@ applicationsRouter.post("/", zValidator("json", createSchema), async (c) => {
     sitId,
     boatName: listing[0].vessel.name,
     ownerName: listing[0].vessel.owner,
-    applicant,
-    applicantName: applicant.name,
+    applicant: safeApplicant,
+    applicantName,
+    applicantUserId: user.id,
     initialMessage: trimmed,
     status: "new",
     createdAt,
@@ -142,7 +152,7 @@ applicationsRouter.post("/", zValidator("json", createSchema), async (c) => {
   await db.insert(applicationMessages).values({
     id: `message-${Date.now()}`,
     applicationId: id,
-    senderName: applicant.name,
+    senderName: applicantName,
     text: trimmed,
     createdAt,
   });
@@ -152,35 +162,65 @@ applicationsRouter.post("/", zValidator("json", createSchema), async (c) => {
   return c.json({ data: shape(row!, msgs) }, 201);
 });
 
-applicationsRouter.patch("/:id", zValidator("json", statusSchema), async (c) => {
+/** Load an application plus the vessel owner id, for authorization checks. */
+async function ownerIdForApplication(env: Env, appRow: ApplicationRow) {
+  const db = getDb(env);
+  const sit = await db.query.sits.findFirst({ where: eq(sits.id, appRow.sitId) });
+  if (!sit) return null;
+  const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+  return vessel?.ownerUserId ?? null;
+}
+
+// Only the listing owner may change an application's status.
+applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), async (c) => {
   const db = getDb(c.env);
   const id = c.req.param("id");
+  const user = c.get("user")!;
+
+  const appRow = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  if (!appRow) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+  if ((await ownerIdForApplication(c.env, appRow)) !== user.id) {
+    return c.json({ error: "Only the listing owner can change this" }, 403);
+  }
+
   const [row] = await db
     .update(applications)
     .set({ status: c.req.valid("json").status })
     .where(eq(applications.id, id))
     .returning();
-  if (!row) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
   const msgs = await loadMessages(c.env, [id]);
   return c.json({ data: shape(row, msgs) });
 });
 
-applicationsRouter.post("/:id/messages", zValidator("json", messageSchema), async (c) => {
-  const db = getDb(c.env);
-  const id = c.req.param("id");
-  const { senderName, text } = c.req.valid("json");
+// Only the two participants (applicant or listing owner) may post messages.
+applicationsRouter.post(
+  "/:id/messages",
+  requireUser,
+  zValidator("json", messageSchema),
+  async (c) => {
+    const db = getDb(c.env);
+    const id = c.req.param("id");
+    const { text } = c.req.valid("json");
+    const user = c.get("user")!;
 
-  const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
-  if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+    const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+    if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
 
-  await db.insert(applicationMessages).values({
-    id: `message-${Date.now()}`,
-    applicationId: id,
-    senderName,
-    text: text.trim(),
-    createdAt: new Date().toISOString(),
-  });
+    const ownerId = await ownerIdForApplication(c.env, app);
+    const isParticipant = user.id === app.applicantUserId || user.id === ownerId;
+    if (!isParticipant) {
+      return c.json({ error: "You are not part of this conversation" }, 403);
+    }
 
-  const msgs = await loadMessages(c.env, [id]);
-  return c.json({ data: shape(app, msgs) });
-});
+    await db.insert(applicationMessages).values({
+      id: `message-${Date.now()}`,
+      applicationId: id,
+      senderName: user.name,
+      text: text.trim(),
+      createdAt: new Date().toISOString(),
+    });
+
+    const msgs = await loadMessages(c.env, [id]);
+    return c.json({ data: shape(app, msgs) });
+  },
+);

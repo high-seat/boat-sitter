@@ -7,14 +7,15 @@ test.describe("owner sit delete and archive", () => {
     await page.goto("/owner/boats");
     await expect(page.getByRole("heading", { name: /Manage boats/i })).toBeVisible();
 
-    const sitCard = page.locator("article").filter({ hasText: /Solstice/i }).first();
+    const sitCard = page
+      .locator("article")
+      .filter({ hasText: /Solstice/i })
+      .first();
     await expect(sitCard).toBeVisible();
     await sitCard.getByRole("button", { name: /Delete .* sit/i }).click();
 
     await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(
-      page.getByText(/Someone has already been accepted.*inform them/i),
-    ).toBeVisible();
+    await expect(page.getByText(/Someone has already been accepted.*inform them/i)).toBeVisible();
     await page.getByRole("button", { name: /Cancel/i }).click();
   });
 

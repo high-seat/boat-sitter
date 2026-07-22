@@ -38,10 +38,7 @@ export function BoatCardSkeleton({ showBadge = false }: { showBadge?: boolean })
 export function BoatsPageLoadingSkeleton({ count = 6 }: { count?: number }) {
   return (
     <>
-      <div
-        aria-hidden="true"
-        className="mt-9 flex flex-wrap items-center justify-between gap-3"
-      >
+      <div aria-hidden="true" className="mt-9 flex flex-wrap items-center justify-between gap-3">
         <ShimmerBlock className="h-4 w-28" />
         <div className="flex items-center gap-2">
           <ShimmerBlock className="h-9 w-44 rounded-xl" />

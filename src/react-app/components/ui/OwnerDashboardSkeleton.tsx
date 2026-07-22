@@ -54,11 +54,7 @@ export function OwnerSitRowSkeleton({ showActions = true }: { showActions?: bool
 
 export function OwnerBoatsLoadingSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <div
-      aria-busy="true"
-      aria-live="polite"
-      className="mt-10 space-y-4"
-    >
+    <div aria-busy="true" aria-live="polite" className="mt-10 space-y-4">
       {Array.from({ length: count }, (_, index) => (
         <OwnerBoatRowSkeleton key={index} />
       ))}

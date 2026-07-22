@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
+import { buildAuth } from "./auth";
+import type { AppEnv, SessionUser } from "./context";
 import { applicationsRouter } from "./routes/applications";
 import { boatsRouter } from "./routes/boats";
 import { devRouter } from "./routes/dev";
@@ -9,10 +11,41 @@ import { sitsRouter } from "./routes/sits";
 import { supportRouter } from "./routes/support";
 import { vesselsRouter } from "./routes/vessels";
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<AppEnv>();
 
 app.use("*", logger());
-app.use("/api/*", cors());
+
+// Auth needs credentialed CORS. Same-origin in prod (SPA + API on one Worker),
+// but this keeps localhost cross-port dev working too.
+app.use("/api/*", (c, next) =>
+  cors({
+    origin: [c.env.BETTER_AUTH_URL ?? "http://localhost:5173", "http://localhost:5173"],
+    credentials: true,
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  })(c, next),
+);
+
+// Populate user/session on the context for every request.
+app.use("*", async (c, next) => {
+  try {
+    const auth = buildAuth(c.env);
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+    c.set("user", (session?.user as SessionUser) ?? null);
+    c.set("session", session?.session ?? null);
+  } catch {
+    // If the auth tables aren't migrated yet, treat as logged out rather than 500.
+    c.set("user", null);
+    c.set("session", null);
+  }
+  await next();
+});
+
+// Better Auth handles all its own routes (sign-in, callback, session, sign-out).
+app.on(["GET", "POST"], "/api/auth/*", (c) => buildAuth(c.env).handler(c.req.raw));
+
+// Convenience: who am I?
+app.get("/api/me", (c) => c.json({ user: c.get("user") }));
 
 app.get("/api/", (context) =>
   context.json({

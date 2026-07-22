@@ -33,6 +33,9 @@ export const vessels = sqliteTable(
     gallery: jsonArray("gallery"),
     owner: text("owner").notNull(),
     ownerImage: text("owner_image").notNull(),
+    // The authenticated user who owns this vessel. Null for seed/legacy rows,
+    // which are therefore not editable through the API (see vessels route).
+    ownerUserId: text("owner_user_id"),
     rating: real("rating").notNull().default(0),
     reviews: integer("reviews").notNull().default(0),
     description: text("description").notNull(),
@@ -122,6 +125,7 @@ export const applications = sqliteTable(
       }>()
       .notNull(),
     applicantName: text("applicant_name").notNull(),
+    applicantUserId: text("applicant_user_id"),
 
     initialMessage: text("initial_message").notNull(),
     status: text("status").notNull().default("new"),
@@ -162,6 +166,9 @@ export const supportRequests = sqliteTable("support_requests", {
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
 });
+
+// Re-export the Better Auth tables so the Drizzle client registers them.
+export { account, session, user, verification } from "./auth-schema";
 
 export type Vessel = typeof vessels.$inferSelect;
 export type NewVessel = typeof vessels.$inferInsert;

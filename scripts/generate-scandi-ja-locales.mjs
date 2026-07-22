@@ -155,7 +155,9 @@ async function translateOne(text, googleLang, attempt = 0) {
       throw new Error("Invalid translate payload");
     }
     let translated = payload[0]
-      .map((segment) => (Array.isArray(segment) && typeof segment[0] === "string" ? segment[0] : ""))
+      .map((segment) =>
+        Array.isArray(segment) && typeof segment[0] === "string" ? segment[0] : "",
+      )
       .join("")
       .trim();
     translated = restorePlaceholders(translated, tokens);
@@ -249,14 +251,18 @@ async function main() {
 
   // Skip work if already present
   if (i18nSource.includes('{ code: "sv"')) {
-    console.log("Languages already registered in i18n.ts — regenerating catalog bodies only if missing.");
+    console.log(
+      "Languages already registered in i18n.ts — regenerating catalog bodies only if missing.",
+    );
   }
 
   console.log("Extracting English catalogs…");
   const enBase = extractI18nBaseEn(i18nSource);
   const enExtras = extractLocaleExtrasEn(extrasSource);
   const enApps = extractApplicationEn(appsSource);
-  console.log(`  base=${Object.keys(enBase).length} extras=${Object.keys(enExtras).length} apps=${Object.keys(enApps).length}`);
+  console.log(
+    `  base=${Object.keys(enBase).length} extras=${Object.keys(enExtras).length} apps=${Object.keys(enApps).length}`,
+  );
 
   const generated = {};
   for (const target of TARGETS) {
@@ -289,8 +295,7 @@ async function main() {
   const resourcesMarker = "const resources = {";
   if (!i18nSource.includes("const sv = messages(")) {
     const blocks = TARGETS.map(
-      (t) =>
-        `const ${t.code} = messages(${formatStringMap(generated[t.code].base, 2)});\n\n`,
+      (t) => `const ${t.code} = messages(${formatStringMap(generated[t.code].base, 2)});\n\n`,
     ).join("");
     i18nSource = insertBefore(i18nSource, resourcesMarker, blocks);
   }
@@ -346,14 +351,11 @@ async function main() {
       (t) => `  ${t.code}: ${formatStringMap(generated[t.code].apps, 4)},\n`,
     ).join("");
     // Insert before closing of applicationTranslationsSource (before helper functions).
-    const sourceClose = appsSource.indexOf(
-      "};\n\nfunction mapTranslationValues",
-    );
+    const sourceClose = appsSource.indexOf("};\n\nfunction mapTranslationValues");
     if (sourceClose < 0) {
       throw new Error("Could not find applicationTranslationsSource closing brace");
     }
-    appsSource =
-      appsSource.slice(0, sourceClose) + appsBlocks + appsSource.slice(sourceClose);
+    appsSource = appsSource.slice(0, sourceClose) + appsBlocks + appsSource.slice(sourceClose);
   }
 
   writeFileSync(i18nPath, i18nSource);

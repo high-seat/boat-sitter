@@ -58,11 +58,7 @@ export function sitDateRangesOverlap(a: SitDateRange, b: SitDateRange) {
   return aStart.getTime() <= bEnd.getTime() && bStart.getTime() <= aEnd.getTime();
 }
 
-export type SitPhase =
-  | "acceptingApplicants"
-  | "applicantChosen"
-  | "stayUnderway"
-  | "stayCompleted";
+export type SitPhase = "acceptingApplicants" | "applicantChosen" | "stayUnderway" | "stayCompleted";
 
 export const SIT_PHASES: SitPhase[] = [
   "acceptingApplicants",

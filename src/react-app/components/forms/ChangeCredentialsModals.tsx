@@ -41,7 +41,12 @@ export function ChangeEmailModal({
   }
 
   return (
-    <Modal onClose={onClose} pending={pending} title={t("settings.changeEmailTitle")} titleId="change-email-title">
+    <Modal
+      onClose={onClose}
+      pending={pending}
+      title={t("settings.changeEmailTitle")}
+      titleId="change-email-title"
+    >
       <p className="text-sm leading-6 text-slate">{t("settings.changeEmailHint")}</p>
       <form className="mt-5 space-y-4" onSubmit={(event) => void submit(event)}>
         <label>
@@ -58,7 +63,9 @@ export function ChangeEmailModal({
           <input
             autoComplete="email"
             className="form-input"
-            onChange={(event) => setForm((current) => ({ ...current, newEmail: event.target.value }))}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, newEmail: event.target.value }))
+            }
             required
             type="email"
             value={form.newEmail}
@@ -69,7 +76,9 @@ export function ChangeEmailModal({
           <input
             autoComplete="current-password"
             className="form-input"
-            onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, password: event.target.value }))
+            }
             required
             type="password"
             value={form.password}

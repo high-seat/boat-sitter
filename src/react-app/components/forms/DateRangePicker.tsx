@@ -1,6 +1,24 @@
 import { useMemo, useState, type MouseEvent } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { da, de, el, enGB, enUS, es, fi, fr, hr, it, ja, nb, nl, pt, ptBR, sv, tr } from "date-fns/locale";
+import {
+  da,
+  de,
+  el,
+  enGB,
+  enUS,
+  es,
+  fi,
+  fr,
+  hr,
+  it,
+  ja,
+  nb,
+  nl,
+  pt,
+  ptBR,
+  sv,
+  tr,
+} from "date-fns/locale";
 import { CalendarDays, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DayPicker, type DateRange } from "react-day-picker";
@@ -146,11 +164,7 @@ export function DateRangePicker({
                   startDate: range?.from ? toIso(range.from) : "",
                   endDate: range?.to ? toIso(range.to) : "",
                 });
-                if (
-                  range?.from &&
-                  range?.to &&
-                  toIso(range.from) !== toIso(range.to)
-                ) {
+                if (range?.from && range?.to && toIso(range.from) !== toIso(range.to)) {
                   setOpen(false);
                 }
               }}

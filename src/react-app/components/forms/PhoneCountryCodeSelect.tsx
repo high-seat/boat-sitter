@@ -12,8 +12,7 @@ import "react-phone-input-2/lib/style.css";
 import { normalizeLanguageCode } from "@/i18n";
 
 const PhoneInput =
-  (PhoneInputImport as unknown as { default: typeof PhoneInputImport }).default ??
-  PhoneInputImport;
+  (PhoneInputImport as unknown as { default: typeof PhoneInputImport }).default ?? PhoneInputImport;
 
 const PREFERRED_COUNTRIES = [
   "us",

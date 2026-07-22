@@ -100,11 +100,7 @@ export function IdentityVerificationCard({
   );
 }
 
-export function IdentityVerificationBadge({
-  checks,
-}: {
-  checks: MemberVerificationChecks;
-}) {
+export function IdentityVerificationBadge({ checks }: { checks: MemberVerificationChecks }) {
   const identityVerificationEnabled = useFeatureFlag("identityVerification");
   const { t } = useTranslation();
   if (!identityVerificationEnabled) return null;

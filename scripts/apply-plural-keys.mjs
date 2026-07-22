@@ -769,10 +769,10 @@ const moreAppReplacements = [
 ];
 
 applyReplacements(join(root, "src/react-app/localeExtras.ts"), localeExtrasReplacements);
-applyReplacements(
-  join(root, "src/react-app/applicationTranslations.ts"),
-  [...appTranslationsReplacements, ...moreAppReplacements],
-);
+applyReplacements(join(root, "src/react-app/applicationTranslations.ts"), [
+  ...appTranslationsReplacements,
+  ...moreAppReplacements,
+]);
 
 // i18n boats.results
 const i18nPath = join(root, "src/react-app/i18n.ts");
