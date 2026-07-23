@@ -12,6 +12,8 @@ const localeExtrasSource = {
     "common.saving": "Saving…",
     "common.required": "Required",
     "common.optional": "optional",
+    "common.charsRemaining_one": "{{count}} character left",
+    "common.charsRemaining_other": "{{count}} characters left",
     "nav.logout": "Log out",
     "nav.logoutConfirmTitle": "Are you sure you want to log out?",
     "nav.logoutConfirmText":
@@ -137,7 +139,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Updates as you edit this sit. This is how it appears when sitters browse.",
     "editorPreview.untitledBoat": "Untitled boat",
-    "editorPreview.homePortPending": "Add a home port",
+    "editorPreview.locationUnknown": "Location unknown",
     "editorPreview.lengthPending": "Length TBD",
     "editorPreview.datesPending": "Choose dates to complete the listing preview",
     "editorPreview.selectBoat": "Select a boat to preview this sit.",
@@ -667,9 +669,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Length unit",
     "vesselEditor.lengthValuePlaceholder": "e.g. 12",
     "vesselEditor.lengthUnknown": "I don’t know",
+    "vesselEditor.lengthDisabledHint": "Uncheck “I don’t know” to enter a length.",
     "vesselEditor.yearBuilt": "Year of manufacture",
     "vesselEditor.yearBuiltPlaceholder": "e.g. 2012",
     "vesselEditor.yearBuiltUnknown": "I don’t know",
+    "vesselEditor.yearBuiltDisabledHint": "Uncheck “I don’t know” to enter a year.",
     "vesselEditor.yearBuiltHint":
       "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
     "vesselEditor.yearBuiltInvalid":
@@ -993,6 +997,8 @@ const localeExtrasSource = {
     "common.saving": "Économie…",
     "common.required": "Obligatoire",
     "common.optional": "facultatif",
+    "common.charsRemaining_one": "{{count}} caractère restant",
+    "common.charsRemaining_other": "{{count}} caractères restants",
     "nav.logout": "Se déconnecter",
     "nav.logoutConfirmTitle": "Voulez-vous vraiment vous déconnecter ?",
     "nav.logoutConfirmText":
@@ -1118,7 +1124,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Se met à jour pendant que vous modifiez cette garde. Voici comment les gardiens la voient.",
     "editorPreview.untitledBoat": "Bateau sans nom",
-    "editorPreview.homePortPending": "Ajoutez un port d’attache",
+    "editorPreview.locationUnknown": "Lieu inconnu",
     "editorPreview.lengthPending": "Longueur à définir",
     "editorPreview.datesPending": "Choisissez des dates pour terminer l’aperçu",
     "editorPreview.selectBoat": "Sélectionnez un bateau pour prévisualiser cette garde.",
@@ -1675,9 +1681,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Unité de longueur",
     "vesselEditor.lengthValuePlaceholder": "ex. 12",
     "vesselEditor.lengthUnknown": "Je ne sais pas",
+    "vesselEditor.lengthDisabledHint": "Décochez « Je ne sais pas » pour saisir une longueur.",
     "vesselEditor.yearBuilt": "Année de construction",
     "vesselEditor.yearBuiltPlaceholder": "ex. 2012",
     "vesselEditor.yearBuiltUnknown": "Je ne sais pas",
+    "vesselEditor.yearBuiltDisabledHint": "Décochez « Je ne sais pas » pour saisir une année.",
     "vesselEditor.yearBuiltHint":
       "Saisissez une année entre {{min}} et {{max}}, ou choisissez « Je ne sais pas ».",
     "vesselEditor.yearBuiltInvalid":
@@ -2004,6 +2012,8 @@ const localeExtrasSource = {
     "common.saving": "Ahorro…",
     "common.required": "Obligatorio",
     "common.optional": "opcional",
+    "common.charsRemaining_one": "{{count}} carácter restante",
+    "common.charsRemaining_other": "{{count}} caracteres restantes",
     "nav.logout": "Finalizar la sesión",
     "nav.logoutConfirmTitle": "¿Seguro que quieres cerrar sesión?",
     "nav.logoutConfirmText":
@@ -2129,7 +2139,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Se actualiza mientras editas esta estancia. Así la ven los cuidadores.",
     "editorPreview.untitledBoat": "Barco sin nombre",
-    "editorPreview.homePortPending": "Añade un puerto base",
+    "editorPreview.locationUnknown": "Ubicación desconocida",
     "editorPreview.lengthPending": "Eslora pendiente",
     "editorPreview.datesPending": "Elige fechas para completar la vista previa",
     "editorPreview.selectBoat": "Selecciona un barco para previsualizar esta estancia.",
@@ -2685,9 +2695,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Unidad de longitud",
     "vesselEditor.lengthValuePlaceholder": "p. ej. 12",
     "vesselEditor.lengthUnknown": "No lo sé",
+    "vesselEditor.lengthDisabledHint": "Desmarca “No lo sé” para indicar una eslora.",
     "vesselEditor.yearBuilt": "Año de fabricación",
     "vesselEditor.yearBuiltPlaceholder": "p. ej. 2012",
     "vesselEditor.yearBuiltUnknown": "No lo sé",
+    "vesselEditor.yearBuiltDisabledHint": "Desmarca “No lo sé” para indicar un año.",
     "vesselEditor.yearBuiltHint": "Introduce un año entre {{min}} y {{max}}, o elige “No lo sé”.",
     "vesselEditor.yearBuiltInvalid":
       "Introduce un año entre {{min}} y {{max}}, o elige “No lo sé”.",
@@ -3013,6 +3025,8 @@ const localeExtrasSource = {
     "common.saving": "Risparmio…",
     "common.required": "Obbligatorio",
     "common.optional": "facoltativo",
+    "common.charsRemaining_one": "{{count}} carattere rimasto",
+    "common.charsRemaining_other": "{{count}} caratteri rimasti",
     "nav.logout": "Esci",
     "nav.logoutConfirmTitle": "Vuoi davvero uscire?",
     "nav.logoutConfirmText":
@@ -3138,7 +3152,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Si aggiorna mentre modifichi questo soggiorno. Così lo vedono i sitter.",
     "editorPreview.untitledBoat": "Barca senza nome",
-    "editorPreview.homePortPending": "Aggiungi un porto base",
+    "editorPreview.locationUnknown": "Posizione sconosciuta",
     "editorPreview.lengthPending": "Lunghezza da definire",
     "editorPreview.datesPending": "Scegli le date per completare l’anteprima",
     "editorPreview.selectBoat": "Seleziona una barca per anteprima di questo soggiorno.",
@@ -3692,9 +3706,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Unità di lunghezza",
     "vesselEditor.lengthValuePlaceholder": "es. 12",
     "vesselEditor.lengthUnknown": "Non lo so",
+    "vesselEditor.lengthDisabledHint": "Deseleziona “Non lo so” per inserire una lunghezza.",
     "vesselEditor.yearBuilt": "Anno di costruzione",
     "vesselEditor.yearBuiltPlaceholder": "es. 2012",
     "vesselEditor.yearBuiltUnknown": "Non lo so",
+    "vesselEditor.yearBuiltDisabledHint": "Deseleziona “Non lo so” per inserire un anno.",
     "vesselEditor.yearBuiltHint":
       "Inserisci un anno tra {{min}} e {{max}}, oppure scegli “Non lo so”.",
     "vesselEditor.yearBuiltInvalid":
@@ -4020,6 +4036,8 @@ const localeExtrasSource = {
     "common.saving": "Sparen…",
     "common.required": "Pflichtfeld",
     "common.optional": "optional",
+    "common.charsRemaining_one": "{{count}} Zeichen übrig",
+    "common.charsRemaining_other": "{{count}} Zeichen übrig",
     "nav.logout": "Abmelden",
     "nav.logoutConfirmTitle": "Möchten Sie sich wirklich abmelden?",
     "nav.logoutConfirmText":
@@ -4146,7 +4164,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Aktualisiert sich, während du diesen Sit bearbeitest. So sehen ihn Bootsitter.",
     "editorPreview.untitledBoat": "Unbenanntes Boot",
-    "editorPreview.homePortPending": "Heimathafen hinzufügen",
+    "editorPreview.locationUnknown": "Standort unbekannt",
     "editorPreview.lengthPending": "Länge offen",
     "editorPreview.datesPending": "Daten wählen, um die Vorschau zu vervollständigen",
     "editorPreview.selectBoat": "Wähle ein Boot, um diesen Sit vorzuschauen.",
@@ -4710,9 +4728,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Längeneinheit",
     "vesselEditor.lengthValuePlaceholder": "z. B. 12",
     "vesselEditor.lengthUnknown": "Weiß ich nicht",
+    "vesselEditor.lengthDisabledHint": "Deaktiviere „Weiß ich nicht“, um eine Länge einzugeben.",
     "vesselEditor.yearBuilt": "Baujahr",
     "vesselEditor.yearBuiltPlaceholder": "z. B. 2012",
     "vesselEditor.yearBuiltUnknown": "Weiß ich nicht",
+    "vesselEditor.yearBuiltDisabledHint": "Deaktiviere „Weiß ich nicht“, um ein Jahr einzugeben.",
     "vesselEditor.yearBuiltHint":
       "Gib ein Jahr zwischen {{min}} und {{max}} ein, oder wähle „Weiß ich nicht“.",
     "vesselEditor.yearBuiltInvalid":
@@ -5038,6 +5058,8 @@ const localeExtrasSource = {
     "common.saving": "Besparing…",
     "common.required": "Verplicht",
     "common.optional": "optioneel",
+    "common.charsRemaining_one": "{{count}} teken over",
+    "common.charsRemaining_other": "{{count}} tekens over",
     "nav.logout": "Uitloggen",
     "nav.logoutConfirmTitle": "Weet je zeker dat je wilt uitloggen?",
     "nav.logoutConfirmText":
@@ -5162,7 +5184,7 @@ const localeExtrasSource = {
     "editorPreview.vesselHint": "Werkt bij terwijl je de bootgegevens bewerkt.",
     "editorPreview.sitHint": "Werkt bij terwijl je dit oppas bewerkt. Zo zien sitters het.",
     "editorPreview.untitledBoat": "Naamloze boot",
-    "editorPreview.homePortPending": "Voeg een thuishaven toe",
+    "editorPreview.locationUnknown": "Locatie onbekend",
     "editorPreview.lengthPending": "Lengte nog open",
     "editorPreview.datesPending": "Kies data om het voorbeeld te voltooien",
     "editorPreview.selectBoat": "Selecteer een boot om dit oppas te bekijken.",
@@ -5713,9 +5735,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Lengte-eenheid",
     "vesselEditor.lengthValuePlaceholder": "bijv. 12",
     "vesselEditor.lengthUnknown": "Weet ik niet",
+    "vesselEditor.lengthDisabledHint": "Vink “Weet ik niet” uit om een lengte in te voeren.",
     "vesselEditor.yearBuilt": "Bouwjaar",
     "vesselEditor.yearBuiltPlaceholder": "bijv. 2012",
     "vesselEditor.yearBuiltUnknown": "Weet ik niet",
+    "vesselEditor.yearBuiltDisabledHint": "Vink “Weet ik niet” uit om een jaar in te voeren.",
     "vesselEditor.yearBuiltHint":
       "Voer een jaar in tussen {{min}} en {{max}}, of kies “Weet ik niet”.",
     "vesselEditor.yearBuiltInvalid":
@@ -6040,6 +6064,8 @@ const localeExtrasSource = {
     "common.saving": "Salvando…",
     "common.required": "Obrigatório",
     "common.optional": "opcional",
+    "common.charsRemaining_one": "{{count}} carácter restante",
+    "common.charsRemaining_other": "{{count}} caracteres restantes",
     "nav.logout": "Sair",
     "nav.logoutConfirmTitle": "Tem a certeza de que pretende terminar sessão?",
     "nav.logoutConfirmText":
@@ -6164,7 +6190,7 @@ const localeExtrasSource = {
     "editorPreview.vesselHint": "Atualiza enquanto edita os detalhes do barco.",
     "editorPreview.sitHint": "Atualiza enquanto edita esta estadia. É assim que os sitters a veem.",
     "editorPreview.untitledBoat": "Barco sem nome",
-    "editorPreview.homePortPending": "Adicione um porto de origem",
+    "editorPreview.locationUnknown": "Localização desconhecida",
     "editorPreview.lengthPending": "Comprimento por definir",
     "editorPreview.datesPending": "Escolha datas para completar a pré-visualização",
     "editorPreview.selectBoat": "Selecione um barco para pré-visualizar esta estadia.",
@@ -6715,9 +6741,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Unidade de comprimento",
     "vesselEditor.lengthValuePlaceholder": "ex. 12",
     "vesselEditor.lengthUnknown": "Não sei",
+    "vesselEditor.lengthDisabledHint": "Desmarque “Não sei” para introduzir um comprimento.",
     "vesselEditor.yearBuilt": "Ano de fabrico",
     "vesselEditor.yearBuiltPlaceholder": "ex. 2012",
     "vesselEditor.yearBuiltUnknown": "Não sei",
+    "vesselEditor.yearBuiltDisabledHint": "Desmarque “Não sei” para introduzir um ano.",
     "vesselEditor.yearBuiltHint": "Introduza um ano entre {{min}} e {{max}}, ou escolha “Não sei”.",
     "vesselEditor.yearBuiltInvalid":
       "Introduza um ano entre {{min}} e {{max}}, ou escolha “Não sei”.",
@@ -7042,6 +7070,8 @@ const localeExtrasSource = {
     "common.saving": "Οικονομία…",
     "common.required": "Υποχρεωτικό",
     "common.optional": "προαιρετικό",
+    "common.charsRemaining_one": "{{count}} χαρακτήρας απομένει",
+    "common.charsRemaining_other": "{{count}} χαρακτήρες απομένουν",
     "nav.logout": "Αποσυνδεθείτε",
     "nav.logoutConfirmTitle": "Θέλετε σίγουρα να αποσυνδεθείτε;",
     "nav.logoutConfirmText":
@@ -7169,7 +7199,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Ενημερώνεται καθώς επεξεργάζεστε αυτή τη διαμονή. Έτσι τη βλέπουν οι sitters.",
     "editorPreview.untitledBoat": "Σκάφος χωρίς όνομα",
-    "editorPreview.homePortPending": "Προσθέστε λιμάνι βάσης",
+    "editorPreview.locationUnknown": "Άγνωστη τοποθεσία",
     "editorPreview.lengthPending": "Μήκος σε εκκρεμότητα",
     "editorPreview.datesPending": "Επιλέξτε ημερομηνίες για να ολοκληρώσετε την προεπισκόπηση",
     "editorPreview.selectBoat": "Επιλέξτε σκάφος για προεπισκόπηση αυτής της διαμονής.",
@@ -7730,9 +7760,13 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Μονάδα μήκους",
     "vesselEditor.lengthValuePlaceholder": "π.χ. 12",
     "vesselEditor.lengthUnknown": "Δεν γνωρίζω",
+    "vesselEditor.lengthDisabledHint":
+      "Καταργήστε την επιλογή «Δεν γνωρίζω» για να εισαγάγετε μήκος.",
     "vesselEditor.yearBuilt": "Έτος ναυπήγησης",
     "vesselEditor.yearBuiltPlaceholder": "π.χ. 2012",
     "vesselEditor.yearBuiltUnknown": "Δεν γνωρίζω",
+    "vesselEditor.yearBuiltDisabledHint":
+      "Καταργήστε την επιλογή «Δεν γνωρίζω» για να εισαγάγετε έτος.",
     "vesselEditor.yearBuiltHint":
       "Εισαγάγετε έτος μεταξύ {{min}} και {{max}}, ή επιλέξτε «Δεν γνωρίζω».",
     "vesselEditor.yearBuiltInvalid":
@@ -8060,6 +8094,8 @@ const localeExtrasSource = {
     "common.saving": "Spremanje...",
     "common.required": "Obavezno",
     "common.optional": "opcionalno",
+    "common.charsRemaining_one": "{{count}} znak preostao",
+    "common.charsRemaining_other": "{{count}} znakova preostalo",
     "nav.logout": "Odjavi se",
     "nav.logoutConfirmTitle": "Jeste li sigurni da se želite odjaviti?",
     "nav.logoutConfirmText":
@@ -8189,7 +8225,7 @@ const localeExtrasSource = {
     "editorPreview.vesselHint": "Ažurira se dok uređujete detalje broda.",
     "editorPreview.sitHint": "Ažurira se dok uređujete ovaj boravak. Ovako ga vide sitteri.",
     "editorPreview.untitledBoat": "Brod bez imena",
-    "editorPreview.homePortPending": "Dodajte matičnu luku",
+    "editorPreview.locationUnknown": "Nepoznata lokacija",
     "editorPreview.lengthPending": "Duljina nije unesena",
     "editorPreview.datesPending": "Odaberite datume da dovršite pregled",
     "editorPreview.selectBoat": "Odaberite brod za pregled ovog boravka.",
@@ -8739,9 +8775,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Jedinica duljine",
     "vesselEditor.lengthValuePlaceholder": "npr. 12",
     "vesselEditor.lengthUnknown": "Ne znam",
+    "vesselEditor.lengthDisabledHint": "Uklonite oznaku „Ne znam“ da unesete duljinu.",
     "vesselEditor.yearBuilt": "Godina izgradnje",
     "vesselEditor.yearBuiltPlaceholder": "npr. 2012",
     "vesselEditor.yearBuiltUnknown": "Ne znam",
+    "vesselEditor.yearBuiltDisabledHint": "Uklonite oznaku „Ne znam“ da unesete godinu.",
     "vesselEditor.yearBuiltHint":
       "Unesite godinu između {{min}} i {{max}} ili odaberite “Ne znam”.",
     "vesselEditor.yearBuiltInvalid":
@@ -9066,6 +9104,8 @@ const localeExtrasSource = {
     "common.saving": "Kaydediliyor…",
     "common.required": "Zorunlu",
     "common.optional": "isteğe bağlı",
+    "common.charsRemaining_one": "{{count}} karakter kaldı",
+    "common.charsRemaining_other": "{{count}} karakter kaldı",
     "nav.logout": "Oturumu kapat",
     "nav.logoutConfirmTitle": "Oturumu kapatmak istediğinizden emin misiniz?",
     "nav.logoutConfirmText":
@@ -9190,7 +9230,7 @@ const localeExtrasSource = {
     "editorPreview.vesselHint": "Tekne ayrıntılarını düzenlerken güncellenir.",
     "editorPreview.sitHint": "Bu konaklamayı düzenlerken güncellenir. Bakıcılar böyle görür.",
     "editorPreview.untitledBoat": "Adsız tekne",
-    "editorPreview.homePortPending": "Ana liman ekleyin",
+    "editorPreview.locationUnknown": "Konum bilinmiyor",
     "editorPreview.lengthPending": "Boy henüz yok",
     "editorPreview.datesPending": "Önizlemeyi tamamlamak için tarihler seçin",
     "editorPreview.selectBoat": "Bu konaklamayı önizlemek için bir tekne seçin.",
@@ -9728,9 +9768,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Uzunluk birimi",
     "vesselEditor.lengthValuePlaceholder": "örn. 12",
     "vesselEditor.lengthUnknown": "Bilmiyorum",
+    "vesselEditor.lengthDisabledHint": "Uzunluk girmek için “Bilmiyorum” seçimini kaldırın.",
     "vesselEditor.yearBuilt": "İmalat yılı",
     "vesselEditor.yearBuiltPlaceholder": "örn. 2012",
     "vesselEditor.yearBuiltUnknown": "Bilmiyorum",
+    "vesselEditor.yearBuiltDisabledHint": "Yıl girmek için “Bilmiyorum” seçimini kaldırın.",
     "vesselEditor.yearBuiltHint":
       "{{min}} ile {{max}} arasında bir yıl girin veya “Bilmiyorum”u seçin.",
     "vesselEditor.yearBuiltInvalid":
@@ -10055,6 +10097,8 @@ const localeExtrasSource = {
     "common.saving": "Sparande…",
     "common.required": "Obligatoriskt",
     "common.optional": "valfritt",
+    "common.charsRemaining_one": "{{count}} tecken kvar",
+    "common.charsRemaining_other": "{{count}} tecken kvar",
     "nav.logout": "Logga ut",
     "nav.logoutConfirmTitle": "Är du säker på att du vill logga ut?",
     "nav.logoutConfirmText":
@@ -10179,7 +10223,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Uppdateringar när du redigerar denna sits. Så här ser det ut när barnvakter surfar.",
     "editorPreview.untitledBoat": "Namnlös båt",
-    "editorPreview.homePortPending": "Lägg till en hemmahamn",
+    "editorPreview.locationUnknown": "Plats okänd",
     "editorPreview.lengthPending": "Längd TBD",
     "editorPreview.datesPending": "Välj datum för att slutföra förhandsgranskningen",
     "editorPreview.selectBoat": "Välj en båt för att förhandsgranska denna sits.",
@@ -10720,9 +10764,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Längdenhet",
     "vesselEditor.lengthValuePlaceholder": "t.ex. 12",
     "vesselEditor.lengthUnknown": "Jag vet inte",
+    "vesselEditor.lengthDisabledHint": "Avmarkera “Jag vet inte” för att ange en längd.",
     "vesselEditor.yearBuilt": "Tillverkningsår",
     "vesselEditor.yearBuiltPlaceholder": "t.ex. 2012",
     "vesselEditor.yearBuiltUnknown": "Jag vet inte",
+    "vesselEditor.yearBuiltDisabledHint": "Avmarkera “Jag vet inte” för att ange ett år.",
     "vesselEditor.yearBuiltHint":
       "Ange ett år mellan {{min}} och {{max}}, eller välj “Jag vet inte”.",
     "vesselEditor.yearBuiltInvalid":
@@ -11048,6 +11094,8 @@ const localeExtrasSource = {
     "common.saving": "Lagrer …",
     "common.required": "Påkrevd",
     "common.optional": "valgfritt",
+    "common.charsRemaining_one": "{{count}} tegn igjen",
+    "common.charsRemaining_other": "{{count}} tegn igjen",
     "nav.logout": "Logg ut",
     "nav.logoutConfirmTitle": "Er du sikker på at du vil logge ut?",
     "nav.logoutConfirmText":
@@ -11173,7 +11221,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Oppdaterer mens du redigerer denne siden. Slik ser det ut når sittere surfer.",
     "editorPreview.untitledBoat": "Båt uten navn",
-    "editorPreview.homePortPending": "Legg til en hjemmeport",
+    "editorPreview.locationUnknown": "Sted ukjent",
     "editorPreview.lengthPending": "Lengde TBD",
     "editorPreview.datesPending": "Velg datoer for å fullføre forhåndsvisningen av oppføringen",
     "editorPreview.selectBoat": "Velg en båt for å forhåndsvise dette setet.",
@@ -11712,9 +11760,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Lengdeenhet",
     "vesselEditor.lengthValuePlaceholder": "f.eks. 12",
     "vesselEditor.lengthUnknown": "Jeg vet ikke",
+    "vesselEditor.lengthDisabledHint": "Fjern avmerkingen “Jeg vet ikke” for å oppgi en lengde.",
     "vesselEditor.yearBuilt": "Produksjonsår",
     "vesselEditor.yearBuiltPlaceholder": "f.eks. 2012",
     "vesselEditor.yearBuiltUnknown": "Jeg vet ikke",
+    "vesselEditor.yearBuiltDisabledHint": "Fjern avmerkingen “Jeg vet ikke” for å oppgi et år.",
     "vesselEditor.yearBuiltHint":
       "Skriv inn et år mellom {{min}} og {{max}}, eller velg “Jeg vet ikke”.",
     "vesselEditor.yearBuiltInvalid":
@@ -12039,6 +12089,8 @@ const localeExtrasSource = {
     "common.saving": "Gemmer...",
     "common.required": "Påkrævet",
     "common.optional": "valgfrit",
+    "common.charsRemaining_one": "{{count}} tegn tilbage",
+    "common.charsRemaining_other": "{{count}} tegn tilbage",
     "nav.logout": "Log ud",
     "nav.logoutConfirmTitle": "Er du sikker på, at du vil logge ud?",
     "nav.logoutConfirmText":
@@ -12164,7 +12216,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Opdateringer, mens du redigerer denne side. Sådan ser det ud, når sitters browser.",
     "editorPreview.untitledBoat": "Unavngivet båd",
-    "editorPreview.homePortPending": "Tilføj en hjemmehavn",
+    "editorPreview.locationUnknown": "Placering ukendt",
     "editorPreview.lengthPending": "Længde TBD",
     "editorPreview.datesPending": "Vælg datoer for at fuldføre forhåndsvisningen af fortegnelsen",
     "editorPreview.selectBoat": "Vælg en båd for at forhåndsvise denne sit.",
@@ -12700,9 +12752,13 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Længde enhed",
     "vesselEditor.lengthValuePlaceholder": "f.eks. 12",
     "vesselEditor.lengthUnknown": "Jeg ved det ikke",
+    "vesselEditor.lengthDisabledHint":
+      "Fjern markeringen “Jeg ved det ikke” for at angive en længde.",
     "vesselEditor.yearBuilt": "Produktionsår",
     "vesselEditor.yearBuiltPlaceholder": "f.eks. 2012",
     "vesselEditor.yearBuiltUnknown": "Jeg ved det ikke",
+    "vesselEditor.yearBuiltDisabledHint":
+      "Fjern markeringen “Jeg ved det ikke” for at angive et år.",
     "vesselEditor.yearBuiltHint":
       "Angiv et år mellem {{min}} og {{max}}, eller vælg “Jeg ved det ikke”.",
     "vesselEditor.yearBuiltInvalid":
@@ -13026,6 +13082,8 @@ const localeExtrasSource = {
     "common.saving": "Tallennetaan…",
     "common.required": "Pakollinen",
     "common.optional": "valinnainen",
+    "common.charsRemaining_one": "{{count}} merkki jäljellä",
+    "common.charsRemaining_other": "{{count}} merkkiä jäljellä",
     "nav.logout": "Kirjaudu ulos",
     "nav.logoutConfirmTitle": "Haluatko varmasti kirjautua ulos?",
     "nav.logoutConfirmText":
@@ -13151,7 +13209,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Päivityksiä, kun muokkaat tätä istuinta. Tältä se näyttää, kun hoitajat selaavat.",
     "editorPreview.untitledBoat": "Nimetön vene",
-    "editorPreview.homePortPending": "Lisää kotiportti",
+    "editorPreview.locationUnknown": "Sijainti tuntematon",
     "editorPreview.lengthPending": "Pituus TBD",
     "editorPreview.datesPending": "Valitse päivämäärät listauksen esikatselun viimeistelemiseksi",
     "editorPreview.selectBoat": "Valitse vene nähdäksesi tämän istunnon.",
@@ -13692,9 +13750,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Pituusyksikkö",
     "vesselEditor.lengthValuePlaceholder": "esim. 12",
     "vesselEditor.lengthUnknown": "En tiedä",
+    "vesselEditor.lengthDisabledHint": "Poista “En tiedä” -valinta syöttääksesi pituuden.",
     "vesselEditor.yearBuilt": "Valmistusvuosi",
     "vesselEditor.yearBuiltPlaceholder": "esim. 2012",
     "vesselEditor.yearBuiltUnknown": "En tiedä",
+    "vesselEditor.yearBuiltDisabledHint": "Poista “En tiedä” -valinta syöttääksesi vuoden.",
     "vesselEditor.yearBuiltHint": "Syötä vuosi välillä {{min}}–{{max}}, tai valitse “En tiedä”.",
     "vesselEditor.yearBuiltInvalid": "Syötä vuosi välillä {{min}}–{{max}}, tai valitse “En tiedä”.",
     "settings.signInTitle": "Kirjaudu sisään nähdäksesi asetukset",
@@ -14018,6 +14078,8 @@ const localeExtrasSource = {
     "common.saving": "保存中…",
     "common.required": "必須",
     "common.optional": "任意",
+    "common.charsRemaining_one": "残り{{count}}文字",
+    "common.charsRemaining_other": "残り{{count}}文字",
     "nav.logout": "ログアウト",
     "nav.logoutConfirmTitle": "ログアウトしてもよろしいですか?",
     "nav.logoutConfirmText":
@@ -14143,7 +14205,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "このシートを編集すると更新されます。シッターが閲覧するとこのように表示されます。",
     "editorPreview.untitledBoat": "無題の船",
-    "editorPreview.homePortPending": "ホームポートを追加する",
+    "editorPreview.locationUnknown": "場所不明",
     "editorPreview.lengthPending": "長さ未定",
     "editorPreview.datesPending": "日付を選択してリスティングのプレビューを完了します",
     "editorPreview.selectBoat": "この座席をプレビューするにはボートを選択してください。",
@@ -14683,9 +14745,13 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "長さの単位",
     "vesselEditor.lengthValuePlaceholder": "例: 12",
     "vesselEditor.lengthUnknown": "わからない",
+    "vesselEditor.lengthDisabledHint":
+      "長さを入力するには「わからない」のチェックを外してください。",
     "vesselEditor.yearBuilt": "建造年",
     "vesselEditor.yearBuiltPlaceholder": "例: 2012",
     "vesselEditor.yearBuiltUnknown": "わからない",
+    "vesselEditor.yearBuiltDisabledHint":
+      "年を入力するには「わからない」のチェックを外してください。",
     "vesselEditor.yearBuiltHint":
       "{{min}}から{{max}}の年を入力するか、「わからない」を選んでください。",
     "vesselEditor.yearBuiltInvalid":
@@ -15010,6 +15076,8 @@ const localeExtrasSource = {
     "common.saving": "Saving…",
     "common.required": "Required",
     "common.optional": "optional",
+    "common.charsRemaining_one": "{{count}} character left",
+    "common.charsRemaining_other": "{{count}} characters left",
     "nav.logout": "Log out",
     "nav.logoutConfirmTitle": "Are you sure you want to log out?",
     "nav.logoutConfirmText":
@@ -15135,7 +15203,7 @@ const localeExtrasSource = {
     "editorPreview.sitHint":
       "Updates as you edit this sit. This is how it appears when sitters browse.",
     "editorPreview.untitledBoat": "Untitled boat",
-    "editorPreview.homePortPending": "Add a home port",
+    "editorPreview.locationUnknown": "Location unknown",
     "editorPreview.lengthPending": "Length TBD",
     "editorPreview.datesPending": "Choose dates to complete the listing preview",
     "editorPreview.selectBoat": "Select a boat to preview this sit.",
@@ -15665,9 +15733,11 @@ const localeExtrasSource = {
     "vesselEditor.lengthUnit": "Length unit",
     "vesselEditor.lengthValuePlaceholder": "e.g. 12",
     "vesselEditor.lengthUnknown": "I don’t know",
+    "vesselEditor.lengthDisabledHint": "Uncheck “I don’t know” to enter a length.",
     "vesselEditor.yearBuilt": "Year of manufacture",
     "vesselEditor.yearBuiltPlaceholder": "e.g. 2012",
     "vesselEditor.yearBuiltUnknown": "I don’t know",
+    "vesselEditor.yearBuiltDisabledHint": "Uncheck “I don’t know” to enter a year.",
     "vesselEditor.yearBuiltHint":
       "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
     "vesselEditor.yearBuiltInvalid":

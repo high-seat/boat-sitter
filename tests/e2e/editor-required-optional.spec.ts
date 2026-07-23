@@ -12,11 +12,18 @@ test.describe("editor required vs optional fields", () => {
     await expect(hint).toHaveText(
       /Required fields are marked with \*\. Everything else is optional\./i,
     );
+    await expect(hint.locator("span[aria-hidden='true']")).toHaveCSS("color", "rgb(239, 112, 87)");
+    await expect(page.getByTestId("vessel-cover").locator("span.font-bold.text-coral")).toHaveCSS(
+      "color",
+      "rgb(239, 112, 87)",
+    );
 
     const requiredLabels = page.getByTestId("form-label-required");
     await expect(requiredLabels.filter({ hasText: /Boat name/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Home port/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Cover image/i })).toContainText("*");
+    await expect(requiredLabels.filter({ hasText: /Vessel type/i })).toContainText("*");
+    await expect(page.getByTestId("vessel-type")).toHaveValue("Not specified");
 
     await expect(page.getByRole("heading", { name: /What’s available/i })).toContainText(
       /optional/i,

@@ -30,8 +30,20 @@ test.describe("vessel editor disabled inputs", () => {
     await expectDisabledFieldLook(lengthUnit);
     await expectDisabledFieldLook(yearBuilt);
 
+    await page.getByTestId("vessel-length-fields").hover();
+    await expect(
+      page.getByRole("tooltip", { name: /Uncheck .*I don’t know.* to enter a length/i }),
+    ).toBeVisible();
+
+    await yearBuilt.hover({ force: true });
+    await expect(
+      page.getByRole("tooltip", { name: /Uncheck .*I don’t know.* to enter a year/i }),
+    ).toBeVisible();
+
     await yearUnknown.uncheck();
     await expectEnabledFieldLook(yearBuilt);
+    await yearBuilt.hover();
+    await expect(page.getByRole("tooltip", { name: /enter a year/i })).toHaveCount(0);
     await yearBuilt.fill("2018");
 
     await yearUnknown.check();
@@ -41,5 +53,7 @@ test.describe("vessel editor disabled inputs", () => {
     await lengthUnknown.uncheck();
     await expectEnabledFieldLook(lengthValue);
     await expectEnabledFieldLook(lengthUnit);
+    await page.getByTestId("vessel-length-fields").hover();
+    await expect(page.getByRole("tooltip", { name: /enter a length/i })).toHaveCount(0);
   });
 });

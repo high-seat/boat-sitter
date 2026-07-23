@@ -279,8 +279,6 @@ const en = {
   "messageReport.escalateSuccessText": "Our team will review this message and follow up by email.",
   "applications.replyPlaceholder": "Write a reply...",
   "applications.replyHint": "Enter to send. {{shortcut}} for a new line.",
-  "applications.experienceHint":
-    "Mention your experience with motor yacht boats and the onboard systems listed in the brief.",
   "applications.sending": "Sending...",
   "applications.sendReply": "Send reply",
   "applications.translateWithGoogle": "Translate with Google",
@@ -368,6 +366,36 @@ const en = {
     "You have {{days}} days left to leave a review. Reviews stay open for 7 days after a sit ends.",
   "reviews.windowClosed": "The review window for this sit has closed.",
   "reviews.sitNotCompleted": "You can leave a review after the sit has finished.",
+  "availability.title": "Your availability",
+  "availability.subtitle":
+    "Share the dates and places you're free to sit. Each open window shows the boats you could apply to right now.",
+  "availability.signInText":
+    "Sign in to publish when you're free to sit, and we'll show you the boats needing a sitter in those places and dates.",
+  "availability.dates": "Dates",
+  "availability.regions": "Countries and cities",
+  "availability.regionsHint":
+    "Leave empty to be open to anywhere, or add specific countries and cities.",
+  "availability.regionsPlaceholder": "Add a country or city",
+  "availability.notes": "Notes",
+  "availability.notesPlaceholder":
+    "Anything owners should know: experience, flexibility, pets you love…",
+  "availability.publish": "Publish availability",
+  "availability.publishing": "Publishing…",
+  "availability.publishBlocked": "Still needed: {{items}}",
+  "availability.windowsTitle": "Published windows",
+  "availability.empty": "No windows yet. Add one above to start getting matched with sits.",
+  "availability.openAnywhere": "Open to anywhere",
+  "availability.withdraw": "Withdraw",
+  "availability.showMatchingSits": "Show matching sits",
+  "availability.hideMatchingSits": "Hide matching sits",
+  "availability.noMatchingSits":
+    "No open sits match this window yet. Check back as new sits appear when owners post them.",
+  "availability.saveFailed": "Couldn't save. Try again.",
+  "availability.phase.open": "Open",
+  "availability.phase.booked": "Booked",
+  "availability.phase.completed": "Completed",
+  "availability.phase.expired": "Expired",
+  "availability.phase.withdrawn": "Withdrawn",
 };
 
 const applicationTranslationsSource: Record<string, Record<string, string>> = {
@@ -661,8 +689,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Notre équipe examinera ce message et vous recontactera par e-mail.",
     "applications.replyPlaceholder": "Rédigez une réponse...",
     "applications.replyHint": "Entrée pour envoyer. {{shortcut}} pour une nouvelle ligne.",
-    "applications.experienceHint":
-      "Mentionnez votre expérience avec les bateaux à moteur et les systèmes de bord décrits dans l'annonce.",
     "applications.sending": "Envoi...",
     "applications.sendReply": "Envoyer la réponse",
     "applications.translateWithGoogle": "Traduire avec Google",
@@ -754,6 +780,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Il vous reste {{days}} jours pour laisser un avis. Les avis restent ouverts pendant 7 jours après la fin de la garde.",
     "reviews.windowClosed": "La période d’avis pour cette garde est terminée.",
     "reviews.sitNotCompleted": "Vous pourrez laisser un avis une fois la garde terminée.",
+    "availability.title": "Votre disponibilité",
+    "availability.subtitle":
+      "Indiquez les dates et les lieux où vous êtes libre pour une garde. Chaque fenêtre ouverte affiche les bateaux auxquels vous pouvez postuler.",
+    "availability.signInText":
+      "Connectez-vous pour publier vos disponibilités, et nous vous montrerons les bateaux qui ont besoin d’un sitter à ces dates et lieux.",
+    "availability.dates": "Dates",
+    "availability.regions": "Pays et villes",
+    "availability.regionsHint":
+      "Laissez vide pour être ouvert à partout, ou ajoutez des pays et des villes.",
+    "availability.regionsPlaceholder": "Ajouter un pays ou une ville",
+    "availability.notes": "Notes",
+    "availability.notesPlaceholder":
+      "Tout ce que les propriétaires devraient savoir : expérience, flexibilité, animaux que vous aimez…",
+    "availability.publish": "Publier la disponibilité",
+    "availability.publishing": "Publication…",
+    "availability.publishBlocked": "Il manque encore : {{items}}",
+    "availability.windowsTitle": "Fenêtres publiées",
+    "availability.empty":
+      "Aucune fenêtre pour l’instant. Ajoutez-en une ci-dessus pour commencer à être mis en relation avec des gardes.",
+    "availability.openAnywhere": "Ouvert à partout",
+    "availability.withdraw": "Retirer",
+    "availability.showMatchingSits": "Afficher les gardes correspondantes",
+    "availability.hideMatchingSits": "Masquer les gardes correspondantes",
+    "availability.noMatchingSits":
+      "Aucune garde ouverte ne correspond encore à cette fenêtre. Revenez plus tard lorsque les propriétaires publieront de nouvelles gardes.",
+    "availability.saveFailed": "Enregistrement impossible. Réessayez.",
+    "availability.phase.open": "Ouverte",
+    "availability.phase.booked": "Réservée",
+    "availability.phase.completed": "Terminée",
+    "availability.phase.expired": "Expirée",
+    "availability.phase.withdrawn": "Retirée",
   },
   "es-ES": {
     "messages.aboutBoat": "Sobre {{boat}}",
@@ -1038,8 +1095,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Nuestro equipo revisará este mensaje y te contactará por correo.",
     "applications.replyPlaceholder": "Escribe una respuesta...",
     "applications.replyHint": "Intro para enviar. {{shortcut}} para una nueva línea.",
-    "applications.experienceHint":
-      "Menciona tu experiencia con yates a motor y los sistemas de a bordo descritos en el anuncio.",
     "applications.sending": "Enviando...",
     "applications.sendReply": "Enviar respuesta",
     "applications.translateWithGoogle": "Traducir con Google",
@@ -1132,6 +1187,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Te quedan {{days}} días para dejar una opinión. Las opiniones permanecen abiertas durante 7 días después de que termine la estancia.",
     "reviews.windowClosed": "El plazo para opinar sobre este sit ha cerrado.",
     "reviews.sitNotCompleted": "Podrás dejar una opinión cuando termine el sit.",
+    "availability.title": "Tu disponibilidad",
+    "availability.subtitle":
+      "Comparte las fechas y lugares en los que estás libre para una estancia. Cada ventana abierta muestra los barcos a los que puedes postularte.",
+    "availability.signInText":
+      "Inicia sesión para publicar cuándo estás libre, y te mostraremos los barcos que necesitan un cuidador en esos lugares y fechas.",
+    "availability.dates": "Fechas",
+    "availability.regions": "Países y ciudades",
+    "availability.regionsHint":
+      "Déjalo vacío para estar abierto a cualquier lugar, o añade países y ciudades concretos.",
+    "availability.regionsPlaceholder": "Añadir un país o una ciudad",
+    "availability.notes": "Notas",
+    "availability.notesPlaceholder":
+      "Todo lo que los propietarios deberían saber: experiencia, flexibilidad, mascotas que te encantan…",
+    "availability.publish": "Publicar disponibilidad",
+    "availability.publishing": "Publicando…",
+    "availability.publishBlocked": "Todavía falta: {{items}}",
+    "availability.windowsTitle": "Ventanas publicadas",
+    "availability.empty":
+      "Aún no hay ventanas. Añade una arriba para empezar a recibir coincidencias con estancias.",
+    "availability.openAnywhere": "Abierto a cualquier lugar",
+    "availability.withdraw": "Retirar",
+    "availability.showMatchingSits": "Mostrar estancias coincidentes",
+    "availability.hideMatchingSits": "Ocultar estancias coincidentes",
+    "availability.noMatchingSits":
+      "Todavía no hay estancias abiertas que coincidan con esta ventana. Vuelve más tarde cuando los propietarios publiquen nuevas.",
+    "availability.saveFailed": "No se pudo guardar. Inténtalo de nuevo.",
+    "availability.phase.open": "Abierta",
+    "availability.phase.booked": "Reservada",
+    "availability.phase.completed": "Completada",
+    "availability.phase.expired": "Caducada",
+    "availability.phase.withdrawn": "Retirada",
   },
   it: {
     "messages.aboutBoat": "Informazioni su {{boat}}",
@@ -1419,8 +1505,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Il nostro team esaminerà questo messaggio e ti ricontatterà via e-mail.",
     "applications.replyPlaceholder": "Scrivi una risposta...",
     "applications.replyHint": "Invio per inviare. {{shortcut}} per una nuova riga.",
-    "applications.experienceHint":
-      "Descrivi la tua esperienza con yacht a motore e i sistemi di bordo indicati nell'annuncio.",
     "applications.sending": "Invio...",
     "applications.sendReply": "Invia risposta",
     "applications.translateWithGoogle": "Traduci con Google",
@@ -1511,6 +1595,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Hai ancora {{days}} giorni per lasciare una recensione. Le recensioni restano aperte per 7 giorni dopo la fine del soggiorno.",
     "reviews.windowClosed": "Il periodo per recensire questo sit è scaduto.",
     "reviews.sitNotCompleted": "Potrai lasciare una recensione quando il sit sarà terminato.",
+    "availability.title": "La tua disponibilità",
+    "availability.subtitle":
+      "Condividi le date e i luoghi in cui sei libero per un soggiorno. Ogni finestra aperta mostra le barche a cui puoi candidarti.",
+    "availability.signInText":
+      "Accedi per pubblicare quando sei libero, e ti mostreremo le barche che cercano un sitter in quei luoghi e date.",
+    "availability.dates": "Date",
+    "availability.regions": "Paesi e città",
+    "availability.regionsHint":
+      "Lascia vuoto per essere aperto a ovunque, oppure aggiungi paesi e città specifici.",
+    "availability.regionsPlaceholder": "Aggiungi un paese o una città",
+    "availability.notes": "Note",
+    "availability.notesPlaceholder":
+      "Tutto ciò che i proprietari dovrebbero sapere: esperienza, flessibilità, animali che ami…",
+    "availability.publish": "Pubblica disponibilità",
+    "availability.publishing": "Pubblicazione…",
+    "availability.publishBlocked": "Manca ancora: {{items}}",
+    "availability.windowsTitle": "Finestre pubblicate",
+    "availability.empty":
+      "Nessuna finestra ancora. Aggiungine una sopra per iniziare a ricevere corrispondenze con i soggiorni.",
+    "availability.openAnywhere": "Aperto a ovunque",
+    "availability.withdraw": "Ritira",
+    "availability.showMatchingSits": "Mostra soggiorni corrispondenti",
+    "availability.hideMatchingSits": "Nascondi soggiorni corrispondenti",
+    "availability.noMatchingSits":
+      "Nessun soggiorno aperto corrisponde ancora a questa finestra. Controlla più tardi quando i proprietari pubblicheranno nuovi annunci.",
+    "availability.saveFailed": "Impossibile salvare. Riprova.",
+    "availability.phase.open": "Aperta",
+    "availability.phase.booked": "Prenotata",
+    "availability.phase.completed": "Completata",
+    "availability.phase.expired": "Scaduta",
+    "availability.phase.withdrawn": "Ritirata",
   },
   de: {
     "messages.aboutBoat": "Über {{boat}}",
@@ -1799,8 +1914,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Unser Team prüft diese Nachricht und meldet sich per E-Mail.",
     "applications.replyPlaceholder": "Antwort schreiben...",
     "applications.replyHint": "Eingabe zum Senden. {{shortcut}} für eine neue Zeile.",
-    "applications.experienceHint":
-      "Erwähne deine Erfahrung mit Motoryachten und den im Inserat aufgeführten Bordsystemen.",
     "applications.sending": "Wird gesendet...",
     "applications.sendReply": "Antwort senden",
     "applications.translateWithGoogle": "Mit Google übersetzen",
@@ -1893,6 +2006,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sie haben noch {{days}} Tage, um eine Bewertung abzugeben. Bewertungen bleiben 7 Tage nach Ende des Sits offen.",
     "reviews.windowClosed": "Die Bewertungsfrist für diesen Sit ist abgelaufen.",
     "reviews.sitNotCompleted": "Sie können eine Bewertung abgeben, sobald der Sit beendet ist.",
+    "availability.title": "Deine Verfügbarkeit",
+    "availability.subtitle":
+      "Teile die Zeiträume und Orte, an denen du frei für eine Betreuung bist. Jedes offene Zeitfenster zeigt Boote, auf die du dich bewerben kannst.",
+    "availability.signInText":
+      "Melde dich an, um zu veröffentlichen, wann du frei bist. Wir zeigen dir dann Boote, die in diesen Orten und Zeiträumen einen Sitter brauchen.",
+    "availability.dates": "Zeitraum",
+    "availability.regions": "Länder und Städte",
+    "availability.regionsHint":
+      "Leer lassen, um überall offen zu sein, oder bestimmte Länder und Städte hinzufügen.",
+    "availability.regionsPlaceholder": "Land oder Stadt hinzufügen",
+    "availability.notes": "Notizen",
+    "availability.notesPlaceholder":
+      "Alles, was Eigentümer wissen sollten: Erfahrung, Flexibilität, Haustiere, die du magst…",
+    "availability.publish": "Verfügbarkeit veröffentlichen",
+    "availability.publishing": "Wird veröffentlicht…",
+    "availability.publishBlocked": "Noch nötig: {{items}}",
+    "availability.windowsTitle": "Veröffentlichte Zeitfenster",
+    "availability.empty":
+      "Noch keine Zeitfenster. Füge oben eines hinzu, um mit Betreuungen gematcht zu werden.",
+    "availability.openAnywhere": "Überall offen",
+    "availability.withdraw": "Zurückziehen",
+    "availability.showMatchingSits": "Passende Betreuungen anzeigen",
+    "availability.hideMatchingSits": "Passende Betreuungen ausblenden",
+    "availability.noMatchingSits":
+      "Noch keine offenen Betreuungen passen zu diesem Zeitfenster. Schau später wieder vorbei, wenn Eigentümer neue anbieten.",
+    "availability.saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    "availability.phase.open": "Offen",
+    "availability.phase.booked": "Gebucht",
+    "availability.phase.completed": "Abgeschlossen",
+    "availability.phase.expired": "Abgelaufen",
+    "availability.phase.withdrawn": "Zurückgezogen",
   },
   nl: {
     "messages.aboutBoat": "Over {{boat}}",
@@ -2182,8 +2326,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ons team bekijkt dit bericht en neemt per e-mail contact op.",
     "applications.replyPlaceholder": "Schrijf een antwoord...",
     "applications.replyHint": "Enter om te verzenden. {{shortcut}} voor een nieuwe regel.",
-    "applications.experienceHint":
-      "Vermeld je ervaring met motorjachten en de boordsystemen die in de advertentie staan.",
     "applications.sending": "Verzenden...",
     "applications.sendReply": "Antwoord verzenden",
     "applications.translateWithGoogle": "Vertalen met Google",
@@ -2274,6 +2416,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Je hebt nog {{days}} dagen om een beoordeling achter te laten. Beoordelingen blijven 7 dagen open na afloop van het verblijf.",
     "reviews.windowClosed": "De beoordelingsperiode voor deze sit is gesloten.",
     "reviews.sitNotCompleted": "Je kunt een beoordeling achterlaten nadat de sit is afgelopen.",
+    "availability.title": "Jouw beschikbaarheid",
+    "availability.subtitle":
+      "Deel de data en plaatsen waarop je vrij bent om te passen. Elk open venster toont boten waarop je kunt solliciteren.",
+    "availability.signInText":
+      "Log in om te publiceren wanneer je vrij bent, en we tonen je boten die in die plaatsen en periodes een sitter zoeken.",
+    "availability.dates": "Datums",
+    "availability.regions": "Landen en steden",
+    "availability.regionsHint":
+      "Laat leeg om overal open te staan, of voeg specifieke landen en steden toe.",
+    "availability.regionsPlaceholder": "Voeg een land of stad toe",
+    "availability.notes": "Notities",
+    "availability.notesPlaceholder":
+      "Alles wat eigenaren moeten weten: ervaring, flexibiliteit, huisdieren die je leuk vindt…",
+    "availability.publish": "Beschikbaarheid publiceren",
+    "availability.publishing": "Publiceren…",
+    "availability.publishBlocked": "Nog nodig: {{items}}",
+    "availability.windowsTitle": "Gepubliceerde vensters",
+    "availability.empty":
+      "Nog geen vensters. Voeg er hierboven een toe om matches met sits te krijgen.",
+    "availability.openAnywhere": "Overal open",
+    "availability.withdraw": "Intrekken",
+    "availability.showMatchingSits": "Toon passende sits",
+    "availability.hideMatchingSits": "Verberg passende sits",
+    "availability.noMatchingSits":
+      "Nog geen open sits matchen dit venster. Kom later terug wanneer eigenaren nieuwe sits plaatsen.",
+    "availability.saveFailed": "Opslaan mislukt. Probeer opnieuw.",
+    "availability.phase.open": "Open",
+    "availability.phase.booked": "Geboekt",
+    "availability.phase.completed": "Voltooid",
+    "availability.phase.expired": "Verlopen",
+    "availability.phase.withdrawn": "Ingetrokken",
   },
   "pt-PT": {
     "messages.aboutBoat": "Sobre {{boat}}",
@@ -2554,8 +2727,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "A nossa equipa irá analisar esta mensagem e contactá-lo por e-mail.",
     "applications.replyPlaceholder": "Escreva uma resposta...",
     "applications.replyHint": "Enter para enviar. {{shortcut}} para uma nova linha.",
-    "applications.experienceHint":
-      "Mencione sua experiência com iates a motor e os sistemas de bordo listados no anúncio.",
     "applications.sending": "A enviar...",
     "applications.sendReply": "Enviar resposta",
     "applications.translateWithGoogle": "Traduzir com o Google",
@@ -2647,6 +2818,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Tem {{days}} dias para deixar uma avaliação. As avaliações ficam abertas durante 7 dias após o fim da estadia.",
     "reviews.windowClosed": "O prazo de avaliação para este sit terminou.",
     "reviews.sitNotCompleted": "Pode deixar uma avaliação depois de o sit terminar.",
+    "availability.title": "A sua disponibilidade",
+    "availability.subtitle":
+      "Partilhe as datas e locais em que está livre para uma estadia. Cada janela aberta mostra os barcos a que pode candidatar-se.",
+    "availability.signInText":
+      "Inicie sessão para publicar quando está livre, e mostraremos os barcos que precisam de um sitter nesses locais e datas.",
+    "availability.dates": "Datas",
+    "availability.regions": "Países e cidades",
+    "availability.regionsHint":
+      "Deixe vazio para estar aberto a qualquer lugar, ou adicione países e cidades específicos.",
+    "availability.regionsPlaceholder": "Adicionar um país ou uma cidade",
+    "availability.notes": "Notas",
+    "availability.notesPlaceholder":
+      "Tudo o que os proprietários devem saber: experiência, flexibilidade, animais de que gosta…",
+    "availability.publish": "Publicar disponibilidade",
+    "availability.publishing": "A publicar…",
+    "availability.publishBlocked": "Ainda é necessário: {{items}}",
+    "availability.windowsTitle": "Janelas publicadas",
+    "availability.empty":
+      "Ainda sem janelas. Adicione uma acima para começar a ser correspondente com estadias.",
+    "availability.openAnywhere": "Aberto a qualquer lugar",
+    "availability.withdraw": "Retirar",
+    "availability.showMatchingSits": "Mostrar estadias correspondentes",
+    "availability.hideMatchingSits": "Ocultar estadias correspondentes",
+    "availability.noMatchingSits":
+      "Ainda não há estadias abertas que correspondam a esta janela. Volte mais tarde quando os proprietários publicarem novas.",
+    "availability.saveFailed": "Não foi possível guardar. Tente novamente.",
+    "availability.phase.open": "Aberta",
+    "availability.phase.booked": "Reservada",
+    "availability.phase.completed": "Concluída",
+    "availability.phase.expired": "Expirada",
+    "availability.phase.withdrawn": "Retirada",
   },
   el: {
     "messages.aboutBoat": "Σχετικά με το {{boat}}",
@@ -2937,8 +3139,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Η ομάδα μας θα εξετάσει αυτό το μήνυμα και θα επικοινωνήσει με e-mail.",
     "applications.replyPlaceholder": "Γράψτε μια απάντηση...",
     "applications.replyHint": "Enter για αποστολή. {{shortcut}} για νέα γραμμή.",
-    "applications.experienceHint":
-      "Αναφέρετε την εμπειρία σας με μηχανοκίνητα σκάφη και τα συστήματα που περιγράφονται στην αγγελία.",
     "applications.sending": "Αποστολή...",
     "applications.sendReply": "Αποστολή απάντησης",
     "applications.translateWithGoogle": "Μετάφραση με Google",
@@ -3029,6 +3229,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Απομένουν {{days}} ημέρες για να αφήσετε κριτική. Οι κριτικές παραμένουν ανοιχτές για 7 ημέρες μετά το τέλος της διαμονής.",
     "reviews.windowClosed": "Η περίοδος κριτικής για αυτό το sit έχει κλείσει.",
     "reviews.sitNotCompleted": "Μπορείτε να αφήσετε κριτική αφού ολοκληρωθεί το sit.",
+    "availability.title": "Η διαθεσιμότητά σας",
+    "availability.subtitle":
+      "Μοιραστείτε τις ημερομηνίες και τα μέρη όπου είστε διαθέσιμοι για φύλαξη. Κάθε ανοιχτό παράθυρο δείχνει τα σκάφη στα οποία μπορείτε να υποβάλετε αίτηση.",
+    "availability.signInText":
+      "Συνδεθείτε για να δημοσιεύσετε πότε είστε διαθέσιμοι, και θα σας δείξουμε σκάφη που χρειάζονται φύλακα σε αυτά τα μέρη και ημερομηνίες.",
+    "availability.dates": "Ημερομηνίες",
+    "availability.regions": "Χώρες και πόλεις",
+    "availability.regionsHint":
+      "Αφήστε κενό για να είστε ανοιχτοί παντού, ή προσθέστε συγκεκριμένες χώρες και πόλεις.",
+    "availability.regionsPlaceholder": "Προσθέστε χώρα ή πόλη",
+    "availability.notes": "Σημειώσεις",
+    "availability.notesPlaceholder":
+      "Ό,τι πρέπει να γνωρίζουν οι ιδιοκτήτες: εμπειρία, ευελιξία, κατοικίδια που αγαπάτε…",
+    "availability.publish": "Δημοσίευση διαθεσιμότητας",
+    "availability.publishing": "Δημοσίευση…",
+    "availability.publishBlocked": "Ακόμα χρειάζεται: {{items}}",
+    "availability.windowsTitle": "Δημοσιευμένα παράθυρα",
+    "availability.empty":
+      "Δεν υπάρχουν ακόμη παράθυρα. Προσθέστε ένα παραπάνω για να ξεκινήσετε τις αντιστοιχίσεις με φυλάξεις.",
+    "availability.openAnywhere": "Ανοιχτό παντού",
+    "availability.withdraw": "Ανάκληση",
+    "availability.showMatchingSits": "Εμφάνιση αντίστοιχων φυλάξεων",
+    "availability.hideMatchingSits": "Απόκρυψη αντίστοιχων φυλάξεων",
+    "availability.noMatchingSits":
+      "Καμία ανοιχτή φύλαξη δεν αντιστοιχεί ακόμη σε αυτό το παράθυρο. Ελέγξτε ξανά όταν οι ιδιοκτήτες δημοσιεύσουν νέες.",
+    "availability.saveFailed": "Δεν ήταν δυνατή η αποθήκευση. Δοκιμάστε ξανά.",
+    "availability.phase.open": "Ανοιχτό",
+    "availability.phase.booked": "Κλεισμένο",
+    "availability.phase.completed": "Ολοκληρωμένο",
+    "availability.phase.expired": "Ληγμένο",
+    "availability.phase.withdrawn": "Ανακλημένο",
   },
   hr: {
     "messages.aboutBoat": "O brodu {{boat}}",
@@ -3313,8 +3544,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText": "Naš tim će pregledati ovu poruku i javiti se e-poštom.",
     "applications.replyPlaceholder": "Napišite odgovor...",
     "applications.replyHint": "Enter za slanje. {{shortcut}} za novi red.",
-    "applications.experienceHint":
-      "Navedite svoje iskustvo s motornim jahtama i brodskim sustavima opisanim u oglasu.",
     "applications.sending": "Slanje...",
     "applications.sendReply": "Pošalji odgovor",
     "applications.translateWithGoogle": "Prevedi s pomoću Googlea",
@@ -3406,6 +3635,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Preostalo je {{days}} dana za ostavljanje recenzije. Recenzije ostaju otvorene 7 dana nakon završetka boravka.",
     "reviews.windowClosed": "Rok za recenziju ovog sita je istekao.",
     "reviews.sitNotCompleted": "Recenziju možete ostaviti nakon što sit završi.",
+    "availability.title": "Vaša dostupnost",
+    "availability.subtitle":
+      "Podijelite datume i mjesta na kojima ste slobodni čuvati brod. Svaki otvoreni prozor prikazuje brodove na koje se možete prijaviti.",
+    "availability.signInText":
+      "Prijavite se da objavite kada ste slobodni, a mi ćemo vam pokazati brodove kojima treba čuvar na tim mjestima i datumima.",
+    "availability.dates": "Datumi",
+    "availability.regions": "Zemlje i gradovi",
+    "availability.regionsHint":
+      "Ostavite prazno da budete otvoreni za bilo gdje, ili dodajte određene zemlje i gradove.",
+    "availability.regionsPlaceholder": "Dodajte zemlju ili grad",
+    "availability.notes": "Bilješke",
+    "availability.notesPlaceholder":
+      "Sve što vlasnici trebaju znati: iskustvo, fleksibilnost, ljubimci koje volite…",
+    "availability.publish": "Objavi dostupnost",
+    "availability.publishing": "Objavljivanje…",
+    "availability.publishBlocked": "Još treba: {{items}}",
+    "availability.windowsTitle": "Objavljeni prozori",
+    "availability.empty":
+      "Još nema prozora. Dodajte jedan iznad da počnete dobivati podudaranja sa sjedenjima.",
+    "availability.openAnywhere": "Otvoreno za bilo gdje",
+    "availability.withdraw": "Povuci",
+    "availability.showMatchingSits": "Prikaži odgovarajuća sjedenja",
+    "availability.hideMatchingSits": "Sakrij odgovarajuća sjedenja",
+    "availability.noMatchingSits":
+      "Još nema otvorenih sjedenja koja odgovaraju ovom prozoru. Provjerite kasnije kad vlasnici objave nova.",
+    "availability.saveFailed": "Nije moguće spremiti. Pokušajte ponovno.",
+    "availability.phase.open": "Otvoreno",
+    "availability.phase.booked": "Rezervirano",
+    "availability.phase.completed": "Završeno",
+    "availability.phase.expired": "Isteklo",
+    "availability.phase.withdrawn": "Povučeno",
   },
   tr: {
     "messages.aboutBoat": "{{boat}} hakkında",
@@ -3685,8 +3945,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText": "Ekibimiz bu mesajı inceleyip e-posta ile size dönecek.",
     "applications.replyPlaceholder": "Bir yanıt yazın...",
     "applications.replyHint": "Göndermek için Enter. Yeni satır için {{shortcut}}.",
-    "applications.experienceHint":
-      "Motorlu yatlar ve ilanda listelenen gemi sistemleriyle ilgili deneyiminizden bahsedin.",
     "applications.sending": "Gönderiliyor...",
     "applications.sendReply": "Yanıt gönder",
     "applications.translateWithGoogle": "Google ile çevir",
@@ -3776,6 +4034,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Değerlendirme bırakmak için {{days}} gününüz kaldı. Değerlendirmeler konaklama bittikten sonra 7 gün boyunca açık kalır.",
     "reviews.windowClosed": "Bu sit için değerlendirme süresi kapandı.",
     "reviews.sitNotCompleted": "Sit bittikten sonra değerlendirme bırakabilirsiniz.",
+    "availability.title": "Müsaitliğiniz",
+    "availability.subtitle":
+      "Bakıcılık için müsait olduğunuz tarihleri ve yerleri paylaşın. Her açık pencere başvurabileceğiniz tekneleri gösterir.",
+    "availability.signInText":
+      "Ne zaman müsait olduğunuzu yayınlamak için oturum açın; o yerlerde ve tarihlerde bakıcı arayan tekneleri göstereceğiz.",
+    "availability.dates": "Tarihler",
+    "availability.regions": "Ülkeler ve şehirler",
+    "availability.regionsHint":
+      "Her yere açık olmak için boş bırakın veya belirli ülkeler ve şehirler ekleyin.",
+    "availability.regionsPlaceholder": "Ülke veya şehir ekleyin",
+    "availability.notes": "Notlar",
+    "availability.notesPlaceholder":
+      "Sahiplerin bilmesi gereken her şey: deneyim, esneklik, sevdiğiniz evcil hayvanlar…",
+    "availability.publish": "Müsaitliği yayınla",
+    "availability.publishing": "Yayınlanıyor…",
+    "availability.publishBlocked": "Hâlâ gerekli: {{items}}",
+    "availability.windowsTitle": "Yayınlanan pencereler",
+    "availability.empty":
+      "Henüz pencere yok. Sitlerle eşleşmeye başlamak için yukarıya bir tane ekleyin.",
+    "availability.openAnywhere": "Her yere açık",
+    "availability.withdraw": "Geri çek",
+    "availability.showMatchingSits": "Eşleşen sitleri göster",
+    "availability.hideMatchingSits": "Eşleşen sitleri gizle",
+    "availability.noMatchingSits":
+      "Bu pencereyle henüz eşleşen açık sit yok. Sahipler yenilerini yayınladığında tekrar bakın.",
+    "availability.saveFailed": "Kaydedilemedi. Tekrar deneyin.",
+    "availability.phase.open": "Açık",
+    "availability.phase.booked": "Rezerve",
+    "availability.phase.completed": "Tamamlandı",
+    "availability.phase.expired": "Süresi doldu",
+    "availability.phase.withdrawn": "Geri çekildi",
   },
   sv: {
     "messages.aboutBoat": "Om {{boat}}",
@@ -4057,8 +4346,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Vårt team kommer att granska detta meddelande och följa upp via e-post.",
     "applications.replyPlaceholder": "Skriv ett svar...",
     "applications.replyHint": "Enter för att skicka. {{shortcut}} för ny rad.",
-    "applications.experienceHint":
-      "Nämn din erfarenhet av motoryachter och de system ombord som anges i annonsen.",
     "applications.sending": "Sändning...",
     "applications.sendReply": "Skicka svar",
     "applications.translateWithGoogle": "Översätt med Google",
@@ -4149,6 +4436,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du har {{days}} dagar kvar på dig att lämna en recension. Recensionerna är öppna i 7 dagar efter att en vistelse avslutats.",
     "reviews.windowClosed": "Granskningsfönstret för denna sit har stängt.",
     "reviews.sitNotCompleted": "Du kan lämna en recension efter att siten är avslutad.",
+    "availability.title": "Din tillgänglighet",
+    "availability.subtitle":
+      "Dela datumen och platserna där du är ledig att sitta. Varje öppet fönster visar båtar du kan ansöka till.",
+    "availability.signInText":
+      "Logga in för att publicera när du är ledig, så visar vi båtar som behöver en sitter på de platserna och datumen.",
+    "availability.dates": "Datum",
+    "availability.regions": "Länder och städer",
+    "availability.regionsHint":
+      "Lämna tomt för att vara öppen för överallt, eller lägg till specifika länder och städer.",
+    "availability.regionsPlaceholder": "Lägg till ett land eller en stad",
+    "availability.notes": "Anteckningar",
+    "availability.notesPlaceholder":
+      "Allt ägare bör veta: erfarenhet, flexibilitet, husdjur du älskar…",
+    "availability.publish": "Publicera tillgänglighet",
+    "availability.publishing": "Publicerar…",
+    "availability.publishBlocked": "Behövs fortfarande: {{items}}",
+    "availability.windowsTitle": "Publicerade fönster",
+    "availability.empty":
+      "Inga fönster ännu. Lägg till ett ovan för att börja matchas med sittningar.",
+    "availability.openAnywhere": "Öppen för överallt",
+    "availability.withdraw": "Dra tillbaka",
+    "availability.showMatchingSits": "Visa matchande sittningar",
+    "availability.hideMatchingSits": "Dölj matchande sittningar",
+    "availability.noMatchingSits":
+      "Inga öppna sittningar matchar detta fönster ännu. Kom tillbaka när ägare publicerar nya.",
+    "availability.saveFailed": "Kunde inte spara. Försök igen.",
+    "availability.phase.open": "Öppen",
+    "availability.phase.booked": "Bokad",
+    "availability.phase.completed": "Avslutad",
+    "availability.phase.expired": "Utgången",
+    "availability.phase.withdrawn": "Tillbakadragen",
   },
   nb: {
     "messages.aboutBoat": "Om {{boat}}",
@@ -4428,8 +4746,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Teamet vårt vil vurdere denne meldingen og følge opp via e-post.",
     "applications.replyPlaceholder": "Skriv et svar...",
     "applications.replyHint": "Enter for å sende. {{shortcut}} for ny linje.",
-    "applications.experienceHint":
-      "Nevn din erfaring med motoryachter og systemene om bord som er oppført i annonsen.",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
     "applications.translateWithGoogle": "Oversett med Google",
@@ -4518,6 +4834,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du har {{days}} dager igjen til å legge igjen en anmeldelse. Anmeldelser holder åpent i 7 dager etter et opphold avsluttes.",
     "reviews.windowClosed": "Gjennomgangsvinduet for dette oppholdet er stengt.",
     "reviews.sitNotCompleted": "Du kan legge igjen en anmeldelse etter at siten er ferdig.",
+    "availability.title": "Din tilgjengelighet",
+    "availability.subtitle":
+      "Del datoene og stedene der du er ledig til å sitte. Hvert åpne vindu viser båter du kan søke på.",
+    "availability.signInText":
+      "Logg inn for å publisere når du er ledig, så viser vi båter som trenger en sitter på de stedene og datoene.",
+    "availability.dates": "Datoer",
+    "availability.regions": "Land og byer",
+    "availability.regionsHint":
+      "La stå tomt for å være åpen for hvor som helst, eller legg til spesifikke land og byer.",
+    "availability.regionsPlaceholder": "Legg til et land eller en by",
+    "availability.notes": "Notater",
+    "availability.notesPlaceholder":
+      "Alt eiere bør vite: erfaring, fleksibilitet, kjæledyr du elsker…",
+    "availability.publish": "Publiser tilgjengelighet",
+    "availability.publishing": "Publiserer…",
+    "availability.publishBlocked": "Fortsatt nødvendig: {{items}}",
+    "availability.windowsTitle": "Publiserte vinduer",
+    "availability.empty":
+      "Ingen vinduer ennå. Legg til ett ovenfor for å begynne å bli matchet med sits.",
+    "availability.openAnywhere": "Åpen for hvor som helst",
+    "availability.withdraw": "Trekk tilbake",
+    "availability.showMatchingSits": "Vis matchende sits",
+    "availability.hideMatchingSits": "Skjul matchende sits",
+    "availability.noMatchingSits":
+      "Ingen åpne sits matcher dette vinduet ennå. Sjekk senere når eiere publiserer nye.",
+    "availability.saveFailed": "Kunne ikke lagre. Prøv igjen.",
+    "availability.phase.open": "Åpen",
+    "availability.phase.booked": "Booket",
+    "availability.phase.completed": "Fullført",
+    "availability.phase.expired": "Utløpt",
+    "availability.phase.withdrawn": "Trukket tilbake",
   },
   da: {
     "messages.aboutBoat": "Om {{boat}}",
@@ -4796,8 +5143,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Vores team vil gennemgå denne meddelelse og følge op via e-mail.",
     "applications.replyPlaceholder": "Skriv et svar...",
     "applications.replyHint": "Enter for at sende. {{shortcut}} for ny linje.",
-    "applications.experienceHint":
-      "Nævn din erfaring med motoryachter og de systemer om bord, der er nævnt i opslaget.",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
     "applications.translateWithGoogle": "Oversæt med Google",
@@ -4887,6 +5232,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du har {{days}} dage tilbage til at skrive en anmeldelse. Anmeldelser forbliver åbne i 7 dage efter et ophold slutter.",
     "reviews.windowClosed": "Gennemgangsvinduet for denne sit er lukket.",
     "reviews.sitNotCompleted": "Du kan skrive en anmeldelse efter siten er afsluttet.",
+    "availability.title": "Din tilgængelighed",
+    "availability.subtitle":
+      "Del de datoer og steder, hvor du er ledig til at sidde. Hvert åbent vindue viser både, du kan søge.",
+    "availability.signInText":
+      "Log ind for at offentliggøre, hvornår du er ledig, så viser vi både, der har brug for en sitter på de steder og datoer.",
+    "availability.dates": "Datoer",
+    "availability.regions": "Lande og byer",
+    "availability.regionsHint":
+      "Lad stå tomt for at være åben overalt, eller tilføj specifikke lande og byer.",
+    "availability.regionsPlaceholder": "Tilføj et land eller en by",
+    "availability.notes": "Noter",
+    "availability.notesPlaceholder":
+      "Alt ejere bør vide: erfaring, fleksibilitet, kæledyr du elsker…",
+    "availability.publish": "Offentliggør tilgængelighed",
+    "availability.publishing": "Offentliggør…",
+    "availability.publishBlocked": "Stadig brug for: {{items}}",
+    "availability.windowsTitle": "Offentliggjorte vinduer",
+    "availability.empty":
+      "Ingen vinduer endnu. Tilføj et ovenfor for at begynde at blive matchet med sits.",
+    "availability.openAnywhere": "Åben overalt",
+    "availability.withdraw": "Træk tilbage",
+    "availability.showMatchingSits": "Vis matchende sits",
+    "availability.hideMatchingSits": "Skjul matchende sits",
+    "availability.noMatchingSits":
+      "Ingen åbne sits matcher dette vindue endnu. Tjek senere, når ejere offentliggør nye.",
+    "availability.saveFailed": "Kunne ikke gemme. Prøv igen.",
+    "availability.phase.open": "Åben",
+    "availability.phase.booked": "Booket",
+    "availability.phase.completed": "Afsluttet",
+    "availability.phase.expired": "Udløbet",
+    "availability.phase.withdrawn": "Tilbagetrukket",
   },
   fi: {
     "messages.aboutBoat": "Tietoja {{boat}}",
@@ -5169,8 +5545,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Tiimimme tarkistaa tämän viestin ja ottaa yhteyttä sähköpostitse.",
     "applications.replyPlaceholder": "Kirjoita vastaus...",
     "applications.replyHint": "Enter lähettää. {{shortcut}} uudelle riville.",
-    "applications.experienceHint":
-      "Mainitse kokemuksesi moottorijahdista ja ilmoituksessa mainituista laitejärjestelmistä.",
     "applications.sending": "Lähetetään...",
     "applications.sendReply": "Lähetä vastaus",
     "applications.translateWithGoogle": "Käännä Googlen avulla",
@@ -5258,6 +5632,36 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sinulla on {{days}} päivää aikaa jättää arvostelu. Arvostelut pysyvät avoinna 7 päivää oleskelun päättymisen jälkeen.",
     "reviews.windowClosed": "Tämän sitin tarkistusikkuna on suljettu.",
     "reviews.sitNotCompleted": "Voit jättää arvion sitin päätyttyä.",
+    "availability.title": "Saatavuutesi",
+    "availability.subtitle":
+      "Jaa päivämäärät ja paikat, joissa olet vapaa istumaan. Jokainen avoin ikkuna näyttää veneet, joihin voit hakea.",
+    "availability.signInText":
+      "Kirjaudu sisään julkaistaksesi, milloin olet vapaa, niin näytämme veneet, jotka tarvitsevat sitterin näissä paikoissa ja päivinä.",
+    "availability.dates": "Päivämäärät",
+    "availability.regions": "Maat ja kaupungit",
+    "availability.regionsHint":
+      "Jätä tyhjäksi ollaksesi avoin kaikkialle, tai lisää tiettyjä maita ja kaupunkeja.",
+    "availability.regionsPlaceholder": "Lisää maa tai kaupunki",
+    "availability.notes": "Muistiinpanot",
+    "availability.notesPlaceholder":
+      "Kaikki, mitä omistajien tulisi tietää: kokemus, joustavuus, lemmikit joista pidät…",
+    "availability.publish": "Julkaise saatavuus",
+    "availability.publishing": "Julkaistaan…",
+    "availability.publishBlocked": "Vielä tarvitaan: {{items}}",
+    "availability.windowsTitle": "Julkaistut ikkunat",
+    "availability.empty": "Ei vielä ikkunoita. Lisää yksi yllä aloittaaksesi sit-osumien saamisen.",
+    "availability.openAnywhere": "Avoin kaikkialle",
+    "availability.withdraw": "Peruuta",
+    "availability.showMatchingSits": "Näytä sopivat sitit",
+    "availability.hideMatchingSits": "Piilota sopivat sitit",
+    "availability.noMatchingSits":
+      "Mikään avoin sit ei vielä vastaa tätä ikkunaa. Tarkista myöhemmin, kun omistajat julkaisevat uusia.",
+    "availability.saveFailed": "Tallennus epäonnistui. Yritä uudelleen.",
+    "availability.phase.open": "Avoin",
+    "availability.phase.booked": "Varattu",
+    "availability.phase.completed": "Valmis",
+    "availability.phase.expired": "Vanhentunut",
+    "availability.phase.withdrawn": "Peruttu",
   },
   ja: {
     "messages.aboutBoat": "{{boat}}について",
@@ -5538,8 +5942,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "私たちのチームがこのメッセージを確認し、電子メールでフォローアップします。",
     "applications.replyPlaceholder": "返信を書いてください...",
     "applications.replyHint": "Enterで送信。改行は{{shortcut}}。",
-    "applications.experienceHint":
-      "モーターヨットの経験と、掲載されている船内システムについてご記入ください。",
     "applications.sending": "送信中...",
     "applications.sendReply": "返信を送信",
     "applications.translateWithGoogle": "Google で翻訳する",
@@ -5629,6 +6031,37 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "レビューを残せる期限は残り {{days}} 日です。レビューは滞在終了後 7 日間公開されます。",
     "reviews.windowClosed": "このシットのレビュー期間は終了しました。",
     "reviews.sitNotCompleted": "シット終了後にレビューを残すことができます。",
+    "availability.title": "あなたの空き状況",
+    "availability.subtitle":
+      "シッターとして空いている日付と場所を共有してください。公開中の各期間に、応募できるボートが表示されます。",
+    "availability.signInText":
+      "サインインして空いている時期を公開すると、その場所と日付でシッターを必要とするボートが表示されます。",
+    "availability.dates": "日付",
+    "availability.regions": "国と都市",
+    "availability.regionsHint":
+      "どこでも可にする場合は空のままにし、特定の国や都市を追加することもできます。",
+    "availability.regionsPlaceholder": "国または都市を追加",
+    "availability.notes": "メモ",
+    "availability.notesPlaceholder":
+      "オーナーに伝えておきたいこと：経験、柔軟性、好きなペットなど…",
+    "availability.publish": "空き状況を公開",
+    "availability.publishing": "公開中…",
+    "availability.publishBlocked": "まだ必要です: {{items}}",
+    "availability.windowsTitle": "公開済みの期間",
+    "availability.empty":
+      "まだ期間がありません。上で追加すると、シットとのマッチングが始まります。",
+    "availability.openAnywhere": "どこでも可",
+    "availability.withdraw": "取り下げる",
+    "availability.showMatchingSits": "一致するシットを表示",
+    "availability.hideMatchingSits": "一致するシットを非表示",
+    "availability.noMatchingSits":
+      "この期間に一致する公開中のシットはまだありません。オーナーが新しいシットを投稿したら、また確認してください。",
+    "availability.saveFailed": "保存できませんでした。もう一度お試しください。",
+    "availability.phase.open": "公開中",
+    "availability.phase.booked": "予約済み",
+    "availability.phase.completed": "完了",
+    "availability.phase.expired": "期限切れ",
+    "availability.phase.withdrawn": "取り下げ",
   },
 };
 

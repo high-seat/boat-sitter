@@ -580,14 +580,14 @@ export function ConversationPanel({
         <div
           className={
             user
-              ? "grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-x-3 gap-y-2"
-              : "grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-3 gap-y-2"
+              ? "grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2"
+              : "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2"
           }
         >
           {user ? (
             <img
               alt=""
-              className="mb-1 size-10 self-end rounded-full object-cover"
+              className="size-12 self-center rounded-full object-cover"
               data-testid="conversation-composer-avatar"
               onError={(event) => {
                 const img = event.currentTarget;
@@ -602,17 +602,21 @@ export function ConversationPanel({
             <span className="sr-only">{t("applications.reply")}</span>
             <textarea
               ref={replyInputRef}
-              className="form-input min-h-24 resize-y"
+              className="form-input h-12 min-h-12 resize-y py-3 leading-5"
               data-testid="conversation-reply-input"
               onBlur={() => publishTyping(false)}
               onChange={(event) => updateReply(event.target.value)}
               onKeyDown={handleReplyKeyDown}
               placeholder={t("applications.replyPlaceholder")}
+              rows={1}
               value={reply}
             />
           </label>
           <button
-            className="flex shrink-0 items-center gap-2 self-end rounded-xl bg-coral px-4 py-3 text-sm font-bold text-white disabled:opacity-50 sm:px-5"
+            aria-label={
+              pending || hasOptimisticSend ? t("applications.sending") : t("applications.sendReply")
+            }
+            className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-coral px-3 text-sm font-bold text-white disabled:opacity-50 sm:px-5"
             data-testid="conversation-send-reply"
             disabled={pending || hasOptimisticSend || !reply.trim()}
             onClick={() => {
@@ -631,7 +635,6 @@ export function ConversationPanel({
             <p className="text-xs text-slate">
               {t("applications.replyHint", { shortcut: newlineShortcut })}
             </p>
-            <p className="mt-2 text-xs text-slate">{t("applications.experienceHint")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"

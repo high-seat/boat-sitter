@@ -3,6 +3,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import type { AppEnv } from "../context";
 import { buildAuth } from "../auth";
 import { getDb } from "../db";
+import { user } from "../db/auth-schema";
 import {
   applicationMessages,
   applications,
@@ -195,20 +196,41 @@ devRouter.post("/login", async (c) => {
     return c.json({ error: "Dev login failed", detail: detail || authResponse.statusText }, 400);
   }
 
+  // Local/e2e accounts should be usable even when verification is required in prod.
+  const db = getDb(c.env);
+  await db.update(user).set({ emailVerified: true }).where(eq(user.email, email));
+
   // Re-read session from the Set-Cookie headers Better Auth just issued.
-  const setCookies = authResponse.headers.getSetCookie?.() ?? [];
-  const cookieHeader = setCookies.map((entry) => entry.split(";")[0]).join("; ");
-  const session = await auth.api.getSession({
+  let setCookies = authResponse.headers.getSetCookie?.() ?? [];
+  let cookieHeader = setCookies.map((entry) => entry.split(";")[0]).join("; ");
+  let session = await auth.api.getSession({
     headers: new Headers({
       cookie: cookieHeader || c.req.header("cookie") || "",
     }),
   });
+  // Sign-up can succeed without a session when verification emails are enabled.
+  if (!session?.user) {
+    authResponse = await auth.api.signInEmail({
+      body: { email, password },
+      asResponse: true,
+    });
+    if (!authResponse.ok) {
+      const detail = await authResponse.text().catch(() => "");
+      return c.json({ error: "Dev login failed", detail: detail || authResponse.statusText }, 400);
+    }
+    setCookies = authResponse.headers.getSetCookie?.() ?? [];
+    cookieHeader = setCookies.map((entry) => entry.split(";")[0]).join("; ");
+    session = await auth.api.getSession({
+      headers: new Headers({
+        cookie: cookieHeader || c.req.header("cookie") || "",
+      }),
+    });
+  }
   const sessionUser = session?.user;
   if (!sessionUser) {
     return c.json({ error: "Dev login created no session" }, 500);
   }
 
-  const db = getDb(c.env);
   await db
     .update(vessels)
     .set({

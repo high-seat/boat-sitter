@@ -26,7 +26,7 @@ export function FormLabel({
 
   return (
     <Tag className="form-label" data-testid={resolvedTestId} id={id}>
-      <span className="inline-flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+      <span className="inline-flex flex-wrap items-baseline gap-x-0.75 gap-y-0.5">
         <span>{children}</span>
         {required ? (
           <>

@@ -6,12 +6,14 @@ export function IconTooltip({
   hidden = false,
   wrap = false,
   side = "bottom",
+  className = "",
 }: {
   children: ReactNode;
   label: string;
   hidden?: boolean;
   wrap?: boolean;
   side?: "top" | "bottom";
+  className?: string;
 }) {
   const positionClass =
     side === "top" ? "bottom-[calc(100%+0.4rem)] top-auto" : "top-[calc(100%+0.4rem)]";
@@ -23,7 +25,7 @@ export function IconTooltip({
   });
 
   return (
-    <span className="group relative inline-flex">
+    <span className={`group relative inline-flex ${className}`.trim()}>
       {content}
       {!hidden && (
         <span

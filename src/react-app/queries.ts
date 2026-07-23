@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createQueryKeys, defineQueryOptions } from "@ocodio/query-key-manager";
 import { listAdminAuditLog, listAdminUsers } from "@/adminApi";
+import { apiGet } from "@/apiClient";
 import {
   getApplicationsForSit,
   getApplicationsForUser,
@@ -20,6 +21,34 @@ import {
 import { getMemberVerificationChecks, getVerificationStatus } from "@/verificationService";
 import type { ApplicationsListParams } from "../shared/applicationsSearch";
 import type { BoatSearchParams } from "../shared/boatsSearch";
+
+export type AvailabilityWindow = {
+  id: string;
+  dateStart: string;
+  dateEnd: string;
+  regions: string[];
+  notes: string;
+  status: string;
+  phase: "open" | "booked" | "expired" | "completed" | "withdrawn";
+};
+
+export type AvailabilityMatchingSit = {
+  id: string;
+  dateStart: string;
+  duration: string;
+  location: string;
+  country: string;
+  vesselName: string;
+  vesselImage: string;
+};
+
+function getAvailabilityMine() {
+  return apiGet<AvailabilityWindow[]>("/api/availability/mine");
+}
+
+function getAvailabilitySits(windowId: string) {
+  return apiGet<AvailabilityMatchingSit[]>(`/api/availability/${windowId}/sits`);
+}
 
 /**
  * Static query options + domain prefixes via `@ocodio/query-key-manager`.
@@ -114,6 +143,12 @@ const managed = createQueryKeys({
     root: defineQueryOptions({
       queryKey: ["boat"],
       queryFn: async () => null,
+    }),
+  },
+  availability: {
+    root: defineQueryOptions({
+      queryKey: ["availability"],
+      queryFn: async () => [] as const,
     }),
   },
 });
@@ -328,5 +363,19 @@ export const queries = {
     users: managed.admin.users,
     audit: managed.admin.audit,
     getQueryKey: managed.admin.getQueryKey,
+  },
+
+  availability: {
+    getQueryKey: managed.availability.getQueryKey,
+    mine: () =>
+      queryOptions({
+        queryKey: ["availability", "mine"] as const,
+        queryFn: getAvailabilityMine,
+      }),
+    sits: (windowId: string) =>
+      queryOptions({
+        queryKey: ["availability", windowId, "sits"] as const,
+        queryFn: () => getAvailabilitySits(windowId),
+      }),
   },
 };

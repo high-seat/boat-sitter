@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
-import { uploadVesselCover } from "./helpers/images";
+import { uploadVesselCover, uploadVesselGalleryPhoto } from "./helpers/images";
 
 test.describe("vessel editor field order", () => {
-  test("shows home port and cover before vessel type, with more photos after cover", async ({
+  test("shows cover first, then name and home port, with more photos after cover", async ({
     page,
   }) => {
     await seedVerifiedOwner(page);
@@ -23,10 +23,10 @@ test.describe("vessel editor field order", () => {
         type: indexIncluding("Vessel type"),
       };
     });
-    expect(order.name).toBeGreaterThanOrEqual(0);
+    expect(order.cover).toBe(0);
+    expect(order.name).toBeGreaterThan(order.cover);
     expect(order.homePort).toBeGreaterThan(order.name);
-    expect(order.cover).toBeGreaterThan(order.homePort);
-    expect(order.type).toBeGreaterThan(order.cover);
+    expect(order.type).toBeGreaterThan(order.homePort);
 
     await expect(page.getByTestId("vessel-add-more-photos")).toHaveCount(0);
 
@@ -39,5 +39,18 @@ test.describe("vessel editor field order", () => {
     await morePhotos.click();
     await expect(morePhotos).toHaveAttribute("aria-expanded", "true");
     await expect(page.getByText(/No additional photos yet/i)).toBeVisible();
+
+    await uploadVesselGalleryPhoto(page);
+    const caption = page.getByTestId("vessel-gallery-caption");
+    const remove = page.getByTestId("vessel-gallery-remove");
+    const gap = await caption.evaluate((el, removeTestId) => {
+      const removeEl = document.querySelector(`[data-testid="${removeTestId}"]`);
+      if (!removeEl) return 0;
+      const captionBox = el.getBoundingClientRect();
+      const removeBox = removeEl.getBoundingClientRect();
+      return removeBox.top - captionBox.bottom;
+    }, "vessel-gallery-remove");
+    expect(gap).toBeGreaterThanOrEqual(12);
+    await expect(remove).toBeVisible();
   });
 });

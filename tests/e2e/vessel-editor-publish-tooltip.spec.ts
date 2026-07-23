@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
+import { uploadVesselCover } from "./helpers/images";
+import { selectVesselType } from "./helpers/vesselEditor";
 
 test.describe("vessel editor publish blocked tooltip", () => {
   test("shows which required fields are missing when publish is disabled", async ({ page }) => {
@@ -10,17 +12,31 @@ test.describe("vessel editor publish blocked tooltip", () => {
     const publish = page.getByTestId("vessel-publish");
     await expect(publish).toBeDisabled();
     await expect(publish).not.toHaveAttribute("title");
+    await expect(page.getByTestId("vessel-type")).toHaveValue("Not specified");
 
     await publish.hover({ force: true });
     await expect(
-      page.getByRole("tooltip", { name: /Still needed:.*Boat name.*Home port/i }),
+      page.getByRole("tooltip", {
+        name: /Still needed:.*Cover image.*Boat name.*Home port.*Vessel type/i,
+      }),
     ).toBeVisible();
+
+    await uploadVesselCover(page);
+    await publish.hover({ force: true });
+    await expect(
+      page.getByRole("tooltip", {
+        name: /Still needed:.*Boat name.*Home port.*Vessel type/i,
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole("tooltip", { name: /Cover image/i })).toHaveCount(0);
+    await expect(publish).not.toHaveAttribute("title");
 
     await page.getByLabel(/Boat name/i).fill("Tooltip Test");
     await publish.hover({ force: true });
-    await expect(page.getByRole("tooltip", { name: /Still needed:.*Home port/i })).toBeVisible();
+    await expect(
+      page.getByRole("tooltip", { name: /Still needed:.*Home port.*Vessel type/i }),
+    ).toBeVisible();
     await expect(page.getByRole("tooltip", { name: /Boat name/i })).toHaveCount(0);
-    await expect(publish).not.toHaveAttribute("title");
 
     await page.getByTestId("vessel-home-port-input").click();
     await page.getByTestId("vessel-home-port-input").fill("Lefk");
@@ -29,6 +45,12 @@ test.describe("vessel editor publish blocked tooltip", () => {
       .first()
       .click();
     await expect(page.getByTestId("vessel-home-port-selected")).toContainText(/Lefkada/i);
+    await publish.hover({ force: true });
+    await expect(page.getByRole("tooltip", { name: /Still needed:.*Vessel type/i })).toBeVisible();
+    await expect(page.getByRole("tooltip", { name: /Home port/i })).toHaveCount(0);
+    await expect(publish).toBeDisabled();
+
+    await selectVesselType(page);
     await expect(publish).toBeEnabled();
     await expect(publish).not.toHaveAttribute("title");
     await publish.hover();

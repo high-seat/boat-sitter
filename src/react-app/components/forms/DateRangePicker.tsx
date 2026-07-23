@@ -18,11 +18,13 @@ export function DateRangePicker({
   endDate,
   onChange,
   variant = "home",
+  testId,
 }: {
   startDate: string;
   endDate: string;
   onChange: (range: { startDate: string; endDate: string }) => void;
   variant?: "home" | "browse";
+  testId?: string;
 }) {
   const { i18n, t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -64,6 +66,7 @@ export function DateRangePicker({
           ? "flex items-center gap-2 border-b border-line px-5 py-4 md:border-r md:border-b-0"
           : "flex min-w-56 items-center gap-1 rounded-xl border border-line bg-white"
       }
+      data-testid={testId}
     >
       <Popover.Root onOpenChange={setOpen} open={open}>
         <Popover.Trigger asChild>
@@ -71,6 +74,7 @@ export function DateRangePicker({
             className={`flex min-w-0 flex-1 items-center gap-3 text-left outline-none ${
               variant === "browse" ? "px-4 py-3" : ""
             }`}
+            data-testid={testId ? `${testId}-trigger` : undefined}
             type="button"
           >
             <CalendarDays

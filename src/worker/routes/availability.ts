@@ -54,6 +54,43 @@ const windowPatchSchema = z
 
 type WindowRow = typeof sitterAvailability.$inferSelect;
 
+/**
+ * Match a sit's place against a window's regions.
+ * Empty regions = open to anywhere. Regions may be countries ("Greece") or
+ * cities ("Lefkada" / "Lefkada, Greece"), same shapes DestinationAutocomplete
+ * emits in multi-select search.
+ */
+function regionMatchesSit(regions: string[], country: string, location: string): boolean {
+  if (regions.length === 0) return true;
+  const countryL = country.toLowerCase().trim();
+  const locationL = location.toLowerCase().trim();
+  return regions.some((raw) => {
+    const region = raw.toLowerCase().trim();
+    if (!region) return false;
+    if (region === countryL) return true;
+    if (region === locationL) return true;
+    const comma = region.lastIndexOf(",");
+    if (comma > 0) {
+      const city = region.slice(0, comma).trim();
+      const regionCountry = region.slice(comma + 1).trim();
+      if (regionCountry === countryL) {
+        return (
+          locationL === city ||
+          locationL.startsWith(`${city},`) ||
+          locationL.includes(city) ||
+          city.includes(locationL)
+        );
+      }
+    }
+    return (
+      locationL === region ||
+      locationL.startsWith(`${region},`) ||
+      locationL.includes(region) ||
+      region.includes(locationL)
+    );
+  });
+}
+
 /** Today as a YYYY-MM-DD string (UTC), for lexical comparison with ISO dates. */
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -134,11 +171,10 @@ async function sitsMatchingWindow(db: Db, win: WindowRow) {
     .innerJoin(vessels, eq(sits.vesselId, vessels.id))
     .where(eq(sits.published, true));
 
-  const winRegions = win.regions.map((r) => r.toLowerCase());
   return rows
     .map((s) => ({ ...s, endDate: addNights(s.dateStart, sitNights(s.duration)) }))
     .filter((s) => s.dateStart <= win.dateEnd && s.endDate >= win.dateStart)
-    .filter((s) => winRegions.length === 0 || winRegions.includes(s.country.toLowerCase()))
+    .filter((s) => regionMatchesSit(win.regions, s.country, s.location))
     .sort((a, b) => a.dateStart.localeCompare(b.dateStart));
 }
 
@@ -265,13 +301,9 @@ availabilityRouter.get("/match", async (c) => {
     .from(sitterAvailability)
     .where(and(eq(sitterAvailability.status, "open"), gte(sitterAvailability.dateEnd, today)));
 
-  const sitCountry = sit.country.toLowerCase();
   const matches = candidates
     .filter((w) => w.dateStart <= sitEnd && w.dateEnd >= sitStart)
-    .filter((w) => {
-      if (w.regions.length === 0) return true;
-      return w.regions.some((r) => r.toLowerCase() === sitCountry);
-    })
+    .filter((w) => regionMatchesSit(w.regions, sit.country, sit.location))
     // Soonest-available first.
     .sort((a, b) => a.dateStart.localeCompare(b.dateStart))
     .map((w) => ({

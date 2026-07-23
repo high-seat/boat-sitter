@@ -15,3 +15,13 @@ export async function uploadVesselCover(page: Page) {
   });
   await expect(page.getByTestId("vessel-cover-preview")).toBeVisible({ timeout: 20_000 });
 }
+
+export async function uploadVesselGalleryPhoto(page: Page) {
+  const input = page.locator("#vessel-editor-more-photos").locator('input[type="file"]');
+  await input.setInputFiles({
+    name: "gallery.png",
+    mimeType: "image/png",
+    buffer: TINY_PNG,
+  });
+  await expect(page.getByTestId("vessel-gallery-remove")).toBeVisible({ timeout: 20_000 });
+}

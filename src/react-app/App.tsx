@@ -84,6 +84,8 @@ import { ApplicationReviewSkeleton } from "@/components/ui/ApplicationReviewSkel
 import { MemberProfileSkeleton } from "@/components/ui/MemberProfileSkeleton";
 import { FeatureIcon } from "@/components/ui/FeatureIcon";
 import { FormLabel } from "@/components/ui/FormLabel";
+import { CharacterCount } from "@/components/ui/CharacterCount";
+import { EditorRequiredFieldsHint } from "@/components/ui/EditorRequiredFieldsHint";
 import { IconTooltip } from "@/components/ui/IconTooltip";
 import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
 import { Select } from "@/components/ui/Select";
@@ -950,7 +952,9 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
             </span>
           </div>
           <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
-            <MapPin size={15} /> {formatSitLocation(boat.location, boat.country)}
+            <MapPin size={15} />{" "}
+            {formatSitLocation(boat.location, boat.country).trim() ||
+              t("editorPreview.locationUnknown")}
           </p>
           <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
             {boat.dateStart ? (
@@ -983,7 +987,9 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
             </span>
           </div>
           <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
-            <MapPin size={15} /> {formatSitLocation(boat.location, boat.country)}
+            <MapPin size={15} />{" "}
+            {formatSitLocation(boat.location, boat.country).trim() ||
+              t("editorPreview.locationUnknown")}
           </p>
           <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
             <span className="font-semibold text-navy">
@@ -2175,9 +2181,6 @@ function ApplyModal({
             {t(sitTypeMeaningKey)}
           </p>
         </div>
-        <p className="mt-4 text-sm leading-6 text-slate">
-          {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
-        </p>
         {!hasSharedLanguage && (
           <div className="mt-5 flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
             <Languages className="mt-0.5 shrink-0" size={18} />
@@ -2210,9 +2213,13 @@ function ApplyModal({
               ? "border-red-400 focus:border-red-500"
               : "border-line focus:border-teal"
           }`}
+          data-testid="apply-message-input"
           onChange={(event) => setMessage(event.target.value)}
           value={message}
         />
+        <p className="mt-2 text-sm leading-6 text-slate" data-testid="apply-message-hint">
+          {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
+        </p>
         {hasBlockedContactDetails && (
           <div
             className="mt-3 flex gap-3 rounded-xl border border-red-300 bg-red-50 p-4 text-sm leading-6 text-red-900"
@@ -3983,6 +3990,19 @@ function MemberPage() {
   );
 }
 
+/** Max character lengths for vessel editor form fields */
+const VESSEL_MAX_LENGTHS = {
+  name: 100,
+  description: 2000,
+  home: 1500,
+  systems: 1000,
+  customAmenities: 500,
+  wifiNetwork: 64,
+  wifiPassword: 64,
+  accessCodes: 500,
+  otherPrivateNotes: 1000,
+} as const;
+
 function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
@@ -4030,7 +4050,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   const [discardOpen, setDiscardOpen] = useState(false);
   const [form, setForm] = useState({
     name: boat?.name ?? "",
-    type: boat?.type ?? "Sailing yacht",
+    type: boat?.type ?? "Not specified",
     engineType: boat?.engineType ?? "Not specified",
     voltageType: boat?.voltageType ?? "Not specified",
     stoveFuelType: boat?.stoveFuelType ?? "Not specified",
@@ -4059,7 +4079,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
       ? JSON.stringify({
           form: {
             name: "",
-            type: "Sailing yacht",
+            type: "Not specified",
             engineType: "Not specified",
             voltageType: "Not specified",
             stoveFuelType: "Not specified",
@@ -4260,11 +4280,14 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
 
   const publishBlockedReasons = useMemo(() => {
     const reasons: string[] = [];
+    if (!form.image.trim()) reasons.push(t("vesselEditor.coverImage"));
     if (!form.name.trim()) reasons.push(t("vesselEditor.name"));
     if (!form.homePort.trim()) reasons.push(t("vesselEditor.homePort"));
-    if (!form.image.trim()) reasons.push(t("vesselEditor.coverImage"));
+    if (!form.type.trim() || form.type === "Not specified") {
+      reasons.push(t("vesselEditor.type"));
+    }
     return reasons;
-  }, [form.homePort, form.image, form.name, t]);
+  }, [form.homePort, form.image, form.name, form.type, t]);
 
   const publishDisabled = mutation.isPending || publishBlockedReasons.length > 0;
   const publishBlockedTooltip =
@@ -4302,14 +4325,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               <ArrowLeft size={16} /> {t("common.back")}
             </button>
           </div>
-          {!boat ? (
-            <p
-              className="mt-4 text-sm leading-5 text-slate"
-              data-testid="editor-required-fields-hint"
-            >
-              {t("editor.requiredFieldsHint")}
-            </p>
-          ) : null}
+          {!boat ? <EditorRequiredFieldsHint className="mt-4" /> : null}
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {underwaySitCount > 0 ? (
               <div
@@ -4325,30 +4341,6 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 </div>
               </div>
             ) : null}
-            <label className="sm:col-span-2">
-              <FormLabel required>{t("vesselEditor.name")}</FormLabel>
-              <input
-                className="form-input"
-                onChange={(event) => setForm({ ...form, name: event.target.value })}
-                placeholder={t("vesselEditor.namePlaceholder")}
-                value={form.name}
-              />
-            </label>
-            <div className="sm:col-span-2">
-              <FormLabel required>{t("vesselEditor.homePort")}</FormLabel>
-              <DestinationAutocomplete
-                includeCountry
-                onChange={(homePort) => setForm({ ...form, homePort })}
-                placeholder={t("search.destination")}
-                requireSelection
-                testId="vessel-home-port"
-                value={form.homePort}
-                variant="profile"
-              />
-              <p className="mt-2 text-xs leading-5 text-slate" data-testid="vessel-home-port-hint">
-                {t("vesselEditor.homePortHint")}
-              </p>
-            </div>
             <section className="sm:col-span-2" data-testid="vessel-cover">
               <FormLabel required>{t("vesselEditor.coverImage")}</FormLabel>
               <div className="grid gap-3 rounded-2xl border border-line bg-cream/50 p-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(13rem,0.7fr)]">
@@ -4440,11 +4432,12 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                                   src={photo.url}
                                 />
                               </div>
-                              <div className="space-y-2 p-3">
-                                <label>
+                              <div className="flex flex-col gap-3 p-3">
+                                <label className="block">
                                   <FormLabel optional>{t("vesselEditor.galleryCaption")}</FormLabel>
                                   <input
                                     className="form-input"
+                                    data-testid="vessel-gallery-caption"
                                     maxLength={160}
                                     onChange={(event) =>
                                       updateGalleryCaption(index, event.target.value)
@@ -4454,7 +4447,8 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                                   />
                                 </label>
                                 <button
-                                  className="inline-flex items-center gap-1.5 text-xs font-bold text-coral"
+                                  className="inline-flex items-center gap-1.5 self-start text-xs font-bold text-coral"
+                                  data-testid="vessel-gallery-remove"
                                   onClick={() => removeGalleryPhoto(index)}
                                   type="button"
                                 >
@@ -4482,13 +4476,47 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 ) : null}
               </div>
             ) : null}
+            <label className="sm:col-span-2">
+              <FormLabel required>{t("vesselEditor.name")}</FormLabel>
+              <div className="relative">
+                <input
+                  className="form-input"
+                  maxLength={VESSEL_MAX_LENGTHS.name}
+                  onChange={(event) => setForm({ ...form, name: event.target.value })}
+                  placeholder={t("vesselEditor.namePlaceholder")}
+                  value={form.name}
+                />
+                <CharacterCount
+                  className="absolute right-3 bottom-2"
+                  current={form.name.length}
+                  max={VESSEL_MAX_LENGTHS.name}
+                />
+              </div>
+            </label>
+            <div className="sm:col-span-2">
+              <FormLabel required>{t("vesselEditor.homePort")}</FormLabel>
+              <DestinationAutocomplete
+                includeCountry
+                onChange={(homePort) => setForm({ ...form, homePort })}
+                placeholder={t("search.destination")}
+                requireSelection
+                testId="vessel-home-port"
+                value={form.homePort}
+                variant="profile"
+              />
+              <p className="mt-2 text-xs leading-5 text-slate" data-testid="vessel-home-port-hint">
+                {t("vesselEditor.homePortHint")}
+              </p>
+            </div>
             <label>
-              <FormLabel optional>{t("vesselEditor.type")}</FormLabel>
+              <FormLabel required>{t("vesselEditor.type")}</FormLabel>
               <Select
+                data-testid="vessel-type"
                 variant="form"
                 onChange={(event) => setForm({ ...form, type: event.target.value })}
                 value={form.type}
               >
+                <option value="Not specified">{displayLabel(t, "Not specified")}</option>
                 {VESSEL_TYPES.map((type) => (
                   <option key={type} value={type}>
                     {displayLabel(t, type)}
@@ -4546,38 +4574,50 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             </label>
             <div>
               <FormLabel optional>{t("vesselEditor.length")}</FormLabel>
-              <span className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
-                <input
-                  className="form-input"
-                  data-testid="vessel-length-value"
-                  disabled={lengthUnknown}
-                  inputMode="decimal"
-                  min="0"
-                  onChange={(event) => {
-                    setLengthValue(event.target.value);
-                    if (event.target.value.trim()) setLengthUnknown(false);
-                  }}
-                  placeholder={t("vesselEditor.lengthValuePlaceholder")}
-                  step="0.1"
-                  type="number"
-                  value={lengthUnknown ? "" : lengthValue}
-                />
-                <Select
-                  variant="form"
-                  aria-label={t("vesselEditor.lengthUnit")}
-                  data-testid="vessel-length-unit"
-                  disabled={lengthUnknown}
-                  onChange={(event) => {
-                    const nextUnit = event.target.value as LengthUnit;
-                    setLengthValue((current) => convertBoatLength(current, lengthUnit, nextUnit));
-                    setLengthUnit(nextUnit);
-                  }}
-                  value={lengthUnit}
+              <IconTooltip
+                className="w-full"
+                hidden={!lengthUnknown}
+                label={t("vesselEditor.lengthDisabledHint")}
+                wrap
+              >
+                <span
+                  className={`grid w-full grid-cols-[minmax(0,1fr)_7.5rem] gap-2 ${
+                    lengthUnknown ? "pointer-events-none" : ""
+                  }`}
+                  data-testid="vessel-length-fields"
                 >
-                  <option value="m">{t("units.meters")}</option>
-                  <option value="ft">{t("units.feet")}</option>
-                </Select>
-              </span>
+                  <input
+                    className="form-input"
+                    data-testid="vessel-length-value"
+                    disabled={lengthUnknown}
+                    inputMode="decimal"
+                    min="0"
+                    onChange={(event) => {
+                      setLengthValue(event.target.value);
+                      if (event.target.value.trim()) setLengthUnknown(false);
+                    }}
+                    placeholder={t("vesselEditor.lengthValuePlaceholder")}
+                    step="0.1"
+                    type="number"
+                    value={lengthUnknown ? "" : lengthValue}
+                  />
+                  <Select
+                    variant="form"
+                    aria-label={t("vesselEditor.lengthUnit")}
+                    data-testid="vessel-length-unit"
+                    disabled={lengthUnknown}
+                    onChange={(event) => {
+                      const nextUnit = event.target.value as LengthUnit;
+                      setLengthValue((current) => convertBoatLength(current, lengthUnit, nextUnit));
+                      setLengthUnit(nextUnit);
+                    }}
+                    value={lengthUnit}
+                  >
+                    <option value="m">{t("units.meters")}</option>
+                    <option value="ft">{t("units.feet")}</option>
+                  </Select>
+                </span>
+              </IconTooltip>
               <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate">
                 <input
                   checked={lengthUnknown}
@@ -4595,23 +4635,30 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             </div>
             <div>
               <FormLabel optional>{t("vesselEditor.yearBuilt")}</FormLabel>
-              <input
-                aria-invalid={Boolean(yearBuiltError)}
-                className="form-input"
-                data-testid="vessel-year-built"
-                disabled={yearUnknown}
-                inputMode="numeric"
-                max={maxYearBuilt()}
-                min={MIN_YEAR_BUILT}
-                onChange={(event) => {
-                  setYearBuiltInput(event.target.value);
-                  setYearBuiltError("");
-                  if (event.target.value.trim()) setYearUnknown(false);
-                }}
-                placeholder={t("vesselEditor.yearBuiltPlaceholder")}
-                type="number"
-                value={yearUnknown ? "" : yearBuiltInput}
-              />
+              <IconTooltip
+                className="w-full"
+                hidden={!yearUnknown}
+                label={t("vesselEditor.yearBuiltDisabledHint")}
+                wrap
+              >
+                <input
+                  aria-invalid={Boolean(yearBuiltError)}
+                  className={`form-input ${yearUnknown ? "pointer-events-none" : ""}`}
+                  data-testid="vessel-year-built"
+                  disabled={yearUnknown}
+                  inputMode="numeric"
+                  max={maxYearBuilt()}
+                  min={MIN_YEAR_BUILT}
+                  onChange={(event) => {
+                    setYearBuiltInput(event.target.value);
+                    setYearBuiltError("");
+                    if (event.target.value.trim()) setYearUnknown(false);
+                  }}
+                  placeholder={t("vesselEditor.yearBuiltPlaceholder")}
+                  type="number"
+                  value={yearUnknown ? "" : yearBuiltInput}
+                />
+              </IconTooltip>
               <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate">
                 <input
                   checked={yearUnknown}
@@ -4633,20 +4680,50 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 </p>
               ) : null}
             </div>
-            {[
-              ["description", t("vesselEditor.about"), t("vesselEditor.aboutPlaceholder")],
-              ["home", t("vesselEditor.lifeAboard"), t("vesselEditor.lifePlaceholder")],
-              ["systems", t("vesselEditor.systems"), t("vesselEditor.systemsPlaceholder")],
-              ["customAmenities", t("vesselEditor.otherFeatures"), t("vesselEditor.onePerLine")],
-            ].map(([key, label, placeholder]) => (
+            {(
+              [
+                [
+                  "description",
+                  t("vesselEditor.about"),
+                  t("vesselEditor.aboutPlaceholder"),
+                  VESSEL_MAX_LENGTHS.description,
+                ],
+                [
+                  "home",
+                  t("vesselEditor.lifeAboard"),
+                  t("vesselEditor.lifePlaceholder"),
+                  VESSEL_MAX_LENGTHS.home,
+                ],
+                [
+                  "systems",
+                  t("vesselEditor.systems"),
+                  t("vesselEditor.systemsPlaceholder"),
+                  VESSEL_MAX_LENGTHS.systems,
+                ],
+                [
+                  "customAmenities",
+                  t("vesselEditor.otherFeatures"),
+                  t("vesselEditor.onePerLine"),
+                  VESSEL_MAX_LENGTHS.customAmenities,
+                ],
+              ] as const
+            ).map(([key, label, placeholder, maxLength]) => (
               <label className="sm:col-span-2" key={key}>
                 <FormLabel optional>{label}</FormLabel>
-                <textarea
-                  className="form-input min-h-24 resize-y"
-                  onChange={(event) => setForm({ ...form, [key]: event.target.value })}
-                  placeholder={placeholder}
-                  value={form[key as keyof typeof form] as string}
-                />
+                <div className="relative">
+                  <textarea
+                    className="form-input min-h-24 resize-y"
+                    maxLength={maxLength}
+                    onChange={(event) => setForm({ ...form, [key]: event.target.value })}
+                    placeholder={placeholder}
+                    value={form[key as keyof typeof form] as string}
+                  />
+                  <CharacterCount
+                    className="absolute right-3 bottom-2"
+                    current={(form[key as keyof typeof form] as string).length}
+                    max={maxLength}
+                  />
+                </div>
               </label>
             ))}
             <section className="sm:col-span-2 rounded-2xl border border-teal/30 bg-seafoam/40 p-4 md:p-5">
@@ -4669,43 +4746,75 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label>
                   <FormLabel>{t("vesselEditor.wifiNetwork")}</FormLabel>
-                  <input
-                    autoComplete="off"
-                    className="form-input"
-                    onChange={(event) => setForm({ ...form, wifiNetwork: event.target.value })}
-                    placeholder={t("vesselEditor.wifiNetworkPlaceholder")}
-                    value={form.wifiNetwork}
-                  />
+                  <div className="relative">
+                    <input
+                      autoComplete="off"
+                      className="form-input"
+                      maxLength={VESSEL_MAX_LENGTHS.wifiNetwork}
+                      onChange={(event) => setForm({ ...form, wifiNetwork: event.target.value })}
+                      placeholder={t("vesselEditor.wifiNetworkPlaceholder")}
+                      value={form.wifiNetwork}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.wifiNetwork.length}
+                      max={VESSEL_MAX_LENGTHS.wifiNetwork}
+                    />
+                  </div>
                 </label>
                 <label>
                   <FormLabel>{t("vesselEditor.wifiPassword")}</FormLabel>
-                  <input
-                    autoComplete="off"
-                    className="form-input"
-                    onChange={(event) => setForm({ ...form, wifiPassword: event.target.value })}
-                    placeholder={t("vesselEditor.wifiPasswordPlaceholder")}
-                    value={form.wifiPassword}
-                  />
+                  <div className="relative">
+                    <input
+                      autoComplete="off"
+                      className="form-input"
+                      maxLength={VESSEL_MAX_LENGTHS.wifiPassword}
+                      onChange={(event) => setForm({ ...form, wifiPassword: event.target.value })}
+                      placeholder={t("vesselEditor.wifiPasswordPlaceholder")}
+                      value={form.wifiPassword}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.wifiPassword.length}
+                      max={VESSEL_MAX_LENGTHS.wifiPassword}
+                    />
+                  </div>
                 </label>
                 <label className="sm:col-span-2">
                   <FormLabel>{t("vesselEditor.accessCodes")}</FormLabel>
-                  <textarea
-                    className="form-input min-h-24 resize-y"
-                    onChange={(event) => setForm({ ...form, accessCodes: event.target.value })}
-                    placeholder={t("vesselEditor.accessCodesPlaceholder")}
-                    value={form.accessCodes}
-                  />
+                  <div className="relative">
+                    <textarea
+                      className="form-input min-h-24 resize-y"
+                      maxLength={VESSEL_MAX_LENGTHS.accessCodes}
+                      onChange={(event) => setForm({ ...form, accessCodes: event.target.value })}
+                      placeholder={t("vesselEditor.accessCodesPlaceholder")}
+                      value={form.accessCodes}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.accessCodes.length}
+                      max={VESSEL_MAX_LENGTHS.accessCodes}
+                    />
+                  </div>
                 </label>
                 <label className="sm:col-span-2">
                   <FormLabel>{t("vesselEditor.otherPrivateNotes")}</FormLabel>
-                  <textarea
-                    className="form-input min-h-24 resize-y"
-                    onChange={(event) =>
-                      setForm({ ...form, otherPrivateNotes: event.target.value })
-                    }
-                    placeholder={t("vesselEditor.otherPrivateNotesPlaceholder")}
-                    value={form.otherPrivateNotes}
-                  />
+                  <div className="relative">
+                    <textarea
+                      className="form-input min-h-24 resize-y"
+                      maxLength={VESSEL_MAX_LENGTHS.otherPrivateNotes}
+                      onChange={(event) =>
+                        setForm({ ...form, otherPrivateNotes: event.target.value })
+                      }
+                      placeholder={t("vesselEditor.otherPrivateNotesPlaceholder")}
+                      value={form.otherPrivateNotes}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.otherPrivateNotes.length}
+                      max={VESSEL_MAX_LENGTHS.otherPrivateNotes}
+                    />
+                  </div>
                 </label>
               </div>
             </section>
@@ -5295,14 +5404,7 @@ function SitEditor({
                 {sit ? t("sitEditor.editTitle") : t("sitEditor.createTitle")}
               </h1>
               <p className="mt-2 text-sm text-slate">{t("sitEditor.hint")}</p>
-              {!sit ? (
-                <p
-                  className="mt-2 text-sm leading-5 text-slate"
-                  data-testid="editor-required-fields-hint"
-                >
-                  {t("editor.requiredFieldsHint")}
-                </p>
-              ) : null}
+              {!sit ? <EditorRequiredFieldsHint className="mt-2" /> : null}
             </div>
             <button
               className="flex shrink-0 items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"

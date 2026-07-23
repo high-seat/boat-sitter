@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
 import { uploadVesselCover } from "./helpers/images";
+import { selectVesselType } from "./helpers/vesselEditor";
 
 test.describe("vessel editor cover required", () => {
   test("requires a cover photo and hides more photos until one is chosen", async ({ page }) => {
@@ -22,6 +23,7 @@ test.describe("vessel editor cover required", () => {
       .first()
       .click();
     await expect(page.getByTestId("vessel-home-port-selected")).toContainText(/Lefkada/i);
+    await selectVesselType(page);
 
     await expect(publish).toBeDisabled();
     await publish.hover({ force: true });

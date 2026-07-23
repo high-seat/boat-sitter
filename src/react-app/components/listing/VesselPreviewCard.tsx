@@ -59,7 +59,10 @@ export function VesselPreviewCard({ vessel }: { vessel: VesselPreviewFields }) {
   const measurementSystem =
     useAppStore((state) => state.user?.measurementSystem) ?? detectMeasurementSystem();
   const name = vessel.name.trim() || t("editorPreview.untitledBoat");
-  const homePort = vessel.homePort.trim() || t("editorPreview.homePortPending");
+  const hasHomePort = Boolean(vessel.homePort.trim());
+  const homePortLabel = hasHomePort
+    ? t("detail.homePort", { homePort: vessel.homePort.trim() })
+    : t("editorPreview.locationUnknown");
   const image = vessel.image.trim() || FALLBACK_IMAGE;
   const lengthLabel = vessel.length
     ? formatBoatLength(vessel.length, measurementSystem)
@@ -85,7 +88,9 @@ export function VesselPreviewCard({ vessel }: { vessel: VesselPreviewFields }) {
         <p className="mt-1 font-display text-xl font-bold text-navy">{name}</p>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-slate">
           <MapPin aria-hidden="true" className="shrink-0" size={14} />
-          <span className="truncate">{t("detail.homePort", { homePort })}</span>
+          <span className="truncate" data-testid="vessel-preview-location">
+            {homePortLabel}
+          </span>
         </p>
         <p className="mt-1 text-xs text-slate">
           {t("owner.engineSummary", { engine: labelFor(t, vessel.engineType) })}

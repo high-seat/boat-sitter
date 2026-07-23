@@ -109,23 +109,23 @@ textarea[aria-disabled="true"] {
 .form-input[aria-disabled="true"] {
   cursor: not-allowed !important;
   border-style: dashed;
-  border-color: color-mix(in srgb, var(--color-slate) 45%, var(--color-line));
-  background-color: color-mix(in srgb, var(--color-line) 85%, var(--color-slate));
+  border-color: color-mix(in srgb, var(--color-line) 70%, var(--color-slate));
+  background-color: color-mix(in srgb, var(--color-cream) 78%, var(--color-line));
   background-image: repeating-linear-gradient(
     -45deg,
     transparent,
     transparent 5px,
-    color-mix(in srgb, var(--color-slate) 12%, transparent) 5px,
-    color-mix(in srgb, var(--color-slate) 12%, transparent) 10px
+    color-mix(in srgb, var(--color-slate) 5%, transparent) 5px,
+    color-mix(in srgb, var(--color-slate) 5%, transparent) 10px
   );
-  color: color-mix(in srgb, var(--color-slate) 80%, white);
+  color: color-mix(in srgb, var(--color-slate) 55%, white);
   opacity: 1;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-slate) 8%, transparent);
+  box-shadow: none;
 }
 
 .form-input:disabled::placeholder,
 .form-input[aria-disabled="true"]::placeholder {
-  color: color-mix(in srgb, var(--color-slate) 45%, white);
+  color: color-mix(in srgb, var(--color-slate) 30%, white);
 }
 
 select.select-control:disabled {

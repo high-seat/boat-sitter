@@ -3,6 +3,8 @@
 # runs stay in development mode (dev console + /api/dev open) while deploys are
 # production.
 ENVIRONMENT=development
+# Overrides wrangler.json so local/e2e sign-in works without email verification.
+REQUIRE_EMAIL_VERIFICATION=false
 ADMIN_TOKEN=dev-token
 BETTER_AUTH_URL=http://127.0.0.1:5173
 BETTER_AUTH_SECRET=dev-local-better-auth-secret-32chars

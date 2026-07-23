@@ -1,5 +1,6 @@
 -- World gazetteer for city/country autocomplete.
-CREATE TABLE `world_places` (
+-- Idempotent: local DBs may already have this table from a prior 0009_world_places apply.
+CREATE TABLE IF NOT EXISTS `world_places` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`name_lower` text NOT NULL,
@@ -12,8 +13,8 @@ CREATE TABLE `world_places` (
 	`popular` integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX `world_places_name_lower_idx` ON `world_places` (`name_lower`);
+CREATE INDEX IF NOT EXISTS `world_places_name_lower_idx` ON `world_places` (`name_lower`);
 --> statement-breakpoint
-CREATE INDEX `world_places_kind_name_idx` ON `world_places` (`kind`,`name_lower`);
+CREATE INDEX IF NOT EXISTS `world_places_kind_name_idx` ON `world_places` (`kind`,`name_lower`);
 --> statement-breakpoint
-CREATE INDEX `world_places_popular_idx` ON `world_places` (`popular`);
+CREATE INDEX IF NOT EXISTS `world_places_popular_idx` ON `world_places` (`popular`);
