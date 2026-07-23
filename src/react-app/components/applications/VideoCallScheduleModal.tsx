@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import { Video } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { DatePicker } from "@/components/forms/DatePicker";
+import { TimePicker } from "@/components/forms/TimePicker";
+import { toIsoDate } from "@/components/forms/dateIso";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
 
@@ -11,17 +14,11 @@ export type VideoCallScheduleValues = {
 
 const DURATION_OPTIONS = [15, 30, 45, 60] as const;
 
-function toLocalDateInputValue(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
 function toLocalTimeInputValue(date: Date) {
   const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
+  const minutes = String(Math.round(date.getMinutes() / 5) * 5).padStart(2, "0");
+  const safeMinutes = minutes === "60" ? "55" : minutes;
+  return `${hours}:${safeMinutes}`;
 }
 
 function defaultSchedule(initial?: Partial<VideoCallScheduleValues>): {
@@ -33,7 +30,7 @@ function defaultSchedule(initial?: Partial<VideoCallScheduleValues>): {
     const starts = new Date(initial.startsAt);
     if (!Number.isNaN(starts.getTime())) {
       return {
-        date: toLocalDateInputValue(starts),
+        date: toIsoDate(starts),
         time: toLocalTimeInputValue(starts),
         durationMinutes: initial.durationMinutes ?? 30,
       };
@@ -43,7 +40,7 @@ function defaultSchedule(initial?: Partial<VideoCallScheduleValues>): {
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(10, 0, 0, 0);
   return {
-    date: toLocalDateInputValue(tomorrow),
+    date: toIsoDate(tomorrow),
     time: "10:00",
     durationMinutes: initial?.durationMinutes ?? 30,
   };
@@ -71,7 +68,7 @@ export function VideoCallScheduleModal({
   const [durationMinutes, setDurationMinutes] = useState(defaults.durationMinutes);
   const [error, setError] = useState("");
 
-  const minDate = toLocalDateInputValue(new Date());
+  const minDate = toIsoDate(new Date());
 
   function submit() {
     if (!date || !time) {
@@ -122,12 +119,10 @@ export function VideoCallScheduleModal({
           <span className="mb-1.5 block text-sm font-bold text-navy">
             {t("applications.videoCall.date")}
           </span>
-          <input
-            className="form-input w-full"
-            min={minDate}
-            onChange={(event) => setDate(event.target.value)}
-            required
-            type="date"
+          <DatePicker
+            aria-label={t("applications.videoCall.date")}
+            minDate={minDate}
+            onChange={setDate}
             value={date}
           />
         </label>
@@ -135,11 +130,9 @@ export function VideoCallScheduleModal({
           <span className="mb-1.5 block text-sm font-bold text-navy">
             {t("applications.videoCall.time")}
           </span>
-          <input
-            className="form-input w-full"
-            onChange={(event) => setTime(event.target.value)}
-            required
-            type="time"
+          <TimePicker
+            aria-label={t("applications.videoCall.time")}
+            onChange={setTime}
             value={time}
           />
         </label>

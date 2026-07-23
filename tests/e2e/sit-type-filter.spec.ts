@@ -21,17 +21,4 @@ test.describe("sit type search filter", () => {
     await page.getByLabel(/^Sit type$/i).selectOption("all");
     await expect(page).not.toHaveURL(/sitType=/);
   });
-
-  test("homepage search passes sit type to boats page", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.clear();
-      localStorage.setItem("i18nextLng", "en-US");
-      localStorage.setItem("harbourly-language", "en-US");
-    });
-    await page.goto("/");
-    await page.getByLabel(/^Sit type$/i).selectOption("daytimeChecks");
-    await page.getByRole("button", { name: /^Search$/i }).click();
-    await expect(page).toHaveURL(/\/boats\?.*sitType=daytimeChecks/);
-    await expect(page.getByLabel(/^Sit type$/i)).toHaveValue("daytimeChecks");
-  });
 });

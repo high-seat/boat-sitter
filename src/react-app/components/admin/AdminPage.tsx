@@ -3,18 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, ShieldAlert, ShieldCheck, Trash2, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { isAdminUser } from "@/adminAccess";
-import {
-  deleteAdminUser,
-  listAdminAuditLog,
-  listAdminUsers,
-  updateAdminUser,
-  type AdminUser,
-  type AdminUserStatus,
-} from "@/adminApi";
+import { deleteAdminUser, updateAdminUser, type AdminUser, type AdminUserStatus } from "@/adminApi";
+import { queries } from "@/queries";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { AdminAuditSkeleton, AdminPageSkeleton } from "@/components/ui/AdminPageSkeleton";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
+import { SegmentedTab, SegmentedTabs } from "@/components/ui/SegmentedTabs";
 import { getIntlLocale } from "@/i18n";
 import { useAppStore } from "@/store";
 import type { UserRole } from "@/adminAccess";
@@ -36,14 +31,12 @@ export function AdminPage() {
   const [formError, setFormError] = useState("");
 
   const usersQuery = useQuery({
-    queryKey: ["admin-users"],
-    queryFn: listAdminUsers,
+    ...queries.admin.users,
     enabled: Boolean(user && isAdminUser(user)),
   });
 
   const auditQuery = useQuery({
-    queryKey: ["admin-audit"],
-    queryFn: listAdminAuditLog,
+    ...queries.admin.audit,
     enabled: Boolean(user && isAdminUser(user) && tab === "audit"),
   });
 
@@ -56,8 +49,8 @@ export function AdminPage() {
     onSuccess: async () => {
       setEditing(null);
       setFormError("");
-      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin-audit"] });
+      await queryClient.invalidateQueries({ queryKey: queries.admin.users.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.admin.audit.queryKey });
     },
     onError: (error: Error) => {
       if (error.message === "ADMIN_CANNOT_DEMOTE_SELF") {
@@ -78,8 +71,8 @@ export function AdminPage() {
       }),
     onSuccess: async () => {
       setDeleting(null);
-      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      await queryClient.invalidateQueries({ queryKey: ["admin-audit"] });
+      await queryClient.invalidateQueries({ queryKey: queries.admin.users.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.admin.audit.queryKey });
     },
   });
 
@@ -133,25 +126,24 @@ export function AdminPage() {
       <h1 className="section-title">{t("admin.title")}</h1>
       <p className="mt-3 max-w-2xl text-slate">{t("admin.subtitle")}</p>
 
-      <div className="mt-8 flex w-fit gap-1 rounded-xl bg-seafoam p-1">
-        {(
-          [
-            ["users", t("admin.tab.users")],
-            ["audit", t("admin.tab.audit")],
-          ] as const
-        ).map(([id, label]) => (
-          <button
-            aria-pressed={tab === id}
-            className={`rounded-lg px-4 py-2.5 text-sm font-bold transition ${
-              tab === id ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
-            }`}
-            key={id}
-            onClick={() => setTab(id)}
-            type="button"
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mt-8">
+        <SegmentedTabs aria-label={t("admin.title")} testId="admin-tabs">
+          {(
+            [
+              ["users", t("admin.tab.users")],
+              ["audit", t("admin.tab.audit")],
+            ] as const
+          ).map(([id, label]) => (
+            <SegmentedTab
+              active={tab === id}
+              aria-pressed={tab === id}
+              key={id}
+              onClick={() => setTab(id)}
+            >
+              {label}
+            </SegmentedTab>
+          ))}
+        </SegmentedTabs>
       </div>
 
       {tab === "users" ? (

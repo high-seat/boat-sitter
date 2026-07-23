@@ -1,15 +1,6 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
-
-function futureDateIso(daysAhead: number) {
-  const date = new Date();
-  date.setDate(date.getDate() + daysAhead);
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-");
-}
+import { fillVideoCallSchedule } from "./helpers/videoCallSchedule";
 
 async function openAlexMessages(browser: Browser) {
   const context = await browser.newContext();
@@ -34,13 +25,14 @@ test.describe("video call scheduling", () => {
       .getByRole("button", { name: /Alex Morgan/i })
       .first()
       .click();
+    await expect(page.getByText(/Propose a date, time, and length before accepting/i)).toHaveCount(
+      0,
+    );
     await page.getByRole("button", { name: /Request video call/i }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: /Propose a video call/i })).toBeVisible();
 
-    await dialog.locator('input[type="date"]').fill(futureDateIso(3));
-    await dialog.locator('input[type="time"]').fill("14:30");
-    await dialog.locator("select").selectOption("45");
+    await fillVideoCallSchedule(dialog, page, { daysAhead: 3, time: "14:30", duration: "45" });
     await dialog.getByRole("button", { name: /Send proposal/i }).click();
 
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
@@ -65,8 +57,7 @@ test.describe("video call scheduling", () => {
       .click();
     await page.getByRole("button", { name: /Request video call/i }).click();
     const dialog = page.getByRole("dialog");
-    await dialog.locator('input[type="date"]').fill(futureDateIso(2));
-    await dialog.locator('input[type="time"]').fill("11:00");
+    await fillVideoCallSchedule(dialog, page, { daysAhead: 2, time: "11:00" });
     await dialog.getByRole("button", { name: /Send proposal/i }).click();
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
 
@@ -74,7 +65,7 @@ test.describe("video call scheduling", () => {
     try {
       await expect(sitterPage.getByRole("heading", { name: /Messages/i })).toBeVisible();
       await sitterPage
-        .getByRole("button", { name: /Maya|Solstice/i })
+        .getByRole("button", { name: /New.*proposed a video call/i })
         .first()
         .click();
       await expect(sitterPage.getByRole("button", { name: /Accept time/i })).toBeVisible();
@@ -88,9 +79,11 @@ test.describe("video call scheduling", () => {
       await expect(
         adjust.getByRole("heading", { name: /Suggest a different time/i }),
       ).toBeVisible();
-      await adjust.locator('input[type="date"]').fill(futureDateIso(4));
-      await adjust.locator('input[type="time"]').fill("16:00");
-      await adjust.locator("select").selectOption("30");
+      await fillVideoCallSchedule(adjust, sitterPage, {
+        daysAhead: 4,
+        time: "16:00",
+        duration: "30",
+      });
       await adjust.getByRole("button", { name: /Send new time/i }).click();
       await expect(sitterPage.getByText(/New time suggested/i).first()).toBeVisible();
       await expect(
@@ -110,24 +103,22 @@ test.describe("video call scheduling", () => {
       .click();
     await page.getByRole("button", { name: /Request video call/i }).click();
     const dialog = page.getByRole("dialog");
-    await dialog.locator('input[type="date"]').fill(futureDateIso(2));
-    await dialog.locator('input[type="time"]').fill("15:00");
-    await dialog.locator("select").selectOption("30");
+    await fillVideoCallSchedule(dialog, page, { daysAhead: 2, time: "15:00", duration: "30" });
     await dialog.getByRole("button", { name: /Send proposal/i }).click();
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
 
     const { context, page: sitterPage } = await openAlexMessages(browser);
     try {
       await sitterPage
-        .getByRole("button", { name: /Maya|Solstice/i })
+        .getByRole("button", { name: /New.*proposed a video call/i })
         .first()
         .click();
       await sitterPage.getByRole("button", { name: /Accept time/i }).click();
       await expect(sitterPage.getByText(/Video call confirmed/i).first()).toBeVisible();
       await expect(sitterPage.getByText(/Add to calendar/i).first()).toBeVisible();
 
-      const google = sitterPage.getByRole("link", { name: /Google Calendar/i });
-      const apple = sitterPage.getByRole("link", { name: /Apple Calendar/i });
+      const google = sitterPage.getByRole("link", { name: /Google Calendar/i }).first();
+      const apple = sitterPage.getByRole("link", { name: /Apple Calendar/i }).first();
       await expect(google).toBeVisible();
       await expect(apple).toBeVisible();
       await expect(google).toHaveAttribute(

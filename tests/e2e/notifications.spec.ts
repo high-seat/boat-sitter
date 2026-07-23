@@ -60,4 +60,21 @@ test.describe("notifications menu", () => {
     await expect(page).toHaveURL(/\/members\/me\?edit=1/);
     await expect(page.getByRole("heading", { name: /^Edit profile$/i })).toBeVisible();
   });
+
+  test("stays fully inside the viewport on mobile", async ({ page }) => {
+    await seedVerifiedOwner(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    await page.getByRole("button", { name: /Open notifications/i }).click();
+    const menu = page.getByRole("menu", { name: /Notifications/i });
+    await expect(menu).toBeVisible();
+
+    const box = await menu.boundingBox();
+    expect(box).toBeTruthy();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.y).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(844);
+  });
 });

@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test";
 export type DevFixtureKind =
   | "completed-sit"
   | "underway-sit"
+  | "clear-underway-sit"
   | "paginated-applications"
   | "accept-solstice"
   | "reset-solstice-open"

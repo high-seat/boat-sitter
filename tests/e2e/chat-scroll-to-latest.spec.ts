@@ -23,11 +23,12 @@ test.describe("chat scroll to latest", () => {
       .first()
       .click();
 
-    const reply = page.getByPlaceholder(/Write a reply/i);
+    const reply = page.getByTestId("conversation-reply-input");
+    const send = page.getByTestId("conversation-send-reply");
     for (let index = 1; index <= 12; index += 1) {
       const text = `Scroll seed message ${index}`;
       await reply.fill(text);
-      await page.getByRole("button", { name: /Send reply/i }).click();
+      await send.click();
       await expect(page.getByText(text, { exact: true })).toBeVisible();
       await expect(page.getByRole("button", { name: /Sending/i })).toHaveCount(0);
     }
@@ -56,13 +57,14 @@ test.describe("chat scroll to latest", () => {
       .first()
       .click();
 
-    const reply = page.getByPlaceholder(/Write a reply/i);
+    const reply = page.getByTestId("conversation-reply-input");
+    const send = page.getByTestId("conversation-send-reply");
     const scroller = page.getByTestId("conversation-messages");
 
     for (let index = 1; index <= 10; index += 1) {
       const text = `Auto-scroll seed ${index}`;
       await reply.fill(text);
-      await page.getByRole("button", { name: /Send reply/i }).click();
+      await send.click();
       await expect(scroller.getByText(text, { exact: true })).toBeVisible();
       await expect(page.getByRole("button", { name: /Sending/i })).toHaveCount(0);
     }
@@ -74,7 +76,7 @@ test.describe("chat scroll to latest", () => {
 
     const newest = `Auto-scroll newest ${Date.now()}`;
     await reply.fill(newest);
-    await page.getByRole("button", { name: /Send reply/i }).click();
+    await send.click();
     await expect(scroller.getByText(newest, { exact: true })).toBeVisible();
     await expect.poll(async () => isNearBottom(scroller)).toMatchObject({ nearBottom: true });
   });

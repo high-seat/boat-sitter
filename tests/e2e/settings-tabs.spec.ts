@@ -7,19 +7,29 @@ test.describe("settings account tabs", () => {
     await page.goto("/settings");
 
     await expect(page.getByRole("heading", { name: /^Account$/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Personal details", exact: true })).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Password & security", exact: true }),
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Preferences", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Privacy", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Email notifications/i })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: /Locali[sz]ation/i })).toHaveCount(0);
+    const tabs = page.getByTestId("settings-tabs");
+    await expect(tabs).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Personal details", exact: true })).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Password & security", exact: true })).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Preferences", exact: true })).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Privacy", exact: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: /Email notifications/i })).toHaveCount(0);
+    await expect(page.getByRole("tab", { name: /Locali[sz]ation/i })).toHaveCount(0);
+
+    // Green track hugs the tabs instead of stretching full content width.
+    const widths = await tabs.evaluate((el) => {
+      const parent = el.parentElement;
+      return {
+        tabs: el.getBoundingClientRect().width,
+        parent: parent?.getBoundingClientRect().width ?? 0,
+      };
+    });
+    expect(widths.tabs).toBeLessThan(widths.parent * 0.95);
 
     await expect(page.getByRole("heading", { name: /^Personal details$/i })).toBeVisible();
     await expect(page.getByRole("heading", { name: /^Localization$/i })).toBeVisible();
 
-    await page.getByRole("button", { name: "Preferences", exact: true }).click();
+    await tabs.getByRole("tab", { name: "Preferences", exact: true }).click();
     await expect(page).toHaveURL(/tab=preferences/);
     await expect(page.getByRole("heading", { name: /^Email notifications$/i })).toBeVisible();
     await expect(page.getByRole("heading", { name: /^Sit creation defaults$/i })).toBeVisible();

@@ -32,6 +32,11 @@ export const FEATURE_FLAGS = {
     description: "Show Continue with Facebook on the auth modal.",
     default: false,
   },
+  sitAlsoLooking: {
+    label: "Sit also-looking social proof",
+    description: 'Show "x people are also looking at this sit" on sit detail pages.',
+    default: false,
+  },
 } as const satisfies Record<string, FeatureFlagDefinition>;
 
 export type FeatureFlagKey = keyof typeof FEATURE_FLAGS;

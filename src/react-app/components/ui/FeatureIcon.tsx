@@ -14,6 +14,7 @@ import {
   Droplets,
   Dumbbell,
   Fan,
+  Fish,
   Flame,
   Forklift,
   Fuel,
@@ -102,6 +103,7 @@ export function FeatureIcon({ feature }: { feature: string }) {
   else if (value.includes("public transport")) Icon = Bus;
   else if (value.includes("airport") || value.includes("taxi")) Icon = Car;
   else if (value.includes("bicycle")) Icon = Bike;
+  else if (value.includes("snorkel")) Icon = Fish;
   else if (
     value.includes("pool") ||
     value.includes("kayak") ||

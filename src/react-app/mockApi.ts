@@ -9,6 +9,7 @@ import {
   apiGetBoat,
   apiGetBoats,
   apiGetBoatsPage,
+  apiSearchDestinations,
   apiGetNotifications,
   apiMarkAllNotificationsRead,
   apiMarkNotificationRead,
@@ -28,6 +29,7 @@ import {
   apiSendApplication,
   apiSendApplicationMessage,
   apiShareApplicationPhone,
+  apiStartSitEarly,
   apiSubmitSupportRequest,
   apiUpdateApplicationStatus,
   apiWithdrawApplication,
@@ -35,6 +37,8 @@ import {
 import { ApiError } from "@/apiClient";
 import { type ApplicationsListParams } from "../shared/applicationsSearch";
 import { type BoatSearchParams } from "../shared/boatsSearch";
+import { type DestinationSearchParams } from "../shared/destinationsSearch";
+import type { Destination } from "@/destinations";
 
 export type { SitPhase };
 export { getSitPhase, SIT_PHASES, sitDateRangesOverlap } from "@/dateUtils";
@@ -525,6 +529,12 @@ export async function getBoatsPage(params: BoatSearchParams): Promise<{
   };
 }
 
+export async function searchDestinations(
+  params: DestinationSearchParams = {},
+): Promise<Destination[]> {
+  return apiSearchDestinations(params);
+}
+
 export async function getBoat(id: string): Promise<Boat | undefined> {
   const remote = await apiGetBoat(id);
   return remote ? fromApiBoat(remote) : undefined;
@@ -748,6 +758,10 @@ export async function deleteSit(id: string): Promise<void> {
     throw new Error("SIT_IS_COMPLETED");
   }
   await apiDeleteSit(id);
+}
+
+export async function startSitEarly(id: string): Promise<Sit> {
+  return fromApiSit(await apiStartSitEarly(id));
 }
 
 export type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined" | "withdrawn";

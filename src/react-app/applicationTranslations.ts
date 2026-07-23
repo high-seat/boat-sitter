@@ -89,14 +89,14 @@ const en = {
   "applications.systemMessage.withdrawn": "You withdrew your interest in this sit",
   "applications.systemMessage.withdrawnOwner": "{{name}} withdrew their interest in this sit",
   "applications.requestVideoCall": "Request video call",
-  "applications.requestVideoCallHint":
-    "Propose a date, time, and length before accepting so you can confirm experience and fit together.",
   "applications.requestVideoCallConfirmTitle": "Propose a video call",
   "applications.requestVideoCallConfirmText":
     "Choose a date, time, and length for a call with {{name}}. They can accept or suggest a different time.",
   "applications.requestVideoCallConfirmAction": "Send proposal",
   "applications.videoCall.date": "Date",
   "applications.videoCall.time": "Time",
+  "applications.videoCall.hour": "Hour",
+  "applications.videoCall.minute": "Minute",
   "applications.videoCall.duration": "Duration",
   "applications.videoCall.durationMinutes_one": "1 minute",
   "applications.videoCall.durationMinutes_other": "{{count}} minutes",
@@ -275,6 +275,8 @@ const en = {
   "messageReport.escalateSuccessText": "Our team will review this message and follow up by email.",
   "applications.replyPlaceholder": "Write a reply...",
   "applications.replyHint": "Enter to send. {{shortcut}} for a new line.",
+  "applications.experienceHint":
+    "Mention your experience with motor yacht boats and the onboard systems listed in the brief.",
   "applications.sending": "Sending...",
   "applications.sendReply": "Send reply",
   "applications.translateWithGoogle": "Translate with Google",
@@ -455,8 +457,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Numéro de téléphone partagé",
     "applications.systemMessage.phoneShared": "{{name}} a partagé son numéro de téléphone.",
     "applications.requestVideoCall": "Demander un appel vidéo",
-    "applications.requestVideoCallHint":
-      "Proposez une date, une heure et une durée avant d'accepter afin de confirmer l'expérience et l'adéquation ensemble.",
     "applications.requestVideoCallConfirmTitle": "Proposer un appel vidéo",
     "applications.requestVideoCallConfirmText":
       "Choisissez une date, une heure et une durée pour un appel avec {{name}}. Cette personne peut accepter ou suggérer un autre créneau.",
@@ -481,6 +481,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 minute",
     "applications.videoCall.duration": "Durée",
     "applications.videoCall.time": "Heure",
+    "applications.videoCall.hour": "Heure",
+    "applications.videoCall.minute": "Minute",
     "applications.videoCall.date": "Date",
     "applications.systemMessage.videoCallDeclined":
       "{{name}} a refusé la proposition d'appel vidéo.",
@@ -655,6 +657,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Notre équipe examinera ce message et vous recontactera par e-mail.",
     "applications.replyPlaceholder": "Rédigez une réponse...",
     "applications.replyHint": "Entrée pour envoyer. {{shortcut}} pour une nouvelle ligne.",
+    "applications.experienceHint":
+      "Mentionnez votre expérience avec les bateaux à moteur et les systèmes de bord décrits dans l'annonce.",
     "applications.sending": "Envoi...",
     "applications.sendReply": "Envoyer la réponse",
     "applications.translateWithGoogle": "Traduire avec Google",
@@ -832,8 +836,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Número de teléfono compartido",
     "applications.systemMessage.phoneShared": "{{name}} ha compartido su número de teléfono.",
     "applications.requestVideoCall": "Solicitar videollamada",
-    "applications.requestVideoCallHint":
-      "Propón una fecha, hora y duración antes de aceptar para confirmar juntos la experiencia y la compatibilidad.",
     "applications.requestVideoCallConfirmTitle": "Proponer una videollamada",
     "applications.requestVideoCallConfirmText":
       "Elige una fecha, hora y duración para una llamada con {{name}}. Puede aceptar o sugerir otra hora.",
@@ -858,6 +860,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 minuto",
     "applications.videoCall.duration": "Duración",
     "applications.videoCall.time": "Hora",
+    "applications.videoCall.hour": "Hora",
+    "applications.videoCall.minute": "Minuto",
     "applications.videoCall.date": "Fecha",
     "applications.systemMessage.videoCallDeclined":
       "{{name}} rechazó la propuesta de videollamada.",
@@ -1030,6 +1034,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Nuestro equipo revisará este mensaje y te contactará por correo.",
     "applications.replyPlaceholder": "Escribe una respuesta...",
     "applications.replyHint": "Intro para enviar. {{shortcut}} para una nueva línea.",
+    "applications.experienceHint":
+      "Menciona tu experiencia con yates a motor y los sistemas de a bordo descritos en el anuncio.",
     "applications.sending": "Enviando...",
     "applications.sendReply": "Enviar respuesta",
     "applications.translateWithGoogle": "Traducir con Google",
@@ -1210,8 +1216,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneShared":
       "{{name}} ha condiviso il proprio numero di telefono.",
     "applications.requestVideoCall": "Richiedi videochiamata",
-    "applications.requestVideoCallHint":
-      "Proponi una data, un'ora e una durata prima di accettare per confermare insieme esperienza e idoneità.",
     "applications.requestVideoCallConfirmTitle": "Proponi una videochiamata",
     "applications.requestVideoCallConfirmText":
       "Scegli una data, un'ora e una durata per una chiamata con {{name}}. Può accettare o suggerire un orario diverso.",
@@ -1236,6 +1240,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 minuto",
     "applications.videoCall.duration": "Durata",
     "applications.videoCall.time": "Ora",
+    "applications.videoCall.hour": "Ora",
+    "applications.videoCall.minute": "Minuto",
     "applications.videoCall.date": "Data",
     "applications.systemMessage.videoCallDeclined":
       "{{name}} ha rifiutato la proposta di videochiamata.",
@@ -1409,6 +1415,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Il nostro team esaminerà questo messaggio e ti ricontatterà via e-mail.",
     "applications.replyPlaceholder": "Scrivi una risposta...",
     "applications.replyHint": "Invio per inviare. {{shortcut}} per una nuova riga.",
+    "applications.experienceHint":
+      "Descrivi la tua esperienza con yacht a motore e i sistemi di bordo indicati nell'annuncio.",
     "applications.sending": "Invio...",
     "applications.sendReply": "Invia risposta",
     "applications.translateWithGoogle": "Traduci con Google",
@@ -1587,8 +1595,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Telefonnummer geteilt",
     "applications.systemMessage.phoneShared": "{{name}} hat die Telefonnummer geteilt.",
     "applications.requestVideoCall": "Videoanruf anfragen",
-    "applications.requestVideoCallHint":
-      "Schlage vor dem Annehmen ein Datum, eine Uhrzeit und eine Dauer vor, damit ihr Erfahrung und Passung gemeinsam klären könnt.",
     "applications.requestVideoCallConfirmTitle": "Videoanruf vorschlagen",
     "applications.requestVideoCallConfirmText":
       "Wähle Datum, Uhrzeit und Dauer für einen Anruf mit {{name}}. Die andere Person kann akzeptieren oder eine andere Zeit vorschlagen.",
@@ -1612,6 +1618,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 Minute",
     "applications.videoCall.duration": "Dauer",
     "applications.videoCall.time": "Uhrzeit",
+    "applications.videoCall.hour": "Stunde",
+    "applications.videoCall.minute": "Minute",
     "applications.videoCall.date": "Datum",
     "applications.systemMessage.videoCallDeclined":
       "{{name}} hat den Videoanrufvorschlag abgelehnt.",
@@ -1787,6 +1795,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Unser Team prüft diese Nachricht und meldet sich per E-Mail.",
     "applications.replyPlaceholder": "Antwort schreiben...",
     "applications.replyHint": "Eingabe zum Senden. {{shortcut}} für eine neue Zeile.",
+    "applications.experienceHint":
+      "Erwähne deine Erfahrung mit Motoryachten und den im Inserat aufgeführten Bordsystemen.",
     "applications.sending": "Wird gesendet...",
     "applications.sendReply": "Antwort senden",
     "applications.translateWithGoogle": "Mit Google übersetzen",
@@ -1966,8 +1976,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Telefoonnummer gedeeld",
     "applications.systemMessage.phoneShared": "{{name}} heeft het telefoonnummer gedeeld.",
     "applications.requestVideoCall": "Videogesprek aanvragen",
-    "applications.requestVideoCallHint":
-      "Stel een datum, tijd en duur voor vóór je accepteert, zodat jullie ervaring en match samen kunnen bevestigen.",
     "applications.requestVideoCallConfirmTitle": "Videogesprek voorstellen",
     "applications.requestVideoCallConfirmText":
       "Kies een datum, tijd en duur voor een gesprek met {{name}}. Die kan accepteren of een andere tijd voorstellen.",
@@ -1992,6 +2000,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 minuut",
     "applications.videoCall.duration": "Duur",
     "applications.videoCall.time": "Tijd",
+    "applications.videoCall.hour": "Uur",
+    "applications.videoCall.minute": "Minuut",
     "applications.videoCall.date": "Datum",
     "applications.systemMessage.videoCallDeclined":
       "{{name}} heeft het voorstel voor een videogesprek geweigerd.",
@@ -2168,6 +2178,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ons team bekijkt dit bericht en neemt per e-mail contact op.",
     "applications.replyPlaceholder": "Schrijf een antwoord...",
     "applications.replyHint": "Enter om te verzenden. {{shortcut}} voor een nieuwe regel.",
+    "applications.experienceHint":
+      "Vermeld je ervaring met motorjachten en de boordsystemen die in de advertentie staan.",
     "applications.sending": "Verzenden...",
     "applications.sendReply": "Antwoord verzenden",
     "applications.translateWithGoogle": "Vertalen met Google",
@@ -2344,8 +2356,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Número de telefone partilhado",
     "applications.systemMessage.phoneShared": "{{name}} partilhou o número de telefone.",
     "applications.requestVideoCall": "Pedir videochamada",
-    "applications.requestVideoCallHint":
-      "Proponha uma data, hora e duração antes de aceitar para confirmarem juntos a experiência e a adequação.",
     "applications.requestVideoCallConfirmTitle": "Propor uma videochamada",
     "applications.requestVideoCallConfirmText":
       "Escolha uma data, hora e duração para uma chamada com {{name}}. Pode aceitar ou sugerir outro horário.",
@@ -2370,6 +2380,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 minuto",
     "applications.videoCall.duration": "Duração",
     "applications.videoCall.time": "Hora",
+    "applications.videoCall.hour": "Hora",
+    "applications.videoCall.minute": "Minuto",
     "applications.videoCall.date": "Data",
     "applications.systemMessage.videoCallDeclined": "{{name}} recusou a proposta de videochamada.",
     "applications.systemMessage.videoCallDeclinedTitle": "Videochamada recusada",
@@ -2538,6 +2550,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "A nossa equipa irá analisar esta mensagem e contactá-lo por e-mail.",
     "applications.replyPlaceholder": "Escreva uma resposta...",
     "applications.replyHint": "Enter para enviar. {{shortcut}} para uma nova linha.",
+    "applications.experienceHint":
+      "Mencione sua experiência com iates a motor e os sistemas de bordo listados no anúncio.",
     "applications.sending": "A enviar...",
     "applications.sendReply": "Enviar resposta",
     "applications.translateWithGoogle": "Traduzir com o Google",
@@ -2717,8 +2731,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneShared":
       "Ο χρήστης {{name}} κοινοποίησε τον αριθμό τηλεφώνου.",
     "applications.requestVideoCall": "Αίτημα βιντεοκλήσης",
-    "applications.requestVideoCallHint":
-      "Προτείνετε ημερομηνία, ώρα και διάρκεια πριν αποδεχτείτε, ώστε να επιβεβαιώσετε μαζί την εμπειρία και την καταλληλότητα.",
     "applications.requestVideoCallConfirmTitle": "Πρόταση βιντεοκλήσης",
     "applications.requestVideoCallConfirmText":
       "Επιλέξτε ημερομηνία, ώρα και διάρκεια για κλήση με τον/την {{name}}. Μπορεί να αποδεχτεί ή να προτείνει άλλη ώρα.",
@@ -2743,6 +2755,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 λεπτό",
     "applications.videoCall.duration": "Διάρκεια",
     "applications.videoCall.time": "Ώρα",
+    "applications.videoCall.hour": "Ώρα",
+    "applications.videoCall.minute": "Λεπτό",
     "applications.videoCall.date": "Ημερομηνία",
     "applications.systemMessage.videoCallDeclined":
       "Ο/Η {{name}} απέρριψε την πρόταση βιντεοκλήσης.",
@@ -2919,6 +2933,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Η ομάδα μας θα εξετάσει αυτό το μήνυμα και θα επικοινωνήσει με e-mail.",
     "applications.replyPlaceholder": "Γράψτε μια απάντηση...",
     "applications.replyHint": "Enter για αποστολή. {{shortcut}} για νέα γραμμή.",
+    "applications.experienceHint":
+      "Αναφέρετε την εμπειρία σας με μηχανοκίνητα σκάφη και τα συστήματα που περιγράφονται στην αγγελία.",
     "applications.sending": "Αποστολή...",
     "applications.sendReply": "Αποστολή απάντησης",
     "applications.translateWithGoogle": "Μετάφραση με Google",
@@ -3097,8 +3113,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Broj telefona podijeljen",
     "applications.systemMessage.phoneShared": "{{name}} je podijelio/la broj telefona.",
     "applications.requestVideoCall": "Zatraži video poziv",
-    "applications.requestVideoCallHint":
-      "Predložite datum, vrijeme i trajanje prije prihvaćanja kako biste zajedno potvrdili iskustvo i pogodnost.",
     "applications.requestVideoCallConfirmTitle": "Predloži video poziv",
     "applications.requestVideoCallConfirmText":
       "Odaberite datum, vrijeme i trajanje poziva s osobom {{name}}. Može prihvatiti ili predložiti drugo vrijeme.",
@@ -3124,6 +3138,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 minuta",
     "applications.videoCall.duration": "Trajanje",
     "applications.videoCall.time": "Vrijeme",
+    "applications.videoCall.hour": "Sat",
+    "applications.videoCall.minute": "Minuta",
     "applications.videoCall.date": "Datum",
     "applications.systemMessage.videoCallDeclined": "{{name}} je odbio/la prijedlog video poziva.",
     "applications.systemMessage.videoCallDeclinedTitle": "Video poziv odbijen",
@@ -3293,6 +3309,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText": "Naš tim će pregledati ovu poruku i javiti se e-poštom.",
     "applications.replyPlaceholder": "Napišite odgovor...",
     "applications.replyHint": "Enter za slanje. {{shortcut}} za novi red.",
+    "applications.experienceHint":
+      "Navedite svoje iskustvo s motornim jahtama i brodskim sustavima opisanim u oglasu.",
     "applications.sending": "Slanje...",
     "applications.sendReply": "Pošalji odgovor",
     "applications.translateWithGoogle": "Prevedi s pomoću Googlea",
@@ -3471,8 +3489,6 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Telefon numarası paylaşıldı",
     "applications.systemMessage.phoneShared": "{{name}} telefon numarasını paylaştı.",
     "applications.requestVideoCall": "Görüntülü görüşme iste",
-    "applications.requestVideoCallHint":
-      "Deneyim ve uyumu birlikte doğrulamak için kabul etmeden önce bir tarih, saat ve süre önerin.",
     "applications.requestVideoCallConfirmTitle": "Görüntülü arama öner",
     "applications.requestVideoCallConfirmText":
       "{{name}} ile bir arama için tarih, saat ve süre seçin. Kabul edebilir veya farklı bir saat önerebilir.",
@@ -3497,6 +3513,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.videoCall.durationMinutes_one": "1 dakika",
     "applications.videoCall.duration": "Süre",
     "applications.videoCall.time": "Saat",
+    "applications.videoCall.hour": "Saat",
+    "applications.videoCall.minute": "Dakika",
     "applications.videoCall.date": "Tarih",
     "applications.systemMessage.videoCallDeclined": "{{name}} görüntülü arama teklifini reddetti.",
     "applications.systemMessage.videoCallDeclinedTitle": "Görüntülü arama reddedildi",
@@ -3663,6 +3681,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText": "Ekibimiz bu mesajı inceleyip e-posta ile size dönecek.",
     "applications.replyPlaceholder": "Bir yanıt yazın...",
     "applications.replyHint": "Göndermek için Enter. Yeni satır için {{shortcut}}.",
+    "applications.experienceHint":
+      "Motorlu yatlar ve ilanda listelenen gemi sistemleriyle ilgili deneyiminizden bahsedin.",
     "applications.sending": "Gönderiliyor...",
     "applications.sendReply": "Yanıt gönder",
     "applications.translateWithGoogle": "Google ile çevir",
@@ -3845,14 +3865,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Telefonnummer delat",
     "applications.systemMessage.phoneShared": "{{name}} delade sitt telefonnummer.",
     "applications.requestVideoCall": "Begär videosamtal",
-    "applications.requestVideoCallHint":
-      "Föreslå ett datum, tid och längd innan du accepterar så att du kan bekräfta erfarenhet och passa ihop.",
     "applications.requestVideoCallConfirmTitle": "Föreslå ett videosamtal",
     "applications.requestVideoCallConfirmText":
       "Välj datum, tid och längd för ett samtal med {{name}}. De kan acceptera eller föreslå en annan tid.",
     "applications.requestVideoCallConfirmAction": "Skicka förslag",
     "applications.videoCall.date": "Datum",
     "applications.videoCall.time": "Tid",
+    "applications.videoCall.hour": "Timme",
+    "applications.videoCall.minute": "Minut",
     "applications.videoCall.duration": "Varaktighet",
     "applications.videoCall.durationMinutes_one": "1 minut",
     "applications.videoCall.durationMinutes_other": "{{count}} minuter",
@@ -4033,6 +4053,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Vårt team kommer att granska detta meddelande och följa upp via e-post.",
     "applications.replyPlaceholder": "Skriv ett svar...",
     "applications.replyHint": "Enter för att skicka. {{shortcut}} för ny rad.",
+    "applications.experienceHint":
+      "Nämn din erfarenhet av motoryachter och de system ombord som anges i annonsen.",
     "applications.sending": "Sändning...",
     "applications.sendReply": "Skicka svar",
     "applications.translateWithGoogle": "Översätt med Google",
@@ -4214,14 +4236,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Telefonnummer delt",
     "applications.systemMessage.phoneShared": "{{name}} delte telefonnummeret sitt.",
     "applications.requestVideoCall": "Be om videosamtale",
-    "applications.requestVideoCallHint":
-      "Foreslå en dato, tid og lengde før du godtar, slik at du kan bekrefte erfaring og passe sammen.",
     "applications.requestVideoCallConfirmTitle": "Foreslå en videosamtale",
     "applications.requestVideoCallConfirmText":
       "Velg dato, klokkeslett og lengde for en samtale med {{name}}. De kan godta eller foreslå et annet tidspunkt.",
     "applications.requestVideoCallConfirmAction": "Send forslag",
     "applications.videoCall.date": "Dato",
     "applications.videoCall.time": "Tid",
+    "applications.videoCall.hour": "Time",
+    "applications.videoCall.minute": "Minutt",
     "applications.videoCall.duration": "Varighet",
     "applications.videoCall.durationMinutes_one": "1 minutt",
     "applications.videoCall.durationMinutes_other": "{{count}} minutter",
@@ -4402,6 +4424,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Teamet vårt vil vurdere denne meldingen og følge opp via e-post.",
     "applications.replyPlaceholder": "Skriv et svar...",
     "applications.replyHint": "Enter for å sende. {{shortcut}} for ny linje.",
+    "applications.experienceHint":
+      "Nevn din erfaring med motoryachter og systemene om bord som er oppført i annonsen.",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
     "applications.translateWithGoogle": "Oversett med Google",
@@ -4581,14 +4605,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Telefonnummer delt",
     "applications.systemMessage.phoneShared": "{{name}} delte sit telefonnummer.",
     "applications.requestVideoCall": "Anmod om videoopkald",
-    "applications.requestVideoCallHint":
-      "Foreslå en dato, tid og længde, før du accepterer, så du kan bekræfte oplevelsen og passe sammen.",
     "applications.requestVideoCallConfirmTitle": "Foreslå et videoopkald",
     "applications.requestVideoCallConfirmText":
       "Vælg en dato, tid og længde for et opkald med {{name}}. De kan acceptere eller foreslå et andet tidspunkt.",
     "applications.requestVideoCallConfirmAction": "Send forslag",
     "applications.videoCall.date": "Dato",
     "applications.videoCall.time": "Tid",
+    "applications.videoCall.hour": "Time",
+    "applications.videoCall.minute": "Minut",
     "applications.videoCall.duration": "Varighed",
     "applications.videoCall.durationMinutes_one": "1 minut",
     "applications.videoCall.durationMinutes_other": "{{count}} minutter",
@@ -4768,6 +4792,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Vores team vil gennemgå denne meddelelse og følge op via e-mail.",
     "applications.replyPlaceholder": "Skriv et svar...",
     "applications.replyHint": "Enter for at sende. {{shortcut}} for ny linje.",
+    "applications.experienceHint":
+      "Nævn din erfaring med motoryachter og de systemer om bord, der er nævnt i opslaget.",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
     "applications.translateWithGoogle": "Oversæt med Google",
@@ -4949,14 +4975,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "Puhelinnumero jaettu",
     "applications.systemMessage.phoneShared": "{{name}} jakoi puhelinnumeronsa.",
     "applications.requestVideoCall": "Pyydä videopuhelua",
-    "applications.requestVideoCallHint":
-      "Ehdota päivämäärä, aika ja pituus ennen hyväksymistä, jotta voit vahvistaa kokemuksesi ja sovittaa yhteen.",
     "applications.requestVideoCallConfirmTitle": "Ehdota videopuhelua",
     "applications.requestVideoCallConfirmText":
       "Valitse puhelun päivämäärä, aika ja pituus painikkeella {{name}}. He voivat hyväksyä tai ehdottaa eri aikaa.",
     "applications.requestVideoCallConfirmAction": "Lähetä ehdotus",
     "applications.videoCall.date": "Päivämäärä",
     "applications.videoCall.time": "Aika",
+    "applications.videoCall.hour": "Tunti",
+    "applications.videoCall.minute": "Minuutti",
     "applications.videoCall.duration": "Kesto",
     "applications.videoCall.durationMinutes_one": "1 minuutti",
     "applications.videoCall.durationMinutes_other": "{{count}} minuuttia",
@@ -5139,6 +5165,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Tiimimme tarkistaa tämän viestin ja ottaa yhteyttä sähköpostitse.",
     "applications.replyPlaceholder": "Kirjoita vastaus...",
     "applications.replyHint": "Enter lähettää. {{shortcut}} uudelle riville.",
+    "applications.experienceHint":
+      "Mainitse kokemuksesi moottorijahdista ja ilmoituksessa mainituista laitejärjestelmistä.",
     "applications.sending": "Lähetetään...",
     "applications.sendReply": "Lähetä vastaus",
     "applications.translateWithGoogle": "Käännä Googlen avulla",
@@ -5315,14 +5343,14 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.phoneSharedTitle": "電話番号が共有されました",
     "applications.systemMessage.phoneShared": "{{name}} が電話番号を共有しました。",
     "applications.requestVideoCall": "ビデオ通話をリクエストする",
-    "applications.requestVideoCallHint":
-      "承諾する前に日付、時間、長さを提案して、経験と相性を確認してください。",
     "applications.requestVideoCallConfirmTitle": "ビデオ通話を提案する",
     "applications.requestVideoCallConfirmText":
       "{{name}} で通話の日付、時刻、長さを選択します。受け入れたり、別の時間を提案したりすることができます。",
     "applications.requestVideoCallConfirmAction": "提案を送信する",
     "applications.videoCall.date": "日付",
     "applications.videoCall.time": "時間",
+    "applications.videoCall.hour": "時間",
+    "applications.videoCall.minute": "分",
     "applications.videoCall.duration": "間隔",
     "applications.videoCall.durationMinutes_one": "1分",
     "applications.videoCall.durationMinutes_other": "{{count}}分",
@@ -5506,6 +5534,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "私たちのチームがこのメッセージを確認し、電子メールでフォローアップします。",
     "applications.replyPlaceholder": "返信を書いてください...",
     "applications.replyHint": "Enterで送信。改行は{{shortcut}}。",
+    "applications.experienceHint":
+      "モーターヨットの経験と、掲載されている船内システムについてご記入ください。",
     "applications.sending": "送信中...",
     "applications.sendReply": "返信を送信",
     "applications.translateWithGoogle": "Google で翻訳する",

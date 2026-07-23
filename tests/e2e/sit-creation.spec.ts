@@ -39,16 +39,19 @@ test.describe("sit creation flow", () => {
     );
     await expect(modal.getByText(/Editable until someone applies/i)).toBeVisible();
     await expect(modal.getByRole("radio", { name: /Accommodation/i })).toBeChecked();
+    await expect(modal.getByTestId("sit-editor-max-guests")).toBeVisible();
     await expect(modal.getByText(/^Region$/i)).toHaveCount(0);
-    await expect(modal.getByText(/for example Mediterranean/i)).toHaveCount(0);
-    await expect(modal.locator(".form-label", { hasText: /^Full address$/i })).toBeVisible();
+    await expect(modal.getByText(/e\.g\. Mediterranean/i)).toHaveCount(0);
+    await expect(
+      modal.getByTestId("form-label-required").filter({ hasText: /Full address/i }),
+    ).toBeVisible();
     await expect(modal.getByText(/Not shared until you accept an applicant/i)).toBeVisible();
-    const publish = modal.getByRole("button", { name: /Publish sit/i });
+    const publish = modal.getByTestId("sit-publish");
     await expect(publish).toBeDisabled();
-    await expect(publish).toHaveAttribute("title", /Still needed:.*Sit dates/i);
-    await expect(publish).toHaveAttribute("title", /Full address/i);
-    await publish.hover();
+    await expect(publish).not.toHaveAttribute("title");
+    await publish.hover({ force: true });
     await expect(page.getByRole("tooltip", { name: /Still needed:.*Sit dates/i })).toBeVisible();
+    await expect(page.getByRole("tooltip", { name: /Full address/i })).toBeVisible();
     await expect(modal.getByRole("complementary", { name: /Live preview/i })).toBeVisible();
     await expect(modal.getByText(/How it will look/i)).toBeVisible();
     await expect(modal.getByText(/Solstice/i).first()).toBeVisible();
@@ -62,6 +65,7 @@ test.describe("sit creation flow", () => {
     await expect(preview.getByText(/Accommodation|Daytime/i).first()).toBeVisible();
     await modal.getByRole("radio", { name: /Daytime checks/i }).check();
     await expect(preview.getByText(/Daytime/i).first()).toBeVisible();
+    await expect(modal.getByTestId("sit-editor-max-guests")).toHaveCount(0);
 
     await expect(preview.getByText(/Choose dates to complete the listing preview/i)).toBeVisible();
     await fillMinimalCreateSitForm(modal, page, {
@@ -127,7 +131,7 @@ test.describe("sit creation flow", () => {
     await expect(page).toHaveURL(/\/my-sits/);
     await expect(sitEditorPage(page)).toHaveCount(0);
     await expect.poll(async () => sitsTabCount(page)).toBe(beforeCount + 1);
-    await expect(page.getByText(/2 care tasks/i)).toBeVisible();
+    await expect(page.getByText(/2 care tasks/i).first()).toBeVisible();
   });
 
   test("blocks create when identity verification is incomplete", async ({ page }) => {

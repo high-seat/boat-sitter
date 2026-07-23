@@ -1,5 +1,7 @@
 /**
- * Offline coordinate lookup for the destinations in destinations.ts.
+ * Offline coordinate lookup for curated marina towns and common countries.
+ * Autocomplete uses D1 `world_places` via `/api/destinations`; this map still
+ * backs sit/map placement when a listing lacks stored lat/lng.
  *
  * Replaces the old 10-city table whose fallback dumped every unknown place at
  * [20, 0] (the Atlantic off West Africa). Resolution order:

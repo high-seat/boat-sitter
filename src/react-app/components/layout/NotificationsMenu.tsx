@@ -12,14 +12,11 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { IconTooltip } from "@/components/ui/IconTooltip";
+import { NavCountBadge } from "@/components/ui/NavCountBadge";
 import { NotificationsMenuSkeleton } from "@/components/ui/NotificationsMenuSkeleton";
 import { getIntlLocale } from "@/i18n";
-import {
-  getNotificationsForUser,
-  markAllNotificationsRead,
-  markNotificationRead,
-  type MockNotification,
-} from "@/mockApi";
+import { markAllNotificationsRead, markNotificationRead, type MockNotification } from "@/mockApi";
+import { queries } from "@/queries";
 import { useAppStore } from "@/store";
 
 function NotificationIcon({ type }: { type: MockNotification["type"] }) {
@@ -40,11 +37,9 @@ export function NotificationsMenu() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const queryKey = ["notifications", user.name] as const;
-  const { data, isPending, isFetching } = useQuery({
-    queryKey,
-    queryFn: () => getNotificationsForUser(user.name),
-  });
+  const notificationsQuery = queries.notifications.user(user.name);
+  const queryKey = notificationsQuery.queryKey;
+  const { data, isPending, isFetching } = useQuery(notificationsQuery);
   const notifications = data ?? [];
   const showSkeleton = isPending || (isFetching && data === undefined);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
@@ -124,29 +119,22 @@ export function NotificationsMenu() {
           type="button"
         >
           <Bell size={19} />
-          {unreadCount > 0 && (
-            <span
-              aria-hidden="true"
-              className="absolute top-1 right-1 grid min-h-4 min-w-4 place-items-center rounded-full bg-coral px-1 text-[9px] font-extrabold leading-none text-white ring-2 ring-cream"
-            >
-              {unreadCount}
-            </span>
-          )}
+          <NavCountBadge count={unreadCount} />
         </button>
       </IconTooltip>
       {open && (
         <div
           aria-label={t("notifications.heading")}
-          className="absolute top-[calc(100%+0.5rem)] right-0 z-60 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-line bg-white shadow-float"
+          className="fixed top-[4.75rem] right-4 left-4 z-60 flex max-h-[calc(100dvh-5.5rem)] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-float md:absolute md:top-[calc(100%+0.5rem)] md:right-0 md:left-auto md:w-80 md:max-w-[calc(100vw-2rem)] md:max-h-none"
           role="menu"
         >
-          <p className="border-b border-line px-4 py-3 font-display text-sm font-bold text-navy">
+          <p className="shrink-0 border-b border-line px-4 py-3 font-display text-sm font-bold text-navy">
             {t("notifications.heading")}
           </p>
           {showSkeleton ? <NotificationsMenuSkeleton /> : null}
           {!showSkeleton && notifications.length ? (
             <>
-              <div className="max-h-96 overflow-y-auto p-2">
+              <div className="min-h-0 flex-1 overflow-y-auto p-2 md:max-h-96 md:flex-none">
                 {notifications.map((notification) => (
                   <Link
                     className="relative flex gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-cream"
@@ -181,7 +169,7 @@ export function NotificationsMenu() {
                   </Link>
                 ))}
               </div>
-              <div className="border-t border-line p-2">
+              <div className="shrink-0 border-t border-line p-2">
                 <button
                   className="w-full rounded-xl px-3 py-2.5 text-sm font-bold text-teal transition hover:bg-cream disabled:cursor-default disabled:text-slate disabled:hover:bg-transparent"
                   disabled={unreadCount === 0 || markAll.isPending}

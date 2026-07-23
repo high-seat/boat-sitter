@@ -33,7 +33,7 @@ const vesselSchema = z.object({
   id: z.string().min(1).max(120),
   name: z.string().min(1),
   type: z.string().min(1),
-  length: z.string().min(1),
+  length: z.string(),
   yearBuilt: z
     .number()
     .int()

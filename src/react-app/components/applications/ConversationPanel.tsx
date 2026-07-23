@@ -12,6 +12,7 @@ import { type ApplicationMessage, type SitApplication } from "@/mockApi";
 import { REPORT_REASONS, useAppStore, type ReportReason } from "@/store";
 import { translateWithGoogle } from "@/translationService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { IconTooltip } from "@/components/ui/IconTooltip";
 import { Select } from "@/components/ui/Select";
 import {
   VideoCallScheduleModal,
@@ -42,6 +43,7 @@ export function ConversationPanel({
   onSharePhone,
   pending,
   translationLanguage,
+  composerFocusKey = 0,
 }: {
   application: SitApplication;
   currentUser: string;
@@ -55,6 +57,8 @@ export function ConversationPanel({
   onSharePhone: (phoneNumber: string) => void;
   pending: boolean;
   translationLanguage: string;
+  /** Bump when the user opens/reopens this chat so the reply field takes focus. */
+  composerFocusKey?: number;
 }) {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
@@ -75,6 +79,7 @@ export function ConversationPanel({
   const remoteTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const replyInputRef = useRef<HTMLTextAreaElement | null>(null);
   const lastMessageKey = optimisticMessages.at(-1)?.id ?? application.messages.at(-1)?.id ?? "";
 
   useEffect(() => {
@@ -82,6 +87,13 @@ export function ConversationPanel({
     setOpenMenuId(null);
     setOptimisticMessages([]);
   }, [application.id]);
+  useEffect(() => {
+    // Defer past list-button focus so opening/switching a chat leaves the composer ready.
+    const timer = window.setTimeout(() => {
+      replyInputRef.current?.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [application.id, composerFocusKey]);
   useEffect(() => {
     setTranslations({});
     setTranslationPending({});
@@ -300,7 +312,9 @@ export function ConversationPanel({
                   <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Phone aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-teal">{message.senderName}</p>
+                      <p className="text-xs font-bold text-teal">
+                        {mine ? t("messages.you") : message.senderName}
+                      </p>
                       <p className="mt-1 font-bold text-navy">
                         {t("applications.systemMessage.phoneSharedTitle")}
                       </p>
@@ -376,7 +390,9 @@ export function ConversationPanel({
                   <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Video aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-teal">{message.senderName}</p>
+                      <p className="text-xs font-bold text-teal">
+                        {mine ? t("messages.you") : message.senderName}
+                      </p>
                       <p className="mt-1 font-bold text-navy">{t(titleKey)}</p>
                       <p className="mt-1 text-slate">
                         {formatApplicationSystemMessage(t, message, application, currentUser)}
@@ -487,10 +503,11 @@ export function ConversationPanel({
                 className={`relative max-w-[85%] rounded-2xl px-4 py-3 ${
                   mine ? "bg-navy text-white" : "bg-cream text-navy"
                 }`}
+                data-testid={mine ? "conversation-message-own" : "conversation-message-peer"}
               >
                 <div className={`flex items-start justify-between gap-2 ${mine ? "" : "pr-1"}`}>
                   <p className={`text-xs font-bold ${mine ? "text-aqua" : "text-teal"}`}>
-                    {message.senderName}
+                    {mine ? t("messages.you") : message.senderName}
                   </p>
                   {!mine && (
                     <MessageActionsMenu
@@ -559,24 +576,44 @@ export function ConversationPanel({
           </p>
         )}
       </div>
-      <div className="border-t border-line p-4">
-        <label>
-          <span className="sr-only">{t("applications.reply")}</span>
-          <textarea
-            className="form-input min-h-24 resize-y"
-            onBlur={() => publishTyping(false)}
-            onChange={(event) => updateReply(event.target.value)}
-            onKeyDown={handleReplyKeyDown}
-            placeholder={t("applications.replyPlaceholder")}
-            value={reply}
-          />
-        </label>
-        <p className="mt-2 text-xs text-slate">
-          {t("applications.replyHint", { shortcut: newlineShortcut })}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
+      <div className="border-t border-line p-4" data-testid="conversation-composer">
+        <div
+          className={
+            user
+              ? "grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-x-3 gap-y-2"
+              : "grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-3 gap-y-2"
+          }
+        >
+          {user ? (
+            <img
+              alt=""
+              className="mb-1 size-10 self-end rounded-full object-cover"
+              data-testid="conversation-composer-avatar"
+              onError={(event) => {
+                const img = event.currentTarget;
+                const fallback = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`;
+                if (img.src !== fallback) img.src = fallback;
+              }}
+              referrerPolicy="no-referrer"
+              src={user.image}
+            />
+          ) : null}
+          <label className="min-w-0">
+            <span className="sr-only">{t("applications.reply")}</span>
+            <textarea
+              ref={replyInputRef}
+              className="form-input min-h-24 resize-y"
+              data-testid="conversation-reply-input"
+              onBlur={() => publishTyping(false)}
+              onChange={(event) => updateReply(event.target.value)}
+              onKeyDown={handleReplyKeyDown}
+              placeholder={t("applications.replyPlaceholder")}
+              value={reply}
+            />
+          </label>
           <button
-            className="flex items-center gap-2 rounded-xl bg-coral px-5 py-3 text-sm font-bold text-white disabled:opacity-50"
+            className="flex shrink-0 items-center gap-2 self-end rounded-xl bg-coral px-4 py-3 text-sm font-bold text-white disabled:opacity-50 sm:px-5"
+            data-testid="conversation-send-reply"
             disabled={pending || hasOptimisticSend || !reply.trim()}
             onClick={() => {
               void submitReply();
@@ -584,39 +621,53 @@ export function ConversationPanel({
             type="button"
           >
             <Send size={16} />
-            {pending || hasOptimisticSend ? t("applications.sending") : t("applications.sendReply")}
+            <span className="max-sm:sr-only">
+              {pending || hasOptimisticSend
+                ? t("applications.sending")
+                : t("applications.sendReply")}
+            </span>
           </button>
-          <button
-            className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"
-            disabled={pending}
-            onClick={() => setScheduleModal({ mode: "propose" })}
-            type="button"
-          >
-            <Video size={16} />
-            {t("applications.requestVideoCall")}
-          </button>
-          <button
-            className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"
-            disabled={pending || !profilePhone}
-            onClick={() => setSharePhoneConfirmOpen(true)}
-            type="button"
-          >
-            <Phone size={16} />
-            {t("applications.sharePhoneInChat")}
-          </button>
+          <div className={user ? "col-start-2 col-end-4" : "col-span-full"}>
+            <p className="text-xs text-slate">
+              {t("applications.replyHint", { shortcut: newlineShortcut })}
+            </p>
+            <p className="mt-2 text-xs text-slate">{t("applications.experienceHint")}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"
+                data-testid="conversation-request-video-call"
+                disabled={pending}
+                onClick={() => setScheduleModal({ mode: "propose" })}
+                type="button"
+              >
+                <Video size={16} />
+                {t("applications.requestVideoCall")}
+              </button>
+              <IconTooltip
+                hidden={Boolean(profilePhone)}
+                label={t("applications.sharePhoneUnavailable")}
+                side="top"
+                wrap
+              >
+                <button
+                  className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"
+                  data-testid="conversation-share-phone"
+                  disabled={pending || !profilePhone}
+                  onClick={() => setSharePhoneConfirmOpen(true)}
+                  type="button"
+                >
+                  <Phone size={16} />
+                  {t("applications.sharePhoneInChat")}
+                </button>
+              </IconTooltip>
+            </div>
+            {profilePhone ? (
+              <p className="mt-2 text-xs leading-5 text-slate">
+                {t("applications.sharePhoneInChatHint")}
+              </p>
+            ) : null}
+          </div>
         </div>
-        <p className="mt-2 text-xs leading-5 text-slate">
-          {t("applications.requestVideoCallHint")}
-        </p>
-        {profilePhone ? (
-          <p className="mt-1 text-xs leading-5 text-slate">
-            {t("applications.sharePhoneInChatHint")}
-          </p>
-        ) : (
-          <p className="mt-1 text-xs leading-5 text-coral">
-            {t("applications.sharePhoneUnavailable")}
-          </p>
-        )}
       </div>
       {sharePhoneConfirmOpen && profilePhone ? (
         <ConfirmDialog

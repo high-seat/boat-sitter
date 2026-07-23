@@ -2,7 +2,8 @@
 name: verify-ui-with-playwright
 description: >-
   Verifies every Boatstead UI change in a real browser using the Playwright
-  MCP, and keeps automated Playwright specs in tests/e2e in sync. Use
+  MCP, and keeps automated Playwright specs in tests/e2e in sync. Requires
+  data-testid on elements under test and getByTestId in specs. Use
   automatically after changing components, pages, routes, forms, interactions,
   responsive behavior, or CSS in this repository. Do not call a UI task complete
   until the affected flow has been exercised visually and matching e2e coverage
@@ -29,11 +30,31 @@ they are missing, add them.
    and assertions in the same change.
 3. If coverage is missing, add or extend a focused spec under `tests/e2e/` and
    reuse helpers when possible (`helpers/auth.ts`, `helpers/sitEditor.ts`, etc.).
-4. Prefer stable roles, labels, and user-visible text over brittle CSS selectors.
-5. Run the affected specs with `pnpm test:e2e` (or
+4. **Add `data-testid` attributes for every element a Playwright spec targets,**
+   and **update those specs to select via `getByTestId(...)`.** Do this in the
+   same change as the UI work. Prefer kebab-case ids scoped by feature
+   (e.g. `sit-emergency-help`, `conversation-messages`,
+   `vessel-feature-group-life-aboard`). Do not rely on visible copy, CSS
+   classes, or fragile DOM structure as the primary locator for automated
+   assertions or clicks. Roles and labels remain fine for MCP exploratory
+   checks and accessibility, but e2e specs should pin behavior with test ids.
+5. When changing copy, layout, or nesting around an existing tested control,
+   keep or refresh its `data-testid` and migrate any leftover role/text
+   selectors in `tests/e2e` to `getByTestId`.
+6. Run the affected specs with `pnpm test:e2e` (or
    `pnpm exec playwright test path/to/spec`) before calling the task done.
-6. Keep MCP visual checks for layout, responsive German, and exploratory QA;
+7. Keep MCP visual checks for layout, responsive German, and exploratory QA;
    keep `tests/e2e` for repeatable regression coverage of critical flows.
+
+### Test id conventions
+
+- Use `data-testid="…"` in React (not ad-hoc `data-*` attrs invented per
+  feature unless they are also the Playwright test id).
+- Name by domain + purpose: `feature-element`, not `button1` or `div`.
+- For lists/groups, put the id on the stable container the test scopes into
+  (group, panel, row), and on interactive controls the test clicks or asserts.
+- Existing examples: `sit-emergency-help`, `conversation-messages`,
+  `email-confirmation-status`.
 
 Current high-value coverage to extend rather than reinvent:
 
@@ -68,8 +89,9 @@ Current high-value coverage to extend rather than reinvent:
    - Keyboard operation, focus behavior, modals, and form validation.
    - Route transitions and persisted localStorage state.
    - Loading, empty, error, and successful mutation states where relevant.
-7. Update or add `tests/e2e` coverage for the same change, then run the affected
-   Playwright specs.
+7. Update or add `tests/e2e` coverage for the same change: add `data-testid`s on
+   targeted UI, point specs at `getByTestId`, then run the affected Playwright
+   specs.
 8. Fix any issue found, then repeat the affected browser flow and screenshot.
 
 ## Minimum route coverage

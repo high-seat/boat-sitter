@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { seedVerifiedOwner } from "./helpers/auth";
+import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
 
 test.describe("share phone in chat", () => {
   test("owner can share profile phone into the conversation", async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe("share phone in chat", () => {
       .getByRole("button", { name: /Alex Morgan/i })
       .first()
       .click();
-    await page.getByRole("button", { name: /Share phone number/i }).click();
+    await page.getByTestId("conversation-share-phone").click();
 
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: /Share your phone number/i })).toBeVisible();
@@ -20,7 +20,7 @@ test.describe("share phone in chat", () => {
 
     await expect(page.getByText(/Phone number shared/i).first()).toBeVisible();
     await expect(page.getByText(/Maya & Finn shared their phone number/i).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /\+30 6912345678/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /\+30 6912345678/ }).first()).toBeVisible();
 
     const phoneCard = page
       .getByText(/Phone number shared/i)
@@ -29,5 +29,39 @@ test.describe("share phone in chat", () => {
     const phoneRow = phoneCard.locator("xpath=..");
     await expect(phoneRow).toHaveClass(/justify-end/);
     await expect(phoneRow).not.toHaveClass(/justify-center/);
+  });
+
+  test("disabled share button shows settings tooltip and no bottom message", async ({ page }) => {
+    await seedOwnerSession(page, {
+      verified: true,
+      phoneNumber: "",
+    });
+    await page.goto("/owner/sits/solstice/applications");
+    await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
+
+    await page
+      .getByRole("button", { name: /Alex Morgan/i })
+      .first()
+      .click();
+
+    const shareButton = page.getByTestId("conversation-share-phone");
+    await expect(shareButton).toBeDisabled();
+
+    await expect(
+      page.locator("p").filter({ hasText: /Add a phone number in Settings before sharing it/i }),
+    ).toHaveCount(0);
+
+    const tip = page.getByRole("tooltip", {
+      name: /Add a phone number in Settings before sharing it/i,
+    });
+    await expect(tip).toBeAttached();
+    await expect
+      .poll(async () => tip.evaluate((element) => getComputedStyle(element).opacity))
+      .toBe("0");
+
+    await shareButton.locator("xpath=ancestor::span[contains(@class,'group')][1]").hover();
+    await expect
+      .poll(async () => tip.evaluate((element) => getComputedStyle(element).opacity))
+      .toBe("1");
   });
 });

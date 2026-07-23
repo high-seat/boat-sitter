@@ -13,10 +13,10 @@ test.describe("optimistic chat send", () => {
       .click();
 
     const uniqueText = `Optimistic ping ${Date.now()}`;
-    const reply = page.getByPlaceholder(/Write a reply/i);
+    const reply = page.getByTestId("conversation-reply-input");
     await reply.fill(uniqueText);
 
-    await page.getByRole("button", { name: /Send reply/i }).click();
+    await page.getByTestId("conversation-send-reply").click();
 
     const pendingBubble = page.getByText(uniqueText, { exact: true });
     await expect(pendingBubble).toBeVisible();
@@ -24,7 +24,7 @@ test.describe("optimistic chat send", () => {
 
     await expect(page.getByLabel(/Sending/i)).toHaveCount(0, { timeout: 10_000 });
     await expect(page.getByText(uniqueText, { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Send reply/i })).toBeVisible();
+    await expect(page.getByTestId("conversation-send-reply")).toBeVisible();
     await expect(page.getByRole("button", { name: /Sending/i })).toHaveCount(0);
   });
 });

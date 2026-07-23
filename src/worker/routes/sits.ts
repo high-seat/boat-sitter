@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { and, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import { computeStartEarlySchedule } from "../../shared/sitSchedule";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { applications, sits, vessels } from "../db/schema";
@@ -113,6 +114,63 @@ sitsRouter.get("/:id/access", requireUser, async (c) => {
     data: {
       ...(privateAccess ?? {}),
       ...(fullAddress ? { fullAddress } : {}),
+    },
+  });
+});
+
+/**
+ * Owner-only: move dateStart to today while keeping the original end date,
+ * so an accepted sit becomes underway immediately.
+ */
+sitsRouter.post("/:id/start-early", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const id = c.req.param("id");
+
+  const sit = await db.query.sits.findFirst({ where: eq(sits.id, id) });
+  if (!sit) return c.json({ error: "Sit not found" }, 404);
+
+  const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+  if (!vessel) return c.json({ error: "Vessel not found" }, 404);
+  if (vessel.ownerUserId != null && vessel.ownerUserId !== user.id) {
+    return c.json({ error: "You do not own this listing" }, 403);
+  }
+  if (vessel.ownerUserId == null && vessel.owner !== user.name) {
+    return c.json({ error: "You do not own this listing" }, 403);
+  }
+
+  const accepted = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .where(and(eq(applications.sitId, sit.id), eq(applications.status, "accepted")))
+    .limit(1);
+  if (!accepted.length) {
+    return c.json({ error: "SIT_START_EARLY_NOT_ALLOWED" }, 400);
+  }
+
+  const schedule = computeStartEarlySchedule(sit.dateStart, sit.duration);
+  if (!schedule) {
+    return c.json({ error: "SIT_START_EARLY_NOT_ALLOWED" }, 400);
+  }
+
+  const [saved] = await db
+    .update(sits)
+    .set({
+      dateStart: schedule.dateStart,
+      duration: schedule.duration,
+      dates: schedule.dates,
+      updatedAt: sql`CURRENT_TIMESTAMP`,
+    })
+    .where(eq(sits.id, sit.id))
+    .returning();
+
+  const { vesselId, ...rest } = saved;
+  return c.json({
+    data: {
+      ...rest,
+      boatId: vesselId,
+      accepted: true,
+      applicationsOpen: false,
     },
   });
 });

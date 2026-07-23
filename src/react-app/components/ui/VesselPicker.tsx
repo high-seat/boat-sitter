@@ -3,6 +3,7 @@ import { Check, ChevronDown, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatBoatLength } from "@/lengthUtils";
 import type { Vessel } from "@/mockApi";
+import { FormLabel } from "@/components/ui/FormLabel";
 import { optimizePhotoUrl } from "@/photoUtils";
 import { detectMeasurementSystem, useAppStore } from "@/store";
 
@@ -91,7 +92,7 @@ export function VesselPicker({
   if (!canChoose) {
     return (
       <div>
-        <span className="form-label">{t("sitEditor.boat")}</span>
+        <FormLabel required>{t("sitEditor.boat")}</FormLabel>
         <div className="rounded-2xl border border-line bg-cream/50 p-3 sm:p-4">
           <VesselOptionContent vessel={selected} />
           {singleBoat && !disabled && (
@@ -104,9 +105,9 @@ export function VesselPicker({
 
   return (
     <div ref={rootRef}>
-      <span className="form-label" id={`${listId}-label`}>
+      <FormLabel id={`${listId}-label`} required>
         {t("sitEditor.boat")}
-      </span>
+      </FormLabel>
       <div className="relative">
         <button
           aria-controls={listId}

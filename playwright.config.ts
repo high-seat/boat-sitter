@@ -13,7 +13,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "pnpm db:migrate:local && pnpm db:seed:local && pnpm exec vite --host 127.0.0.1 --port 4174",
+      "pnpm db:migrate:local && pnpm db:seed:local && pnpm db:seed:places:local && pnpm exec vite --host 127.0.0.1 --port 4174",
     reuseExistingServer: !process.env.CI,
     url: "http://127.0.0.1:4174",
     timeout: 180_000,

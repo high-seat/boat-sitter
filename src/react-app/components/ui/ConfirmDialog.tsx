@@ -31,6 +31,7 @@ export function ConfirmDialog({
   onCancel,
   onConfirm,
   children,
+  testId,
 }: {
   title: string;
   titleId?: string;
@@ -43,6 +44,7 @@ export function ConfirmDialog({
   onCancel: () => void;
   onConfirm: () => void;
   children?: ReactNode;
+  testId?: string;
 }) {
   const { t } = useTranslation();
   const styles = toneStyles[tone];
@@ -58,6 +60,7 @@ export function ConfirmDialog({
         aria-labelledby={titleId}
         aria-modal="true"
         className="w-full max-w-md rounded-3xl bg-white p-6 shadow-float md:p-8"
+        data-testid={testId}
         role="dialog"
       >
         <span className={`grid size-12 place-items-center rounded-full ${styles.icon}`}>

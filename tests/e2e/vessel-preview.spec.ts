@@ -11,7 +11,7 @@ test.describe("vessel editor live preview", () => {
     await expect(preview).toBeVisible();
     await expect(preview.getByText(/Untitled boat|How it will look/i).first()).toBeVisible();
 
-    await page.getByPlaceholder(/for example Solstice/i).fill("Preview Wind");
+    await page.getByPlaceholder(/e\.g\. Solstice/i).fill("Preview Wind");
     await expect(preview.getByText("Preview Wind")).toBeVisible();
 
     await page.getByPlaceholder("Start typing a city").fill("Antibes, France");

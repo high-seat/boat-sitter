@@ -30,6 +30,7 @@ cp .dev.vars.example .dev.vars
 
 npm run db:migrate:local
 npm run db:seed:local
+npm run db:seed:places:local
 npm run dev
 ```
 
@@ -48,10 +49,11 @@ npm run build && npm run deploy
 
 ### Public — browse / detail
 
-| Method | Path             | Notes                                                                                                                                                                                                                                                                                       |
-| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/boats`     | Filters applied in D1 SQL: `q`, `type` (slug e.g. `motor-yacht`; legacy labels still accepted), `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
-| GET    | `/api/boats/:id` | One listing by sit id; 404 if missing/unpublished                                                                                                                                                                                                                                           |
+| Method | Path                | Notes                                                                                                                                                                                                                                                                                       |
+| ------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/boats`        | Filters applied in D1 SQL: `q`, `type` (slug e.g. `motor-yacht`; legacy labels still accepted), `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
+| GET    | `/api/boats/:id`    | One listing by sit id; 404 if missing/unpublished                                                                                                                                                                                                                                           |
+| GET    | `/api/destinations` | City/country autocomplete gazetteer. Query: `q`, `kind` (`city`/`country`/`all`), `limit` (1–20, default 8). Empty `q` returns popular places. Response: `{ data: [{ name, detail, kind, latitude?, longitude?, countryCode? }] }`                                                          |
 
 ### Owner — vessels & sits _(writes require Better Auth session)_
 

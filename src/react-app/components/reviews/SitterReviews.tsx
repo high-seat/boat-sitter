@@ -6,14 +6,12 @@ import { Star } from "lucide-react";
 import { canLeaveReview, reviewDaysRemaining } from "@/dateUtils";
 import {
   createReview,
-  getBoat,
-  getReviewForApplication,
-  getReviewsForSitter,
   respondToReview,
   summarizeSitterRating,
   type SitApplication,
   type SitReview,
 } from "@/mockApi";
+import { queries } from "@/queries";
 import { SitterReviewsSkeleton } from "@/components/ui/MemberProfileSkeleton";
 
 function formatReviewDate(language: string, iso: string) {
@@ -104,7 +102,7 @@ function ReviewCard({
     onSuccess: async () => {
       setResponseText("");
       setError("");
-      await queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      await queryClient.invalidateQueries({ queryKey: queries.reviews.getQueryKey() });
     },
     onError: (err) => {
       const code = err instanceof Error ? err.message : "";
@@ -198,12 +196,10 @@ export function LeaveReviewForm({
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const { data: existing } = useQuery({
-    queryKey: ["reviews", "application", application.id],
-    queryFn: () => getReviewForApplication(application.id),
+    ...queries.reviews.application(application.id),
   });
   const { data: sit, isLoading: sitLoading } = useQuery({
-    queryKey: ["boat", application.sitId],
-    queryFn: () => getBoat(application.sitId),
+    ...queries.boat.detail(application.sitId),
   });
   const mutation = useMutation({
     mutationFn: () =>
@@ -215,7 +211,7 @@ export function LeaveReviewForm({
       }),
     onSuccess: async () => {
       setError("");
-      await queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      await queryClient.invalidateQueries({ queryKey: queries.reviews.getQueryKey() });
       onSubmitted?.();
     },
     onError: (err) => {
@@ -308,8 +304,7 @@ export function SitterReviewsSection({
 }) {
   const { t, i18n } = useTranslation();
   const { data: reviews = [], isLoading } = useQuery({
-    queryKey: ["reviews", "sitter", sitterName],
-    queryFn: () => getReviewsForSitter(sitterName),
+    ...queries.reviews.sitter(sitterName),
     enabled: Boolean(sitterName),
   });
   const summary = summarizeSitterRating(reviews);
@@ -375,8 +370,7 @@ export function SitterReviewsSection({
 export function SitterRatingBadge({ sitterName }: { sitterName: string }) {
   const { t } = useTranslation();
   const { data: reviews = [] } = useQuery({
-    queryKey: ["reviews", "sitter", sitterName],
-    queryFn: () => getReviewsForSitter(sitterName),
+    ...queries.reviews.sitter(sitterName),
     enabled: Boolean(sitterName),
   });
   const summary = summarizeSitterRating(reviews);

@@ -11,6 +11,9 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.7.0
         version: 0.7.6(hono@4.12.31)(zod@4.4.3)
+      '@ocodio/query-key-manager':
+        specifier: ^0.1.2
+        version: 0.1.2(@tanstack/react-query@5.101.3(react@19.2.7))
       '@radix-ui/react-popover':
         specifier: ^1.1.20
         version: 1.1.20(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1035,6 +1038,12 @@ packages:
   '@noble/hashes@2.2.0':
     resolution: {integrity: sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg==}
     engines: {node: '>= 20.19.0'}
+
+  '@ocodio/query-key-manager@0.1.2':
+    resolution: {integrity: sha512-0BaiXlsFe5WcP8suVkliwhpZleRCVkSiaJfKM2KCqVj32v9L0S+vPhbBe+TD/aXBEl/OHiSavH3oppSoU0U6rQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@tanstack/react-query': ^5.0.0
 
   '@opentelemetry/semantic-conventions@1.43.0':
     resolution: {integrity: sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==}
@@ -3429,6 +3438,10 @@ snapshots:
   '@noble/ciphers@2.2.0': {}
 
   '@noble/hashes@2.2.0': {}
+
+  '@ocodio/query-key-manager@0.1.2(@tanstack/react-query@5.101.3(react@19.2.7))':
+    dependencies:
+      '@tanstack/react-query': 5.101.3(react@19.2.7)
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
 

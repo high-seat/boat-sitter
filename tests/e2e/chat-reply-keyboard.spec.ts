@@ -11,10 +11,13 @@ test.describe("chat reply keyboard", () => {
       .first()
       .click();
 
-    await expect(page.getByText(/Enter to send/i)).toBeVisible();
-    await expect(page.getByText(/for a new line/i)).toBeVisible();
+    const composer = page.getByTestId("conversation-composer");
+    await expect(composer.getByText(/Enter to send/i)).toBeVisible();
+    await expect(composer.getByText(/for a new line/i)).toBeVisible();
+    await expect(page.getByTestId("conversation-composer-avatar")).toBeVisible();
+    await expect(page.getByTestId("conversation-send-reply")).toBeVisible();
 
-    const reply = page.getByPlaceholder(/Write a reply/i);
+    const reply = page.getByTestId("conversation-reply-input");
     await reply.click();
     await reply.pressSequentially("Line one");
     await reply.press("Control+Enter");

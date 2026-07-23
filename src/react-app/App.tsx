@@ -32,6 +32,7 @@ import {
   Menu,
   MessageCircle,
   Pencil,
+  Play,
   Plus,
   Quote,
   Search,
@@ -82,9 +83,11 @@ import { MessagesPageSkeleton } from "@/components/ui/MessagesPageSkeleton";
 import { ApplicationReviewSkeleton } from "@/components/ui/ApplicationReviewSkeleton";
 import { MemberProfileSkeleton } from "@/components/ui/MemberProfileSkeleton";
 import { FeatureIcon } from "@/components/ui/FeatureIcon";
+import { FormLabel } from "@/components/ui/FormLabel";
 import { IconTooltip } from "@/components/ui/IconTooltip";
 import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
 import { Select } from "@/components/ui/Select";
+import { SegmentedTab, SegmentedTabs, segmentedTabClassName } from "@/components/ui/SegmentedTabs";
 import { ShimmerBlock } from "@/components/ui/Shimmer";
 import { VesselPicker } from "@/components/ui/VesselPicker";
 import { DestinationAutocomplete } from "@/components/search/DestinationAutocomplete";
@@ -121,6 +124,7 @@ import {
 } from "@/dateUtils";
 import { deleteMockAccount } from "@/mockAuth";
 import { LanguageSelect } from "@/components/layout/LanguageSelect";
+import { MessagesNavLink } from "@/components/layout/MessagesNavLink";
 import { NotificationsMenu } from "@/components/layout/NotificationsMenu";
 import {
   containsOffPlatformContactDetails,
@@ -128,22 +132,13 @@ import {
   deleteVessel,
   coordinatesForLocation,
   findConfirmedSitDateConflict,
-  getBoat,
-  getBoats,
-  getBoatsPage,
-  getSavedListings,
-  getApplicationsForSit,
-  getApplicationsForUser,
-  getPublicMemberProfile,
-  getReviewsForSitter,
-  getSits,
-  getSitPrivateAccessForViewer,
-  getVessels,
+  markNotificationRead,
   saveSit,
   saveVessel,
   sendApplication,
   sendApplicationMessage,
   shareApplicationPhoneNumber,
+  startSitEarly,
   requestApplicationVideoCall,
   acceptApplicationVideoCall,
   declineApplicationVideoCall,
@@ -162,6 +157,7 @@ import {
   type StoveFuelType,
   type ApplicationStatus,
   type BoatPhoto,
+  type MockNotification,
   type Sit,
   type SitApplication,
   type SitType,
@@ -185,6 +181,7 @@ import {
 } from "../shared/yearBuilt";
 import { coverPhotoClassName, coverPhotoStyle, optimizePhotoUrl } from "@/photoUtils";
 import { useFeatureFlag } from "@/featureFlags";
+import { getSitAlsoLookingCount } from "@/sitAlsoLooking";
 import { setOwnerDashboardTab } from "@/ownerDashboardDev";
 import { APPLICATIONS_PAGE_SIZE } from "../shared/applicationsSearch";
 import { VESSEL_TYPES, vesselTypeFromParam, vesselTypeToSlug } from "../shared/vesselTypes";
@@ -200,12 +197,9 @@ import {
   useAppStore,
   type EmailNotificationPrefs,
 } from "@/store";
-import {
-  getVerificationStatus,
-  getMemberVerificationChecks,
-  isFullyVerified,
-  startVerification,
-} from "@/verificationService";
+import { unreadNewMessageNotificationsForApplication } from "@/unreadMessages";
+import { isFullyVerified, startVerification } from "@/verificationService";
+import { queries } from "@/queries";
 import {
   IdentityVerificationBadge,
   IdentityVerificationCard,
@@ -393,8 +387,10 @@ const DISPLAY_LABEL_KEYS: Record<string, string> = {
   "On-site bathrooms & showers": "feature.facilityBathrooms",
   "24/7 security": "feature.security",
   "Gated access": "feature.gatedAccess",
+  Laundry: "feature.laundry",
   "On-site laundry": "feature.laundry",
   "Swimming pool": "feature.pool",
+  Restaurant: "feature.restaurant",
   "On-site restaurant": "feature.restaurant",
   Parking: "feature.parking",
   "Fuel dock": "feature.fuelDock",
@@ -436,6 +432,7 @@ const DISPLAY_LABEL_KEYS: Record<string, string> = {
   Kayak: "feature.kayak",
   Bicycles: "feature.bicycles",
   "Swim platform": "feature.swimPlatform",
+  "Snorkel gear": "feature.snorkelGear",
   "Bluewater / offshore": "experience.bluewater",
   Liveaboard: "experience.liveaboard",
   "Tropical weather": "experience.tropicalWeather",
@@ -454,11 +451,6 @@ const DISPLAY_LABEL_KEYS: Record<string, string> = {
   "Pet care": "skill.petCare",
   "Tender handling": "skill.tenderHandling",
 };
-
-function displayLabel(t: ReturnType<typeof useTranslation>["t"], value: string) {
-  const key = DISPLAY_LABEL_KEYS[value];
-  return key ? t(key) : value;
-}
 
 function formatSitDates(language: string, dateStart: string, duration: string) {
   const [year, month, day] = dateStart.split("-").map(Number);
@@ -561,12 +553,14 @@ function Header() {
                   {t("nav.manage")}
                 </Link>
                 <Link
-                  className="flex items-center gap-2 rounded-full bg-white py-1.5 pr-3 pl-1.5 text-sm font-semibold text-navy shadow-sm"
+                  className="flex min-w-0 max-w-[11.5rem] items-center gap-2 rounded-full bg-white py-1.5 pr-3 pl-1.5 text-sm font-semibold text-navy shadow-sm"
+                  data-testid="nav-profile"
+                  title={user.name}
                   to="/members/me"
                 >
                   <img
                     alt=""
-                    className="size-8 rounded-full object-cover"
+                    className="size-8 shrink-0 rounded-full object-cover"
                     onError={(event) => {
                       const img = event.currentTarget;
                       const fallback = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`;
@@ -575,18 +569,12 @@ function Header() {
                     referrerPolicy="no-referrer"
                     src={user.image}
                   />
-                  {user.name}
+                  <span className="min-w-0 truncate" data-testid="nav-profile-name">
+                    {user.name}
+                  </span>
                 </Link>
                 <NotificationsMenu />
-                <IconTooltip label={t("nav.messages")}>
-                  <Link
-                    aria-label={t("nav.messages")}
-                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
-                    to="/messages"
-                  >
-                    <MessageCircle size={19} />
-                  </Link>
-                </IconTooltip>
+                <MessagesNavLink />
                 <IconTooltip label="Availability">
                   <Link
                     aria-label="Availability"
@@ -650,15 +638,7 @@ function Header() {
             {user && (
               <>
                 <NotificationsMenu />
-                <IconTooltip label={t("nav.messages")}>
-                  <Link
-                    aria-label={t("nav.messages")}
-                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
-                    to="/messages"
-                  >
-                    <MessageCircle size={19} />
-                  </Link>
-                </IconTooltip>
+                <MessagesNavLink />
                 <IconTooltip label="Availability">
                   <Link
                     aria-label="Availability"
@@ -806,7 +786,6 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
   const navigate = useNavigate();
   const [where, setWhere] = useState("");
   const [type, setType] = useState("");
-  const [sitType, setSitType] = useState<"" | SitType>("");
   const [dates, setDates] = useState({ startDate: "", endDate: "" });
 
   function submit(event: React.FormEvent) {
@@ -817,7 +796,6 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
       const slug = vesselTypeToSlug(type);
       if (slug) params.set("type", slug);
     }
-    if (sitType) params.set("sitType", sitType);
     if (dates.startDate) params.set("from", dates.startDate);
     if (dates.endDate) params.set("to", dates.endDate);
     navigate(`/boats?${params.toString()}`);
@@ -825,10 +803,16 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
 
   return (
     <form
-      className={`grid rounded-2xl border border-line bg-white shadow-float md:grid-cols-[1.1fr_0.85fr_0.8fr_0.8fr_auto] ${compact ? "" : "mx-auto max-w-5xl"}`}
+      className={`grid rounded-2xl border border-line bg-white shadow-float md:grid-cols-[1.1fr_0.85fr_0.8fr_auto] ${compact ? "" : "mx-auto max-w-5xl"}`}
       onSubmit={submit}
     >
-      <DestinationAutocomplete multiple onChange={setWhere} value={where} variant="home" />
+      <DestinationAutocomplete
+        multiple
+        onChange={setWhere}
+        testId="home-destination"
+        value={where}
+        variant="home"
+      />
       <DateRangePicker endDate={dates.endDate} onChange={setDates} startDate={dates.startDate} />
       <label className="flex items-center gap-3 border-b border-line px-5 py-4 md:border-r md:border-b-0">
         <ShipWheel className="shrink-0 text-coral" size={20} />
@@ -843,23 +827,6 @@ function SearchPanel({ compact = false }: { compact?: boolean }) {
                 {displayLabel(t, vesselType)}
               </option>
             ))}
-          </Select>
-        </span>
-      </label>
-      <label className="flex items-center gap-3 border-b border-line px-5 py-4 md:border-r md:border-b-0">
-        <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-bold uppercase tracking-[0.13em] text-slate">
-            {t("search.sitType")}
-          </span>
-          <Select
-            aria-label={t("search.sitType")}
-            onChange={(event) => setSitType(event.target.value as "" | SitType)}
-            value={sitType}
-            variant="inline"
-          >
-            <option value="">{t("search.anySitType")}</option>
-            <option value="liveaboard">{t("sitType.liveaboard")}</option>
-            <option value="daytimeChecks">{t("sitType.daytimeChecks")}</option>
           </Select>
         </span>
       </label>
@@ -1033,7 +1000,7 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
 }
 
 function FeaturedBoats() {
-  const { data: boats = [], isLoading } = useQuery({ queryKey: ["boats"], queryFn: getBoats });
+  const { data: boats = [], isLoading } = useQuery(queries.boats.all);
   if (isLoading) {
     return (
       <div className="grid gap-x-6 gap-y-10 md:grid-cols-3">
@@ -1382,8 +1349,7 @@ function BoatsPage() {
   const mapFitKey = useMemo(() => JSON.stringify(filterParams), [filterParams]);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["boats", "search", listSearchParams],
-    queryFn: () => getBoatsPage(listSearchParams),
+    ...queries.boats.search(listSearchParams),
     placeholderData: keepPreviousData,
   });
 
@@ -1403,10 +1369,7 @@ function BoatsPage() {
       try {
         while (!cancelled && pageIdx < totalPages) {
           const pageParams = { ...filterParams, page: pageIdx, limit: BOATS_PER_PAGE };
-          const result = await queryClient.fetchQuery({
-            queryKey: ["boats", "search", pageParams],
-            queryFn: () => getBoatsPage(pageParams),
-          });
+          const result = await queryClient.fetchQuery(queries.boats.search(pageParams));
           if (cancelled) return;
           total = result.total;
           totalPages = Math.max(1, result.totalPages);
@@ -1583,7 +1546,12 @@ function BoatsPage() {
           <p className="mt-3 text-slate">{t("boats.subtitle")}</p>
         </div>
         <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm md:flex-row md:flex-wrap">
-          <DestinationAutocomplete multiple onChange={updateLocationQuery} value={query} />
+          <DestinationAutocomplete
+            multiple
+            onChange={updateLocationQuery}
+            testId="boats-destination"
+            value={query}
+          />
           <DateRangePicker
             endDate={dates.endDate}
             onChange={(next) => {
@@ -1862,28 +1830,28 @@ const BOAT_FEATURE_GROUPS = [
   {
     title: "Life aboard",
     options: [
-      "Bathroom",
-      "Full kitchen",
-      "Outdoor BBQ",
-      "Air conditioning",
-      "Heating",
       "Wi-Fi",
-      "Dedicated workspace",
-      "TV",
-      "Refrigerator",
-      "Freezer",
-      "Oven",
-      "Microwave",
-      "Coffee maker",
-      "Dishwasher",
+      "Bathroom",
       "Hot water",
+      "Full kitchen",
+      "Refrigerator",
+      "Bedding & linens",
+      "Heating",
+      "Air conditioning",
       "Deck shower",
       "Washing machine",
-      "Dryer",
       "Fans",
       "Mosquito screens",
+      "Coffee maker",
+      "Microwave",
+      "Oven",
+      "Freezer",
+      "Dryer",
+      "Dishwasher",
+      "TV",
       "Sound system",
-      "Bedding & linens",
+      "Dedicated workspace",
+      "Outdoor BBQ",
     ],
   },
   {
@@ -1894,60 +1862,77 @@ const BOAT_FEATURE_GROUPS = [
       "Pump-out station",
       "Dock Wi-Fi",
       "Fuel dock",
-      "LPG / gas refill",
       "Waste & recycling",
-      "Ice",
+      "LPG / gas refill",
       "Marina staff",
+      "Ice",
       "Mail & package reception",
     ],
   },
   {
     title: "Marina facilities",
     options: [
-      "On-site bathrooms & showers",
-      "Showers",
-      "Accessible bathrooms",
-      "On-site laundry",
       "Parking",
-      "EV charging",
+      "Showers",
+      "Laundry",
       "Grocery & provisions",
-      "Chandlery",
       "Cafe / bar",
-      "On-site restaurant",
+      "Restaurant",
+      "Chandlery",
+      "Accessible bathrooms",
+      "EV charging",
       "Clubhouse / lounge",
+      "Beach access",
+      "Picnic / BBQ area",
       "Gym",
       "Swimming pool",
       "Sauna",
-      "Picnic / BBQ area",
-      "Beach access",
-      "Children's play area",
       "Dog exercise area",
+      "Children's play area",
     ],
   },
   {
     title: "Security & access",
-    options: ["24/7 security", "CCTV", "Gated access", "Locked pontoons", "Night lighting"],
+    options: ["Gated access", "24/7 security", "CCTV", "Locked pontoons", "Night lighting"],
   },
   {
     title: "Boatyard & transport",
     options: [
-      "Boatyard / shipyard",
-      "Marine engineer",
-      "Travel lift",
-      "Crane",
-      "Slipway / boat ramp",
-      "Dry storage",
       "Public transport nearby",
       "Airport transfer / taxi access",
+      "Boatyard / shipyard",
+      "Marine engineer",
+      "Slipway / boat ramp",
+      "Dry storage",
+      "Travel lift",
+      "Crane",
     ],
   },
   {
     title: "Water & recreation",
-    options: ["Tender", "Paddleboard", "Kayak", "Bicycles", "Swim platform"],
+    options: ["Tender", "Swim platform", "Snorkel gear", "Kayak", "Paddleboard", "Bicycles"],
   },
 ];
 
+/** Two rows of three on md+: five chips + a trailing “more” badge. */
+const BOAT_FEATURES_COLLAPSED_VISIBLE = 5;
+
 const ALL_BOAT_FEATURES = BOAT_FEATURE_GROUPS.flatMap((group) => group.options);
+
+/** Legacy amenity ids still stored on older vessels. */
+const BOAT_FEATURE_ALIASES: Record<string, string> = {
+  "On-site laundry": "Laundry",
+  "On-site restaurant": "Restaurant",
+};
+
+function normalizeBoatFeature(value: string) {
+  return BOAT_FEATURE_ALIASES[value] ?? value;
+}
+
+function displayLabel(t: ReturnType<typeof useTranslation>["t"], value: string) {
+  const key = DISPLAY_LABEL_KEYS[normalizeBoatFeature(value)] ?? DISPLAY_LABEL_KEYS[value];
+  return key ? t(key) : value;
+}
 const FEATURE_GROUP_KEYS: Record<string, string> = {
   "Life aboard": "featureGroup.aboard",
   "Utilities & services": "featureGroup.utilities",
@@ -2019,13 +2004,7 @@ function ApplyModal({
   );
   const hasBlockedContactDetails = containsOffPlatformContactDetails(message);
   const { data: verificationChecks, isLoading: verificationLoading } = useQuery({
-    queryKey: ["verification-checks", user.name, user.email, user.phoneNumber],
-    queryFn: () =>
-      getMemberVerificationChecks(user.name, {
-        isSelf: true,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-      }),
+    ...queries.verificationChecks.profile(user.name, user.email, user.phoneNumber),
     enabled: requireVerificationToSit,
   });
   let canApply = true;
@@ -2037,14 +2016,17 @@ function ApplyModal({
     mutationFn: () => startVerification(user.name),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["verification-checks", user.name],
+        queryKey: [...queries.verificationChecks.getQueryKey(), user.name],
       });
-      await queryClient.invalidateQueries({ queryKey: ["verification", user.name] });
+      await queryClient.invalidateQueries({
+        queryKey: queries.verification.status(user.name).queryKey,
+      });
     },
   });
+  const isDaytimeSit = (boat.sitType ?? "liveaboard") === "daytimeChecks";
   const mutation = useMutation({
     mutationFn: () =>
-      sendApplication(boat.id, message, partySize, {
+      sendApplication(boat.id, message, isDaytimeSit ? 1 : partySize, {
         name: user.name,
         image: user.image,
         location: user.location,
@@ -2057,7 +2039,7 @@ function ApplyModal({
         phoneNumber: user.phoneNumber,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const verificationBlocked =
@@ -2170,8 +2152,29 @@ function ApplyModal({
         </div>
       );
     }
+    const sitType = boat.sitType ?? "liveaboard";
+    const sitTypeMeaningKey =
+      sitType === "daytimeChecks"
+        ? "apply.sitTypeMeaningDaytimeChecks"
+        : "apply.sitTypeMeaningLiveaboard";
+
     return (
       <>
+        <div
+          className="mt-5 rounded-xl border border-line bg-cream p-4"
+          data-sit-type={sitType}
+          data-testid="apply-sit-type-reminder"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <SitTypeBadge sitType={sitType} size="md" />
+            <p className="text-sm font-semibold text-navy" data-testid="apply-sit-type-title">
+              {t("apply.sitTypeReminderTitle", { type: t(`sitType.${sitType}`) })}
+            </p>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-slate" data-testid="apply-sit-type-meaning">
+            {t(sitTypeMeaningKey)}
+          </p>
+        </div>
         <p className="mt-4 text-sm leading-6 text-slate">
           {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
         </p>
@@ -2181,23 +2184,25 @@ function ApplyModal({
             <p>{t("apply.noSharedLanguage", { owner: boat.owner })}</p>
           </div>
         )}
-        <label className="mt-5 block">
-          <span className="form-label">{t("apply.partySize")}</span>
-          <Select
-            variant="form"
-            onChange={(event) => setPartySize(Number(event.target.value))}
-            value={partySize}
-          >
-            {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
-              <option key={count} value={count}>
-                {count}
-              </option>
-            ))}
-          </Select>
-          <span className="mt-1.5 block text-xs leading-5 text-slate">
-            {t("apply.partySizeHint", { count: maxGuests })}
-          </span>
-        </label>
+        {!isDaytimeSit ? (
+          <label className="mt-5 block" data-testid="apply-party-size">
+            <span className="form-label">{t("apply.partySize")}</span>
+            <Select
+              variant="form"
+              onChange={(event) => setPartySize(Number(event.target.value))}
+              value={partySize}
+            >
+              {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
+                <option key={count} value={count}>
+                  {count}
+                </option>
+              ))}
+            </Select>
+            <span className="mt-1.5 block text-xs leading-5 text-slate">
+              {t("apply.partySizeHint", { count: maxGuests })}
+            </span>
+          </label>
+        ) : null}
         <textarea
           aria-invalid={hasBlockedContactDetails}
           className={`mt-5 min-h-40 w-full resize-none rounded-xl border bg-cream p-4 text-sm leading-6 outline-none ${
@@ -2317,6 +2322,7 @@ function DetailPage() {
   const user = useAppStore((state) => state.user);
   const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
   const identityVerificationEnabled = useFeatureFlag("identityVerification");
+  const sitAlsoLookingEnabled = useFeatureFlag("sitAlsoLooking");
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
@@ -2324,17 +2330,14 @@ function DetailPage() {
   const saved = useAppStore((state) => state.saved);
   const toggleSaved = useAppStore((state) => state.toggleSaved);
   const { data: boat, isLoading } = useQuery({
-    queryKey: ["boat", id],
-    queryFn: () => getBoat(id),
+    ...queries.boat.detail(id),
   });
   const { data: userApplications = [] } = useQuery({
-    queryKey: ["applications", "user", user?.name],
-    queryFn: () => getApplicationsForUser(user!.name),
+    ...queries.applications.user(user?.name),
     enabled: Boolean(user),
   });
   const { data: sits = [] } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
+    ...queries.sits.all,
     enabled: Boolean(user),
   });
   const existingApplication = userApplications.find((application) => application.sitId === id);
@@ -2349,19 +2352,12 @@ function DetailPage() {
   const canSeePrivateAccess =
     Boolean(user) && (user?.name === boat?.owner || activeApplication?.status === "accepted");
   const { data: privateAccess } = useQuery({
-    queryKey: ["sit-private-access", id, user?.name],
-    queryFn: () => getSitPrivateAccessForViewer(id, user!.name),
+    ...queries.sitPrivateAccess.forViewer(id, user?.name),
     enabled: Boolean(boat && user && canSeePrivateAccess),
   });
   const { data: applicantVerification } = useQuery({
-    queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "apply-gate"],
+    ...queries.verificationChecks.applyGate(user?.name, user?.email, user?.phoneNumber),
     enabled: Boolean(requireVerificationToSit && user && boat && user.name !== boat.owner),
-    queryFn: () =>
-      getMemberVerificationChecks(user!.name, {
-        isSelf: true,
-        email: user!.email,
-        phoneNumber: user!.phoneNumber,
-      }),
   });
   const applicantNeedsVerification =
     requireVerificationToSit &&
@@ -2369,8 +2365,7 @@ function DetailPage() {
     applicantVerification !== undefined &&
     !isFullyVerified(applicantVerification);
   const { data: ownerVerification } = useQuery({
-    queryKey: ["verification-checks", boat?.owner],
-    queryFn: () => getMemberVerificationChecks(boat!.owner),
+    ...queries.verificationChecks.owner(boat?.owner),
     enabled: Boolean(boat?.owner),
   });
   const ownerContentTexts = useMemo(() => {
@@ -2758,10 +2753,12 @@ function DetailPage() {
                 <p className="flex items-center gap-3">
                   <ShieldCheck className="text-coral" size={18} /> {t("detail.contactsVerified")}
                 </p>
-                <p className="flex items-center gap-3">
-                  <Users className="text-coral" size={18} />{" "}
-                  {t("detail.maxGuests", { count: boat.maxGuests ?? 2 })}
-                </p>
+                {(boat.sitType ?? "liveaboard") !== "daytimeChecks" ? (
+                  <p className="flex items-center gap-3" data-testid="detail-max-guests">
+                    <Users className="text-coral" size={18} />{" "}
+                    {t("detail.maxGuests", { count: boat.maxGuests ?? 2 })}
+                  </p>
+                ) : null}
               </div>
               <button
                 className="mt-6 w-full rounded-xl bg-coral py-3.5 font-bold text-white transition hover:bg-coral-dark disabled:opacity-60"
@@ -2821,6 +2818,14 @@ function DetailPage() {
                     {t("apply.verificationRequiredText")}
                   </p>
                 )}
+              {sitAlsoLookingEnabled && isAcceptingApplications(boat) && (
+                <p
+                  className="mt-3 text-center text-xs font-medium text-teal"
+                  data-testid="sit-also-looking"
+                >
+                  {t("detail.alsoLooking", { count: getSitAlsoLookingCount(boat.id) })}
+                </p>
+              )}
               <p className="mt-3 text-center text-xs text-slate">
                 {t("detail.applicants", { count: boat.applicants })}
               </p>
@@ -2872,8 +2877,7 @@ function SavedPage() {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["saved-listings", availability, saved],
-    queryFn: () => getSavedListings({ availability, savedIds: saved }),
+    ...queries.savedListings.list(availability, saved),
     enabled: Boolean(user),
   });
   const totalPages = Math.max(1, Math.ceil(visibleBoats.length / BOATS_PER_PAGE));
@@ -3352,8 +3356,8 @@ function ProfileEditor({ close }: { close: () => void }) {
         image: form.image,
         languages: form.languages,
       });
-      await queryClient.invalidateQueries({ queryKey: ["vessels"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: queries.vessels.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
     }
     updateProfile({
       ...form,
@@ -3597,8 +3601,7 @@ function MemberPage() {
     isLoading: boatLoading,
     isFetched: boatFetched,
   } = useQuery({
-    queryKey: ["boat", id],
-    queryFn: async () => (await getBoat(id)) ?? null,
+    ...queries.boat.detail(id),
     enabled: Boolean(currentUser) && !isMe,
     retry: false,
   });
@@ -3609,40 +3612,29 @@ function MemberPage() {
   else if (isBoatOwnerProfile) profileName = boat!.owner;
   else profileName = memberKey;
   const { data: namedMember, isLoading: namedLoading } = useQuery({
-    queryKey: ["member-profile", memberKey],
-    queryFn: () => getPublicMemberProfile(memberKey),
+    ...queries.memberProfile.detail(memberKey),
     enabled: Boolean(currentUser) && isSitterNameProfile,
   });
   const { data: sitterReviews = [] } = useQuery({
-    queryKey: ["reviews", "sitter", profileName],
-    queryFn: () => getReviewsForSitter(profileName),
+    ...queries.reviews.sitter(profileName),
     enabled: Boolean(currentUser) && Boolean(profileName) && (isMe || isSitterNameProfile),
   });
   const { data: applications = [] } = useQuery({
-    queryKey: ["applications", "user", currentUser?.name],
-    queryFn: () => getApplicationsForUser(currentUser!.name),
+    ...queries.applications.user(currentUser?.name),
     enabled: Boolean(currentUser),
   });
   const { data: verification } = useQuery({
-    queryKey: ["verification", currentUser?.name],
-    queryFn: () => getVerificationStatus(currentUser!.name),
+    ...queries.verification.status(currentUser?.name),
     enabled: isMe && Boolean(currentUser),
   });
   const { data: verificationChecks } = useQuery({
-    queryKey: [
-      "verification-checks",
+    ...queries.verificationChecks.member(
       profileName,
       isMe,
-      isMe ? currentUser?.email : "",
-      isMe ? currentUser?.phoneNumber : "",
+      isMe ? (currentUser?.email ?? "") : "",
+      isMe ? (currentUser?.phoneNumber ?? "") : "",
       verification?.status,
-    ],
-    queryFn: () =>
-      getMemberVerificationChecks(profileName, {
-        isSelf: isMe,
-        email: currentUser?.email,
-        phoneNumber: currentUser?.phoneNumber,
-      }),
+    ),
     enabled:
       Boolean(currentUser) &&
       Boolean(profileName) &&
@@ -3651,8 +3643,8 @@ function MemberPage() {
   const verifyMutation = useMutation({
     mutationFn: () => startVerification(currentUser!.name),
     onSuccess: async (record) => {
-      queryClient.setQueryData(["verification", currentUser?.name], record);
-      await queryClient.invalidateQueries({ queryKey: ["verification-checks"] });
+      queryClient.setQueryData(queries.verification.status(currentUser?.name).queryKey, record);
+      await queryClient.invalidateQueries({ queryKey: queries.verificationChecks.getQueryKey() });
     },
   });
 
@@ -3663,8 +3655,7 @@ function MemberPage() {
       application.applicant.name === profileName,
   );
   const { data: pendingReviewSit } = useQuery({
-    queryKey: ["boat", pendingReviewApplication?.sitId],
-    queryFn: () => getBoat(pendingReviewApplication!.sitId),
+    ...queries.boat.detail(pendingReviewApplication?.sitId),
     enabled: Boolean(pendingReviewApplication),
   });
   const existingConversation =
@@ -3993,7 +3984,8 @@ function MemberPage() {
 }
 
 function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const navigate = useNavigate();
   const user = useAppStore((state) => state.user)!;
   const queryClient = useQueryClient();
   const preferredLengthUnit: LengthUnit = user.measurementSystem === "imperial" ? "ft" : "m";
@@ -4005,16 +3997,37 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   const [imageUploading, setImageUploading] = useState(false);
   const [galleryError, setGalleryError] = useState("");
   const [galleryUploading, setGalleryUploading] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [expandedFeatureGroups, setExpandedFeatureGroups] = useState<Record<string, boolean>>(
+    () => {
+      const initial: Record<string, boolean> = {};
+      const amenities = (boat?.amenities ?? []).map(normalizeBoatFeature);
+      for (const group of BOAT_FEATURE_GROUPS) {
+        if (
+          group.options.length > BOAT_FEATURES_COLLAPSED_VISIBLE &&
+          group.options
+            .slice(BOAT_FEATURES_COLLAPSED_VISIBLE)
+            .some((feature) => amenities.includes(feature))
+        ) {
+          initial[group.title] = true;
+        }
+      }
+      return initial;
+    },
+  );
   const [gallery, setGallery] = useState<BoatPhoto[]>(() =>
     (boat?.gallery ?? []).map((photo) => ({ ...photo })),
   );
   const [lengthValue, setLengthValue] = useState(initialLengthValue);
   const [lengthUnit, setLengthUnit] = useState<LengthUnit>(preferredLengthUnit);
+  const [lengthUnknown, setLengthUnknown] = useState(!initialLengthValue);
   const [yearUnknown, setYearUnknown] = useState(boat?.yearBuilt == null);
   const [yearBuiltInput, setYearBuiltInput] = useState(
     boat?.yearBuilt != null ? String(boat.yearBuilt) : "",
   );
   const [yearBuiltError, setYearBuiltError] = useState("");
+  const [createSitNow, setCreateSitNow] = useState(true);
+  const [discardOpen, setDiscardOpen] = useState(false);
   const [form, setForm] = useState({
     name: boat?.name ?? "",
     type: boat?.type ?? "Sailing yacht",
@@ -4026,14 +4039,93 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     description: boat?.description ?? "",
     home: boat?.home ?? "",
     systems: boat?.systems.join("\n") ?? "",
-    amenities: boat?.amenities.filter((item) => ALL_BOAT_FEATURES.includes(item)) ?? [],
+    amenities:
+      boat?.amenities
+        .map(normalizeBoatFeature)
+        .filter((item) => ALL_BOAT_FEATURES.includes(item)) ?? [],
     customAmenities:
-      boat?.amenities.filter((item) => !ALL_BOAT_FEATURES.includes(item)).join("\n") ?? "",
+      boat?.amenities
+        .map(normalizeBoatFeature)
+        .filter((item) => !ALL_BOAT_FEATURES.includes(item))
+        .join("\n") ?? "",
     wifiNetwork: boat?.privateAccess?.wifiNetwork ?? "",
     wifiPassword: boat?.privateAccess?.wifiPassword ?? "",
     accessCodes: boat?.privateAccess?.accessCodes ?? "",
     otherPrivateNotes: boat?.privateAccess?.otherNotes ?? "",
   });
+  const isCreatingVessel = !boat;
+  const vesselCreateBaseline = useRef(
+    isCreatingVessel
+      ? JSON.stringify({
+          form: {
+            name: "",
+            type: "Sailing yacht",
+            engineType: "Not specified",
+            voltageType: "Not specified",
+            stoveFuelType: "Not specified",
+            homePort: "",
+            image: "",
+            description: "",
+            home: "",
+            systems: "",
+            amenities: [] as string[],
+            customAmenities: "",
+            wifiNetwork: "",
+            wifiPassword: "",
+            accessCodes: "",
+            otherPrivateNotes: "",
+          },
+          gallery: [] as BoatPhoto[],
+          lengthValue: "",
+          lengthUnit: preferredLengthUnit,
+          lengthUnknown: true,
+          yearUnknown: true,
+          yearBuiltInput: "",
+          createSitNow: true,
+        })
+      : null,
+  );
+  const isVesselCreateDirty = useMemo(() => {
+    if (!vesselCreateBaseline.current) return false;
+    return (
+      JSON.stringify({
+        form,
+        gallery,
+        lengthValue,
+        lengthUnit,
+        lengthUnknown,
+        yearUnknown,
+        yearBuiltInput,
+        createSitNow,
+      }) !== vesselCreateBaseline.current
+    );
+  }, [
+    createSitNow,
+    form,
+    gallery,
+    lengthUnit,
+    lengthUnknown,
+    lengthValue,
+    yearBuiltInput,
+    yearUnknown,
+  ]);
+
+  function requestVesselClose() {
+    if (isVesselCreateDirty) {
+      setDiscardOpen(true);
+      return;
+    }
+    close();
+  }
+  const { data: sits = [] } = useQuery({
+    ...queries.sits.all,
+    enabled: Boolean(boat),
+  });
+  const underwaySitCount = useMemo(() => {
+    if (!boat) return 0;
+    return sits.filter((sit) => sit.boatId === boat.id && resolveSitPhase(sit) === "stayUnderway")
+      .length;
+  }, [boat, sits]);
 
   async function uploadImage(file?: File) {
     if (!file) return;
@@ -4107,9 +4199,12 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
         homePort: form.homePort,
         description: form.description,
         home: form.home,
-        length: lengthValue ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`) : "",
+        length:
+          lengthUnknown || !lengthValue
+            ? ""
+            : normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`),
         yearBuilt,
-        image: form.image || fallbackImage,
+        image: form.image,
         gallery: gallery.map((photo) => ({
           url: photo.url,
           ...(photo.caption?.trim() ? { caption: photo.caption.trim() } : {}),
@@ -4135,9 +4230,13 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
         },
       });
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
-      await queryClient.invalidateQueries({ queryKey: ["vessels"] });
+    onSuccess: async (vessel) => {
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.vessels.all.queryKey });
+      if (!boat && createSitNow) {
+        navigate(`/owner/sits/new?boatId=${encodeURIComponent(vessel.id)}`);
+        return;
+      }
       close();
     },
   });
@@ -4159,14 +4258,24 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     mutation.mutate();
   }
 
-  const fields: Array<{
-    key: keyof typeof form;
-    label: string;
-    placeholder: string;
-    wide?: boolean;
-  }> = [
-    { key: "name", label: t("vesselEditor.name"), placeholder: t("vesselEditor.namePlaceholder") },
-  ];
+  const publishBlockedReasons = useMemo(() => {
+    const reasons: string[] = [];
+    if (!form.name.trim()) reasons.push(t("vesselEditor.name"));
+    if (!form.homePort.trim()) reasons.push(t("vesselEditor.homePort"));
+    if (!form.image.trim()) reasons.push(t("vesselEditor.coverImage"));
+    return reasons;
+  }, [form.homePort, form.image, form.name, t]);
+
+  const publishDisabled = mutation.isPending || publishBlockedReasons.length > 0;
+  const publishBlockedTooltip =
+    publishBlockedReasons.length > 0
+      ? t("vesselEditor.publishBlocked", {
+          items: new Intl.ListFormat(getIntlLocale(i18n.language), {
+            style: "long",
+            type: "conjunction",
+          }).format(publishBlockedReasons),
+        })
+      : "";
 
   let vesselSaveButtonLabel = t("vesselEditor.publish");
   if (mutation.isPending) vesselSaveButtonLabel = t("common.saving");
@@ -4178,7 +4287,6 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
         <div className="order-2 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
           <div className="flex items-start justify-between">
             <div>
-              <p className="eyebrow">{t("owner.tools")}</p>
               <h1 className="font-display text-3xl font-bold text-navy">
                 {boat
                   ? t("vesselEditor.editTitle", { boat: boat.name })
@@ -4187,15 +4295,195 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             </div>
             <button
               className="flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
-              onClick={close}
+              data-testid="vessel-editor-back"
+              onClick={requestVesselClose}
               type="button"
             >
               <ArrowLeft size={16} /> {t("common.back")}
             </button>
           </div>
+          {!boat ? (
+            <p
+              className="mt-4 text-sm leading-5 text-slate"
+              data-testid="editor-required-fields-hint"
+            >
+              {t("editor.requiredFieldsHint")}
+            </p>
+          ) : null}
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {underwaySitCount > 0 ? (
+              <div
+                className="flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950 sm:col-span-2"
+                role="status"
+              >
+                <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                <div>
+                  <p className="font-bold">
+                    {t("vesselEditor.underwayBannerTitle", { count: underwaySitCount })}
+                  </p>
+                  <p className="mt-1">{t("vesselEditor.underwayBanner")}</p>
+                </div>
+              </div>
+            ) : null}
+            <label className="sm:col-span-2">
+              <FormLabel required>{t("vesselEditor.name")}</FormLabel>
+              <input
+                className="form-input"
+                onChange={(event) => setForm({ ...form, name: event.target.value })}
+                placeholder={t("vesselEditor.namePlaceholder")}
+                value={form.name}
+              />
+            </label>
+            <div className="sm:col-span-2">
+              <FormLabel required>{t("vesselEditor.homePort")}</FormLabel>
+              <DestinationAutocomplete
+                includeCountry
+                onChange={(homePort) => setForm({ ...form, homePort })}
+                placeholder={t("search.destination")}
+                requireSelection
+                testId="vessel-home-port"
+                value={form.homePort}
+                variant="profile"
+              />
+              <p className="mt-2 text-xs leading-5 text-slate" data-testid="vessel-home-port-hint">
+                {t("vesselEditor.homePortHint")}
+              </p>
+            </div>
+            <section className="sm:col-span-2" data-testid="vessel-cover">
+              <FormLabel required>{t("vesselEditor.coverImage")}</FormLabel>
+              <div className="grid gap-3 rounded-2xl border border-line bg-cream/50 p-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(13rem,0.7fr)]">
+                <div className="aspect-video overflow-hidden rounded-xl bg-seafoam">
+                  {form.image ? (
+                    <img
+                      alt={t("vesselEditor.coverPreviewAlt")}
+                      className="size-full object-cover"
+                      data-testid="vessel-cover-preview"
+                      src={form.image}
+                    />
+                  ) : (
+                    <div className="grid size-full place-items-center text-center text-slate">
+                      <div>
+                        <ImagePlus className="mx-auto mb-2 text-teal" size={28} />
+                        <p className="text-sm font-semibold">{t("vesselEditor.noCover")}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col justify-center gap-2">
+                  <div data-testid="vessel-cover-upload">
+                    <ImageUploadControl
+                      hasImage={Boolean(form.image)}
+                      onFile={(file) => void uploadImage(file)}
+                      pending={imageUploading}
+                    />
+                  </div>
+                  {form.image && (
+                    <button
+                      className="self-start text-xs font-bold text-coral"
+                      data-testid="vessel-cover-remove"
+                      onClick={() => {
+                        setForm({ ...form, image: "" });
+                        setImageError("");
+                        setGalleryOpen(false);
+                      }}
+                      type="button"
+                    >
+                      {t("upload.remove")}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {imageError && (
+                <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                  {imageError}
+                </p>
+              )}
+            </section>
+            {form.image ? (
+              <div className="sm:col-span-2">
+                <button
+                  aria-controls="vessel-editor-more-photos"
+                  aria-expanded={galleryOpen}
+                  className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+                  data-testid="vessel-add-more-photos"
+                  onClick={() => setGalleryOpen((open) => !open)}
+                  type="button"
+                >
+                  {gallery.length > 0
+                    ? t("vesselEditor.addMorePhotosCount", { count: gallery.length })
+                    : t("vesselEditor.addMorePhotos")}
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={`transition ${galleryOpen ? "rotate-180" : ""}`}
+                    size={16}
+                  />
+                </button>
+                {galleryOpen ? (
+                  <section className="mt-3" id="vessel-editor-more-photos">
+                    <p className="mb-3 text-sm text-slate">{t("vesselEditor.galleryHint")}</p>
+                    <div className="rounded-2xl border border-line bg-cream/50 p-3">
+                      {gallery.length === 0 ? (
+                        <p className="mb-3 text-sm font-semibold text-slate">
+                          {t("vesselEditor.galleryEmpty")}
+                        </p>
+                      ) : (
+                        <ul className="mb-3 grid gap-3 sm:grid-cols-2">
+                          {gallery.map((photo, index) => (
+                            <li
+                              className="overflow-hidden rounded-xl border border-line bg-white"
+                              key={`${photo.url}-${index}`}
+                            >
+                              <div className="aspect-video overflow-hidden bg-seafoam">
+                                <img
+                                  alt={t("vesselEditor.galleryPhotoAlt", { number: index + 1 })}
+                                  className="size-full object-cover"
+                                  src={photo.url}
+                                />
+                              </div>
+                              <div className="space-y-2 p-3">
+                                <label>
+                                  <FormLabel optional>{t("vesselEditor.galleryCaption")}</FormLabel>
+                                  <input
+                                    className="form-input"
+                                    maxLength={160}
+                                    onChange={(event) =>
+                                      updateGalleryCaption(index, event.target.value)
+                                    }
+                                    placeholder={t("vesselEditor.galleryCaptionPlaceholder")}
+                                    value={photo.caption ?? ""}
+                                  />
+                                </label>
+                                <button
+                                  className="inline-flex items-center gap-1.5 text-xs font-bold text-coral"
+                                  onClick={() => removeGalleryPhoto(index)}
+                                  type="button"
+                                >
+                                  <Trash2 size={14} />
+                                  {t("vesselEditor.removeGalleryPhoto")}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <ImageUploadControl
+                        hasImage={gallery.length > 0}
+                        multiple
+                        onFiles={(files) => void uploadGalleryImages(files)}
+                        pending={galleryUploading}
+                      />
+                    </div>
+                    {galleryError && (
+                      <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                        {galleryError}
+                      </p>
+                    )}
+                  </section>
+                ) : null}
+              </div>
+            ) : null}
             <label>
-              <span className="form-label">{t("vesselEditor.type")}</span>
+              <FormLabel optional>{t("vesselEditor.type")}</FormLabel>
               <Select
                 variant="form"
                 onChange={(event) => setForm({ ...form, type: event.target.value })}
@@ -4209,7 +4497,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               </Select>
             </label>
             <label>
-              <span className="form-label">{t("vesselEditor.engineType")}</span>
+              <FormLabel optional>{t("vesselEditor.engineType")}</FormLabel>
               <Select
                 variant="form"
                 onChange={(event) =>
@@ -4225,7 +4513,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               </Select>
             </label>
             <label>
-              <span className="form-label">{t("vesselEditor.voltageType")}</span>
+              <FormLabel optional>{t("vesselEditor.voltageType")}</FormLabel>
               <Select
                 variant="form"
                 onChange={(event) =>
@@ -4241,7 +4529,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               </Select>
             </label>
             <label>
-              <span className="form-label">{t("vesselEditor.stoveFuelType")}</span>
+              <FormLabel optional>{t("vesselEditor.stoveFuelType")}</FormLabel>
               <Select
                 variant="form"
                 onChange={(event) =>
@@ -4256,22 +4544,29 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 ))}
               </Select>
             </label>
-            <label>
-              <span className="form-label">{t("vesselEditor.length")}</span>
+            <div>
+              <FormLabel optional>{t("vesselEditor.length")}</FormLabel>
               <span className="grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
                 <input
                   className="form-input"
+                  data-testid="vessel-length-value"
+                  disabled={lengthUnknown}
                   inputMode="decimal"
                   min="0"
-                  onChange={(event) => setLengthValue(event.target.value)}
+                  onChange={(event) => {
+                    setLengthValue(event.target.value);
+                    if (event.target.value.trim()) setLengthUnknown(false);
+                  }}
                   placeholder={t("vesselEditor.lengthValuePlaceholder")}
                   step="0.1"
                   type="number"
-                  value={lengthValue}
+                  value={lengthUnknown ? "" : lengthValue}
                 />
                 <Select
                   variant="form"
                   aria-label={t("vesselEditor.lengthUnit")}
+                  data-testid="vessel-length-unit"
+                  disabled={lengthUnknown}
                   onChange={(event) => {
                     const nextUnit = event.target.value as LengthUnit;
                     setLengthValue((current) => convertBoatLength(current, lengthUnit, nextUnit));
@@ -4283,12 +4578,27 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   <option value="ft">{t("units.feet")}</option>
                 </Select>
               </span>
-            </label>
+              <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate">
+                <input
+                  checked={lengthUnknown}
+                  className="size-4 accent-teal"
+                  data-testid="vessel-length-unknown"
+                  onChange={(event) => {
+                    const unknown = event.target.checked;
+                    setLengthUnknown(unknown);
+                    if (unknown) setLengthValue("");
+                  }}
+                  type="checkbox"
+                />
+                {t("vesselEditor.lengthUnknown")}
+              </label>
+            </div>
             <div>
-              <span className="form-label">{t("vesselEditor.yearBuilt")}</span>
+              <FormLabel optional>{t("vesselEditor.yearBuilt")}</FormLabel>
               <input
                 aria-invalid={Boolean(yearBuiltError)}
                 className="form-input"
+                data-testid="vessel-year-built"
                 disabled={yearUnknown}
                 inputMode="numeric"
                 max={maxYearBuilt()}
@@ -4306,6 +4616,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 <input
                   checked={yearUnknown}
                   className="size-4 accent-teal"
+                  data-testid="vessel-year-unknown"
                   onChange={(event) => {
                     const unknown = event.target.checked;
                     setYearUnknown(unknown);
@@ -4320,141 +4631,8 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 <p className="mt-2 text-sm font-semibold text-coral" role="alert">
                   {yearBuiltError}
                 </p>
-              ) : (
-                <p className="mt-2 text-xs leading-5 text-slate">
-                  {t("vesselEditor.yearBuiltHint", {
-                    min: MIN_YEAR_BUILT,
-                    max: maxYearBuilt(),
-                  })}
-                </p>
-              )}
+              ) : null}
             </div>
-            {fields.map((field) => (
-              <label className={field.wide ? "sm:col-span-2" : ""} key={field.key}>
-                <span className="form-label">{field.label}</span>
-                <input
-                  className="form-input"
-                  onChange={(event) => setForm({ ...form, [field.key]: event.target.value })}
-                  placeholder={field.placeholder}
-                  value={form[field.key]}
-                />
-              </label>
-            ))}
-            <div className="sm:col-span-2">
-              <span className="form-label">{t("vesselEditor.homePort")}</span>
-              <DestinationAutocomplete
-                cityOnly
-                includeCountry
-                onChange={(homePort) => setForm({ ...form, homePort })}
-                value={form.homePort}
-                variant="profile"
-              />
-              <p className="mt-2 text-xs leading-5 text-slate">{t("vesselEditor.homePortHint")}</p>
-            </div>
-            <section className="sm:col-span-2">
-              <span className="form-label">{t("vesselEditor.coverImage")}</span>
-              <div className="grid gap-3 rounded-2xl border border-line bg-cream/50 p-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(13rem,0.7fr)]">
-                <div className="aspect-video overflow-hidden rounded-xl bg-seafoam">
-                  {form.image ? (
-                    <img
-                      alt={t("vesselEditor.coverPreviewAlt")}
-                      className="size-full object-cover"
-                      src={form.image}
-                    />
-                  ) : (
-                    <div className="grid size-full place-items-center text-center text-slate">
-                      <div>
-                        <ImagePlus className="mx-auto mb-2 text-teal" size={28} />
-                        <p className="text-sm font-semibold">{t("vesselEditor.noCover")}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col justify-center gap-2">
-                  <ImageUploadControl
-                    hasImage={Boolean(form.image)}
-                    onFile={(file) => void uploadImage(file)}
-                    pending={imageUploading}
-                  />
-                  {form.image && (
-                    <button
-                      className="self-start text-xs font-bold text-coral"
-                      onClick={() => {
-                        setForm({ ...form, image: "" });
-                        setImageError("");
-                      }}
-                      type="button"
-                    >
-                      {t("upload.remove")}
-                    </button>
-                  )}
-                </div>
-              </div>
-              {imageError && (
-                <p className="mt-2 text-sm font-semibold text-coral" role="alert">
-                  {imageError}
-                </p>
-              )}
-            </section>
-            <section className="sm:col-span-2">
-              <span className="form-label">{t("vesselEditor.gallery")}</span>
-              <p className="mb-3 text-sm text-slate">{t("vesselEditor.galleryHint")}</p>
-              <div className="rounded-2xl border border-line bg-cream/50 p-3">
-                {gallery.length === 0 ? (
-                  <p className="mb-3 text-sm font-semibold text-slate">
-                    {t("vesselEditor.galleryEmpty")}
-                  </p>
-                ) : (
-                  <ul className="mb-3 grid gap-3 sm:grid-cols-2">
-                    {gallery.map((photo, index) => (
-                      <li
-                        className="overflow-hidden rounded-xl border border-line bg-white"
-                        key={`${photo.url}-${index}`}
-                      >
-                        <div className="aspect-video overflow-hidden bg-seafoam">
-                          <img
-                            alt={t("vesselEditor.galleryPhotoAlt", { number: index + 1 })}
-                            className="size-full object-cover"
-                            src={photo.url}
-                          />
-                        </div>
-                        <div className="space-y-2 p-3">
-                          <label>
-                            <span className="form-label">{t("vesselEditor.galleryCaption")}</span>
-                            <input
-                              className="form-input"
-                              maxLength={160}
-                              onChange={(event) => updateGalleryCaption(index, event.target.value)}
-                              placeholder={t("vesselEditor.galleryCaptionPlaceholder")}
-                              value={photo.caption ?? ""}
-                            />
-                          </label>
-                          <button
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-coral"
-                            onClick={() => removeGalleryPhoto(index)}
-                            type="button"
-                          >
-                            <Trash2 size={14} />
-                            {t("vesselEditor.removeGalleryPhoto")}
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <ImageUploadControl
-                  hasImage={gallery.length > 0}
-                  multiple
-                  onFiles={(files) => void uploadGalleryImages(files)}
-                  pending={galleryUploading}
-                />
-              </div>
-              {galleryError && (
-                <p className="mt-2 text-sm font-semibold text-coral" role="alert">
-                  {galleryError}
-                </p>
-              )}
-            </section>
             {[
               ["description", t("vesselEditor.about"), t("vesselEditor.aboutPlaceholder")],
               ["home", t("vesselEditor.lifeAboard"), t("vesselEditor.lifePlaceholder")],
@@ -4462,7 +4640,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               ["customAmenities", t("vesselEditor.otherFeatures"), t("vesselEditor.onePerLine")],
             ].map(([key, label, placeholder]) => (
               <label className="sm:col-span-2" key={key}>
-                <span className="form-label">{label}</span>
+                <FormLabel optional>{label}</FormLabel>
                 <textarea
                   className="form-input min-h-24 resize-y"
                   onChange={(event) => setForm({ ...form, [key]: event.target.value })}
@@ -4478,7 +4656,10 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 </span>
                 <div className="min-w-0">
                   <h2 className="font-display text-lg font-bold text-navy">
-                    {t("vesselEditor.privateAccessTitle")}
+                    {t("vesselEditor.privateAccessTitle")}{" "}
+                    <span className="text-sm font-semibold text-slate">
+                      ({t("common.optional")})
+                    </span>
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-slate">
                     {t("vesselEditor.privateAccessHint")}
@@ -4487,7 +4668,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label>
-                  <span className="form-label">{t("vesselEditor.wifiNetwork")}</span>
+                  <FormLabel>{t("vesselEditor.wifiNetwork")}</FormLabel>
                   <input
                     autoComplete="off"
                     className="form-input"
@@ -4497,7 +4678,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   />
                 </label>
                 <label>
-                  <span className="form-label">{t("vesselEditor.wifiPassword")}</span>
+                  <FormLabel>{t("vesselEditor.wifiPassword")}</FormLabel>
                   <input
                     autoComplete="off"
                     className="form-input"
@@ -4507,7 +4688,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   />
                 </label>
                 <label className="sm:col-span-2">
-                  <span className="form-label">{t("vesselEditor.accessCodes")}</span>
+                  <FormLabel>{t("vesselEditor.accessCodes")}</FormLabel>
                   <textarea
                     className="form-input min-h-24 resize-y"
                     onChange={(event) => setForm({ ...form, accessCodes: event.target.value })}
@@ -4516,7 +4697,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   />
                 </label>
                 <label className="sm:col-span-2">
-                  <span className="form-label">{t("vesselEditor.otherPrivateNotes")}</span>
+                  <FormLabel>{t("vesselEditor.otherPrivateNotes")}</FormLabel>
                   <textarea
                     className="form-input min-h-24 resize-y"
                     onChange={(event) =>
@@ -4532,64 +4713,145 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
           <section className="mt-7">
             <p className="eyebrow">{t("vesselEditor.featuresKicker")}</p>
             <h3 className="font-display text-lg font-bold text-navy">
-              {t("vesselEditor.featuresTitle")}
+              {t("vesselEditor.featuresTitle")}{" "}
+              <span className="text-sm font-semibold text-slate">({t("common.optional")})</span>
             </h3>
             <p className="mt-1 text-sm text-slate">{t("vesselEditor.featuresHint")}</p>
             <div className="mt-5 space-y-5">
-              {BOAT_FEATURE_GROUPS.map((group) => (
-                <div key={group.title}>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                    {t(FEATURE_GROUP_KEYS[group.title])}
-                  </p>
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-                    {group.options.map((feature) => {
-                      const selected = form.amenities.includes(feature);
-                      return (
+              {BOAT_FEATURE_GROUPS.map((group) => {
+                const canCollapse = group.options.length > BOAT_FEATURES_COLLAPSED_VISIBLE;
+                const expanded = Boolean(expandedFeatureGroups[group.title]);
+                const visibleOptions =
+                  !canCollapse || expanded
+                    ? group.options
+                    : group.options.slice(0, BOAT_FEATURES_COLLAPSED_VISIBLE);
+                const hiddenCount = group.options.length - BOAT_FEATURES_COLLAPSED_VISIBLE;
+                return (
+                  <div
+                    data-testid={`vessel-feature-group-${group.title
+                      .toLowerCase()
+                      .replace(/[^a-z0-9]+/g, "-")
+                      .replace(/^-|-$/g, "")}`}
+                    key={group.title}
+                  >
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                      {t(FEATURE_GROUP_KEYS[group.title])}
+                    </p>
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                      {visibleOptions.map((feature) => {
+                        const selected = form.amenities.includes(feature);
+                        return (
+                          <button
+                            aria-pressed={selected}
+                            className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${
+                              selected
+                                ? "border-teal bg-seafoam text-teal"
+                                : "border-line bg-white text-navy hover:border-teal"
+                            }`}
+                            key={feature}
+                            onClick={() =>
+                              setForm({
+                                ...form,
+                                amenities: selected
+                                  ? form.amenities.filter((item) => item !== feature)
+                                  : [...form.amenities, feature],
+                              })
+                            }
+                            type="button"
+                          >
+                            <FeatureIcon feature={feature} />
+                            <span className="min-w-0 flex-1">{displayLabel(t, feature)}</span>
+                            {selected && <Check className="shrink-0" size={15} />}
+                          </button>
+                        );
+                      })}
+                      {canCollapse && !expanded ? (
                         <button
-                          aria-pressed={selected}
-                          className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${
-                            selected
-                              ? "border-teal bg-seafoam text-teal"
-                              : "border-line bg-white text-navy hover:border-teal"
-                          }`}
-                          key={feature}
+                          aria-expanded={false}
+                          className="flex items-center justify-center rounded-xl border border-dashed border-teal/50 bg-seafoam/50 px-3 py-3 text-sm font-semibold text-teal transition hover:border-teal hover:bg-seafoam"
+                          data-testid="vessel-feature-group-more"
                           onClick={() =>
-                            setForm({
-                              ...form,
-                              amenities: selected
-                                ? form.amenities.filter((item) => item !== feature)
-                                : [...form.amenities, feature],
-                            })
+                            setExpandedFeatureGroups((prev) => ({
+                              ...prev,
+                              [group.title]: true,
+                            }))
                           }
                           type="button"
                         >
-                          <FeatureIcon feature={feature} />
-                          <span className="min-w-0 flex-1">{displayLabel(t, feature)}</span>
-                          {selected && <Check className="shrink-0" size={15} />}
+                          {t("vesselEditor.featuresMore", { count: hiddenCount })}
                         </button>
-                      );
-                    })}
+                      ) : null}
+                      {canCollapse && expanded ? (
+                        <button
+                          aria-expanded={true}
+                          className="flex items-center justify-center rounded-xl border border-dashed border-line bg-white px-3 py-3 text-sm font-semibold text-slate transition hover:border-teal hover:text-teal"
+                          data-testid="vessel-feature-group-show-less"
+                          onClick={() =>
+                            setExpandedFeatureGroups((prev) => ({
+                              ...prev,
+                              [group.title]: false,
+                            }))
+                          }
+                          type="button"
+                        >
+                          {t("vesselEditor.featuresShowLess")}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
-          <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
-            <button
-              className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
-              onClick={close}
-              type="button"
-            >
-              {t("common.cancel")}
-            </button>
-            <button
-              className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
-              disabled={mutation.isPending || !form.name || !form.homePort}
-              onClick={submitVessel}
-              type="button"
-            >
-              {vesselSaveButtonLabel}
-            </button>
+          <div className="mt-6 space-y-4 border-t border-line pt-5">
+            {!boat ? (
+              <p className="text-sm leading-5 text-slate" data-testid="vessel-publish-sit-note">
+                {t("vesselEditor.publishNotListedNote")}
+              </p>
+            ) : null}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <button
+                className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
+                data-testid="vessel-editor-cancel"
+                onClick={requestVesselClose}
+                type="button"
+              >
+                {t("common.cancel")}
+              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                {!boat ? (
+                  <label
+                    className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-navy"
+                    data-testid="vessel-create-sit-now"
+                  >
+                    <input
+                      checked={createSitNow}
+                      className="size-4 accent-teal"
+                      data-testid="vessel-create-sit-now-input"
+                      onChange={(event) => setCreateSitNow(event.target.checked)}
+                      type="checkbox"
+                    />
+                    {t("vesselEditor.createSitNow")}
+                  </label>
+                ) : null}
+                <IconTooltip
+                  hidden={!publishBlockedTooltip || mutation.isPending}
+                  label={publishBlockedTooltip}
+                  side="top"
+                  wrap
+                >
+                  <button
+                    className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
+                    data-testid="vessel-publish"
+                    disabled={publishDisabled}
+                    onClick={submitVessel}
+                    type="button"
+                  >
+                    {vesselSaveButtonLabel}
+                  </button>
+                </IconTooltip>
+              </div>
+            </div>
           </div>
         </div>
         <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
@@ -4598,7 +4860,10 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               vessel={{
                 name: form.name,
                 type: form.type,
-                length: lengthValue ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`) : "",
+                length:
+                  lengthUnknown || !lengthValue
+                    ? ""
+                    : normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`),
                 yearBuilt: yearUnknown ? null : (parseYearBuiltInput(yearBuiltInput) ?? null),
                 homePort: form.homePort,
                 image: form.image,
@@ -4610,6 +4875,19 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
           </EditorLivePreview>
         </div>
       </div>
+      {discardOpen ? (
+        <ConfirmDialog
+          cancelLabel={t("editor.discardKeepEditing")}
+          confirmLabel={t("editor.discardConfirm")}
+          onCancel={() => setDiscardOpen(false)}
+          onConfirm={close}
+          testId="editor-discard-dialog"
+          text={t("editor.discardText")}
+          title={t("editor.discardTitle")}
+          titleId="vessel-discard-title"
+          tone="danger"
+        />
+      ) : null}
     </main>
   );
 }
@@ -4620,8 +4898,7 @@ function VesselEditorPage({ mode }: { mode: "new" | "edit" }) {
   const navigate = useNavigate();
   const { boatId } = useParams();
   const { data: vessels = [], isLoading } = useQuery({
-    queryKey: ["vessels"],
-    queryFn: getVessels,
+    ...queries.vessels.all,
   });
 
   useEffect(() => {
@@ -4739,16 +5016,55 @@ function SitEditor({
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState("");
+  const [discardOpen, setDiscardOpen] = useState(false);
   const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
   const isCreating = !sit;
+  const sitCreateBaseline = useRef(
+    isCreating
+      ? JSON.stringify({
+          form: {
+            boatId: initialBoatId,
+            location: initialHomePort.location,
+            country: initialHomePort.country,
+            fullAddress: "",
+            startDate: "",
+            endDate: "",
+            sitType: "liveaboard",
+            responsibilities: "",
+            requirements: "",
+            minYearsExperience: "0",
+            requiredExperience: [] as string[],
+            requiredCertifications: [] as string[],
+            requiredSkills: [] as string[],
+            maxGuests: "2",
+            pet: "",
+            nonSmokerRequired: sitDefaults.nonSmokerRequired,
+          },
+          sameAsHomePort: true,
+          acceptedTerms: false,
+        })
+      : null,
+  );
+  const isSitCreateDirty = useMemo(() => {
+    if (!sitCreateBaseline.current) return false;
+    return (
+      JSON.stringify({
+        form,
+        sameAsHomePort,
+        acceptedTerms,
+      }) !== sitCreateBaseline.current
+    );
+  }, [acceptedTerms, form, sameAsHomePort]);
+
+  function requestSitClose() {
+    if (isSitCreateDirty) {
+      setDiscardOpen(true);
+      return;
+    }
+    close();
+  }
   const { data: verificationChecks, isLoading: verificationLoading } = useQuery({
-    queryKey: ["verification-checks", user?.name, user?.email, user?.phoneNumber, "sit-create"],
-    queryFn: () =>
-      getMemberVerificationChecks(user!.name, {
-        isSelf: true,
-        email: user!.email,
-        phoneNumber: user!.phoneNumber,
-      }),
+    ...queries.verificationChecks.sitCreate(user?.name, user?.email, user?.phoneNumber),
     enabled: Boolean(isCreating && requireVerificationToSit && user),
   });
   let canCreateSit = true;
@@ -4758,8 +5074,12 @@ function SitEditor({
   const verifyMutation = useMutation({
     mutationFn: () => startVerification(user!.name),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["verification-checks", user?.name] });
-      await queryClient.invalidateQueries({ queryKey: ["verification", user?.name] });
+      await queryClient.invalidateQueries({
+        queryKey: [...queries.verificationChecks.getQueryKey(), user?.name],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: queries.verification.status(user?.name).queryKey,
+      });
     },
   });
   const mutation = useMutation({
@@ -4803,7 +5123,7 @@ function SitEditor({
           requiredExperience: form.requiredExperience,
           requiredCertifications: form.requiredCertifications,
           requiredSkills: form.requiredSkills,
-          maxGuests: Math.max(1, Number(form.maxGuests)),
+          maxGuests: form.sitType === "daytimeChecks" ? 1 : Math.max(1, Number(form.maxGuests)),
           applicants: sit?.applicants ?? 0,
           pet: form.pet || undefined,
           featured: sit?.featured,
@@ -4822,8 +5142,8 @@ function SitEditor({
       );
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
       close();
     },
   });
@@ -4875,7 +5195,7 @@ function SitEditor({
       ownerImage: selectedVessel.ownerImage,
       rating: selectedVessel.rating,
       reviews: selectedVessel.reviews,
-      maxGuests: Math.max(1, Number(form.maxGuests) || 1),
+      maxGuests: form.sitType === "daytimeChecks" ? 1 : Math.max(1, Number(form.maxGuests) || 1),
       applicants: sit?.applicants ?? 0,
       description: selectedVessel.description,
       home: selectedVessel.home,
@@ -4926,9 +5246,12 @@ function SitEditor({
     if (!sameAsHomePort && !form.location.trim()) reasons.push(t("sitEditor.location"));
     if (!sameAsHomePort && !form.country.trim()) reasons.push(t("sitEditor.country"));
     if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
-    const guests = Number(form.maxGuests);
-    if (!Number.isFinite(guests) || guests < 1 || guests > 12) {
-      reasons.push(t("sitEditor.maxGuests"));
+    if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
+    if (form.sitType !== "daytimeChecks") {
+      const guests = Number(form.maxGuests);
+      if (!Number.isFinite(guests) || guests < 1 || guests > 12) {
+        reasons.push(t("sitEditor.maxGuests"));
+      }
     }
     return reasons;
   }, [
@@ -4938,6 +5261,7 @@ function SitEditor({
     form.fullAddress,
     form.location,
     form.maxGuests,
+    form.sitType,
     form.startDate,
     sameAsHomePort,
     t,
@@ -4971,10 +5295,19 @@ function SitEditor({
                 {sit ? t("sitEditor.editTitle") : t("sitEditor.createTitle")}
               </h1>
               <p className="mt-2 text-sm text-slate">{t("sitEditor.hint")}</p>
+              {!sit ? (
+                <p
+                  className="mt-2 text-sm leading-5 text-slate"
+                  data-testid="editor-required-fields-hint"
+                >
+                  {t("editor.requiredFieldsHint")}
+                </p>
+              ) : null}
             </div>
             <button
               className="flex shrink-0 items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-bold text-navy hover:border-teal"
-              onClick={close}
+              data-testid="sit-editor-back"
+              onClick={requestSitClose}
               type="button"
             >
               <ArrowLeft size={16} /> {t("common.back")}
@@ -5042,7 +5375,7 @@ function SitEditor({
               </Link>
               <button
                 className="block w-full text-sm font-semibold text-slate hover:text-navy"
-                onClick={close}
+                onClick={requestSitClose}
                 type="button"
               >
                 {t("common.cancel")}
@@ -5116,7 +5449,7 @@ function SitEditor({
                 {!sameAsHomePort && (
                   <section className="grid gap-4 rounded-2xl border border-line p-4 sm:grid-cols-2">
                     <div>
-                      <span className="form-label">{t("sitEditor.location")}</span>
+                      <FormLabel required>{t("sitEditor.location")}</FormLabel>
                       <DestinationAutocomplete
                         cityOnly
                         onChange={(location) => setForm({ ...form, location })}
@@ -5133,7 +5466,7 @@ function SitEditor({
                       />
                     </div>
                     <div>
-                      <span className="form-label">{t("sitEditor.country")}</span>
+                      <FormLabel required>{t("sitEditor.country")}</FormLabel>
                       <DestinationAutocomplete
                         countryOnly
                         onChange={(country) => setForm({ ...form, country })}
@@ -5146,9 +5479,10 @@ function SitEditor({
                 )}
                 <section className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
                   <label className="block">
-                    <span className="form-label">{t("sitEditor.fullAddress")}</span>
+                    <FormLabel required>{t("sitEditor.fullAddress")}</FormLabel>
                     <textarea
                       className="form-input mt-1 min-h-24"
+                      data-testid="sit-full-address"
                       onChange={(event) => setForm({ ...form, fullAddress: event.target.value })}
                       placeholder={t("sitEditor.fullAddressPlaceholder")}
                       value={form.fullAddress}
@@ -5159,7 +5493,7 @@ function SitEditor({
                   </p>
                 </section>
                 <div>
-                  <span className="form-label">{t("sitEditor.dates")}</span>
+                  <FormLabel required>{t("sitEditor.dates")}</FormLabel>
                   <DateRangePicker
                     endDate={form.endDate}
                     onChange={({ startDate, endDate }) => setForm({ ...form, startDate, endDate })}
@@ -5168,7 +5502,7 @@ function SitEditor({
                   />
                 </div>
                 <fieldset>
-                  <legend className="form-label">{t("sitEditor.sitType")}</legend>
+                  <FormLabel as="legend">{t("sitEditor.sitType")}</FormLabel>
                   <div className="mt-2 grid gap-3 sm:grid-cols-2">
                     <label
                       className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
@@ -5205,7 +5539,9 @@ function SitEditor({
                         checked={form.sitType === "daytimeChecks"}
                         className="mt-1 size-4 accent-teal"
                         name="sitType"
-                        onChange={() => setForm({ ...form, sitType: "daytimeChecks" })}
+                        onChange={() =>
+                          setForm({ ...form, sitType: "daytimeChecks", maxGuests: "1" })
+                        }
                         type="radio"
                         value="daytimeChecks"
                       />
@@ -5220,23 +5556,25 @@ function SitEditor({
                     </label>
                   </div>
                 </fieldset>
+                {form.sitType !== "daytimeChecks" ? (
+                  <label data-testid="sit-editor-max-guests">
+                    <FormLabel required>{t("sitEditor.maxGuests")}</FormLabel>
+                    <input
+                      className="form-input"
+                      max="12"
+                      min="1"
+                      onChange={(event) => setForm({ ...form, maxGuests: event.target.value })}
+                      required
+                      type="number"
+                      value={form.maxGuests}
+                    />
+                    <span className="mt-1.5 block text-xs leading-5 text-slate">
+                      {t("sitEditor.maxGuestsHint")}
+                    </span>
+                  </label>
+                ) : null}
                 <label>
-                  <span className="form-label">{t("sitEditor.maxGuests")}</span>
-                  <input
-                    className="form-input"
-                    max="12"
-                    min="1"
-                    onChange={(event) => setForm({ ...form, maxGuests: event.target.value })}
-                    required
-                    type="number"
-                    value={form.maxGuests}
-                  />
-                  <span className="mt-1.5 block text-xs leading-5 text-slate">
-                    {t("sitEditor.maxGuestsHint")}
-                  </span>
-                </label>
-                <label>
-                  <span className="form-label">{t("sitEditor.responsibilities")}</span>
+                  <FormLabel optional>{t("sitEditor.responsibilities")}</FormLabel>
                   <textarea
                     className="form-input min-h-28 resize-y"
                     onChange={(event) => setForm({ ...form, responsibilities: event.target.value })}
@@ -5247,10 +5585,13 @@ function SitEditor({
                 <section className="rounded-2xl border border-line bg-cream/60 p-5">
                   <p className="eyebrow">{t("sitEditor.requirementsKicker")}</p>
                   <h3 className="font-display text-lg font-bold text-navy">
-                    {t("sitEditor.requirementsTitle")}
+                    {t("sitEditor.requirementsTitle")}{" "}
+                    <span className="text-sm font-semibold text-slate">
+                      ({t("common.optional")})
+                    </span>
                   </h3>
                   <label className="mt-5 block">
-                    <span className="form-label">{t("sitEditor.minimumYears")}</span>
+                    <FormLabel>{t("sitEditor.minimumYears")}</FormLabel>
                     <Select
                       variant="form"
                       onChange={(event) =>
@@ -5284,7 +5625,7 @@ function SitEditor({
                     },
                   ].map((group) => (
                     <div className="mt-5" key={group.field}>
-                      <p className="form-label">{group.title}</p>
+                      <FormLabel as="p">{group.title}</FormLabel>
                       <div className="flex flex-wrap gap-2">
                         {group.options.map((option) => {
                           const selected = form[group.field].includes(option);
@@ -5327,7 +5668,7 @@ function SitEditor({
                   </label>
                 </section>
                 <label>
-                  <span className="form-label">{t("sitEditor.additional")}</span>
+                  <FormLabel optional>{t("sitEditor.additional")}</FormLabel>
                   <textarea
                     className="form-input min-h-24 resize-y"
                     onChange={(event) => setForm({ ...form, requirements: event.target.value })}
@@ -5336,7 +5677,7 @@ function SitEditor({
                   />
                 </label>
                 <label>
-                  <span className="form-label">{t("sitEditor.pets")}</span>
+                  <FormLabel optional>{t("sitEditor.pets")}</FormLabel>
                   <input
                     className="form-input"
                     onChange={(event) => setForm({ ...form, pet: event.target.value })}
@@ -5352,6 +5693,7 @@ function SitEditor({
                       setAcceptedTerms(checked);
                       if (checked) setTermsError("");
                     }}
+                    required
                   />
                 )}
                 {termsError && (
@@ -5363,7 +5705,8 @@ function SitEditor({
               <div className="mt-6 flex justify-end gap-3 border-t border-line pt-5">
                 <button
                   className="rounded-xl px-5 py-3 text-sm font-bold text-slate"
-                  onClick={close}
+                  data-testid="sit-editor-cancel"
+                  onClick={requestSitClose}
                   type="button"
                 >
                   {locked ? t("common.close") : t("common.cancel")}
@@ -5377,6 +5720,7 @@ function SitEditor({
                   >
                     <button
                       className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
+                      data-testid="sit-publish"
                       disabled={publishDisabled}
                       onClick={() => {
                         if (!acceptedTerms) {
@@ -5386,11 +5730,6 @@ function SitEditor({
                         setTermsError("");
                         mutation.mutate();
                       }}
-                      title={
-                        publishBlockedTooltip && !mutation.isPending
-                          ? publishBlockedTooltip
-                          : undefined
-                      }
                       type="button"
                     >
                       {sitSaveButtonLabel}
@@ -5411,6 +5750,19 @@ function SitEditor({
           </EditorLivePreview>
         </div>
       </div>
+      {discardOpen ? (
+        <ConfirmDialog
+          cancelLabel={t("editor.discardKeepEditing")}
+          confirmLabel={t("editor.discardConfirm")}
+          onCancel={() => setDiscardOpen(false)}
+          onConfirm={close}
+          testId="editor-discard-dialog"
+          text={t("editor.discardText")}
+          title={t("editor.discardTitle")}
+          titleId="sit-discard-title"
+          tone="danger"
+        />
+      ) : null}
     </main>
   );
 }
@@ -5428,16 +5780,13 @@ function SitEditorPage({ mode }: { mode: "new" | "edit" }) {
   }, []);
 
   const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
-    queryKey: ["vessels"],
-    queryFn: getVessels,
+    ...queries.vessels.all,
   });
   const { data: sits = [], isLoading: sitsLoading } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
+    ...queries.sits.all,
   });
   const { data: ownerApplications = [] } = useQuery({
-    queryKey: ["applications", "user", user?.name],
-    queryFn: () => getApplicationsForUser(user!.name),
+    ...queries.applications.user(user?.name),
     enabled: Boolean(user),
   });
 
@@ -5540,6 +5889,7 @@ function OwnerBoatsPage() {
   const [flaggingSit, setFlaggingSit] = useState<Sit | null>(null);
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState<Sit | null>(null);
   const [withdrawConfirm, setWithdrawConfirm] = useState<SitApplication | null>(null);
+  const [startEarlyConfirm, setStartEarlyConfirm] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<
     | { type: "boat"; id: string; name: string }
     | {
@@ -5568,32 +5918,17 @@ function OwnerBoatsPage() {
   }, [navigate]);
 
   const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
-    queryKey: ["vessels"],
-    queryFn: getVessels,
+    ...queries.vessels.all,
   });
   const { data: sits = [], isLoading: sitsLoading } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
+    ...queries.sits.all,
   });
   const { data: ownerApplications = [], isLoading: applicationsLoading } = useQuery({
-    queryKey: ["applications", "user", user?.name],
-    queryFn: () => getApplicationsForUser(user!.name),
+    ...queries.applications.user(user?.name),
     enabled: Boolean(user),
   });
   const { data: ownerVerificationChecks, isLoading: ownerVerificationLoading } = useQuery({
-    queryKey: [
-      "verification-checks",
-      user?.name,
-      user?.email,
-      user?.phoneNumber,
-      "owner-create-sit",
-    ],
-    queryFn: () =>
-      getMemberVerificationChecks(user!.name, {
-        isSelf: true,
-        email: user!.email,
-        phoneNumber: user!.phoneNumber,
-      }),
+    ...queries.verificationChecks.ownerCreateSit(user?.name, user?.email, user?.phoneNumber),
     enabled: Boolean(requireVerificationToSit && user),
   });
   let canCreateSit = true;
@@ -5603,16 +5938,16 @@ function OwnerBoatsPage() {
   const removeVesselMutation = useMutation({
     mutationFn: deleteVessel,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["vessels"] });
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: queries.vessels.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
     },
   });
   const removeSitMutation = useMutation({
     mutationFn: deleteSit,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
     },
   });
   const toggleApplicationsMutation = useMutation({
@@ -5624,17 +5959,26 @@ function OwnerBoatsPage() {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+    },
+  });
+  const startSitEarlyMutation = useMutation({
+    mutationFn: (id: string) => startSitEarly(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      setStartEarlyConfirm(null);
     },
   });
   const withdrawMutation = useMutation({
     mutationFn: ({ applicationId, explanation }: { applicationId: string; explanation: string }) =>
       withdrawApplication(applicationId, user!.name, explanation),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
       setWithdrawConfirm(null);
     },
   });
@@ -5865,6 +6209,18 @@ function OwnerBoatsPage() {
               {isAcceptingApplications(sit) ? t("owner.closeRequests") : t("owner.openRequests")}
             </button>
           ) : null}
+          {!isArchived && resolveSitPhase(sit) === "applicantChosen" && (
+            <button
+              className="flex items-center gap-2 rounded-xl border border-teal bg-seafoam px-4 py-2.5 text-sm font-bold text-teal hover:bg-seafoam/80 disabled:opacity-60"
+              disabled={startSitEarlyMutation.isPending}
+              onClick={() => {
+                setStartEarlyConfirm(sit.id);
+              }}
+              type="button"
+            >
+              <Play size={16} /> {t("owner.startSitEarly")}
+            </button>
+          )}
           {!isArchived && resolveSitPhase(sit) === "stayUnderway" && (
             <>
               <SitEmergencyHelp />
@@ -6068,33 +6424,34 @@ function OwnerBoatsPage() {
           )}
         </div>
       </div>
-      <div className="mt-8 flex gap-1 rounded-xl bg-seafoam p-1 sm:w-fit">
-        {(
-          [
-            { tab: "sits", to: "/my-sits" },
-            { tab: "boats", to: "/my-boats" },
-          ] as const
-        ).map(({ tab, to }) => (
-          <NavLink
-            className={({ isActive }) =>
-              `flex-1 rounded-lg px-6 py-2.5 text-sm font-bold capitalize transition sm:flex-none ${
-                isActive ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
-              }`
-            }
-            end
-            key={tab}
-            to={to}
-          >
-            {t(`owner.tab.${tab}`)}{" "}
-            {(tab === "boats" ? boatsCountLoading : sitsCountLoading) ? (
-              <ShimmerBlock className="ml-1 inline-block h-3 w-4 align-middle" />
-            ) : (
-              <span className="ml-1 text-xs text-slate">
-                {tab === "boats" ? ownedBoats.length : sitsTabCount}
-              </span>
-            )}
-          </NavLink>
-        ))}
+      <div className="mt-8">
+        <SegmentedTabs fullWidthOnMobile testId="owner-dashboard-tabs">
+          {(
+            [
+              { tab: "sits", to: "/my-sits" },
+              { tab: "boats", to: "/my-boats" },
+            ] as const
+          ).map(({ tab, to }) => (
+            <NavLink
+              className={({ isActive }) =>
+                segmentedTabClassName(isActive, "flex-1 px-6 capitalize sm:flex-none")
+              }
+              end
+              key={tab}
+              role="tab"
+              to={to}
+            >
+              {t(`owner.tab.${tab}`)}{" "}
+              {(tab === "boats" ? boatsCountLoading : sitsCountLoading) ? (
+                <ShimmerBlock className="ml-1 inline-block h-3 w-4 align-middle" />
+              ) : (
+                <span className="ml-1 text-xs text-slate">
+                  {tab === "boats" ? ownedBoats.length : sitsTabCount}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </SegmentedTabs>
       </div>
       {removeVesselMutation.isError && (
         <p
@@ -6127,6 +6484,14 @@ function OwnerBoatsPage() {
             }
             return t("owner.deleteSitError");
           })()}
+        </p>
+      )}
+      {startSitEarlyMutation.isError && (
+        <p
+          className="mt-5 rounded-xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral"
+          role="alert"
+        >
+          {t("owner.startSitEarlyError")}
         </p>
       )}
       {isLoading && activeTab === "boats" ? <OwnerBoatsLoadingSkeleton /> : null}
@@ -6501,6 +6866,20 @@ function OwnerBoatsPage() {
           tone="default"
         />
       )}
+      {startEarlyConfirm && (
+        <ConfirmDialog
+          confirmLabel={t("owner.startSitEarlyAction")}
+          onCancel={() => setStartEarlyConfirm(null)}
+          onConfirm={() => {
+            startSitEarlyMutation.mutate(startEarlyConfirm);
+          }}
+          pending={startSitEarlyMutation.isPending}
+          text={t("owner.startSitEarlyConfirm")}
+          title={t("owner.startSitEarlyTitle")}
+          titleId="start-sit-early-confirm-title"
+          tone="warning"
+        />
+      )}
     </main>
   );
 }
@@ -6637,20 +7016,13 @@ function SettingsPage() {
         <p className="mt-3 text-slate">{t("settings.subtitle")}</p>
 
         <div className="mt-8 -mx-5 overflow-x-auto px-5 sm:mx-0 sm:overflow-visible sm:px-0">
-          <div className="flex w-max gap-1 rounded-xl bg-seafoam p-1 sm:w-auto">
+          <SegmentedTabs aria-label={t("settings.title")} testId="settings-tabs">
             {accountTabs.map((tab) => (
-              <button
-                className={`rounded-lg px-4 py-2.5 text-sm font-bold whitespace-nowrap transition ${
-                  activeTab === tab ? "bg-white text-navy shadow-sm" : "text-slate hover:text-navy"
-                }`}
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                type="button"
-              >
+              <SegmentedTab active={activeTab === tab} key={tab} onClick={() => setActiveTab(tab)}>
                 {t(`settings.tab.${tab}`)}
-              </button>
+              </SegmentedTab>
             ))}
-          </div>
+          </SegmentedTabs>
         </div>
 
         {accountFlash ? (
@@ -7509,7 +7881,7 @@ function patchSitAcceptanceInCache(
   sitId: string,
   accepted: boolean,
 ) {
-  queryClient.setQueryData<Sit[]>(["sits"], (current) => {
+  queryClient.setQueryData<Sit[]>(queries.sits.all.queryKey, (current) => {
     if (!current) return current;
     return current.map((sit) => {
       if (sit.id !== sitId) return sit;
@@ -7673,8 +8045,10 @@ function ApplicationReviewPage() {
   const user = useAppStore((state) => state.user);
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState("");
+  const [composerFocusKey, setComposerFocusKey] = useState(0);
   const [flaggingIssue, setFlaggingIssue] = useState(false);
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState(false);
+  const [startEarlyConfirm, setStartEarlyConfirm] = useState(false);
   const [confirmingStatus, setConfirmingStatus] = useState<
     "accepted" | "declined" | "unaccept" | null
   >(null);
@@ -7687,12 +8061,10 @@ function ApplicationReviewPage() {
   const [listPage, setListPage] = useState(0);
 
   const { data: sits = [], isLoading: sitsLoading } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
+    ...queries.sits.all,
   });
   const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
-    queryKey: ["vessels"],
-    queryFn: getVessels,
+    ...queries.vessels.all,
   });
 
   const listParams = useMemo(
@@ -7711,8 +8083,7 @@ function ApplicationReviewPage() {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["applications", "sit", sitId, listParams],
-    queryFn: () => getApplicationsForSit(sitId, listParams),
+    ...queries.applications.sit(sitId, listParams),
     placeholderData: keepPreviousData,
     enabled: Boolean(sitId),
   });
@@ -7772,9 +8143,9 @@ function ApplicationReviewPage() {
       if (acceptedNow || unaccepting) {
         patchSitAcceptanceInCache(queryClient, sitId, acceptedNow);
       }
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
     },
   });
   const toggleApplicationsMutation = useMutation({
@@ -7787,18 +8158,30 @@ function ApplicationReviewPage() {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["sits"] });
-      await queryClient.invalidateQueries({ queryKey: ["boats"] });
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+    },
+  });
+  const startSitEarlyMutation = useMutation({
+    mutationFn: () => {
+      if (!sit) throw new Error("APPLICATION_SIT_NOT_FOUND");
+      return startSitEarly(sit.id);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      setStartEarlyConfirm(false);
     },
   });
   const messageMutation = useMutation({
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       sendApplicationMessage(id, user!.name, text),
     onSuccess: async (updated) => {
-      queryClient.setQueriesData({ queryKey: ["applications"] }, (old) =>
+      queryClient.setQueriesData({ queryKey: queries.applications.getQueryKey() }, (old) =>
         patchApplicationInQueriesCache(old, updated),
       );
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const videoCallMutation = useMutation({
@@ -7812,28 +8195,28 @@ function ApplicationReviewPage() {
       counter?: boolean;
     }) => requestApplicationVideoCall(id, user!.name, proposal, { counter }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const videoCallAcceptMutation = useMutation({
     mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
       acceptApplicationVideoCall(id, user!.name, messageId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const videoCallDeclineMutation = useMutation({
     mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
       declineApplicationVideoCall(id, user!.name, messageId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const sharePhoneMutation = useMutation({
     mutationFn: ({ id, phoneNumber }: { id: string; phoneNumber: string }) =>
       shareApplicationPhoneNumber(id, user!.name, phoneNumber),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
 
@@ -7917,6 +8300,16 @@ function ApplicationReviewPage() {
                   {isAcceptingApplications(sit)
                     ? t("applications.closeRequests")
                     : t("applications.openRequests")}
+                </button>
+              )}
+              {sit && sitPhase === "applicantChosen" && (
+                <button
+                  className="flex items-center gap-2 rounded-full border border-teal bg-seafoam px-5 py-2.5 text-sm font-bold text-teal hover:bg-seafoam/80 disabled:opacity-60"
+                  disabled={startSitEarlyMutation.isPending}
+                  onClick={() => setStartEarlyConfirm(true)}
+                  type="button"
+                >
+                  <Play size={16} /> {t("owner.startSitEarly")}
                 </button>
               )}
               {sit && sitPhase === "stayUnderway" && (
@@ -8036,6 +8429,7 @@ function ApplicationReviewPage() {
                             key={application.id}
                             onClick={() => {
                               setSelectedId(application.id);
+                              setComposerFocusKey((key) => key + 1);
                               window.requestAnimationFrame(() => {
                                 document
                                   .getElementById("application-detail-panel")
@@ -8172,7 +8566,10 @@ function ApplicationReviewPage() {
                                 application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
                               }`}
                               key={application.id}
-                              onClick={() => setSelectedId(application.id)}
+                              onClick={() => {
+                                setSelectedId(application.id);
+                                setComposerFocusKey((key) => key + 1);
+                              }}
                               type="button"
                             >
                               <img
@@ -8476,6 +8873,7 @@ function ApplicationReviewPage() {
 
                     <ConversationPanel
                       application={selected}
+                      composerFocusKey={composerFocusKey}
                       currentUser={user.name}
                       onRequestVideoCall={(proposal) =>
                         videoCallMutation.mutate({ id: selected.id, proposal })
@@ -8659,6 +9057,20 @@ function ApplicationReviewPage() {
           }}
         />
       )}
+      {startEarlyConfirm && sit && (
+        <ConfirmDialog
+          confirmLabel={t("owner.startSitEarlyAction")}
+          onCancel={() => setStartEarlyConfirm(false)}
+          onConfirm={() => {
+            startSitEarlyMutation.mutate();
+          }}
+          pending={startSitEarlyMutation.isPending}
+          text={t("owner.startSitEarlyConfirm")}
+          title={t("owner.startSitEarlyTitle")}
+          titleId="start-sit-early-review-confirm-title"
+          tone="warning"
+        />
+      )}
     </main>
   );
 }
@@ -8673,17 +9085,16 @@ function MessagesPage() {
   const [searchParams] = useSearchParams();
   const requestedApplicationId = searchParams.get("application");
   const { data: applications = [], isLoading } = useQuery({
-    queryKey: ["applications", "user", user?.name],
-    queryFn: () => getApplicationsForUser(user!.name),
+    ...queries.applications.user(user?.name),
     enabled: Boolean(user),
   });
   const { data: sits = [] } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
+    ...queries.sits.all,
     enabled: Boolean(user),
   });
   const [messagesTab, setMessagesTab] = useState<"inbox" | "archived">("inbox");
   const [selectedId, setSelectedId] = useState("");
+  const [composerFocusKey, setComposerFocusKey] = useState(0);
   const [conversationPage, setConversationPage] = useState(0);
 
   const inboxApplications = useMemo(
@@ -8723,6 +9134,31 @@ function MessagesPage() {
     }
   }, [tabApplications, requestedApplicationId, selectedId]);
 
+  const notificationsQuery = queries.notifications.user(user?.name);
+  const { data: notifications = [] } = useQuery({
+    ...notificationsQuery,
+    enabled: Boolean(user),
+  });
+
+  useEffect(() => {
+    if (!user || !selectedId) return;
+    const unread = unreadNewMessageNotificationsForApplication(notifications, selectedId);
+    if (!unread.length) return;
+
+    const queryKey = queries.notifications.user(user.name).queryKey;
+    queryClient.setQueryData<MockNotification[]>(queryKey, (current = []) =>
+      current.map((item) =>
+        unread.some((notification) => notification.id === item.id) ? { ...item, read: true } : item,
+      ),
+    );
+
+    void Promise.all(
+      unread.map((notification) => markNotificationRead(notification.id, user.name)),
+    ).finally(() => {
+      void queryClient.invalidateQueries({ queryKey });
+    });
+  }, [notifications, queryClient, selectedId, user]);
+
   const totalConversationPages = Math.max(
     1,
     Math.ceil(tabApplications.length / CONVERSATIONS_PER_PAGE),
@@ -8759,10 +9195,10 @@ function MessagesPage() {
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       sendApplicationMessage(id, user!.name, text),
     onSuccess: async (updated) => {
-      queryClient.setQueriesData({ queryKey: ["applications"] }, (old) =>
+      queryClient.setQueriesData({ queryKey: queries.applications.getQueryKey() }, (old) =>
         patchApplicationInQueriesCache(old, updated),
       );
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const videoCallMutation = useMutation({
@@ -8776,28 +9212,28 @@ function MessagesPage() {
       counter?: boolean;
     }) => requestApplicationVideoCall(id, user!.name, proposal, { counter }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const videoCallAcceptMutation = useMutation({
     mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
       acceptApplicationVideoCall(id, user!.name, messageId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const videoCallDeclineMutation = useMutation({
     mutationFn: ({ id, messageId }: { id: string; messageId: string }) =>
       declineApplicationVideoCall(id, user!.name, messageId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
   const sharePhoneMutation = useMutation({
     mutationFn: ({ id, phoneNumber }: { id: string; phoneNumber: string }) =>
       shareApplicationPhoneNumber(id, user!.name, phoneNumber),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["applications"] });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
     },
   });
 
@@ -8828,25 +9264,23 @@ function MessagesPage() {
         </div>
       ) : (
         <>
-          <div className="mt-8 flex gap-1 rounded-xl bg-seafoam p-1 sm:w-fit">
-            {(["inbox", "archived"] as const).map((tab) => (
-              <button
-                aria-pressed={messagesTab === tab}
-                className={`flex-1 rounded-lg px-6 py-2.5 text-sm font-bold transition sm:flex-none ${
-                  messagesTab === tab
-                    ? "bg-white text-navy shadow-sm"
-                    : "text-slate hover:text-navy"
-                }`}
-                key={tab}
-                onClick={() => setMessagesTab(tab)}
-                type="button"
-              >
-                {t(`messages.tab.${tab}`)}{" "}
-                <span className="ml-1 text-xs text-slate">
-                  {tab === "inbox" ? inboxApplications.length : archivedApplications.length}
-                </span>
-              </button>
-            ))}
+          <div className="mt-8">
+            <SegmentedTabs fullWidthOnMobile testId="messages-tabs">
+              {(["inbox", "archived"] as const).map((tab) => (
+                <SegmentedTab
+                  active={messagesTab === tab}
+                  aria-pressed={messagesTab === tab}
+                  className="flex-1 px-6 sm:flex-none"
+                  key={tab}
+                  onClick={() => setMessagesTab(tab)}
+                >
+                  {t(`messages.tab.${tab}`)}{" "}
+                  <span className="ml-1 text-xs text-slate">
+                    {tab === "inbox" ? inboxApplications.length : archivedApplications.length}
+                  </span>
+                </SegmentedTab>
+              ))}
+            </SegmentedTabs>
           </div>
           {isLoading ? <MessagesPageSkeleton /> : null}
           {!isLoading && tabApplications.length && selected ? (
@@ -8864,7 +9298,10 @@ function MessagesPage() {
                         application.id === selected.id ? "bg-seafoam" : "hover:bg-cream"
                       }`}
                       key={application.id}
-                      onClick={() => setSelectedId(application.id)}
+                      onClick={() => {
+                        setSelectedId(application.id);
+                        setComposerFocusKey((key) => key + 1);
+                      }}
                       type="button"
                     >
                       <span className="flex items-center justify-between gap-2">
@@ -9019,6 +9456,7 @@ function MessagesPage() {
                 })()}
                 <ConversationPanel
                   application={selected}
+                  composerFocusKey={composerFocusKey}
                   currentUser={user.name}
                   onRequestVideoCall={(proposal) =>
                     videoCallMutation.mutate({ id: selected.id, proposal })

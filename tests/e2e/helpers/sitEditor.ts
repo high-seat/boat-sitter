@@ -100,8 +100,12 @@ export async function fillMinimalCreateSitForm(
     .getByPlaceholder(/Street, marina berth|Straße|marina/i)
     .fill(options?.fullAddress ?? "Berth A4, Demo Marina, Harbor Road 12");
 
-  const maxGuests = modal.locator('input[type="number"]');
-  await maxGuests.fill(String(options?.maxGuests ?? 2));
+  if (sitType !== "daytimeChecks") {
+    const maxGuests = modal.getByTestId("sit-editor-max-guests").locator('input[type="number"]');
+    await maxGuests.fill(String(options?.maxGuests ?? 2));
+  } else {
+    await expect(modal.getByTestId("sit-editor-max-guests")).toHaveCount(0);
+  }
 
   const responsibilities =
     options?.responsibilities ??

@@ -487,6 +487,20 @@ devRouter.post("/fixture", async (c) => {
     return c.json({ ok: true, sitId, applicationId });
   }
 
+  if (kind === "clear-underway-sit") {
+    const sitId = "sit-underway-emergency-e2e";
+    await db
+      .update(sits)
+      .set({
+        dateStart: "2026-01-02",
+        duration: "5 nights",
+        dates: "Jan 2 – Jan 7",
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(sits.id, sitId));
+    return c.json({ ok: true, sitId, cleared: true });
+  }
+
   if (kind === "paginated-applications") {
     for (let n = 1; n <= 22; n += 1) {
       const id = `application-solstice-page-${n}`;

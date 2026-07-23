@@ -35,9 +35,10 @@ import {
   type FeatureFlagKey,
 } from "@/featureFlags";
 import { useFeatureFlagStore } from "@/featureFlagStore";
-import { createDevRandomSit, createDevRandomVessel, getSits, getVessels } from "@/mockApi";
+import { createDevRandomSit, createDevRandomVessel } from "@/mockApi";
 import { isAdminUser } from "@/adminAccess";
 import { useAppStore } from "@/store";
+import { queries } from "@/queries";
 import { getVerificationStatusSync, setMockVerificationStatus } from "@/verificationService";
 
 const DEMO_PHONE = "5550100100";
@@ -112,8 +113,8 @@ export function CommandPalette() {
   }
 
   async function refreshVerificationQueries() {
-    await queryClient.invalidateQueries({ queryKey: ["verification"] });
-    await queryClient.invalidateQueries({ queryKey: ["verification-checks"] });
+    await queryClient.invalidateQueries({ queryKey: queries.verification.getQueryKey() });
+    await queryClient.invalidateQueries({ queryKey: queries.verificationChecks.getQueryKey() });
   }
 
   const boatMatch = matchPath("/boats/:id", location.pathname);
@@ -131,13 +132,11 @@ export function CommandPalette() {
   const applicationSitId = applicationsMatch?.params.sitId;
 
   const { data: sits = [] } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
+    ...queries.sits.all,
     enabled: open && Boolean(applicationSitId || user),
   });
   const { data: vessels = [] } = useQuery({
-    queryKey: ["vessels"],
-    queryFn: getVessels,
+    ...queries.vessels.all,
     enabled: open && Boolean(user),
   });
 
@@ -239,8 +238,8 @@ export function CommandPalette() {
                     image: user.image,
                     languages: user.languages,
                   });
-                  await queryClient.invalidateQueries({ queryKey: ["vessels"] });
-                  await queryClient.invalidateQueries({ queryKey: ["boats"] });
+                  await queryClient.invalidateQueries({ queryKey: queries.vessels.all.queryKey });
+                  await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
                 })();
               })
             }
@@ -280,9 +279,9 @@ export function CommandPalette() {
                     email: user.email,
                     phoneNumber: user.phoneNumber,
                   });
-                  await queryClient.invalidateQueries({ queryKey: ["vessels"] });
-                  await queryClient.invalidateQueries({ queryKey: ["sits"] });
-                  await queryClient.invalidateQueries({ queryKey: ["boats"] });
+                  await queryClient.invalidateQueries({ queryKey: queries.vessels.all.queryKey });
+                  await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+                  await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
                 })();
               })
             }

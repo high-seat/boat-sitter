@@ -418,3 +418,34 @@ export type SupportRequest = typeof supportRequests.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+
+/**
+ * World gazetteer for destination autocomplete: every country plus cities
+ * (GeoNames cities15000 + curated marina towns). Searched by `/api/destinations`.
+ */
+export const worldPlaces = sqliteTable(
+  "world_places",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    nameLower: text("name_lower").notNull(),
+    /** Empty for country rows; country display name for cities. */
+    countryName: text("country_name").notNull().default(""),
+    countryCode: text("country_code").notNull().default(""),
+    /** city | country */
+    kind: text("kind").notNull(),
+    latitude: real("latitude"),
+    longitude: real("longitude"),
+    population: integer("population").notNull().default(0),
+    /** Featured in empty-query autocomplete suggestions. */
+    popular: integer("popular", { mode: "boolean" }).notNull().default(false),
+  },
+  (t) => [
+    index("world_places_name_lower_idx").on(t.nameLower),
+    index("world_places_kind_name_idx").on(t.kind, t.nameLower),
+    index("world_places_popular_idx").on(t.popular),
+  ],
+);
+
+export type WorldPlace = typeof worldPlaces.$inferSelect;
+export type NewWorldPlace = typeof worldPlaces.$inferInsert;

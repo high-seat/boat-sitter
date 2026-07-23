@@ -5,7 +5,7 @@
  * Run: node --experimental-strip-types scripts/verify_coordinates.ts
  */
 import { lookupCoordinates } from "../src/react-app/coordinates.ts";
-import { destinations } from "../src/react-app/destinations.ts";
+import { curatedMarinaCities } from "../src/react-app/destinations.ts";
 
 let failures = 0;
 
@@ -20,7 +20,7 @@ function check(label: string, ok: boolean, detail = "") {
 // cityOnly, and home ports are cities). Countries in the destinations list are
 // search filters and never need coordinates — so we only require cities, plus
 // each city's own country, to resolve.
-const cities = destinations.filter((d) => d.kind === "City" && d.name);
+const cities = curatedMarinaCities.filter((d) => d.kind === "City" && d.name);
 for (const d of cities) {
   const hit = lookupCoordinates(d.name, d.detail);
   check(`resolve "${d.name}, ${d.detail}"`, hit !== null);

@@ -5,6 +5,11 @@ import {
   type ApplicationsListParams,
 } from "../shared/applicationsSearch";
 import { boatsSearchQueryString, type BoatSearchParams } from "../shared/boatsSearch";
+import {
+  destinationsSearchQueryString,
+  type DestinationSearchParams,
+} from "../shared/destinationsSearch";
+import type { Destination } from "@/destinations";
 
 export type ApiEngineType = string;
 export type ApiVoltageType = string;
@@ -636,6 +641,13 @@ export async function apiGetBoats(): Promise<Boat[]> {
   return rows.map(normalizeApiBoat);
 }
 
+export async function apiSearchDestinations(
+  params: DestinationSearchParams = {},
+): Promise<Destination[]> {
+  const qs = destinationsSearchQueryString(params);
+  return apiGet<Destination[]>(`/api/destinations${qs}`);
+}
+
 export async function apiGetBoatsPage(params: BoatSearchParams): Promise<{
   boats: Boat[];
   total: number;
@@ -720,6 +732,11 @@ export async function apiSaveSit(sit: Sit): Promise<Sit> {
 
 export async function apiDeleteSit(id: string): Promise<void> {
   await apiDelete(`/api/sits/${encodeURIComponent(id)}`);
+}
+
+export async function apiStartSitEarly(id: string): Promise<Sit> {
+  const row = await apiPost<ApiSit>(`/api/sits/${encodeURIComponent(id)}/start-early`, {});
+  return normalizeApiSit(row);
 }
 
 export async function apiGetApplicationsForSit(

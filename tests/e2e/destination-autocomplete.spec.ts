@@ -1,0 +1,136 @@
+import { expect, test } from "@playwright/test";
+import { seedVerifiedOwner } from "./helpers/auth";
+import { TOP_BOAT_SITTING_PORT_CITIES } from "../../src/shared/popularPortCities";
+
+test.describe("destination autocomplete gazetteer", () => {
+  test("searches world cities from the destinations API", async ({ page }) => {
+    const api = await page.request.get("/api/destinations?q=Lefkada&kind=city&limit=5");
+    expect(api.ok()).toBeTruthy();
+    const body = await api.json();
+    expect(body.data?.some((row: { name: string }) => row.name === "Lefkada")).toBeTruthy();
+
+    await seedVerifiedOwner(page);
+    await page.goto("/owner/boats/solstice-boat/edit");
+    await expect(page.getByRole("heading", { name: /Edit Solstice/i })).toBeVisible();
+
+    const homePort = page.getByTestId("vessel-home-port");
+    await expect(page.getByTestId("vessel-home-port-selected")).toBeVisible();
+    await page.getByTestId("vessel-home-port-edit").click();
+    const input = page.getByTestId("vessel-home-port-input");
+    await expect(input).toBeVisible();
+    await input.fill("Lefk");
+    const option = homePort.getByRole("option", { name: /Lefkada/i }).first();
+    await expect(option).toBeVisible({ timeout: 10_000 });
+    await option.click();
+    await expect(page.getByTestId("vessel-home-port-selected")).toContainText(/Lefkada/i);
+  });
+
+  test("lists countries from the destinations API", async ({ page }) => {
+    const api = await page.request.get("/api/destinations?q=Croatia&kind=country&limit=5");
+    expect(api.ok()).toBeTruthy();
+    const body = await api.json();
+    expect(
+      body.data?.some((row: { name: string; kind: string }) => row.name === "Croatia"),
+    ).toBeTruthy();
+
+    await page.goto("/");
+    const input = page.getByPlaceholder(/City or country/i).first();
+    await expect(input).toBeVisible();
+    await input.fill("Croa");
+    await expect(page.getByRole("option", { name: /Croatia/i }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+  });
+
+  test("opens with top port cities before typing", async ({ page }) => {
+    const api = await page.request.get("/api/destinations?kind=all&limit=5");
+    expect(api.ok()).toBeTruthy();
+    const body = (await api.json()) as {
+      data: Array<{ name: string; kind: string; detail: string }>;
+    };
+    expect(body.data).toHaveLength(TOP_BOAT_SITTING_PORT_CITIES.length);
+    expect(body.data.every((row) => row.kind === "City")).toBeTruthy();
+    expect(body.data.map((row) => row.name)).toEqual(
+      TOP_BOAT_SITTING_PORT_CITIES.map((city) => city.name),
+    );
+
+    await page.goto("/boats");
+    const input = page.getByPlaceholder(/City or country/i).first();
+    await input.click();
+    const list = page.getByTestId("destination-suggestions");
+    await expect(list).toBeVisible({ timeout: 10_000 });
+    for (const city of TOP_BOAT_SITTING_PORT_CITIES) {
+      await expect(list.getByRole("option", { name: new RegExp(city.name, "i") })).toBeVisible();
+    }
+    const names = await list
+      .getByTestId("destination-option-city")
+      .evaluateAll((nodes) =>
+        nodes.map((node) => node.textContent?.replace(/\s+/g, " ").trim() ?? ""),
+      );
+    expect(names).toHaveLength(TOP_BOAT_SITTING_PORT_CITIES.length);
+    expect(names[0]).toMatch(new RegExp(`^${TOP_BOAT_SITTING_PORT_CITIES[0].name}`));
+  });
+
+  test("returns countries before cities for mixed searches", async ({ page }) => {
+    const api = await page.request.get("/api/destinations?q=Portu&kind=all&limit=12");
+    expect(api.ok()).toBeTruthy();
+    const body = (await api.json()) as {
+      data: Array<{ name: string; kind: "City" | "Country" }>;
+    };
+    const kinds = body.data.map((row) => row.kind);
+    const firstCity = kinds.indexOf("City");
+    const lastCountry = kinds.lastIndexOf("Country");
+    expect(kinds.includes("Country")).toBeTruthy();
+    expect(kinds.includes("City")).toBeTruthy();
+    expect(lastCountry).toBeLessThan(firstCity);
+
+    await page.goto("/boats");
+    const input = page.getByPlaceholder(/City or country/i).first();
+    await input.click();
+    await input.fill("Portu");
+    const list = page.getByTestId("destination-suggestions");
+    await expect(list).toBeVisible({ timeout: 10_000 });
+    await expect(list.getByTestId("destination-option-country").first()).toBeVisible();
+    await expect(list.getByTestId("destination-option-city").first()).toBeVisible();
+
+    const optionKinds = await list
+      .locator("[data-testid^='destination-option-']")
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-testid")));
+    const firstCityOption = optionKinds.findIndex((id) => id === "destination-option-city");
+    const lastCountryOption = optionKinds.findLastIndex(
+      (id) => id === "destination-option-country",
+    );
+    expect(lastCountryOption).toBeLessThan(firstCityOption);
+  });
+
+  test("keeps multi-select chips out of the text input", async ({ page }) => {
+    await page.goto("/");
+    const field = page.getByTestId("home-destination");
+    const input = page.getByTestId("home-destination-input");
+    await expect(input).toBeVisible();
+
+    await input.click();
+    await input.fill("Aust");
+    await expect(page.getByRole("option", { name: /^Austria/i }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("option", { name: /^Austria/i })
+      .first()
+      .click();
+    await expect(field.getByText(/^Austria$/)).toBeVisible();
+    await expect(input).toHaveValue("");
+
+    await input.fill("Vien");
+    await expect(page.getByRole("option", { name: /^Vienna/i }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("option", { name: /^Vienna/i })
+      .first()
+      .click();
+    await expect(field.getByText(/^Vienna$/)).toBeVisible();
+    await expect(input).toHaveValue("");
+    await expect(input).not.toHaveValue(/\|/);
+  });
+});
