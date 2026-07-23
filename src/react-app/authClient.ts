@@ -35,6 +35,40 @@ export function resendVerificationEmail(email: string) {
   return authClient.sendVerificationEmail({ email, callbackURL: window.location.origin });
 }
 
+/** Change password for a signed-in credential account (requires current password). */
+export function changePassword(currentPassword: string, newPassword: string) {
+  return authClient.changePassword({
+    currentPassword,
+    newPassword,
+    revokeOtherSessions: true,
+  });
+}
+
+/** Change email for a signed-in user; sends a verification link to the new address. */
+export function changeEmail(newEmail: string) {
+  return authClient.changeEmail({ newEmail, callbackURL: `${window.location.origin}/?verified=1` });
+}
+
+/** Start "forgot password" / "set a password": emails a reset link to /reset-password. */
+export function requestPasswordReset(email: string) {
+  return authClient.requestPasswordReset({
+    email,
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+}
+
+/** Complete a password reset with the token from the emailed link. */
+export function resetPassword(newPassword: string, token: string) {
+  return authClient.resetPassword({ newPassword, token });
+}
+
+/** List the current user's linked accounts (providers) — e.g. ["credential"], ["google"]. */
+export async function listLinkedProviders(): Promise<string[]> {
+  const res = await authClient.listAccounts();
+  const accounts = (res?.data ?? []) as Array<{ providerId?: string; provider?: string }>;
+  return accounts.map((a) => a.providerId ?? a.provider ?? "").filter(Boolean);
+}
+
 export function signOut() {
   return authClient.signOut();
 }

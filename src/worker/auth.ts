@@ -57,6 +57,18 @@ export function buildAuth(env: Env, request?: Request) {
       // users). Until then the verification email still sends, but sign-in isn't
       // blocked — avoids locking out testers pre-domain.
       requireEmailVerification: env.REQUIRE_EMAIL_VERIFICATION === "true",
+      // "Forgot password" / "set a password" (for Google-only users) email.
+      resetPasswordTokenExpiresIn: 60 * 60, // 1 hour
+      sendResetPassword: async ({ user: u, url }) => {
+        await sendNotificationEmail(env, {
+          to: u.email,
+          subject: "Reset your Boatstead password",
+          heading: "Reset your password",
+          body: "Tap the button below to choose a new password. This link expires in 1 hour. If you didn't request this, you can ignore it.",
+          actionUrl: url,
+          actionLabel: "Reset password",
+        });
+      },
     },
     emailVerification: {
       sendOnSignUp: true,

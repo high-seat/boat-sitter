@@ -9,6 +9,7 @@ import {
 import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
 import { continueWithSocialProvider, type SocialProvider } from "@/mockAuth";
 import {
+  requestPasswordReset,
   resendVerificationEmail,
   signInWithEmail,
   signInWithGoogle,
@@ -178,6 +179,26 @@ export function AuthModal() {
     }
   }
 
+  async function forgotPassword() {
+    setError("");
+    setNotice("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      setError(t("auth.emailInvalid"));
+      return;
+    }
+    // Same response whether or not the email exists (no account enumeration).
+    const sent = t(
+      "auth.resetSent",
+      "If that email has an account, we've sent a link to reset your password.",
+    );
+    try {
+      await requestPasswordReset(form.email);
+    } catch {
+      // ignore — show the same message regardless
+    }
+    setNotice(sent);
+  }
+
   async function resendVerification() {
     if (!pendingVerifyEmail) return;
     setError("");
@@ -328,6 +349,15 @@ export function AuthModal() {
               <span className="mt-1 block text-xs text-slate">{t("auth.passwordHint")}</span>
             )}
           </label>
+          {mode === "login" && (
+            <button
+              className="-mt-1 self-start text-sm font-semibold text-teal hover:text-navy"
+              onClick={() => void forgotPassword()}
+              type="button"
+            >
+              {t("auth.forgotPassword", "Forgot password?")}
+            </button>
+          )}
           {mode === "signup" && (
             <TermsAgreementCheckbox
               checked={acceptedTerms}
