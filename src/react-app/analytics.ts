@@ -26,7 +26,7 @@ declare global {
 // separate staging property). Committing it means every build — any teammate's,
 // or CI — includes analytics without needing a local .env file.
 const MEASUREMENT_ID =
-  (import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined) ?? "G-QX5XWC25XK";
+  (import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined) ?? "G-FCW1NT333Y";
 const ENABLED = import.meta.env.PROD && Boolean(MEASUREMENT_ID);
 
 const CONSENT_KEY = "boatstead-analytics-consent";
