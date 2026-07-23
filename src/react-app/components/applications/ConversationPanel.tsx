@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { Ellipsis, Flag, Languages, LoaderCircle, Phone, Send, Video, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getIntlLocale } from "@/i18n";
@@ -17,10 +23,7 @@ import {
 } from "@/components/applications/formatApplicationSystemMessage";
 import { VideoCallCalendarLinks } from "@/components/applications/VideoCallCalendarLinks";
 
-function isOptimisticMessageSynced(
-  optimistic: ApplicationMessage,
-  messages: ApplicationMessage[],
-) {
+function isOptimisticMessageSynced(optimistic: ApplicationMessage, messages: ApplicationMessage[]) {
   return messages.some(
     (message) =>
       !message.pending &&
@@ -72,8 +75,7 @@ export function ConversationPanel({
   const remoteTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const lastMessageKey =
-    optimisticMessages.at(-1)?.id ?? application.messages.at(-1)?.id ?? "";
+  const lastMessageKey = optimisticMessages.at(-1)?.id ?? application.messages.at(-1)?.id ?? "";
 
   useEffect(() => {
     setReply("");
@@ -259,8 +261,7 @@ export function ConversationPanel({
 
   const newlineShortcut =
     typeof navigator !== "undefined" &&
-    (/Mac|iPhone|iPad|iPod/i.test(navigator.platform) ||
-      /Mac OS/i.test(navigator.userAgent))
+    (/Mac|iPhone|iPad|iPod/i.test(navigator.platform) || /Mac OS/i.test(navigator.userAgent))
       ? "⌘ Enter"
       : "Ctrl+Enter";
 
@@ -295,10 +296,7 @@ export function ConversationPanel({
             if (message.systemKind === "phoneShared" && message.sharedPhone) {
               const mine = message.senderName === currentUser;
               return (
-                <div
-                  className={`flex ${mine ? "justify-end" : "justify-start"}`}
-                  key={message.id}
-                >
+                <div className={`flex ${mine ? "justify-end" : "justify-start"}`} key={message.id}>
                   <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Phone aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
@@ -374,10 +372,7 @@ export function ConversationPanel({
                 (message.systemKind === "videoCallRequest" ||
                   message.systemKind === "videoCallCounter");
               return (
-                <div
-                  className={`flex ${mine ? "justify-end" : "justify-start"}`}
-                  key={message.id}
-                >
+                <div className={`flex ${mine ? "justify-end" : "justify-start"}`} key={message.id}>
                   <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Video aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
@@ -387,6 +382,17 @@ export function ConversationPanel({
                         {formatApplicationSystemMessage(t, message, application, currentUser)}
                       </p>
                       {details ? <p className="mt-2 font-semibold text-navy">{details}</p> : null}
+                      {message.videoCall?.meetUrl ? (
+                        <a
+                          className="mt-2 inline-flex items-center gap-2 rounded-full bg-navy px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal"
+                          href={message.videoCall.meetUrl}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          <Video aria-hidden="true" size={14} />
+                          {t("applications.videoCall.joinMeet")}
+                        </a>
+                      ) : null}
                       {message.systemKind === "videoCallAccepted" && message.videoCall ? (
                         <VideoCallCalendarLinks
                           event={{
@@ -577,9 +583,7 @@ export function ConversationPanel({
             type="button"
           >
             <Send size={16} />
-            {pending || hasOptimisticSend
-              ? t("applications.sending")
-              : t("applications.sendReply")}
+            {pending || hasOptimisticSend ? t("applications.sending") : t("applications.sendReply")}
           </button>
           <button
             className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"

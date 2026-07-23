@@ -68,18 +68,18 @@ npm run build && npm run deploy
 
 ### Applications _(writes require Better Auth session)_
 
-| Method | Path                                                  | Notes                                                              |
-| ------ | ----------------------------------------------------- | ------------------------------------------------------------------ |
+| Method | Path                                                  | Notes                                                                                                                                                                                                                                                                          |
+| ------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | GET    | `/api/applications?sitId=`                            | Applications for one listing; `sort` (`newest`/`experience`/`skillMatch`/`priorSits`), `status`, `experience` (`any`/`meetsMin`/`fivePlus`/`tenPlus`), `page`, `limit` (default 20, max 50). Response: `data`, `accepted`, `total`, `page`, `limit`, `totalPages`, `sitTotal`. |
-| GET    | `/api/applications?user=`                             | Where user is owner **or** applicant                               |
-| POST   | `/api/applications`                                   | `{ sitId, message, partySize?, applicant }`; identity from session |
-| PATCH  | `/api/applications/:id`                               | `{ status, ownerPhone? }`; owner only; emits system messages       |
-| POST   | `/api/applications/:id/withdraw`                      | Applicant withdraw + system message                                |
-| POST   | `/api/applications/:id/messages`                      | `{ text }`; sender from session                                    |
-| POST   | `/api/applications/:id/phone`                         | `{ phoneNumber }` phone-share system message                       |
-| POST   | `/api/applications/:id/video-call`                    | `{ startsAt, durationMinutes, counter? }` request/counter          |
-| POST   | `/api/applications/:id/video-call/:messageId/accept`  | Accept a proposal                                                  |
-| POST   | `/api/applications/:id/video-call/:messageId/decline` | Decline a proposal                                                 |
+| GET    | `/api/applications?user=`                             | Where user is owner **or** applicant                                                                                                                                                                                                                                           |
+| POST   | `/api/applications`                                   | `{ sitId, message, partySize?, applicant }`; identity from session                                                                                                                                                                                                             |
+| PATCH  | `/api/applications/:id`                               | `{ status, ownerPhone? }`; owner only; emits system messages                                                                                                                                                                                                                   |
+| POST   | `/api/applications/:id/withdraw`                      | Applicant withdraw + system message                                                                                                                                                                                                                                            |
+| POST   | `/api/applications/:id/messages`                      | `{ text }`; sender from session                                                                                                                                                                                                                                                |
+| POST   | `/api/applications/:id/phone`                         | `{ phoneNumber }` phone-share system message                                                                                                                                                                                                                                   |
+| POST   | `/api/applications/:id/video-call`                    | `{ startsAt, durationMinutes, counter? }` request/counter                                                                                                                                                                                                                      |
+| POST   | `/api/applications/:id/video-call/:messageId/accept`  | Accept a proposal                                                                                                                                                                                                                                                              |
+| POST   | `/api/applications/:id/video-call/:messageId/decline` | Decline a proposal                                                                                                                                                                                                                                                             |
 
 ### Prefs, uploads _(Better Auth session)_
 

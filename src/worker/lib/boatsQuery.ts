@@ -85,7 +85,9 @@ function buildWhere(params: BoatSearchParams): SQL | undefined {
     parts.push(sql`${lengthMetres} <= ${params.maxLengthM}`);
   }
   if (params.yearFrom != null && Number.isFinite(params.yearFrom)) {
-    parts.push(sql`${vessels.yearBuilt} is not null AND ${vessels.yearBuilt} >= ${params.yearFrom}`);
+    parts.push(
+      sql`${vessels.yearBuilt} is not null AND ${vessels.yearBuilt} >= ${params.yearFrom}`,
+    );
   }
   if (params.yearTo != null && Number.isFinite(params.yearTo)) {
     parts.push(sql`${vessels.yearBuilt} is not null AND ${vessels.yearBuilt} <= ${params.yearTo}`);

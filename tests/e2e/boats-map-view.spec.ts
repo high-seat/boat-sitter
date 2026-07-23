@@ -16,7 +16,9 @@ test.describe("boats map view", () => {
     await expect
       .poll(async () => {
         const progress = await page.getByText(/Loaded \d+ of \d+ sits onto the map/i).count();
-        const markersReady = await page.getByRole("region", { name: /Boat sit search map/i }).count();
+        const markersReady = await page
+          .getByRole("region", { name: /Boat sit search map/i })
+          .count();
         return progress > 0 || markersReady > 0;
       })
       .toBeTruthy();

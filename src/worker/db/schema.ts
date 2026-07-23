@@ -158,7 +158,7 @@ export const applications = sqliteTable(
 );
 
 export type MessagePayload = {
-  videoCall?: { startsAt: string; durationMinutes: number };
+  videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
   sharedPhone?: string;
 };
 

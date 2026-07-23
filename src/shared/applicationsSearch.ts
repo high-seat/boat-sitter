@@ -185,9 +185,7 @@ export function paginateApplicationList<T>(
   const returnAll = limitInput == null || limitInput <= 0;
   const limit = returnAll ? Math.max(total, 1) : Math.min(50, Math.max(1, Math.floor(limitInput)));
   const totalPages = Math.max(1, Math.ceil(total / limit));
-  const page = returnAll
-    ? 0
-    : Math.min(Math.max(0, Math.floor(pageInput ?? 0)), totalPages - 1);
+  const page = returnAll ? 0 : Math.min(Math.max(0, Math.floor(pageInput ?? 0)), totalPages - 1);
   const offset = returnAll ? 0 : page * limit;
   return {
     items: returnAll ? items : items.slice(offset, offset + limit),

@@ -22,6 +22,7 @@ import {
 } from "../db/schema";
 import { insertNotification } from "../lib/notifications";
 import { sendNotificationEmail } from "../email";
+import { createMeetLink } from "../gcal";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -649,6 +650,18 @@ applicationsRouter.post(
     const isCounter = Boolean(body.counter);
     const systemKind = isCounter ? "videoCallCounter" : "videoCallRequest";
 
+    // If the proposer signed in with Google (with calendar access), create a
+    // real Google Meet + calendar invite for the other party. Returns null and
+    // degrades gracefully for non-Google users or any API issue.
+    const otherId = user.id === app.applicantUserId ? ownerId : app.applicantUserId;
+    const attendeeEmail = await emailForUserId(c.env, otherId);
+    const meetUrl = await createMeetLink(c.env, user.id, {
+      summary: `Boatstead video call — ${app.boatName}`,
+      startsAt: startsAt.toISOString(),
+      durationMinutes,
+      attendeeEmail,
+    });
+
     await insertSystemMessage(c.env, {
       applicationId: id,
       senderName: user.name,
@@ -656,7 +669,13 @@ applicationsRouter.post(
         ? `${user.name} suggested a different video call time`
         : `${user.name} proposed a video call`,
       systemKind,
-      payload: { videoCall: { startsAt: startsAt.toISOString(), durationMinutes } },
+      payload: {
+        videoCall: {
+          startsAt: startsAt.toISOString(),
+          durationMinutes,
+          ...(meetUrl ? { meetUrl } : {}),
+        },
+      },
     });
 
     const msgs = await loadMessages(c.env, [id]);

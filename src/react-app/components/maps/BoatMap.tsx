@@ -37,9 +37,7 @@ function MapViewport({ boats, fitKey }: { boats: Boat[]; fitKey: string }) {
       return;
     }
     const current = map.getBounds();
-    const needsExpand = boats.some(
-      (boat) => !current.contains([boat.latitude, boat.longitude]),
-    );
+    const needsExpand = boats.some((boat) => !current.contains([boat.latitude, boat.longitude]));
     if (needsExpand) {
       map.fitBounds(bounds, { maxZoom: 10, padding: [45, 45], animate: false });
     }

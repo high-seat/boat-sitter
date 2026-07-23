@@ -129,8 +129,13 @@ test.describe("sit emergency help during underway", () => {
     await page.goto("/my-sits");
     await expect(page.getByTestId("sit-emergency-help").first()).toBeVisible();
     await page.getByTestId("sit-emergency-help").first().click();
-    await expect(page.getByRole("dialog").getByRole("heading", { name: /In an emergency/i })).toBeVisible();
-    await page.getByRole("dialog").getByRole("button", { name: /Got it/i }).click();
+    await expect(
+      page.getByRole("dialog").getByRole("heading", { name: /In an emergency/i }),
+    ).toBeVisible();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: /Got it/i })
+      .click();
 
     await page.goto("/messages?application=application-underway-emergency-e2e");
     await expect(page.getByTestId("sit-emergency-help")).toBeVisible();

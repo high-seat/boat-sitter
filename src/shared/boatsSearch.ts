@@ -154,11 +154,9 @@ export function filterBoats<T extends BoatSearchItem>(boats: T[], params: BoatSe
 
     const metres = boatLengthMetres(boat.length);
     const matchesMinLength =
-      params.minLengthM == null ||
-      (Number.isFinite(metres) && metres >= params.minLengthM);
+      params.minLengthM == null || (Number.isFinite(metres) && metres >= params.minLengthM);
     const matchesMaxLength =
-      params.maxLengthM == null ||
-      (Number.isFinite(metres) && metres <= params.maxLengthM);
+      params.maxLengthM == null || (Number.isFinite(metres) && metres <= params.maxLengthM);
     const year = boat.yearBuilt;
     const matchesYearFrom =
       params.yearFrom == null ||
@@ -301,8 +299,7 @@ export function parseBoatsSearchParams(
     maxLengthRaw != null && maxLengthRaw !== "" ? Number.parseFloat(maxLengthRaw) : undefined;
   const yearFrom =
     yearFromRaw != null && yearFromRaw !== "" ? Number.parseInt(yearFromRaw, 10) : undefined;
-  const yearTo =
-    yearToRaw != null && yearToRaw !== "" ? Number.parseInt(yearToRaw, 10) : undefined;
+  const yearTo = yearToRaw != null && yearToRaw !== "" ? Number.parseInt(yearToRaw, 10) : undefined;
   return {
     q: get("q") || undefined,
     type: vesselTypeFromParam(get("type")),

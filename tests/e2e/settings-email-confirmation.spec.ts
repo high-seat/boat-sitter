@@ -27,6 +27,6 @@ test.describe("settings email confirmation", () => {
     await expect(dialog.getByText(/maya\.finn@boatstead\.mock/i)).toBeVisible();
     await expect(dialog.locator('input[type="email"]')).toHaveCount(1);
     await expect(dialog.getByLabel(/New email/i)).toBeVisible();
-    await expect(dialog.locator('input[readonly]')).toHaveCount(0);
+    await expect(dialog.locator("input[readonly]")).toHaveCount(0);
   });
 });

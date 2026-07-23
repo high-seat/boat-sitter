@@ -66,8 +66,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Open {{location}} in Maps",
     "map.approximateLocationNote":
       "This pin marks the general area. Exact berth details are shared after you apply.",
-      "map.loadingMore": "Loading sits onto the map…",
-      "map.loadingProgress": "Loaded {{loaded}} of {{total}} sits onto the map",
+    "map.loadingMore": "Loading sits onto the map…",
+    "map.loadingProgress": "Loaded {{loaded}} of {{total}} sits onto the map",
     "home.heroImageAlt": "Sailboat anchored in a clear bay",
     "apply.defaultMessage":
       "Hi {{owner}}, I’d love to care for {{boat}}. I have relevant boat experience and would be happy to arrange a video call.",
@@ -637,8 +637,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Year of manufacture",
     "vesselEditor.yearBuiltPlaceholder": "e.g. 2012",
     "vesselEditor.yearBuiltUnknown": "I don’t know",
-    "vesselEditor.yearBuiltHint": "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
-    "vesselEditor.yearBuiltInvalid": "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
+    "vesselEditor.yearBuiltHint":
+      "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
     "settings.signInTitle": "Sign in to view settings",
     "settings.signInText": "Site preferences are saved to your member account.",
     "command.label": "Boatstead command palette",
@@ -1010,8 +1012,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Ouvrir {{location}} dans Plans",
     "map.approximateLocationNote":
       "Cette épingle indique la zone générale. Les détails exacts du poste à quai sont partagés après votre candidature.",
-      "map.loadingMore": "Chargement des gardes sur la carte…",
-      "map.loadingProgress": "{{loaded}} gardes sur {{total}} chargées sur la carte",
+    "map.loadingMore": "Chargement des gardes sur la carte…",
+    "map.loadingProgress": "{{loaded}} gardes sur {{total}} chargées sur la carte",
     "home.heroImageAlt": "Voilier ancré dans une baie dégagée",
     "apply.defaultMessage":
       "Salut {{owner}}, j'aimerais m'occuper de {{boat}}. J'ai une expérience pertinente en bateau et je serais heureux d'organiser un appel vidéo.",
@@ -1606,8 +1608,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Année de construction",
     "vesselEditor.yearBuiltPlaceholder": "ex. 2012",
     "vesselEditor.yearBuiltUnknown": "Je ne sais pas",
-    "vesselEditor.yearBuiltHint": "Saisissez une année entre {{min}} et {{max}}, ou choisissez « Je ne sais pas ».",
-    "vesselEditor.yearBuiltInvalid": "Saisissez une année entre {{min}} et {{max}}, ou choisissez « Je ne sais pas ».",
+    "vesselEditor.yearBuiltHint":
+      "Saisissez une année entre {{min}} et {{max}}, ou choisissez « Je ne sais pas ».",
+    "vesselEditor.yearBuiltInvalid":
+      "Saisissez une année entre {{min}} et {{max}}, ou choisissez « Je ne sais pas ».",
     "settings.signInTitle": "Connectez-vous pour afficher les paramètres",
     "settings.signInText": "Les préférences du site sont enregistrées sur votre compte membre.",
     "command.label": "Palette de commandes Boatstead",
@@ -1982,8 +1986,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Abrir {{location}} en Mapas",
     "map.approximateLocationNote":
       "Este pin marca la zona general. Los detalles exactos del amarre se comparten después de solicitar.",
-      "map.loadingMore": "Cargando sits en el mapa…",
-      "map.loadingProgress": "Cargados {{loaded}} de {{total}} sits en el mapa",
+    "map.loadingMore": "Cargando sits en el mapa…",
+    "map.loadingProgress": "Cargados {{loaded}} de {{total}} sits en el mapa",
     "home.heroImageAlt": "Velero anclado en una bahía clara",
     "apply.defaultMessage":
       "Hola {{owner}}, me encantaría cuidar de {{boat}}. Tengo experiencia relevante en barcos y estaré encantado de concertar una videollamada.",
@@ -2579,7 +2583,8 @@ const localeExtrasSource = {
     "vesselEditor.yearBuiltPlaceholder": "p. ej. 2012",
     "vesselEditor.yearBuiltUnknown": "No lo sé",
     "vesselEditor.yearBuiltHint": "Introduce un año entre {{min}} y {{max}}, o elige “No lo sé”.",
-    "vesselEditor.yearBuiltInvalid": "Introduce un año entre {{min}} y {{max}}, o elige “No lo sé”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Introduce un año entre {{min}} y {{max}}, o elige “No lo sé”.",
     "settings.signInTitle": "Inicia sesión para ver la configuración",
     "settings.signInText": "Las preferencias del sitio se guardan en su cuenta de miembro.",
     "command.label": "Paleta de comandos Boatstead",
@@ -2954,8 +2959,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Apri {{location}} in Mappe",
     "map.approximateLocationNote":
       "Questo pin indica l’area generale. I dettagli esatti dell’ormeggio vengono condivisi dopo la candidatura.",
-      "map.loadingMore": "Caricamento dei sit sulla mappa…",
-      "map.loadingProgress": "Caricati {{loaded}} di {{total}} sit sulla mappa",
+    "map.loadingMore": "Caricamento dei sit sulla mappa…",
+    "map.loadingProgress": "Caricati {{loaded}} di {{total}} sit sulla mappa",
     "home.heroImageAlt": "Barca a vela ancorata in una baia limpida",
     "apply.defaultMessage":
       "Ciao {{owner}}, mi piacerebbe prendermi cura di {{boat}}. Ho esperienza in barca e sarei felice di organizzare una videochiamata.",
@@ -3548,8 +3553,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Anno di costruzione",
     "vesselEditor.yearBuiltPlaceholder": "es. 2012",
     "vesselEditor.yearBuiltUnknown": "Non lo so",
-    "vesselEditor.yearBuiltHint": "Inserisci un anno tra {{min}} e {{max}}, oppure scegli “Non lo so”.",
-    "vesselEditor.yearBuiltInvalid": "Inserisci un anno tra {{min}} e {{max}}, oppure scegli “Non lo so”.",
+    "vesselEditor.yearBuiltHint":
+      "Inserisci un anno tra {{min}} e {{max}}, oppure scegli “Non lo so”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Inserisci un anno tra {{min}} e {{max}}, oppure scegli “Non lo so”.",
     "settings.signInTitle": "Accedi per visualizzare le impostazioni",
     "settings.signInText": "Le preferenze del sito vengono salvate nel tuo account membro.",
     "command.label": "Tavolozza dei comandi Boatstead",
@@ -3923,8 +3930,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "{{location}} in Karten öffnen",
     "map.approximateLocationNote":
       "Diese Markierung zeigt nur den allgemeinen Bereich. Genaue Liegeplatzdetails werden nach der Bewerbung geteilt.",
-      "map.loadingMore": "Sits werden auf die Karte geladen…",
-      "map.loadingProgress": "{{loaded}} von {{total}} Sits auf die Karte geladen",
+    "map.loadingMore": "Sits werden auf die Karte geladen…",
+    "map.loadingProgress": "{{loaded}} von {{total}} Sits auf die Karte geladen",
     "home.heroImageAlt": "Segelboot vor Anker in einer klaren Bucht",
     "apply.defaultMessage":
       "Hallo {{owner}}, ich würde mich gerne um {{boat}} kümmern. Ich verfüge über einschlägige Bootserfahrung und würde gerne einen Videoanruf vereinbaren.",
@@ -4363,8 +4370,7 @@ const localeExtrasSource = {
     "sitEditor.certifications": "Zertifizierungen",
     "sitEditor.skills": "Praktische Fähigkeiten",
     "sitEditor.nonSmoker": "Muss Nichtraucher sein",
-    "sitEditor.nonSmokerHint":
-      "Verlange Sitter, die an Bord und während des Sits nicht rauchen.",
+    "sitEditor.nonSmokerHint": "Verlange Sitter, die an Bord und während des Sits nicht rauchen.",
     "requirement.nonSmoker": "Nichtraucher",
     "sitEditor.additional": "Zusätzliche Sitteranforderungen",
     "sitEditor.additionalPlaceholder": "Eine pro Zeile, zum Beispiel zwei aktuelle Referenzen",
@@ -4529,8 +4535,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Baujahr",
     "vesselEditor.yearBuiltPlaceholder": "z. B. 2012",
     "vesselEditor.yearBuiltUnknown": "Weiß ich nicht",
-    "vesselEditor.yearBuiltHint": "Gib ein Jahr zwischen {{min}} und {{max}} ein, oder wähle „Weiß ich nicht“.",
-    "vesselEditor.yearBuiltInvalid": "Gib ein Jahr zwischen {{min}} und {{max}} ein, oder wähle „Weiß ich nicht“.",
+    "vesselEditor.yearBuiltHint":
+      "Gib ein Jahr zwischen {{min}} und {{max}} ein, oder wähle „Weiß ich nicht“.",
+    "vesselEditor.yearBuiltInvalid":
+      "Gib ein Jahr zwischen {{min}} und {{max}} ein, oder wähle „Weiß ich nicht“.",
     "settings.signInTitle": "Melden Sie sich an, um die Einstellungen anzuzeigen",
     "settings.signInText": "Die Website-Einstellungen werden in Ihrem Mitgliedskonto gespeichert.",
     "command.label": "Boatstead-Befehlspalette",
@@ -4904,8 +4912,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "{{location}} openen in Kaarten",
     "map.approximateLocationNote":
       "Deze pin toont alleen het algemene gebied. Exacte ligplaatsdetails worden gedeeld na je aanmelding.",
-      "map.loadingMore": "Sits op de kaart laden…",
-      "map.loadingProgress": "{{loaded}} van {{total}} sits op de kaart geladen",
+    "map.loadingMore": "Sits op de kaart laden…",
+    "map.loadingProgress": "{{loaded}} van {{total}} sits op de kaart geladen",
     "home.heroImageAlt": "Zeilboot verankerd in een heldere baai",
     "apply.defaultMessage":
       "Hallo {{owner}}, ik zou graag voor de {{boat}} zorgen. Ik heb relevante bootervaring en plan graag een videogesprek.",
@@ -5494,8 +5502,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Bouwjaar",
     "vesselEditor.yearBuiltPlaceholder": "bijv. 2012",
     "vesselEditor.yearBuiltUnknown": "Weet ik niet",
-    "vesselEditor.yearBuiltHint": "Voer een jaar in tussen {{min}} en {{max}}, of kies “Weet ik niet”.",
-    "vesselEditor.yearBuiltInvalid": "Voer een jaar in tussen {{min}} en {{max}}, of kies “Weet ik niet”.",
+    "vesselEditor.yearBuiltHint":
+      "Voer een jaar in tussen {{min}} en {{max}}, of kies “Weet ik niet”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Voer een jaar in tussen {{min}} en {{max}}, of kies “Weet ik niet”.",
     "settings.signInTitle": "Meld u aan om de instellingen te bekijken",
     "settings.signInText": "Sitevoorkeuren worden opgeslagen in uw ledenaccount.",
     "command.label": "Boatstead-opdrachtpalet",
@@ -5868,8 +5878,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Abrir {{location}} no Mapas",
     "map.approximateLocationNote":
       "Este pin marca a zona geral. Os detalhes exatos do cais são partilhados depois de se candidatar.",
-      "map.loadingMore": "A carregar sits para o mapa…",
-      "map.loadingProgress": "Carregados {{loaded}} de {{total}} sits no mapa",
+    "map.loadingMore": "A carregar sits para o mapa…",
+    "map.loadingProgress": "Carregados {{loaded}} de {{total}} sits no mapa",
     "home.heroImageAlt": "Veleiro ancorado em uma baía clara",
     "apply.defaultMessage":
       "Olá {{owner}}, adoraria cuidar do {{boat}}. Tenho experiência relevante em barcos e ficaria feliz em organizar uma videochamada.",
@@ -6459,7 +6469,8 @@ const localeExtrasSource = {
     "vesselEditor.yearBuiltPlaceholder": "ex. 2012",
     "vesselEditor.yearBuiltUnknown": "Não sei",
     "vesselEditor.yearBuiltHint": "Introduza um ano entre {{min}} e {{max}}, ou escolha “Não sei”.",
-    "vesselEditor.yearBuiltInvalid": "Introduza um ano entre {{min}} e {{max}}, ou escolha “Não sei”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Introduza um ano entre {{min}} e {{max}}, ou escolha “Não sei”.",
     "settings.signInTitle": "Faça login para ver as configurações",
     "settings.signInText": "As preferências do site são salvas na sua conta de membro.",
     "command.label": "Paleta de comandos Boatstead",
@@ -6833,8 +6844,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Άνοιγμα της τοποθεσίας {{location}} στους Χάρτες",
     "map.approximateLocationNote":
       "Αυτή η καρφίτσα δείχνει την γενική περιοχή. Οι ακριβείς λεπτομέρειες θέσης μοιράζονται μετά την αίτηση.",
-      "map.loadingMore": "Φόρτωση sits στον χάρτη…",
-      "map.loadingProgress": "Φορτώθηκαν {{loaded}} από {{total}} sits στον χάρτη",
+    "map.loadingMore": "Φόρτωση sits στον χάρτη…",
+    "map.loadingProgress": "Φορτώθηκαν {{loaded}} από {{total}} sits στον χάρτη",
     "home.heroImageAlt": "Ιστιοφόρο αγκυροβολημένο σε έναν καθαρό κόλπο",
     "apply.defaultMessage":
       "Γεια σου {{owner}}, θα ήθελα πολύ να φροντίσω το {{boat}}. Έχω σχετική εμπειρία με σκάφος και θα χαρώ να κανονίσω μια βιντεοκλήση.",
@@ -7434,8 +7445,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Έτος ναυπήγησης",
     "vesselEditor.yearBuiltPlaceholder": "π.χ. 2012",
     "vesselEditor.yearBuiltUnknown": "Δεν γνωρίζω",
-    "vesselEditor.yearBuiltHint": "Εισαγάγετε έτος μεταξύ {{min}} και {{max}}, ή επιλέξτε «Δεν γνωρίζω».",
-    "vesselEditor.yearBuiltInvalid": "Εισαγάγετε έτος μεταξύ {{min}} και {{max}}, ή επιλέξτε «Δεν γνωρίζω».",
+    "vesselEditor.yearBuiltHint":
+      "Εισαγάγετε έτος μεταξύ {{min}} και {{max}}, ή επιλέξτε «Δεν γνωρίζω».",
+    "vesselEditor.yearBuiltInvalid":
+      "Εισαγάγετε έτος μεταξύ {{min}} και {{max}}, ή επιλέξτε «Δεν γνωρίζω».",
     "settings.signInTitle": "Συνδεθείτε για να δείτε τις ρυθμίσεις",
     "settings.signInText": "Οι προτιμήσεις ιστότοπου αποθηκεύονται στον λογαριασμό μέλους σας.",
     "command.label": "Παλέτα εντολών Boatstead",
@@ -7811,8 +7824,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Otvori {{location}} u Kartama",
     "map.approximateLocationNote":
       "Ova oznaka pokazuje opću lokaciju. Točne informacije o vezistu dijele se nakon prijave.",
-      "map.loadingMore": "Učitavanje sitova na kartu…",
-      "map.loadingProgress": "Učitano {{loaded}} od {{total}} sitova na kartu",
+    "map.loadingMore": "Učitavanje sitova na kartu…",
+    "map.loadingProgress": "Učitano {{loaded}} od {{total}} sitova na kartu",
     "home.heroImageAlt": "Jedrilica usidrena u čistoj uvali",
     "apply.defaultMessage":
       "Bok {{owner}}, volio bih se brinuti za {{boat}}. Imam odgovarajuće iskustvo s brodom i rado ću organizirati video poziv.",
@@ -8401,8 +8414,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Godina izgradnje",
     "vesselEditor.yearBuiltPlaceholder": "npr. 2012",
     "vesselEditor.yearBuiltUnknown": "Ne znam",
-    "vesselEditor.yearBuiltHint": "Unesite godinu između {{min}} i {{max}} ili odaberite “Ne znam”.",
-    "vesselEditor.yearBuiltInvalid": "Unesite godinu između {{min}} i {{max}} ili odaberite “Ne znam”.",
+    "vesselEditor.yearBuiltHint":
+      "Unesite godinu između {{min}} i {{max}} ili odaberite “Ne znam”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Unesite godinu između {{min}} i {{max}} ili odaberite “Ne znam”.",
     "settings.signInTitle": "Prijavite se za pregled postavki",
     "settings.signInText": "Postavke web mjesta spremaju se na vaš članski račun.",
     "command.label": "Boatstead paleta naredbi",
@@ -8775,8 +8790,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "{{location}} konumunu Haritalarda aç",
     "map.approximateLocationNote":
       "Bu iğne genel bölgeyi gösterir. Tam bağlama yeri bilgileri başvurudan sonra paylaşılır.",
-      "map.loadingMore": "Sitler haritaya yükleniyor…",
-      "map.loadingProgress": "Haritaya {{total}} sitten {{loaded}} yüklendi",
+    "map.loadingMore": "Sitler haritaya yükleniyor…",
+    "map.loadingProgress": "Haritaya {{total}} sitten {{loaded}} yüklendi",
     "home.heroImageAlt": "Açık bir koyda demirlemiş yelkenli",
     "apply.defaultMessage":
       "Merhaba {{owner}}, {{boat}} ile ilgilenmeyi çok isterim. İlgili tekne deneyimim var ve görüntülü görüşme ayarlamaktan memnuniyet duyarım.",
@@ -9352,8 +9367,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "İmalat yılı",
     "vesselEditor.yearBuiltPlaceholder": "örn. 2012",
     "vesselEditor.yearBuiltUnknown": "Bilmiyorum",
-    "vesselEditor.yearBuiltHint": "{{min}} ile {{max}} arasında bir yıl girin veya “Bilmiyorum”u seçin.",
-    "vesselEditor.yearBuiltInvalid": "{{min}} ile {{max}} arasında bir yıl girin veya “Bilmiyorum”u seçin.",
+    "vesselEditor.yearBuiltHint":
+      "{{min}} ile {{max}} arasında bir yıl girin veya “Bilmiyorum”u seçin.",
+    "vesselEditor.yearBuiltInvalid":
+      "{{min}} ile {{max}} arasında bir yıl girin veya “Bilmiyorum”u seçin.",
     "settings.signInTitle": "Ayarları görüntülemek için oturum açın",
     "settings.signInText": "Site tercihleri üye hesabınıza kaydedilir.",
     "command.label": "Boatstead komut paleti",
@@ -9726,8 +9743,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Öppna {{location}} i Maps",
     "map.approximateLocationNote":
       "Denna stift markerar det allmänna området. Exakta kajdetaljer delas efter att du ansökt.",
-      "map.loadingMore": "Laddar sits till kartan…",
-      "map.loadingProgress": "Laddade {{loaded}} av {{total}} sits till kartan",
+    "map.loadingMore": "Laddar sits till kartan…",
+    "map.loadingProgress": "Laddade {{loaded}} av {{total}} sits till kartan",
     "home.heroImageAlt": "Segelbåt förankrad i en klar vik",
     "apply.defaultMessage":
       "Hej {{owner}}, jag skulle gärna ta hand om {{boat}}. Jag har relevant båtvana och ordnar gärna ett videosamtal.",
@@ -10307,8 +10324,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Tillverkningsår",
     "vesselEditor.yearBuiltPlaceholder": "t.ex. 2012",
     "vesselEditor.yearBuiltUnknown": "Jag vet inte",
-    "vesselEditor.yearBuiltHint": "Ange ett år mellan {{min}} och {{max}}, eller välj “Jag vet inte”.",
-    "vesselEditor.yearBuiltInvalid": "Ange ett år mellan {{min}} och {{max}}, eller välj “Jag vet inte”.",
+    "vesselEditor.yearBuiltHint":
+      "Ange ett år mellan {{min}} och {{max}}, eller välj “Jag vet inte”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Ange ett år mellan {{min}} och {{max}}, eller välj “Jag vet inte”.",
     "settings.signInTitle": "Logga in för att se inställningar",
     "settings.signInText": "Webbplatsinställningar sparas på ditt medlemskonto.",
     "command.label": "Boatstead kommandopalett",
@@ -10682,8 +10701,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Åpne {{location}} i Maps",
     "map.approximateLocationNote":
       "Denne pinnen markerer det generelle området. Nøyaktige kaidetaljer deles etter at du har søkt.",
-      "map.loadingMore": "Laster sits inn på kartet…",
-      "map.loadingProgress": "Lastet {{loaded}} av {{total}} sits inn på kartet",
+    "map.loadingMore": "Laster sits inn på kartet…",
+    "map.loadingProgress": "Lastet {{loaded}} av {{total}} sits inn på kartet",
     "home.heroImageAlt": "Seilbåt ankret i en klar bukt",
     "apply.defaultMessage":
       "Hei {{owner}}, jeg vil gjerne ta vare på {{boat}}. Jeg har relevant båterfaring og arrangerer gjerne en videosamtale.",
@@ -11261,8 +11280,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Produksjonsår",
     "vesselEditor.yearBuiltPlaceholder": "f.eks. 2012",
     "vesselEditor.yearBuiltUnknown": "Jeg vet ikke",
-    "vesselEditor.yearBuiltHint": "Skriv inn et år mellom {{min}} og {{max}}, eller velg “Jeg vet ikke”.",
-    "vesselEditor.yearBuiltInvalid": "Skriv inn et år mellom {{min}} og {{max}}, eller velg “Jeg vet ikke”.",
+    "vesselEditor.yearBuiltHint":
+      "Skriv inn et år mellom {{min}} og {{max}}, eller velg “Jeg vet ikke”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Skriv inn et år mellom {{min}} og {{max}}, eller velg “Jeg vet ikke”.",
     "settings.signInTitle": "Logg på for å se innstillinger",
     "settings.signInText": "Nettstedspreferanser lagres på medlemskontoen din.",
     "command.label": "Boatstead kommandopalett",
@@ -11635,8 +11656,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Åbn {{location}} i Maps",
     "map.approximateLocationNote":
       "Denne stift markerer det generelle område. De nøjagtige oplysninger om kajpladsen deles, når du har ansøgt.",
-      "map.loadingMore": "Indlæser sits på kortet…",
-      "map.loadingProgress": "Indlæste {{loaded}} af {{total}} sits på kortet",
+    "map.loadingMore": "Indlæser sits på kortet…",
+    "map.loadingProgress": "Indlæste {{loaded}} af {{total}} sits på kortet",
     "home.heroImageAlt": "Sejlbåd forankret i en klar bugt",
     "apply.defaultMessage":
       "Hej {{owner}}, jeg ville elske at passe {{boat}}. Jeg har relevant båderfaring og arrangerer gerne et videoopkald.",
@@ -12212,8 +12233,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Produktionsår",
     "vesselEditor.yearBuiltPlaceholder": "f.eks. 2012",
     "vesselEditor.yearBuiltUnknown": "Jeg ved det ikke",
-    "vesselEditor.yearBuiltHint": "Angiv et år mellem {{min}} og {{max}}, eller vælg “Jeg ved det ikke”.",
-    "vesselEditor.yearBuiltInvalid": "Angiv et år mellem {{min}} og {{max}}, eller vælg “Jeg ved det ikke”.",
+    "vesselEditor.yearBuiltHint":
+      "Angiv et år mellem {{min}} og {{max}}, eller vælg “Jeg ved det ikke”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Angiv et år mellem {{min}} og {{max}}, eller vælg “Jeg ved det ikke”.",
     "settings.signInTitle": "Log ind for at se indstillinger",
     "settings.signInText": "Webstedspræferencer gemmes på din medlemskonto.",
     "command.label": "Boatstead kommandopalet",
@@ -12585,8 +12608,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Avaa {{location}} Mapsissa",
     "map.approximateLocationNote":
       "Tämä tappi merkitsee yleisen alueen. Tarkat makuupaikkatiedot jaetaan hakemuksen jättämisen jälkeen.",
-      "map.loadingMore": "Ladataan sitejä kartalle…",
-      "map.loadingProgress": "Ladattu {{loaded}}/{{total}} sitiä kartalle",
+    "map.loadingMore": "Ladataan sitejä kartalle…",
+    "map.loadingProgress": "Ladattu {{loaded}}/{{total}} sitiä kartalle",
     "home.heroImageAlt": "Purjevene ankkuroituna selkeään lahteen",
     "apply.defaultMessage":
       "Hei {{owner}}, haluaisin hoitaa {{boat}}. Minulla on kokemusta veneestä ja järjestän mielelläni videopuhelun.",
@@ -13543,8 +13566,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "マップで {{location}} を開く",
     "map.approximateLocationNote":
       "このピンは一般的な領域をマークします。正確な寝台詳細は、お申し込み後に共有されます。",
-      "map.loadingMore": "マップにシットを読み込み中…",
-      "map.loadingProgress": "マップに {{total}} 件中 {{loaded}} 件のシットを読み込みました",
+    "map.loadingMore": "マップにシットを読み込み中…",
+    "map.loadingProgress": "マップに {{total}} 件中 {{loaded}} 件のシットを読み込みました",
     "home.heroImageAlt": "澄んだ湾に停泊する帆船",
     "apply.defaultMessage":
       "こんにちは {{owner}}、{{boat}} の世話をしたいと思っています。私にはボートの経験があり、喜んでビデオ通話を手配させていただきます。",
@@ -14125,8 +14148,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "建造年",
     "vesselEditor.yearBuiltPlaceholder": "例: 2012",
     "vesselEditor.yearBuiltUnknown": "わからない",
-    "vesselEditor.yearBuiltHint": "{{min}}から{{max}}の年を入力するか、「わからない」を選んでください。",
-    "vesselEditor.yearBuiltInvalid": "{{min}}から{{max}}の年を入力するか、「わからない」を選んでください。",
+    "vesselEditor.yearBuiltHint":
+      "{{min}}から{{max}}の年を入力するか、「わからない」を選んでください。",
+    "vesselEditor.yearBuiltInvalid":
+      "{{min}}から{{max}}の年を入力するか、「わからない」を選んでください。",
     "settings.signInTitle": "サインインして設定を表示する",
     "settings.signInText": "サイト設定はメンバー アカウントに保存されます。",
     "command.label": "Boatstead コマンド パレット",
@@ -14499,8 +14524,8 @@ const localeExtrasSource = {
     "map.openInMapsAriaLabel": "Open {{location}} in Maps",
     "map.approximateLocationNote":
       "This pin marks the general area. Exact berth details are shared after you apply.",
-      "map.loadingMore": "Loading sits onto the map…",
-      "map.loadingProgress": "Loaded {{loaded}} of {{total}} sits onto the map",
+    "map.loadingMore": "Loading sits onto the map…",
+    "map.loadingProgress": "Loaded {{loaded}} of {{total}} sits onto the map",
     "home.heroImageAlt": "Sailboat anchored in a clear bay",
     "apply.defaultMessage":
       "Hi {{owner}}, I’d love to care for {{boat}}. I have relevant boat experience and would be happy to arrange a video call.",
@@ -15070,8 +15095,10 @@ const localeExtrasSource = {
     "vesselEditor.yearBuilt": "Year of manufacture",
     "vesselEditor.yearBuiltPlaceholder": "e.g. 2012",
     "vesselEditor.yearBuiltUnknown": "I don’t know",
-    "vesselEditor.yearBuiltHint": "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
-    "vesselEditor.yearBuiltInvalid": "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
+    "vesselEditor.yearBuiltHint":
+      "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
+    "vesselEditor.yearBuiltInvalid":
+      "Enter a year between {{min}} and {{max}}, or choose “I don’t know”.",
     "settings.signInTitle": "Sign in to view settings",
     "settings.signInText": "Site preferences are saved to your member account.",
     "command.label": "Boatstead command palette",

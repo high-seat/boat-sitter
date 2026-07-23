@@ -45,6 +45,12 @@ export function buildAuth(env: Env) {
       google: {
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
+        // Calendar access so we can create Google Meet links for video calls.
+        // accessType offline + prompt consent → we receive a refresh token,
+        // letting us mint Meet links server-side after the login token expires.
+        scope: ["https://www.googleapis.com/auth/calendar.events"],
+        accessType: "offline",
+        prompt: "consent",
       },
     },
     trustedOrigins: [

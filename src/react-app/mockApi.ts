@@ -1836,6 +1836,7 @@ export type ApplicationMessage = {
   videoCall?: {
     startsAt: string;
     durationMinutes: number;
+    meetUrl?: string;
   };
   /** Profile phone shared into the thread (E.164-ish display string). */
   sharedPhone?: string;

@@ -17,16 +17,16 @@ aligned to the same meaning.
 **Sit** is the product noun for a boat-sitting arrangement (the listing, dates,
 and care period).
 
-| Prefer | Avoid (product noun) |
-| ------ | -------------------- |
-| sit / sits | stay / stays |
-| create a sit | create a stay |
-| during the sit | during the stay |
-| sit underway | stay underway |
-| sit completed | stay completed |
-| shortest sit | shortest stay |
-| sit details | stay details |
-| sit issue | stay issue |
+| Prefer         | Avoid (product noun) |
+| -------------- | -------------------- |
+| sit / sits     | stay / stays         |
+| create a sit   | create a stay        |
+| during the sit | during the stay      |
+| sit underway   | stay underway        |
+| sit completed  | stay completed       |
+| shortest sit   | shortest stay        |
+| sit details    | stay details         |
+| sit issue      | stay issue           |
 
 **OK to keep** when `stay` is an English **verb** meaning remain or lodge, not
 the product noun:
@@ -40,15 +40,15 @@ When unsure, rewrite so the product noun is **sit**.
 
 ## Related terms
 
-| Term | Meaning |
-| ---- | ------- |
-| sit | One boat-sitting arrangement / listing |
-| sitter | Member who applies to care for a boat |
-| owner | Member who lists a vessel / sit |
-| vessel / boat | The physical craft |
-| applicant | Sitter who applied to a specific sit |
-| liveaboard | Sit type: sitter sleeps aboard |
-| daytime checks | Sit type: daily visits, no overnight |
+| Term           | Meaning                                |
+| -------------- | -------------------------------------- |
+| sit            | One boat-sitting arrangement / listing |
+| sitter         | Member who applies to care for a boat  |
+| owner          | Member who lists a vessel / sit        |
+| vessel / boat  | The physical craft                     |
+| applicant      | Sitter who applied to a specific sit   |
+| liveaboard     | Sit type: sitter sleeps aboard         |
+| daytime checks | Sit type: daily visits, no overnight   |
 
 ## Checklist
 

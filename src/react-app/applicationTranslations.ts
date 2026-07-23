@@ -103,6 +103,7 @@ const en = {
   "applications.videoCall.addToCalendar": "Add to calendar",
   "applications.videoCall.googleCalendar": "Google Calendar",
   "applications.videoCall.appleCalendar": "Apple Calendar",
+  "applications.videoCall.joinMeet": "Join Google Meet",
   "applications.videoCall.calendarTitle": "Video call with {{name}} · {{boat}}",
   "applications.videoCall.calendarDescription":
     "Boatstead video call with {{name}} about {{boat}}.",
@@ -430,8 +431,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.acceptedOwner": "Vous avez accepté {{name}} pour cette garde",
     "applications.systemMessage.declined":
       "Vous n’êtes plus pris en considération pour cette garde",
-    "applications.systemMessage.declinedOwner":
-      "Vous ne considérez plus {{name}} pour cette garde",
+    "applications.systemMessage.declinedOwner": "Vous ne considérez plus {{name}} pour cette garde",
     "applications.systemMessage.applicantsClosed":
       "Le propriétaire n’examine plus les candidatures pour cette garde",
     "applications.systemMessage.videoCallRequestTitle": "Appel vidéo proposé",
@@ -801,7 +801,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Fuiste aceptado para esta estancia",
     "applications.systemMessage.acceptedOwner": "Aceptaste a {{name}} para esta estancia",
     "applications.systemMessage.declined": "Ya no se te está considerando para esta estancia",
-    "applications.systemMessage.declinedOwner": "Ya no estás considerando a {{name}} para esta estancia",
+    "applications.systemMessage.declinedOwner":
+      "Ya no estás considerando a {{name}} para esta estancia",
     "applications.systemMessage.applicantsClosed":
       "El propietario ya no está considerando solicitantes para esta estancia",
     "applications.systemMessage.videoCallRequestTitle": "Videollamada propuesta",
@@ -1171,7 +1172,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Sei stato accettato per questo soggiorno",
     "applications.systemMessage.acceptedOwner": "Hai accettato {{name}} per questo soggiorno",
     "applications.systemMessage.declined": "Non stai più venendo considerato per questo soggiorno",
-    "applications.systemMessage.declinedOwner": "Non stai più considerando {{name}} per questo soggiorno",
+    "applications.systemMessage.declinedOwner":
+      "Non stai più considerando {{name}} per questo soggiorno",
     "applications.systemMessage.applicantsClosed":
       "Il proprietario non sta più considerando candidati per questo soggiorno",
     "applications.systemMessage.videoCallRequestTitle": "Videochiamata proposta",
@@ -1714,8 +1716,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "sitIssue.messagePlaceholder":
       "Beschreibe das Problem, seit wann und alles, was uns helfen könnte.",
     "sitIssue.messageTooShort": "Bitte schreibe mindestens 20 Zeichen.",
-    "sitIssue.messagePrefix":
-      "Problem während des Sits auf {{boat}} ({{sit}}):\n\n{{details}}",
+    "sitIssue.messagePrefix": "Problem während des Sits auf {{boat}} ({{sit}}):\n\n{{details}}",
     "sitIssue.submit": "An Boatstead senden",
     "sitIssue.sending": "Wird gesendet…",
     "sitIssue.submitError": "Dein Bericht konnte nicht gesendet werden. Bitte erneut versuchen.",
@@ -1847,8 +1848,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.windowBanner":
       "Sie haben noch {{days}} Tage, um eine Bewertung abzugeben. Bewertungen bleiben 7 Tage nach Ende des Sits offen.",
     "reviews.windowClosed": "Die Bewertungsfrist für diesen Sit ist abgelaufen.",
-    "reviews.sitNotCompleted":
-      "Sie können eine Bewertung abgeben, sobald der Sit beendet ist.",
+    "reviews.sitNotCompleted": "Sie können eine Bewertung abgeben, sobald der Sit beendet ist.",
   },
   nl: {
     "messages.aboutBoat": "Over {{boat}}",
@@ -1917,7 +1917,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Je bent geaccepteerd voor dit verblijf",
     "applications.systemMessage.acceptedOwner": "Je hebt {{name}} geaccepteerd voor dit verblijf",
     "applications.systemMessage.declined": "Je wordt niet langer overwogen voor dit verblijf",
-    "applications.systemMessage.declinedOwner": "Je overweegt {{name}} niet langer voor dit verblijf",
+    "applications.systemMessage.declinedOwner":
+      "Je overweegt {{name}} niet langer voor dit verblijf",
     "applications.systemMessage.applicantsClosed":
       "De eigenaar overweegt geen sollicitanten meer voor dit verblijf",
     "applications.systemMessage.videoCallRequestTitle": "Videogesprek voorgesteld",
@@ -2219,8 +2220,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.windowBanner":
       "Je hebt nog {{days}} dagen om een beoordeling achter te laten. Beoordelingen blijven 7 dagen open na afloop van het verblijf.",
     "reviews.windowClosed": "De beoordelingsperiode voor deze sit is gesloten.",
-    "reviews.sitNotCompleted":
-      "Je kunt een beoordeling achterlaten nadat de sit is afgelopen.",
+    "reviews.sitNotCompleted": "Je kunt een beoordeling achterlaten nadat de sit is afgelopen.",
   },
   "pt-PT": {
     "messages.aboutBoat": "Sobre {{boat}}",
@@ -2288,7 +2288,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Foste aceite para esta estadia",
     "applications.systemMessage.acceptedOwner": "Aceitou {{name}} para esta estadia",
     "applications.systemMessage.declined": "Já não está a ser considerado para esta estadia",
-    "applications.systemMessage.declinedOwner": "Já não está a considerar {{name}} para esta estadia",
+    "applications.systemMessage.declinedOwner":
+      "Já não está a considerar {{name}} para esta estadia",
     "applications.systemMessage.applicantsClosed":
       "O proprietário já não está a considerar candidatos para esta estadia",
     "applications.systemMessage.videoCallRequestTitle": "Videochamada proposta",
@@ -2653,7 +2654,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Έχετε γίνει αποδεκτοί για αυτή τη διαμονή",
     "applications.systemMessage.acceptedOwner": "Αποδεχθήκατε τον/την {{name}} για αυτή τη διαμονή",
     "applications.systemMessage.declined": "Δεν εξετάζεστε πλέον για αυτή τη διαμονή",
-    "applications.systemMessage.declinedOwner": "Δεν εξετάζετε πλέον τον/την {{name}} για αυτή τη διαμονή",
+    "applications.systemMessage.declinedOwner":
+      "Δεν εξετάζετε πλέον τον/την {{name}} για αυτή τη διαμονή",
     "applications.systemMessage.applicantsClosed":
       "Ο ιδιοκτήτης δεν εξετάζει πλέον υποψηφίους για αυτή τη διαμονή",
     "applications.systemMessage.videoCallRequestTitle": "Προτάθηκε βιντεοκλήση",
@@ -3394,7 +3396,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.acceptedOwner":
       "Bu konaklama için {{name}} adlı kişiyi kabul ettiniz",
     "applications.systemMessage.declined": "Bu konaklama için artık değerlendirilmiyorsunuz",
-    "applications.systemMessage.declinedOwner": "{{name}} kişisini bu konaklama için artık değerlendirmiyorsunuz",
+    "applications.systemMessage.declinedOwner":
+      "{{name}} kişisini bu konaklama için artık değerlendirmiyorsunuz",
     "applications.systemMessage.applicantsClosed":
       "Sahip bu konaklama için artık başvuranları değerlendirmiyor",
     "applications.systemMessage.videoCallRequestTitle": "Görüntülü arama önerildi",
@@ -3754,7 +3757,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Du blev accepterad för denna sittning",
     "applications.systemMessage.acceptedOwner": "Du accepterade {{name}} för denna sittning",
     "applications.systemMessage.declined": "Du övervägs inte längre för denna sittning",
-    "applications.systemMessage.declinedOwner": "Du överväger inte längre {{name}} för denna sittning",
+    "applications.systemMessage.declinedOwner":
+      "Du överväger inte längre {{name}} för denna sittning",
     "applications.systemMessage.applicantsClosed":
       "Ägaren överväger inte längre sökande till denna sitt",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtal föreslagits",
@@ -4837,7 +4841,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.accepted": "Sinut hyväksyttiin tähän istuntoon",
     "applications.systemMessage.acceptedOwner": "Hyväksyit {{name}} tälle istunnolle",
     "applications.systemMessage.declined": "Sinua ei enää oteta huomioon tässä istunnossa",
-    "applications.systemMessage.declinedOwner": "Et enää harkitse henkilöä {{name}} tähän istuntoon",
+    "applications.systemMessage.declinedOwner":
+      "Et enää harkitse henkilöä {{name}} tähän istuntoon",
     "applications.systemMessage.applicantsClosed":
       "Omistaja ei enää harkitse hakijoita tälle paikalle",
     "applications.systemMessage.videoCallRequestTitle": "Videopuhelu ehdotettu",

@@ -49,7 +49,10 @@ test.describe("messages chat avatar", () => {
     await page.goto("/messages");
     await expect(page.getByRole("heading", { name: /Messages/i })).toBeVisible();
 
-    await page.getByRole("button", { name: /Jonas|Blue Hour/i }).first().click();
+    await page
+      .getByRole("button", { name: /Jonas|Blue Hour/i })
+      .first()
+      .click();
     await expect(page.getByRole("link", { name: /^Jonas$/i })).toBeVisible();
 
     const avatar = page

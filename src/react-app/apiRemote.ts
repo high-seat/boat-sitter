@@ -161,7 +161,7 @@ type SitApplication = {
       | "videoCallDeclined"
       | "phoneShared"
       | "withdrawn";
-    videoCall?: { startsAt: string; durationMinutes: number };
+    videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
     sharedPhone?: string;
   }>;
 };
@@ -313,7 +313,7 @@ type ApiApplication = {
     createdAt: string;
     kind?: "user" | "system";
     systemKind?: string;
-    videoCall?: { startsAt: string; durationMinutes: number };
+    videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
     sharedPhone?: string;
   }>;
 };

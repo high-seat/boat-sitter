@@ -8,7 +8,7 @@
     "start": "vite --open",
     "build": "tsgo -b && vite build",
     "cf-typegen": "wrangler types",
-    "deploy": "wrangler deploy",
+    "deploy": "pnpm build && wrangler deploy",
     "typecheck": "tsgo -b",
     "lint": "oxlint",
     "fmt": "oxfmt",

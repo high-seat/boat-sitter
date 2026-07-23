@@ -29,7 +29,11 @@ export function SitEmergencyHelp({ shape = "card", className = "" }: SitEmergenc
         {t("sitEmergency.button")}
       </button>
       {open ? (
-        <Modal onClose={() => setOpen(false)} title={t("sitEmergency.title")} titleId="sit-emergency-title">
+        <Modal
+          onClose={() => setOpen(false)}
+          title={t("sitEmergency.title")}
+          titleId="sit-emergency-title"
+        >
           <p className="text-sm leading-6 text-slate">{t("sitEmergency.lead")}</p>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm font-semibold leading-6 text-navy">
             <li>{t("sitEmergency.police")}</li>

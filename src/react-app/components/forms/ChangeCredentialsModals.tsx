@@ -51,9 +51,7 @@ export function ChangeEmailModal({
       <form className="mt-8 space-y-4" onSubmit={(event) => void submit(event)}>
         <div>
           <span className="form-label">{t("settings.currentEmail")}</span>
-          <p className="mt-1 wrap-break-word text-base font-semibold text-navy">
-            {currentEmail}
-          </p>
+          <p className="mt-1 wrap-break-word text-base font-semibold text-navy">{currentEmail}</p>
         </div>
         <label className="block">
           <span className="form-label">{t("settings.newEmail")}</span>
