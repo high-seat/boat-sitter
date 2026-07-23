@@ -776,10 +776,13 @@ export type MockNotification = {
     | "applicationAccepted"
     | "applicationDeclined"
     | "applicationUnaccepted"
+    | "availabilityMatch"
+    | "availabilitySitsFound"
     | "newApplication"
     | "newMessage"
     | "sitAccepted"
     | "sitReminder"
+    | "sitSittersFound"
     | "welcome";
 };
 

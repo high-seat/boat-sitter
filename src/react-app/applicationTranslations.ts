@@ -197,6 +197,10 @@ const en = {
   "notifications.items.applicationUnaccepted":
     "{{actor}} is no longer confirming you for {{boat}}.",
   "notifications.items.newApplication": "{{actor}} applied to sit {{boat}}.",
+  "notifications.items.availabilityMatch": "A new sit matches your availability: {{boat}}.",
+  "notifications.items.availabilitySitsFound":
+    "{{actor}} sits match your availability — tap to view.",
+  "notifications.items.sitSittersFound": "{{actor}} sitters are available for {{boat}}.",
   "notifications.items.newMessage": "{{actor}} sent you a new message about {{boat}}.",
   "notifications.items.sitReminder": "Your sit on {{boat}} starts soon.",
   "notifications.items.welcome":

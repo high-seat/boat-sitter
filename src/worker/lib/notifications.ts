@@ -6,10 +6,13 @@ export type NotificationType =
   | "applicationAccepted"
   | "applicationDeclined"
   | "applicationUnaccepted"
+  | "availabilityMatch"
+  | "availabilitySitsFound"
   | "newApplication"
   | "newMessage"
   | "sitAccepted"
   | "sitReminder"
+  | "sitSittersFound"
   | "welcome";
 
 export async function insertNotification(

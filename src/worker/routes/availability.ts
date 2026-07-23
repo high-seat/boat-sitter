@@ -4,8 +4,11 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { sits, sitterAvailability, vessels } from "../db/schema";
+import { sits, sitterAvailability, user, vessels } from "../db/schema";
+import { sendNotificationEmail } from "../email";
+import { insertNotification } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
+import type { Db } from "../db";
 
 /**
  * Sitter availability — the supply side of the marketplace.
@@ -102,8 +105,67 @@ availabilityRouter.post("/", requireUser, zValidator("json", windowSchema), asyn
   };
 
   const [row] = await db.insert(sitterAvailability).values(values).returning();
+
+  // Summary alert to the sitter: how many open sits already fit this window.
+  await notifySitterOfMatches(c.env, row).catch((err) => {
+    console.error("availability sits-found notify failed:", err);
+  });
+
   return c.json({ data: withPhase(row) }, 201);
 });
+
+/**
+ * Published sits whose dates overlap a window and whose country the window
+ * covers (or the window is open to anywhere). Shared by the reverse-match
+ * endpoint and the "sits found" summary alert.
+ */
+async function sitsMatchingWindow(db: Db, win: WindowRow) {
+  const rows = await db
+    .select({
+      id: sits.id,
+      dateStart: sits.dateStart,
+      duration: sits.duration,
+      location: sits.location,
+      country: sits.country,
+      vesselName: vessels.name,
+      vesselImage: vessels.image,
+    })
+    .from(sits)
+    .innerJoin(vessels, eq(sits.vesselId, vessels.id))
+    .where(eq(sits.published, true));
+
+  const winRegions = win.regions.map((r) => r.toLowerCase());
+  return rows
+    .map((s) => ({ ...s, endDate: addNights(s.dateStart, sitNights(s.duration)) }))
+    .filter((s) => s.dateStart <= win.dateEnd && s.endDate >= win.dateStart)
+    .filter((s) => winRegions.length === 0 || winRegions.includes(s.country.toLowerCase()))
+    .sort((a, b) => a.dateStart.localeCompare(b.dateStart));
+}
+
+/** One summary notification to the sitter when a new window already has matches. */
+async function notifySitterOfMatches(env: Env, win: WindowRow) {
+  const db = getDb(env);
+  const matches = await sitsMatchingWindow(db, win);
+  if (matches.length === 0) return;
+
+  await insertNotification(db, {
+    userId: win.sitterUserId,
+    userName: win.sitterName,
+    type: "availabilitySitsFound",
+    actor: String(matches.length),
+    href: "/availability",
+  });
+
+  const u = await db.query.user.findFirst({ where: eq(user.id, win.sitterUserId) });
+  await sendNotificationEmail(env, {
+    subject: `${matches.length} sits match your new availability`,
+    heading: "There are boats needing a sitter in your dates",
+    body: `We found ${matches.length} open sit(s) that fit the window you just published. Open your availability to see them.`,
+    actionUrl: `${env.BETTER_AUTH_URL ?? ""}/availability`,
+    actionLabel: "View matches",
+    to: u?.email ?? undefined,
+  });
+}
 
 /** PATCH /api/availability/:id — edit your own window. */
 availabilityRouter.patch("/:id", requireUser, zValidator("json", windowPatchSchema), async (c) => {
@@ -250,27 +312,7 @@ availabilityRouter.get("/:id/sits", requireUser, async (c) => {
     return c.json({ error: "You do not own this availability" }, 403);
   }
 
-  // Small dataset: fetch published sits joined to their vessel, refine in JS.
-  const rows = await db
-    .select({
-      id: sits.id,
-      dateStart: sits.dateStart,
-      duration: sits.duration,
-      location: sits.location,
-      country: sits.country,
-      vesselName: vessels.name,
-      vesselImage: vessels.image,
-    })
-    .from(sits)
-    .innerJoin(vessels, eq(sits.vesselId, vessels.id))
-    .where(eq(sits.published, true));
-
-  const winRegions = win.regions.map((r) => r.toLowerCase());
-  const matches = rows
-    .map((s) => ({ ...s, endDate: addNights(s.dateStart, sitNights(s.duration)) }))
-    .filter((s) => s.dateStart <= win.dateEnd && s.endDate >= win.dateStart)
-    .filter((s) => winRegions.length === 0 || winRegions.includes(s.country.toLowerCase()))
-    .sort((a, b) => a.dateStart.localeCompare(b.dateStart));
+  const matches = await sitsMatchingWindow(db, win);
 
   return c.json({
     data: matches,

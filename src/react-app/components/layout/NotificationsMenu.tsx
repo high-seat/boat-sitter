@@ -24,6 +24,10 @@ function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   if (type === "newMessage") return <MessageCircle className={className} />;
   if (type === "newApplication") return <UserPlus className={className} />;
   if (type === "sitReminder") return <CalendarClock className={className} />;
+  if (type === "availabilityMatch" || type === "availabilitySitsFound") {
+    return <ShipWheel className={className} />;
+  }
+  if (type === "sitSittersFound") return <UserPlus className={className} />;
   if (type === "welcome") return <ShipWheel className={className} />;
   if (type === "applicationDeclined" || type === "applicationUnaccepted") {
     return <XCircle className={className} />;

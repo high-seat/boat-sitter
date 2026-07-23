@@ -1,11 +1,13 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { computeStartEarlySchedule } from "../../shared/sitSchedule";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { applications, sits, vessels } from "../db/schema";
+import { applications, sits, sitterAvailability, user, vessels } from "../db/schema";
+import { sendNotificationEmail } from "../email";
+import { insertNotification } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -203,6 +205,9 @@ sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => 
       .where(eq(vessels.id, vessel.id));
   }
 
+  // PUT is an upsert; only a genuinely new row should fan out match alerts.
+  const existed = await db.query.sits.findFirst({ where: eq(sits.id, body.id) });
+
   const row = toRow(body);
   const [saved] = await db
     .insert(sits)
@@ -210,9 +215,102 @@ sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => 
     .onConflictDoUpdate({ target: sits.id, set: { ...row, updatedAt: sql`CURRENT_TIMESTAMP` } })
     .returning();
 
+  if (!existed && saved.published) {
+    await notifyMatchingSitters(c.env, saved, vessel.name, {
+      userId: vessel.ownerUserId ?? user.id,
+      name: user.name,
+      email: user.email,
+    }).catch((err) => {
+      // Best-effort: a notification failure must never fail the sit write.
+      console.error("availability match notify failed:", err);
+    });
+  }
+
   const { vesselId, ...rest } = saved;
   return c.json({ data: { ...rest, boatId: vesselId } });
 });
+
+/** Add whole days to a YYYY-MM-DD date, returning YYYY-MM-DD (UTC-safe). */
+function addNights(dateStart: string, nights: number): string {
+  const d = new Date(`${dateStart}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + nights);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * When a new published sit appears:
+ *  - alert every sitter whose open availability window overlaps its dates and
+ *    covers its region (or is open to anywhere), and
+ *  - send the owner one summary alert ("N sitters are available").
+ * Mirrors the /api/availability matching predicate, run at creation time.
+ */
+async function notifyMatchingSitters(
+  env: Env,
+  sit: typeof sits.$inferSelect,
+  vesselName: string,
+  owner: { userId: string | null; name: string; email?: string | null },
+) {
+  const db = getDb(env);
+  const today = new Date().toISOString().slice(0, 10);
+  const nights = Number.parseInt(sit.duration, 10);
+  const sitEnd = addNights(sit.dateStart, Number.isFinite(nights) && nights > 0 ? nights : 0);
+  const country = sit.country.toLowerCase();
+
+  const windows = await db
+    .select()
+    .from(sitterAvailability)
+    .where(and(eq(sitterAvailability.status, "open"), gte(sitterAvailability.dateEnd, today)));
+
+  const matches = windows.filter(
+    (w) =>
+      w.dateStart <= sitEnd &&
+      w.dateEnd >= sit.dateStart &&
+      (w.regions.length === 0 || w.regions.some((r) => r.toLowerCase() === country)),
+  );
+
+  const baseUrl = env.BETTER_AUTH_URL ?? "";
+  for (const w of matches) {
+    await insertNotification(db, {
+      userId: w.sitterUserId,
+      userName: w.sitterName,
+      type: "availabilityMatch",
+      actor: vesselName,
+      boatName: vesselName,
+      href: `/boats/${sit.id}`,
+    });
+
+    const u = await db.query.user.findFirst({ where: eq(user.id, w.sitterUserId) });
+    await sendNotificationEmail(env, {
+      subject: `A new sit matches your availability: ${vesselName}`,
+      heading: "A boat needs a sitter during your free dates",
+      body: `${vesselName} in ${sit.location}, ${sit.country} (${sit.dates}) matches an availability window you published. Take a look and apply if it suits.`,
+      actionUrl: `${baseUrl}/boats/${sit.id}`,
+      actionLabel: "View the sit",
+      to: u?.email ?? undefined,
+    });
+  }
+
+  // Owner summary: one alert with the count of available sitters.
+  if (matches.length > 0) {
+    await insertNotification(db, {
+      userId: owner.userId,
+      userName: owner.name,
+      type: "sitSittersFound",
+      actor: String(matches.length),
+      boatName: vesselName,
+      href: `/boats/${sit.id}`,
+    });
+
+    await sendNotificationEmail(env, {
+      subject: `${matches.length} sitters are available for ${vesselName}`,
+      heading: "Sitters are free for your new sit",
+      body: `${matches.length} sitter(s) have published availability that fits ${vesselName} (${sit.dates}).`,
+      actionUrl: `${baseUrl}/boats/${sit.id}`,
+      actionLabel: "View the sit",
+      to: owner.email ?? undefined,
+    });
+  }
+}
 
 sitsRouter.delete("/:id", requireUser, async (c) => {
   const db = getDb(c.env);
