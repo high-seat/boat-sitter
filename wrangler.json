@@ -30,6 +30,7 @@
   ],
   "vars": {
     "ENVIRONMENT": "production",
-    "BETTER_AUTH_URL": "https://boatstead.sharukrules.workers.dev"
+    "BETTER_AUTH_URL": "https://boatstead.sharukrules.workers.dev",
+    "REQUIRE_EMAIL_VERIFICATION": "true"
   }
 }
