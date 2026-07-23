@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "@/App";
+import { AnalyticsListener, initAnalytics } from "@/analytics";
 import { EmailVerifiedBanner } from "@/components/EmailVerifiedBanner";
 import { ResetPasswordPage } from "@/components/ResetPasswordPage";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -13,6 +14,9 @@ import "@/index.css";
 // Pull the real Better Auth session into the store on load, so a Google login
 // is reflected in the UI. Fire-and-forget; the store update re-renders.
 void hydrateSession();
+
+// Google Analytics (prod builds only, cookieless until consent — see analytics.ts).
+initAnalytics();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +41,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ErrorBoundary>
+          <AnalyticsListener />
           <ResetPasswordPage />
           <EmailVerifiedBanner />
           <App />
