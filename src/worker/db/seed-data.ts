@@ -437,3 +437,320 @@ export const seedApplications: SeedApplication[] = [
     ],
   },
 ];
+
+/**
+ * Seed users, profiles, and availability windows.
+ *
+ * DATA RECORDS ONLY — these are not login-capable (no `account`/password rows),
+ * so you can't sign in as them; they exist so listings, applications, member
+ * pages and the matching engine have coherent people behind them.
+ *
+ * Every id is prefixed `seed-` so the generator can delete/re-insert ONLY these
+ * rows (scoped `WHERE id LIKE 'seed-%'`) and never touch real accounts — safe to
+ * run against production.
+ *
+ * `name` deliberately matches the `owner` on vessels and the `applicant.name` on
+ * applications, so the generator can link `owner_user_id` / `applicant_user_id`
+ * by name without editing those records.
+ */
+
+// Better Auth stores timestamps as integer seconds; a fixed epoch is fine here.
+const SEED_TS = 1_735_689_600; // 2025-01-01T00:00:00Z
+
+export interface SeedUser {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string;
+  role: "owner" | "sitter";
+}
+
+export const seedUsers: SeedUser[] = [
+  // Owners — names match the `owner` field on seedVessels.
+  {
+    id: "seed-user-maya-finn",
+    name: "Maya & Finn",
+    email: "maya.finn@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=32",
+    role: "owner",
+  },
+  {
+    id: "seed-user-jonas",
+    name: "Jonas",
+    email: "jonas@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=12",
+    role: "owner",
+  },
+  {
+    id: "seed-user-ingrid",
+    name: "Ingrid",
+    email: "ingrid@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=47",
+    role: "owner",
+  },
+  {
+    id: "seed-user-tama-ruth",
+    name: "Tama & Ruth",
+    email: "tama.ruth@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=53",
+    role: "owner",
+  },
+  {
+    id: "seed-user-peter",
+    name: "Peter",
+    email: "peter@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=15",
+    role: "owner",
+  },
+  {
+    id: "seed-user-priya",
+    name: "Priya",
+    email: "priya@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=44",
+    role: "owner",
+  },
+  // Sitters — Alex & Samira match the seed applications; Noah & Lena add variety.
+  {
+    id: "seed-user-alex",
+    name: "Alex Morgan",
+    email: "alex.morgan@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=11",
+    role: "sitter",
+  },
+  {
+    id: "seed-user-samira",
+    name: "Samira Costa",
+    email: "samira.costa@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=45",
+    role: "sitter",
+  },
+  {
+    id: "seed-user-noah",
+    name: "Noah Bennett",
+    email: "noah.bennett@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=13",
+    role: "sitter",
+  },
+  {
+    id: "seed-user-lena",
+    name: "Lena Fischer",
+    email: "lena.fischer@seed.boatstead.test",
+    emailVerified: true,
+    image: "https://i.pravatar.cc/160?img=48",
+    role: "sitter",
+  },
+];
+
+export interface SeedProfile {
+  userId: string;
+  name: string;
+  email: string;
+  image: string;
+  location: string;
+  bio: string;
+  languages: string[];
+  preferredCountries: string[];
+  skills: string[];
+  yearsExperience: number;
+  certifications: string[];
+  memberSince: number;
+}
+
+export const seedProfiles: SeedProfile[] = [
+  {
+    userId: "seed-user-maya-finn",
+    name: "Maya & Finn",
+    email: "maya.finn@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=32",
+    location: "Athens, Greece",
+    bio: "Owners of Solstice, cruising the Aegean.",
+    languages: ["English", "Greek"],
+    preferredCountries: [],
+    skills: [],
+    yearsExperience: 0,
+    certifications: [],
+    memberSince: 2022,
+  },
+  {
+    userId: "seed-user-jonas",
+    name: "Jonas",
+    email: "jonas@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=12",
+    location: "Bergen, Norway",
+    bio: "Keeps Blue Hour ready for the fjords.",
+    languages: ["Norwegian", "English"],
+    preferredCountries: [],
+    skills: [],
+    yearsExperience: 0,
+    certifications: [],
+    memberSince: 2021,
+  },
+  {
+    userId: "seed-user-ingrid",
+    name: "Ingrid",
+    email: "ingrid@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=47",
+    location: "Stockholm, Sweden",
+    bio: "Northern Light's caretaker in the archipelago.",
+    languages: ["Swedish", "English"],
+    preferredCountries: [],
+    skills: [],
+    yearsExperience: 0,
+    certifications: [],
+    memberSince: 2023,
+  },
+  {
+    userId: "seed-user-tama-ruth",
+    name: "Tama & Ruth",
+    email: "tama.ruth@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=53",
+    location: "Auckland, New Zealand",
+    bio: "Kingfisher owners, Hauraki Gulf regulars.",
+    languages: ["English", "Māori"],
+    preferredCountries: [],
+    skills: [],
+    yearsExperience: 0,
+    certifications: [],
+    memberSince: 2020,
+  },
+  {
+    userId: "seed-user-peter",
+    name: "Peter",
+    email: "peter@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=15",
+    location: "Falmouth, United Kingdom",
+    bio: "Saltwood's owner on the Cornish coast.",
+    languages: ["English"],
+    preferredCountries: [],
+    skills: [],
+    yearsExperience: 0,
+    certifications: [],
+    memberSince: 2019,
+  },
+  {
+    userId: "seed-user-priya",
+    name: "Priya",
+    email: "priya@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=44",
+    location: "Mumbai, India",
+    bio: "Sea Glass owner, warm-water sailor.",
+    languages: ["English", "Hindi"],
+    preferredCountries: [],
+    skills: [],
+    yearsExperience: 0,
+    certifications: [],
+    memberSince: 2023,
+  },
+  {
+    userId: "seed-user-alex",
+    name: "Alex Morgan",
+    email: "alex.morgan@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=11",
+    location: "Brighton, United Kingdom",
+    bio: "Calm liveaboard sailor with practical diesel and electrical experience.",
+    languages: ["English", "French"],
+    preferredCountries: ["Greece", "Croatia", "Italy"],
+    skills: ["Diesel troubleshooting", "12V electrical", "Mooring & lines", "Pet care"],
+    yearsExperience: 7,
+    certifications: ["RYA Day Skipper", "VHF / SRC", "First aid"],
+    memberSince: 2021,
+  },
+  {
+    userId: "seed-user-samira",
+    name: "Samira Costa",
+    email: "samira.costa@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=45",
+    location: "Lisbon, Portugal",
+    bio: "Offshore crew member and experienced pet sitter who works remotely.",
+    languages: ["Portuguese", "English", "Spanish"],
+    preferredCountries: ["Portugal", "Spain", "Greece"],
+    skills: ["Mooring & lines", "Storm preparation", "Pet care", "Tender handling"],
+    yearsExperience: 4,
+    certifications: ["ICC", "VHF / SRC", "First aid"],
+    memberSince: 2022,
+  },
+  {
+    userId: "seed-user-noah",
+    name: "Noah Bennett",
+    email: "noah.bennett@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=13",
+    location: "Cape Town, South Africa",
+    bio: "Bluewater sailor happy anywhere with a swell.",
+    languages: ["English"],
+    preferredCountries: [],
+    skills: ["Rigging", "Navigation", "Engine maintenance"],
+    yearsExperience: 5,
+    certifications: ["Yachtmaster Offshore"],
+    memberSince: 2020,
+  },
+  {
+    userId: "seed-user-lena",
+    name: "Lena Fischer",
+    email: "lena.fischer@seed.boatstead.test",
+    image: "https://i.pravatar.cc/160?img=48",
+    location: "Hamburg, Germany",
+    bio: "Careful coastal sitter, loves boat cats.",
+    languages: ["German", "English"],
+    preferredCountries: ["Germany", "Netherlands", "Denmark"],
+    skills: ["Pet care", "Cleaning", "Mooring & lines"],
+    yearsExperience: 3,
+    certifications: ["First aid"],
+    memberSince: 2024,
+  },
+];
+
+export interface SeedAvailability {
+  id: string;
+  sitterUserId: string;
+  sitterName: string;
+  dateStart: string;
+  dateEnd: string;
+  regions: string[];
+  notes: string;
+  status: string;
+}
+
+export const seedAvailability: SeedAvailability[] = [
+  {
+    id: "seed-avail-alex",
+    sitterUserId: "seed-user-alex",
+    sitterName: "Alex Morgan",
+    dateStart: "2026-08-01",
+    dateEnd: "2026-11-30",
+    regions: ["Greece", "Croatia", "Italy"],
+    notes: "Free through autumn, Med only. Happy with liveaboard sits.",
+    status: "open",
+  },
+  {
+    id: "seed-avail-samira",
+    sitterUserId: "seed-user-samira",
+    sitterName: "Samira Costa",
+    dateStart: "2026-07-01",
+    dateEnd: "2026-10-31",
+    regions: ["Portugal", "Spain", "Greece"],
+    notes: "Remote worker, flexible on exact dates.",
+    status: "open",
+  },
+  {
+    id: "seed-avail-noah",
+    sitterUserId: "seed-user-noah",
+    sitterName: "Noah Bennett",
+    dateStart: "2026-08-15",
+    dateEnd: "2026-12-31",
+    regions: [],
+    notes: "Open to anywhere — will travel for the right boat.",
+    status: "open",
+  },
+];
+
+export const SEED_USER_TIMESTAMP = SEED_TS;
