@@ -33,6 +33,8 @@ const en = {
   "applications.filterExperienceTenPlus": "10+ years experience",
   "applications.filteredCount": "Showing {{count}} of {{total}}",
   "applications.filterEmpty": "No applications match these filters",
+  "applications.filtersToggle": "Filters",
+  "applications.filtersToggleActive": "Filters ({{count}})",
   "applications.listMeta": "{{years}} yrs · {{matches}}/{{total}} match · prior {{sits}}",
   "applications.priorSits": "Prior sits",
   "applications.priorSitsCount_one": "Prior boat sits completed: 1",
@@ -52,6 +54,8 @@ const en = {
   "applications.skills": "Skills",
   "applications.languages": "Languages",
   "applications.initialMessage": "Initial message",
+  "applications.showDetails": "More details",
+  "applications.hideDetails": "Less details",
   "applications.action.shortlisted": "Shortlist",
   "applications.action.accepted": "Accept",
   "applications.action.declined": "Decline",
@@ -180,9 +184,9 @@ const en = {
   "applications.partySize": "People staying",
   "detail.maxGuests_one": "Maximum 1 person",
   "detail.maxGuests_other": "Maximum {{count}} people",
-  "how.liveaboardTitle": "Every sit is liveaboard",
+  "how.liveaboardTitle": "Most sits are liveaboard",
   "how.liveaboardText":
-    "Boatstead is for sits where the accepted sitter lives and sleeps aboard throughout the agreed dates. The vessel is temporary accommodation and a care responsibility, not a boat to borrow, charter, or cruise unless the owner gives explicit written instructions.",
+    "Boatstead is for sits where the accepted sitter lives and sleeps aboard throughout the agreed dates. The vessel is temporary accommodation and a care responsibility, not a boat to borrow, charter, or cruise unless the owner gives explicit written instructions. Daytime checks are the exception: the sitter cares for the boat during the day only and does not stay overnight.",
   "how.risksKicker": "Why liveaboard care matters",
   "how.risksTitle": "A boat left alone can develop serious problems quickly",
   "how.risksText":
@@ -202,7 +206,7 @@ const en = {
     "Security alarms, marina notices, pests, or onboard pets can require immediate attention.",
   "terms.liveaboard.title": "Liveaboard use of the vessel",
   "terms.liveaboard.text":
-    "Listings must offer a vessel that is safe, legal, and reasonably habitable for the sitter to live and sleep aboard. Every sit is a liveaboard arrangement, not a day-check service. During the agreed dates, the sitter may use the vessel only as temporary accommodation and to perform agreed care. Unless the owner gives explicit written permission, the sitter must not navigate, relocate, charter, lend, sublet, commercially use, or host unauthorized overnight guests aboard the vessel. Safety and emergency instructions take priority.",
+    "Listings must offer a vessel that is safe, legal, and appropriate for the agreed sit type. Liveaboard sits require a vessel that is reasonably habitable for the sitter to live and sleep aboard. Daytime checks are the exception: day-only care visits with no overnight stay. During the agreed dates, the sitter may use the vessel only as temporary accommodation when living aboard, and to perform agreed care. Unless the owner gives explicit written permission, the sitter must not navigate, relocate, charter, lend, sublet, commercially use, or host unauthorized overnight guests aboard the vessel. Safety and emergency instructions take priority.",
   "notifications.items.sitAccepted": "{{actor}} accepted your invitation to sit {{boat}}.",
   "notifications.items.applicationAccepted": "{{actor}} accepted your application for {{boat}}.",
   "notifications.items.applicationDeclined": "{{actor}} declined your application for {{boat}}.",
@@ -456,6 +460,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ ans d’expérience",
     "applications.filteredCount": "{{count}} sur {{total}} affichées",
     "applications.filterEmpty": "Aucune candidature ne correspond à ces filtres",
+    "applications.filtersToggle": "Filtres",
+    "applications.filtersToggleActive": "Filtres ({{count}})",
     "applications.listMeta": "{{years}} ans · {{matches}}/{{total}} · préc. {{sits}}",
     "applications.priorSits": "Gardes précédentes",
     "applications.priorSitsCount_one": "Gardes de bateau terminées : 1",
@@ -475,6 +481,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Compétences",
     "applications.languages": "Langues",
     "applications.initialMessage": "Premier message",
+    "applications.showDetails": "Plus de détails",
+    "applications.hideDetails": "Moins de détails",
     "applications.action.shortlisted": "Présélectionner",
     "applications.action.accepted": "Accepter",
     "applications.action.declined": "Refuser",
@@ -605,9 +613,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Personnes à bord",
     "detail.maxGuests_one": "1 personne maximum",
     "detail.maxGuests_other": "{{count}} personnes maximum",
-    "how.liveaboardTitle": "Chaque garde se fait à bord",
+    "how.liveaboardTitle": "La plupart des gardes se font à bord",
     "how.liveaboardText":
-      "Boatstead est destiné aux séjours durant lesquels le gardien vit et dort à bord pendant toutes les dates convenues. Le bateau sert d’hébergement temporaire et doit être entretenu. Il ne peut pas être emprunté, loué ou utilisé pour naviguer sans instructions écrites explicites du propriétaire.",
+      "Boatstead est destiné aux gardes durant lesquelles le gardien accepté vit et dort à bord pendant toutes les dates convenues. Le bateau sert d’hébergement temporaire et d’une responsabilité de soin. Il ne peut pas être emprunté, loué ou utilisé pour naviguer sans instructions écrites explicites du propriétaire. Les visites de jour sont l’exception : le gardien s’occupe du bateau uniquement pendant la journée et ne reste pas à bord pour la nuit.",
     "how.risksKicker": "Pourquoi une présence à bord est importante",
     "how.risksTitle": "Un bateau laissé seul peut rapidement rencontrer de graves problèmes",
     "how.risksText":
@@ -630,7 +638,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Les alarmes, avis de la marina, nuisibles ou animaux à bord peuvent nécessiter une attention immédiate.",
     "terms.liveaboard.title": "Utilisation du bateau comme hébergement à bord",
     "terms.liveaboard.text":
-      "Les annonces doivent proposer un bateau sûr, légal et raisonnablement habitable afin que le gardien puisse y vivre et y dormir. Chaque garde implique de vivre à bord et ne constitue pas un simple service de visite quotidienne. Pendant les dates convenues, le gardien ne peut utiliser le bateau que comme hébergement temporaire et pour effectuer les soins convenus. Sans autorisation écrite explicite du propriétaire, il est interdit de naviguer, déplacer, louer, prêter, sous-louer ou utiliser commercialement le bateau, ainsi que d’héberger des invités non autorisés pour la nuit. Les consignes de sécurité et d’urgence sont prioritaires.",
+      "Les annonces doivent proposer un bateau sûr, légal et adapté au type de garde convenu. Les gardes à bord exigent un bateau raisonnablement habitable pour que le gardien puisse y vivre et y dormir. Les visites de jour sont l’exception : des soins uniquement diurnes, sans nuit à bord. Pendant les dates convenues, le gardien ne peut utiliser le bateau que comme hébergement temporaire lorsqu’il vit à bord, et pour effectuer les soins convenus. Sans autorisation écrite explicite du propriétaire, il est interdit de naviguer, déplacer, louer, prêter, sous-louer ou utiliser commercialement le bateau, ainsi que d’héberger des invités non autorisés pour la nuit. Les consignes de sécurité et d’urgence sont prioritaires.",
     "notifications.items.sitAccepted": "{{actor}} a accepté votre invitation à garder {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} a accepté votre candidature pour {{boat}}.",
@@ -878,6 +886,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ años de experiencia",
     "applications.filteredCount": "Mostrando {{count}} de {{total}}",
     "applications.filterEmpty": "Ninguna solicitud coincide con estos filtros",
+    "applications.filtersToggle": "Filtros",
+    "applications.filtersToggleActive": "Filtros ({{count}})",
     "applications.listMeta": "{{years}} años · {{matches}}/{{total}} · previas {{sits}}",
     "applications.priorSits": "Estancias previas",
     "applications.priorSitsCount_one": "Estancias de barco completadas: 1",
@@ -897,6 +907,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Habilidades",
     "applications.languages": "Idiomas",
     "applications.initialMessage": "Mensaje inicial",
+    "applications.showDetails": "Más detalles",
+    "applications.hideDetails": "Menos detalles",
     "applications.action.shortlisted": "Preseleccionar",
     "applications.action.accepted": "Aceptar",
     "applications.action.declined": "Rechazar",
@@ -1026,9 +1038,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Personas alojadas",
     "detail.maxGuests_one": "Máximo 1 persona",
     "detail.maxGuests_other": "Máximo {{count}} personas",
-    "how.liveaboardTitle": "Todas las estancias son a bordo",
+    "how.liveaboardTitle": "La mayoría de las estancias son a bordo",
     "how.liveaboardText":
-      "Boatstead está pensado para estancias en las que el cuidador aceptado vive y duerme a bordo durante todas las fechas acordadas. La embarcación es un alojamiento temporal y una responsabilidad de cuidado, no un barco para pedir prestado, alquilar o navegar sin instrucciones escritas explícitas del propietario.",
+      "Boatstead está pensado para estancias en las que el cuidador aceptado vive y duerme a bordo durante todas las fechas acordadas. La embarcación es un alojamiento temporal y una responsabilidad de cuidado, no un barco para pedir prestado, alquilar o navegar sin instrucciones escritas explícitas del propietario. Las visitas diurnas son la excepción: el cuidador cuida del barco solo durante el día y no pernocta a bordo.",
     "how.risksKicker": "Por qué importa el cuidado a bordo",
     "how.risksTitle": "Un barco desatendido puede desarrollar problemas graves rápidamente",
     "how.risksText":
@@ -1051,7 +1063,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Las alarmas, avisos de la marina, plagas o mascotas a bordo pueden necesitar atención inmediata.",
     "terms.liveaboard.title": "Uso de la embarcación como alojamiento a bordo",
     "terms.liveaboard.text":
-      "Los anuncios deben ofrecer una embarcación segura, legal y razonablemente habitable para que el cuidador viva y duerma a bordo. Cada estancia exige vivir a bordo y no es un servicio de visitas diurnas. Durante las fechas acordadas, el cuidador solo puede usar la embarcación como alojamiento temporal y para realizar los cuidados acordados. Sin permiso escrito explícito del propietario, no puede navegar, trasladar, alquilar, prestar, subarrendar, usar comercialmente ni alojar invitados nocturnos no autorizados en la embarcación. Las instrucciones de seguridad y emergencia tienen prioridad.",
+      "Los anuncios deben ofrecer una embarcación segura, legal y adecuada al tipo de estancia acordado. Las estancias a bordo requieren una embarcación razonablemente habitable para que el cuidador viva y duerma a bordo. Las visitas diurnas son la excepción: cuidados solo diurnos, sin pernocta. Durante las fechas acordadas, el cuidador solo puede usar la embarcación como alojamiento temporal cuando vive a bordo, y para realizar los cuidados acordados. Sin permiso escrito explícito del propietario, no puede navegar, trasladar, alquilar, prestar, subarrendar, usar comercialmente ni alojar invitados nocturnos no autorizados en la embarcación. Las instrucciones de seguridad y emergencia tienen prioridad.",
     "notifications.items.sitAccepted": "{{actor}} aceptó tu invitación para cuidar {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} aceptó tu solicitud para cuidar {{boat}}.",
@@ -1302,6 +1314,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ anni di esperienza",
     "applications.filteredCount": "Mostro {{count}} di {{total}}",
     "applications.filterEmpty": "Nessuna candidatura corrisponde a questi filtri",
+    "applications.filtersToggle": "Filtri",
+    "applications.filtersToggleActive": "Filtri ({{count}})",
     "applications.listMeta": "{{years}} anni · {{matches}}/{{total}} · precedenti {{sits}}",
     "applications.priorSits": "Soggiorni precedenti",
     "applications.priorSitsCount_one": "Soggiorni in barca completati: 1",
@@ -1321,6 +1335,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Competenze",
     "applications.languages": "Lingue",
     "applications.initialMessage": "Messaggio iniziale",
+    "applications.showDetails": "Altri dettagli",
+    "applications.hideDetails": "Meno dettagli",
     "applications.action.shortlisted": "Seleziona",
     "applications.action.accepted": "Accetta",
     "applications.action.declined": "Rifiuta",
@@ -1452,9 +1468,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Persone a bordo",
     "detail.maxGuests_one": "Massimo 1 persona",
     "detail.maxGuests_other": "Massimo {{count}} persone",
-    "how.liveaboardTitle": "Ogni soggiorno è a bordo",
+    "how.liveaboardTitle": "La maggior parte dei soggiorni è a bordo",
     "how.liveaboardText":
-      "Boatstead è pensato per soggiorni in cui il sitter accettato vive e dorme a bordo per tutte le date concordate. L’imbarcazione è un alloggio temporaneo e una responsabilità di cura, non una barca da prendere in prestito, noleggiare o usare per navigare senza istruzioni scritte esplicite del proprietario.",
+      "Boatstead è pensato per soggiorni in cui il sitter accettato vive e dorme a bordo per tutte le date concordate. L’imbarcazione è un alloggio temporaneo e una responsabilità di cura, non una barca da prendere in prestito, noleggiare o usare per navigare senza istruzioni scritte esplicite del proprietario. Le visite diurne sono l’eccezione: il sitter si prende cura della barca solo di giorno e non pernotta a bordo.",
     "how.risksKicker": "Perché la presenza a bordo è importante",
     "how.risksTitle": "Una barca lasciata sola può sviluppare rapidamente problemi seri",
     "how.risksText":
@@ -1477,7 +1493,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Allarmi, avvisi del porto, infestazioni o animali a bordo possono richiedere attenzione immediata.",
     "terms.liveaboard.title": "Uso dell’imbarcazione come alloggio a bordo",
     "terms.liveaboard.text":
-      "Gli annunci devono offrire un’imbarcazione sicura, legale e ragionevolmente abitabile affinché il sitter possa vivere e dormire a bordo. Ogni soggiorno richiede la permanenza a bordo e non è un servizio di sole visite diurne. Durante le date concordate, il sitter può usare l’imbarcazione solo come alloggio temporaneo e per svolgere le cure concordate. Senza esplicito permesso scritto del proprietario, non può navigare, spostare, noleggiare, prestare, subaffittare, utilizzare commercialmente o ospitare persone non autorizzate per la notte. Le istruzioni di sicurezza e di emergenza hanno la priorità.",
+      "Gli annunci devono offrire un’imbarcazione sicura, legale e adatta al tipo di soggiorno concordato. I soggiorni a bordo richiedono un’imbarcazione ragionevolmente abitabile affinché il sitter possa vivere e dormire a bordo. Le visite diurne sono l’eccezione: cure solo diurne, senza pernottamento. Durante le date concordate, il sitter può usare l’imbarcazione solo come alloggio temporaneo quando vive a bordo, e per svolgere le cure concordate. Senza esplicito permesso scritto del proprietario, non può navigare, spostare, noleggiare, prestare, subaffittare, utilizzare commercialmente o ospitare persone non autorizzate per la notte. Le istruzioni di sicurezza e di emergenza hanno la priorità.",
     "notifications.items.sitAccepted":
       "{{actor}} ha accettato il tuo invito a occuparsi di {{boat}}.",
     "notifications.items.applicationAccepted":
@@ -1727,6 +1743,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ Jahre Erfahrung",
     "applications.filteredCount": "{{count}} von {{total}} angezeigt",
     "applications.filterEmpty": "Keine Bewerbungen entsprechen diesen Filtern",
+    "applications.filtersToggle": "Filter",
+    "applications.filtersToggleActive": "Filter ({{count}})",
     "applications.listMeta": "{{years}} J. · {{matches}}/{{total}} · früher {{sits}}",
     "applications.priorSits": "Frühere Sits",
     "applications.priorSitsCount_one": "Abgeschlossene Boots-Sits: 1",
@@ -1746,6 +1764,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Fähigkeiten",
     "applications.languages": "Sprachen",
     "applications.initialMessage": "Erste Nachricht",
+    "applications.showDetails": "Mehr Details",
+    "applications.hideDetails": "Weniger Details",
     "applications.action.shortlisted": "Vorauswählen",
     "applications.action.accepted": "Annehmen",
     "applications.action.declined": "Ablehnen",
@@ -1875,9 +1895,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Personen an Bord",
     "detail.maxGuests_one": "Maximal 1 Person",
     "detail.maxGuests_other": "Maximal {{count}} Personen",
-    "how.liveaboardTitle": "Jede Betreuung findet an Bord statt",
+    "how.liveaboardTitle": "Die meisten Betreuungen finden an Bord statt",
     "how.liveaboardText":
-      "Boatstead ist für Sits gedacht, bei denen die angenommene Betreuungsperson während des gesamten vereinbarten Zeitraums an Bord lebt und schläft. Das Boot ist eine vorübergehende Unterkunft und eine Betreuungsverantwortung. Es darf ohne ausdrückliche schriftliche Anweisung des Eigentümers nicht ausgeliehen, vermietet oder gefahren werden.",
+      "Boatstead ist für Sits gedacht, bei denen die angenommene Betreuungsperson während des gesamten vereinbarten Zeitraums an Bord lebt und schläft. Das Boot ist eine vorübergehende Unterkunft und eine Betreuungsverantwortung. Es darf ohne ausdrückliche schriftliche Anweisung des Eigentümers nicht ausgeliehen, vermietet oder gefahren werden. Tagesbesuche sind die Ausnahme: Die Betreuungsperson kümmert sich nur tagsüber um das Boot und übernachtet nicht an Bord.",
     "how.risksKicker": "Warum Betreuung an Bord wichtig ist",
     "how.risksTitle": "Ein unbeaufsichtigtes Boot kann schnell ernsthafte Probleme entwickeln",
     "how.risksText":
@@ -1900,7 +1920,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Alarme, Hafenmitteilungen, Schädlinge oder Tiere an Bord können sofortige Aufmerksamkeit erfordern.",
     "terms.liveaboard.title": "Nutzung des Boots als Unterkunft an Bord",
     "terms.liveaboard.text":
-      "Inserate müssen ein sicheres, rechtmäßiges und angemessen bewohnbares Boot anbieten, auf dem die Betreuungsperson leben und schlafen kann. Jede Betreuung ist ein Sit an Bord und kein reiner Tageskontrolldienst. Während des vereinbarten Zeitraums darf das Boot nur als vorübergehende Unterkunft und für die vereinbarte Betreuung genutzt werden. Ohne ausdrückliche schriftliche Erlaubnis des Eigentümers darf die Betreuungsperson das Boot nicht fahren, verlegen, vermieten, verleihen, untervermieten, gewerblich nutzen oder nicht autorisierte Übernachtungsgäste aufnehmen. Sicherheits- und Notfallanweisungen haben Vorrang.",
+      "Inserate müssen ein sicheres, rechtmäßiges und für den vereinbarten Sit-Typ geeignetes Boot anbieten. Sits an Bord erfordern ein angemessen bewohnbares Boot, auf dem die Betreuungsperson leben und schlafen kann. Tagesbesuche sind die Ausnahme: Betreuung nur tagsüber, ohne Übernachtung. Während des vereinbarten Zeitraums darf das Boot nur als vorübergehende Unterkunft genutzt werden, wenn die Betreuungsperson an Bord lebt, und für die vereinbarte Betreuung. Ohne ausdrückliche schriftliche Erlaubnis des Eigentümers darf die Betreuungsperson das Boot nicht fahren, verlegen, vermieten, verleihen, untervermieten, gewerblich nutzen oder nicht autorisierte Übernachtungsgäste aufnehmen. Sicherheits- und Notfallanweisungen haben Vorrang.",
     "notifications.items.sitAccepted":
       "{{actor}} hat Ihre Einladung zur Betreuung von {{boat}} angenommen.",
     "notifications.items.applicationAccepted":
@@ -2152,6 +2172,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ jaar ervaring",
     "applications.filteredCount": "{{count}} van {{total}} getoond",
     "applications.filterEmpty": "Geen aanvragen passen bij deze filters",
+    "applications.filtersToggle": "Filters",
+    "applications.filtersToggleActive": "Filters ({{count}})",
     "applications.listMeta": "{{years}} jr · {{matches}}/{{total}} · eerder {{sits}}",
     "applications.priorSits": "Eerdere verblijven",
     "applications.priorSitsCount_one": "Voltooide bootverblijven: 1",
@@ -2171,6 +2193,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Vaardigheden",
     "applications.languages": "Talen",
     "applications.initialMessage": "Eerste bericht",
+    "applications.showDetails": "Meer details",
+    "applications.hideDetails": "Minder details",
     "applications.action.shortlisted": "Selecteren",
     "applications.action.accepted": "Accepteren",
     "applications.action.declined": "Afwijzen",
@@ -2301,9 +2325,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Personen aan boord",
     "detail.maxGuests_one": "Maximaal 1 persoon",
     "detail.maxGuests_other": "Maximaal {{count}} personen",
-    "how.liveaboardTitle": "Elke oppas verblijft aan boord",
+    "how.liveaboardTitle": "De meeste oppassen verblijven aan boord",
     "how.liveaboardText":
-      "Boatstead is bedoeld voor verblijven waarbij de geaccepteerde oppas tijdens alle afgesproken datums aan boord woont en slaapt. Het vaartuig is tijdelijke accommodatie en een zorgverantwoordelijkheid, geen boot om te lenen, verhuren of mee te varen zonder uitdrukkelijke schriftelijke instructies van de eigenaar.",
+      "Boatstead is bedoeld voor verblijven waarbij de geaccepteerde oppas tijdens alle afgesproken datums aan boord woont en slaapt. Het vaartuig is tijdelijke accommodatie en een zorgverantwoordelijkheid, geen boot om te lenen, verhuren of mee te varen zonder uitdrukkelijke schriftelijke instructies van de eigenaar. Dagelijkse controles zijn de uitzondering: de oppas verzorgt de boot alleen overdag en blijft ’s nachts niet aan boord.",
     "how.risksKicker": "Waarom zorg aan boord belangrijk is",
     "how.risksTitle": "Een onbeheerde boot kan snel ernstige problemen ontwikkelen",
     "how.risksText":
@@ -2326,7 +2350,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Alarmen, havenberichten, ongedierte of huisdieren aan boord kunnen directe aandacht vereisen.",
     "terms.liveaboard.title": "Gebruik van het vaartuig als verblijf aan boord",
     "terms.liveaboard.text":
-      "Advertenties moeten een veilig, legaal en redelijk bewoonbaar vaartuig aanbieden waarop de oppas kan wonen en slapen. Elke oppas is een verblijf aan boord en geen dienst met alleen dagcontroles. Tijdens de afgesproken datums mag de oppas het vaartuig uitsluitend gebruiken als tijdelijke accommodatie en voor de afgesproken zorg. Zonder uitdrukkelijke schriftelijke toestemming van de eigenaar mag de oppas niet varen, verplaatsen, verhuren, uitlenen, onderverhuren, commercieel gebruiken of onbevoegde gasten laten overnachten. Veiligheids- en noodinstructies hebben voorrang.",
+      "Advertenties moeten een veilig, legaal en voor het afgesproken oppasstype geschikt vaartuig aanbieden. Verblijven aan boord vereisen een redelijk bewoonbaar vaartuig waarop de oppas kan wonen en slapen. Dagelijkse controles zijn de uitzondering: alleen overdag zorg, zonder overnachting. Tijdens de afgesproken datums mag de oppas het vaartuig uitsluitend gebruiken als tijdelijke accommodatie wanneer hij of zij aan boord woont, en voor de afgesproken zorg. Zonder uitdrukkelijke schriftelijke toestemming van de eigenaar mag de oppas niet varen, verplaatsen, verhuren, uitlenen, onderverhuren, commercieel gebruiken of onbevoegde gasten laten overnachten. Veiligheids- en noodinstructies hebben voorrang.",
     "notifications.items.sitAccepted":
       "{{actor}} heeft je uitnodiging voor de oppas van {{boat}} geaccepteerd.",
     "notifications.items.applicationAccepted":
@@ -2575,6 +2599,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ anos de experiência",
     "applications.filteredCount": "A mostrar {{count}} de {{total}}",
     "applications.filterEmpty": "Nenhuma candidatura corresponde a estes filtros",
+    "applications.filtersToggle": "Filtros",
+    "applications.filtersToggleActive": "Filtros ({{count}})",
     "applications.listMeta": "{{years}} anos · {{matches}}/{{total}} · anteriores {{sits}}",
     "applications.priorSits": "Estadias anteriores",
     "applications.priorSitsCount_one": "Estadias de barco concluídas: 1",
@@ -2594,6 +2620,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Competências",
     "applications.languages": "Idiomas",
     "applications.initialMessage": "Mensagem inicial",
+    "applications.showDetails": "Mais detalhes",
+    "applications.hideDetails": "Menos detalhes",
     "applications.action.shortlisted": "Pré-selecionar",
     "applications.action.accepted": "Aceitar",
     "applications.action.declined": "Recusar",
@@ -2721,9 +2749,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Pessoas a bordo",
     "detail.maxGuests_one": "Máximo de 1 pessoa",
     "detail.maxGuests_other": "Máximo de {{count}} pessoas",
-    "how.liveaboardTitle": "Todas as estadias são a bordo",
+    "how.liveaboardTitle": "A maioria das estadias é a bordo",
     "how.liveaboardText":
-      "A Boatstead destina-se a estadias em que o cuidador aceite vive e dorme a bordo durante todas as datas acordadas. A embarcação é alojamento temporário e uma responsabilidade de cuidado, não um barco para emprestar, alugar ou navegar sem instruções escritas explícitas do proprietário.",
+      "A Boatstead destina-se a estadias em que o cuidador aceite vive e dorme a bordo durante todas as datas acordadas. A embarcação é alojamento temporário e uma responsabilidade de cuidado, não um barco para emprestar, alugar ou navegar sem instruções escritas explícitas do proprietário. As visitas diurnas são a exceção: o cuidador cuida do barco apenas durante o dia e não pernoita a bordo.",
     "how.risksKicker": "Porque é importante cuidar a bordo",
     "how.risksTitle": "Um barco deixado sozinho pode desenvolver problemas graves rapidamente",
     "how.risksText":
@@ -2746,7 +2774,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Alarmes, avisos da marina, pragas ou animais a bordo podem exigir atenção imediata.",
     "terms.liveaboard.title": "Uso da embarcação como alojamento a bordo",
     "terms.liveaboard.text":
-      "Os anúncios devem oferecer uma embarcação segura, legal e razoavelmente habitável para o cuidador viver e dormir a bordo. Cada estadia exige permanência a bordo e não é um serviço apenas de visitas diurnas. Durante as datas acordadas, o cuidador só pode usar a embarcação como alojamento temporário e para prestar os cuidados acordados. Sem autorização escrita explícita do proprietário, não pode navegar, deslocar, alugar, emprestar, subalugar, usar comercialmente nem alojar convidados noturnos não autorizados. As instruções de segurança e emergência têm prioridade.",
+      "Os anúncios devem oferecer uma embarcação segura, legal e adequada ao tipo de estadia acordado. As estadias a bordo exigem uma embarcação razoavelmente habitável para o cuidador viver e dormir a bordo. As visitas diurnas são a exceção: cuidados apenas diurnos, sem pernoita. Durante as datas acordadas, o cuidador só pode usar a embarcação como alojamento temporário quando vive a bordo, e para prestar os cuidados acordados. Sem autorização escrita explícita do proprietário, não pode navegar, deslocar, alugar, emprestar, subalugar, usar comercialmente nem alojar convidados noturnos não autorizados. As instruções de segurança e emergência têm prioridade.",
     "notifications.items.sitAccepted": "{{actor}} aceitou o seu convite para cuidar de {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} aceitou a sua candidatura para {{boat}}.",
     "notifications.items.applicationUnaccepted": "{{actor}} já não o confirma para {{boat}}.",
@@ -2994,6 +3022,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ χρόνια εμπειρίας",
     "applications.filteredCount": "Εμφάνιση {{count}} από {{total}}",
     "applications.filterEmpty": "Καμία αίτηση δεν ταιριάζει με αυτά τα φίλτρα",
+    "applications.filtersToggle": "Φίλτρα",
+    "applications.filtersToggleActive": "Φίλτρα ({{count}})",
     "applications.listMeta": "{{years}} έτη · {{matches}}/{{total}} · προηγ. {{sits}}",
     "applications.priorSits": "Προηγούμενες διαμονές",
     "applications.priorSitsCount_one": "Ολοκληρωμένες διαμονές σε σκάφος: 1",
@@ -3013,6 +3043,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Δεξιότητες",
     "applications.languages": "Γλώσσες",
     "applications.initialMessage": "Αρχικό μήνυμα",
+    "applications.showDetails": "Περισσότερες λεπτομέρειες",
+    "applications.hideDetails": "Λιγότερες λεπτομέρειες",
     "applications.action.shortlisted": "Προεπιλογή",
     "applications.action.accepted": "Αποδοχή",
     "applications.action.declined": "Απόρριψη",
@@ -3143,9 +3175,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Άτομα στο σκάφος",
     "detail.maxGuests_one": "Έως 1 άτομο",
     "detail.maxGuests_other": "Έως {{count}} άτομα",
-    "how.liveaboardTitle": "Κάθε φύλαξη γίνεται με διαμονή στο σκάφος",
+    "how.liveaboardTitle": "Οι περισσότερες φυλάξεις γίνονται με διαμονή στο σκάφος",
     "how.liveaboardText":
-      "Το Boatstead προορίζεται για διαμονές όπου ο εγκεκριμένος φροντιστής ζει και κοιμάται στο σκάφος σε όλη τη συμφωνημένη περίοδο. Το σκάφος αποτελεί προσωρινό κατάλυμα και ευθύνη φροντίδας, όχι μέσο για δανεισμό, ναύλωση ή πλεύση χωρίς ρητές γραπτές οδηγίες του ιδιοκτήτη.",
+      "Το Boatstead προορίζεται για διαμονές όπου ο εγκεκριμένος φροντιστής ζει και κοιμάται στο σκάφος σε όλη τη συμφωνημένη περίοδο. Το σκάφος αποτελεί προσωρινό κατάλυμα και ευθύνη φροντίδας, όχι μέσο για δανεισμό, ναύλωση ή πλεύση χωρίς ρητές γραπτές οδηγίες του ιδιοκτήτη. Οι ημερήσιοι έλεγχοι αποτελούν την εξαίρεση: ο φροντιστής φροντίζει το σκάφος μόνο την ημέρα και δεν διανυκτερεύει στο σκάφος.",
     "how.risksKicker": "Γιατί έχει σημασία η φροντίδα επί του σκάφους",
     "how.risksTitle": "Ένα σκάφος χωρίς επίβλεψη μπορεί να εμφανίσει γρήγορα σοβαρά προβλήματα",
     "how.risksText":
@@ -3168,7 +3200,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Συναγερμοί, ειδοποιήσεις της μαρίνας, παράσιτα ή ζώα στο σκάφος μπορεί να απαιτούν άμεση προσοχή.",
     "terms.liveaboard.title": "Χρήση του σκάφους ως κατάλυμα",
     "terms.liveaboard.text":
-      "Οι αγγελίες πρέπει να προσφέρουν ένα ασφαλές, νόμιμο και επαρκώς κατοικήσιμο σκάφος στο οποίο ο φροντιστής μπορεί να ζει και να κοιμάται. Κάθε φύλαξη απαιτεί διαμονή στο σκάφος και δεν αποτελεί υπηρεσία απλών ημερήσιων ελέγχων. Κατά τις συμφωνημένες ημερομηνίες, ο φροντιστής μπορεί να χρησιμοποιεί το σκάφος μόνο ως προσωρινό κατάλυμα και για τη συμφωνημένη φροντίδα. Χωρίς ρητή γραπτή άδεια του ιδιοκτήτη, δεν επιτρέπεται να πλεύσει, μετακινήσει, ναυλώσει, δανείσει, υπεκμισθώσει, χρησιμοποιήσει εμπορικά το σκάφος ή να φιλοξενήσει μη εξουσιοδοτημένους επισκέπτες για διανυκτέρευση. Οι οδηγίες ασφάλειας και έκτακτης ανάγκης έχουν προτεραιότητα.",
+      "Οι αγγελίες πρέπει να προσφέρουν ένα ασφαλές, νόμιμο και κατάλληλο για τον συμφωνημένο τύπο φύλαξης σκάφος. Οι φυλάξεις με διαμονή απαιτούν ένα επαρκώς κατοικήσιμο σκάφος στο οποίο ο φροντιστής μπορεί να ζει και να κοιμάται. Οι ημερήσιοι έλεγχοι αποτελούν την εξαίρεση: φροντίδα μόνο την ημέρα, χωρίς διανυκτέρευση. Κατά τις συμφωνημένες ημερομηνίες, ο φροντιστής μπορεί να χρησιμοποιεί το σκάφος μόνο ως προσωρινό κατάλυμα όταν ζει στο σκάφος, και για τη συμφωνημένη φροντίδα. Χωρίς ρητή γραπτή άδεια του ιδιοκτήτη, δεν επιτρέπεται να πλεύσει, μετακινήσει, ναυλώσει, δανείσει, υπεκμισθώσει, χρησιμοποιήσει εμπορικά το σκάφος ή να φιλοξενήσει μη εξουσιοδοτημένους επισκέπτες για διανυκτέρευση. Οι οδηγίες ασφάλειας και έκτακτης ανάγκης έχουν προτεραιότητα.",
     "notifications.items.sitAccepted":
       "Ο χρήστης {{actor}} αποδέχτηκε την πρόσκλησή σας για τη φροντίδα του {{boat}}.",
     "notifications.items.applicationAccepted":
@@ -3419,6 +3451,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ godina iskustva",
     "applications.filteredCount": "Prikazano {{count}} od {{total}}",
     "applications.filterEmpty": "Nijedna prijava ne odgovara ovim filtrima",
+    "applications.filtersToggle": "Filtri",
+    "applications.filtersToggleActive": "Filtri ({{count}})",
     "applications.listMeta": "{{years}} god. · {{matches}}/{{total}} · preth. {{sits}}",
     "applications.priorSits": "Prethodni boravci",
     "applications.priorSitsCount_one": "Završeni boravci na brodu: 1",
@@ -3440,6 +3474,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Vještine",
     "applications.languages": "Jezici",
     "applications.initialMessage": "Početna poruka",
+    "applications.showDetails": "Više detalja",
+    "applications.hideDetails": "Manje detalja",
     "applications.action.shortlisted": "Uži izbor",
     "applications.action.accepted": "Prihvati",
     "applications.action.declined": "Odbij",
@@ -3568,9 +3604,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "detail.maxGuests_one": "Najviše 1 osoba",
     "detail.maxGuests_few": "Najviše {{count}} osobe",
     "detail.maxGuests_other": "Najviše {{count}} osoba",
-    "how.liveaboardTitle": "Svako čuvanje uključuje boravak na brodu",
+    "how.liveaboardTitle": "Većina čuvanja uključuje boravak na brodu",
     "how.liveaboardText":
-      "Boatstead je namijenjen boravcima tijekom kojih prihvaćeni čuvar živi i spava na brodu sve dogovorene dane. Plovilo je privremeni smještaj i odgovornost za brigu, a nije brod za posudbu, najam ili plovidbu bez izričitih pisanih uputa vlasnika.",
+      "Boatstead je namijenjen boravcima tijekom kojih prihvaćeni čuvar živi i spava na brodu sve dogovorene dane. Plovilo je privremeni smještaj i odgovornost za brigu, a nije brod za posudbu, najam ili plovidbu bez izričitih pisanih uputa vlasnika. Dnevni obilasci su iznimka: čuvar brine o brodu samo danju i ne spava na brodu.",
     "how.risksKicker": "Zašto je briga na brodu važna",
     "how.risksTitle": "Na brodu bez nadzora mogu se brzo pojaviti ozbiljni problemi",
     "how.risksText":
@@ -3593,7 +3629,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Alarmi, obavijesti marine, nametnici ili životinje na brodu mogu zahtijevati hitnu pažnju.",
     "terms.liveaboard.title": "Korištenje plovila kao smještaja",
     "terms.liveaboard.text":
-      "Oglasi moraju nuditi sigurno, zakonito i razumno useljivo plovilo na kojem čuvar može živjeti i spavati. Svako čuvanje uključuje boravak na brodu i nije usluga samo dnevnih obilazaka. Tijekom dogovorenih datuma čuvar smije koristiti plovilo isključivo kao privremeni smještaj i za dogovorenu brigu. Bez izričite pisane dozvole vlasnika čuvar ne smije ploviti, premještati, iznajmljivati, posuđivati, davati u podnajam, komercijalno koristiti plovilo niti dopustiti neovlaštenim gostima da prespavaju. Upute za sigurnost i hitne slučajeve imaju prednost.",
+      "Oglasi moraju nuditi sigurno, zakonito i za dogovoreni tip čuvanja prikladno plovilo. Čuvanja s boravkom na brodu zahtijevaju razumno useljivo plovilo na kojem čuvar može živjeti i spavati. Dnevni obilasci su iznimka: briga samo danju, bez noćenja. Tijekom dogovorenih datuma čuvar smije koristiti plovilo isključivo kao privremeni smještaj kada živi na brodu, i za dogovorenu brigu. Bez izričite pisane dozvole vlasnika čuvar ne smije ploviti, premještati, iznajmljivati, posuđivati, davati u podnajam, komercijalno koristiti plovilo niti dopustiti neovlaštenim gostima da prespavaju. Upute za sigurnost i hitne slučajeve imaju prednost.",
     "notifications.items.sitAccepted":
       "{{actor}} je prihvatio vaš poziv za čuvanje broda {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} je prihvatio vašu prijavu za {{boat}}.",
@@ -3838,6 +3874,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ yıl deneyim",
     "applications.filteredCount": "{{total}} içinden {{count}} gösteriliyor",
     "applications.filterEmpty": "Bu filtrelere uyan başvuru yok",
+    "applications.filtersToggle": "Filtreler",
+    "applications.filtersToggleActive": "Filtreler ({{count}})",
     "applications.listMeta": "{{years}} yıl · {{matches}}/{{total}} · önceki {{sits}}",
     "applications.priorSits": "Önceki konaklamalar",
     "applications.priorSitsCount_one": "Tamamlanmış tekne konaklaması: 1",
@@ -3857,6 +3895,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Beceriler",
     "applications.languages": "Diller",
     "applications.initialMessage": "İlk mesaj",
+    "applications.showDetails": "Daha fazla ayrıntı",
+    "applications.hideDetails": "Daha az ayrıntı",
     "applications.action.shortlisted": "Kısa listeye al",
     "applications.action.accepted": "Kabul et",
     "applications.action.declined": "Reddet",
@@ -3984,9 +4024,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Teknede kalacak kişiler",
     "detail.maxGuests_one": "En fazla 1 kişi",
     "detail.maxGuests_other": "En fazla {{count}} kişi",
-    "how.liveaboardTitle": "Her bakıcılık teknede konaklamayı içerir",
+    "how.liveaboardTitle": "Çoğu bakıcılık teknede konaklamayı içerir",
     "how.liveaboardText":
-      "Boatstead, kabul edilen bakıcının kararlaştırılan tarihler boyunca teknede yaşadığı ve uyuduğu konaklamalar içindir. Tekne geçici bir konaklama yeri ve bakım sorumluluğudur. Sahibinin açık yazılı talimatı olmadan ödünç alınacak, kiralanacak veya seyir yapılacak bir araç değildir.",
+      "Boatstead, kabul edilen bakıcının kararlaştırılan tarihler boyunca teknede yaşadığı ve uyuduğu konaklamalar içindir. Tekne geçici bir konaklama yeri ve bakım sorumluluğudur. Sahibinin açık yazılı talimatı olmadan ödünç alınacak, kiralanacak veya seyir yapılacak bir araç değildir. Gündüz kontrolleri istisnadır: bakıcı tekneye yalnızca gündüz bakar ve gece teknede kalmaz.",
     "how.risksKicker": "Teknede bakım neden önemlidir",
     "how.risksTitle": "Yalnız bırakılan bir teknede ciddi sorunlar hızla gelişebilir",
     "how.risksText":
@@ -4009,7 +4049,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Güvenlik alarmları, marina bildirimleri, zararlılar veya teknedeki evcil hayvanlar acil ilgi gerektirebilir.",
     "terms.liveaboard.title": "Teknenin konaklama amacıyla kullanımı",
     "terms.liveaboard.text":
-      "İlanlar, bakıcının yaşayıp uyuyabileceği güvenli, yasal ve makul ölçüde yaşanabilir bir tekne sunmalıdır. Her bakıcılık teknede konaklamayı içerir ve yalnızca gündüz kontrolü hizmeti değildir. Kararlaştırılan tarihler boyunca bakıcı tekneyi sadece geçici konaklama ve kararlaştırılan bakım için kullanabilir. Sahibinin açık yazılı izni olmadan tekneyi seyir amacıyla kullanamaz, taşıyamaz, kiralayamaz, ödünç veremez, alt kiraya veremez, ticari amaçla kullanamaz veya yetkisiz gece misafirleri ağırlayamaz. Güvenlik ve acil durum talimatları önceliklidir.",
+      "İlanlar, kararlaştırılan bakıcılık türüne uygun, güvenli, yasal bir tekne sunmalıdır. Teknede konaklamalı bakıcılıklar, bakıcının yaşayıp uyuyabileceği makul ölçüde yaşanabilir bir tekne gerektirir. Gündüz kontrolleri istisnadır: yalnızca gündüz bakım, geceleme yok. Kararlaştırılan tarihler boyunca bakıcı tekneyi yalnızca teknede yaşarken geçici konaklama ve kararlaştırılan bakım için kullanabilir. Sahibinin açık yazılı izni olmadan tekneyi seyir amacıyla kullanamaz, taşıyamaz, kiralayamaz, ödünç veremez, alt kiraya veremez, ticari amaçla kullanamaz veya yetkisiz gece misafirleri ağırlayamaz. Güvenlik ve acil durum talimatları önceliklidir.",
     "notifications.items.sitAccepted": "{{actor}}, {{boat}} için bakıcılık davetinizi kabul etti.",
     "notifications.items.applicationAccepted": "{{actor}}, {{boat}} için başvurunuzu kabul etti.",
     "notifications.items.applicationUnaccepted": "{{actor}}, {{boat}} için artık sizi onaylamıyor.",
@@ -4252,6 +4292,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ års erfarenhet",
     "applications.filteredCount": "Visar {{count}} av {{total}}",
     "applications.filterEmpty": "Inga applikationer matchar dessa filter",
+    "applications.filtersToggle": "Filter",
+    "applications.filtersToggleActive": "Filter ({{count}})",
     "applications.listMeta": "{{years}} år · {{matches}}/{{total}} match · före {{sits}}",
     "applications.priorSits": "Prior sitter",
     "applications.priorSitsCount_one": "Tidigare båtsitter färdigställda: 1",
@@ -4271,6 +4313,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Färdigheter",
     "applications.languages": "Språk",
     "applications.initialMessage": "Inledande meddelande",
+    "applications.showDetails": "Fler detaljer",
+    "applications.hideDetails": "Färre detaljer",
     "applications.action.shortlisted": "Shortlist",
     "applications.action.accepted": "Acceptera",
     "applications.action.declined": "Nedgång",
@@ -4398,9 +4442,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Folk som stannar",
     "detail.maxGuests_one": "Max 1 person",
     "detail.maxGuests_other": "Max {{count}} personer",
-    "how.liveaboardTitle": "Varje sittning är liveaboard",
+    "how.liveaboardTitle": "De flesta sittningar är liveaboard",
     "how.liveaboardText":
-      "Boatstead är för vistelser där den accepterade barnvakten bor och sover ombord under de överenskomna datumen. Fartyget är ett tillfälligt boende och ett skötselansvar, inte en båt att låna, chartra eller kryssa om inte ägaren ger uttryckliga skriftliga instruktioner.",
+      "Boatstead är för vistelser där den accepterade sittaren bor och sover ombord under de överenskomna datumen. Fartyget är ett tillfälligt boende och ett skötselansvar, inte en båt att låna, chartra eller kryssa om inte ägaren ger uttryckliga skriftliga instruktioner. Dagkontroller är undantaget: sittaren tar hand om båten endast dagtid och övernattar inte ombord.",
     "how.risksKicker": "Varför liveaboard-vård är viktigt",
     "how.risksTitle": "En båt som lämnas ensam kan snabbt utveckla allvarliga problem",
     "how.risksText":
@@ -4422,7 +4466,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Säkerhetslarm, marinameddelanden, skadedjur eller husdjur ombord kan kräva omedelbar uppmärksamhet.",
     "terms.liveaboard.title": "Liveaboard användning av fartyget",
     "terms.liveaboard.text":
-      "Listor måste erbjuda ett fartyg som är säkert, lagligt och rimligt beboeligt för sittaren att bo och sova ombord. Varje sittning är ett liveaboard-arrangemang, inte en dagkontrolltjänst. Under överenskomna datum får barnvakten endast använda fartyget som tillfälligt boende och för att utföra överenskommen vård. Såvida inte ägaren ger uttryckligt skriftligt tillstånd, får barnvakten inte navigera, flytta, chartra, låna ut, hyra ut i andra hand, använda kommersiellt eller ta emot obehöriga övernattande gäster ombord på fartyget. Säkerhets- och nödanvisningar har prioritet.",
+      "Listningar måste erbjuda ett fartyg som är säkert, lagligt och lämpligt för den överenskomna sittningstypen. Liveaboard-sittningar kräver ett rimligt beboeligt fartyg där sittaren kan bo och sova ombord. Dagkontroller är undantaget: vård endast dagtid, utan övernattning. Under överenskomna datum får sittaren endast använda fartyget som tillfälligt boende när hen bor ombord, och för att utföra överenskommen vård. Såvida inte ägaren ger uttryckligt skriftligt tillstånd, får sittaren inte navigera, flytta, chartra, låna ut, hyra ut i andra hand, använda kommersiellt eller ta emot obehöriga övernattande gäster ombord på fartyget. Säkerhets- och nödanvisningar har prioritet.",
     "notifications.items.sitAccepted": "{{actor}} tackade ja till din inbjudan att sitta {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} accepterade din ansökan för {{boat}}.",
     "notifications.items.applicationUnaccepted":
@@ -4670,6 +4714,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ års erfaring",
     "applications.filteredCount": "Viser {{count}} av {{total}}",
     "applications.filterEmpty": "Ingen applikasjoner samsvarer med disse filtrene",
+    "applications.filtersToggle": "Filtre",
+    "applications.filtersToggleActive": "Filtre ({{count}})",
     "applications.listMeta": "{{years}} år · {{matches}}/{{total}} kamp · tidligere {{sits}}",
     "applications.priorSits": "Prior sitter",
     "applications.priorSitsCount_one": "Tidligere båtplasser fullført: 1",
@@ -4689,6 +4735,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Ferdigheter",
     "applications.languages": "Språk",
     "applications.initialMessage": "Innledende melding",
+    "applications.showDetails": "Flere detaljer",
+    "applications.hideDetails": "Færre detaljer",
     "applications.action.shortlisted": "Shortlist",
     "applications.action.accepted": "Akseptere",
     "applications.action.declined": "Avslå",
@@ -4814,9 +4862,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Folk som bor",
     "detail.maxGuests_one": "Maks 1 person",
     "detail.maxGuests_other": "Maksimalt {{count}} personer",
-    "how.liveaboardTitle": "Hver sits er liveaboard",
+    "how.liveaboardTitle": "De fleste sits er liveaboard",
     "how.liveaboardText":
-      "Boatstead er for opphold der den aksepterte sitter bor og sover ombord gjennom de avtalte datoene. Fartøyet er midlertidig innkvartering og et omsorgsansvar, ikke en båt å låne, leie eller cruise med mindre eieren gir uttrykkelige skriftlige instruksjoner.",
+      "Boatstead er for opphold der den aksepterte sitteren bor og sover ombord gjennom de avtalte datoene. Fartøyet er midlertidig innkvartering og et omsorgsansvar, ikke en båt å låne, leie eller cruise med mindre eieren gir uttrykkelige skriftlige instruksjoner. Dagkontroller er unntaket: sitteren tar vare på båten bare på dagtid og overnatter ikke ombord.",
     "how.risksKicker": "Hvorfor liveaboard omsorg er viktig",
     "how.risksTitle": "En båt som står alene kan raskt utvikle alvorlige problemer",
     "how.risksText":
@@ -4839,7 +4887,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sikkerhetsalarmer, marinameldinger, skadedyr eller kjæledyr ombord kan kreve umiddelbar oppmerksomhet.",
     "terms.liveaboard.title": "Liveaboard bruk av fartøyet",
     "terms.liveaboard.text":
-      "Oppføringer må tilby et fartøy som er trygt, lovlig og rimelig beboelig for sitteren å bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dagsjekk-tjeneste. På de avtalte datoene kan oppsitteren kun bruke fartøyet som midlertidig innkvartering og for å utføre avtalt stell. Med mindre eieren gir uttrykkelig skriftlig tillatelse, må sitteren ikke navigere, flytte, leie ut, låne ut, fremleie, bruke kommersielt eller være vert for uautoriserte overnattingsgjester ombord på fartøyet. Sikkerhets- og nødinstruksjoner har prioritet.",
+      "Oppføringer må tilby et fartøy som er trygt, lovlig og egnet for den avtalte sit-typen. Liveaboard-sits krever et rimelig beboelig fartøy der sitteren kan bo og sove ombord. Dagkontroller er unntaket: omsorg bare på dagtid, uten overnatting. På de avtalte datoene kan sitteren kun bruke fartøyet som midlertidig innkvartering når hen bor ombord, og for å utføre avtalt stell. Med mindre eieren gir uttrykkelig skriftlig tillatelse, må sitteren ikke navigere, flytte, leie ut, låne ut, fremleie, bruke kommersielt eller være vert for uautoriserte overnattingsgjester ombord på fartøyet. Sikkerhets- og nødinstruksjoner har prioritet.",
     "notifications.items.sitAccepted": "{{actor}} godtok invitasjonen din til å sitte {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} godtok søknaden din for {{boat}}.",
     "notifications.items.applicationUnaccepted":
@@ -5084,6 +5132,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ års erfaring",
     "applications.filteredCount": "Viser {{count}} af {{total}}",
     "applications.filterEmpty": "Ingen applikationer matcher disse filtre",
+    "applications.filtersToggle": "Filtre",
+    "applications.filtersToggleActive": "Filtre ({{count}})",
     "applications.listMeta": "{{years}} år · {{matches}}/{{total}} kamp · tidligere {{sits}}",
     "applications.priorSits": "Prior sidder",
     "applications.priorSitsCount_one": "Tidligere bådsejlads afsluttet: 1",
@@ -5103,6 +5153,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Færdigheder",
     "applications.languages": "Sprog",
     "applications.initialMessage": "Indledende besked",
+    "applications.showDetails": "Flere detaljer",
+    "applications.hideDetails": "Færre detaljer",
     "applications.action.shortlisted": "Shortlist",
     "applications.action.accepted": "Acceptere",
     "applications.action.declined": "Nedgang",
@@ -5227,9 +5279,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Folk der bliver",
     "detail.maxGuests_one": "Max 1 person",
     "detail.maxGuests_other": "Maksimalt {{count}} personer",
-    "how.liveaboardTitle": "Hver sit er liveaboard",
+    "how.liveaboardTitle": "De fleste sits er liveaboard",
     "how.liveaboardText":
-      "Boatstead er til ophold, hvor den accepterede sitter bor og sover ombord på de aftalte datoer. Skibet er midlertidig indkvartering og et plejeansvar, ikke en båd til at låne, chartre eller sejle, medmindre ejeren giver udtrykkelige skriftlige instruktioner.",
+      "Boatstead er til ophold, hvor den accepterede sitter bor og sover ombord på de aftalte datoer. Skibet er midlertidig indkvartering og et plejeansvar, ikke en båd til at låne, chartre eller sejle, medmindre ejeren giver udtrykkelige skriftlige instruktioner. Dagkontroller er undtagelsen: sitteren passer båden kun om dagen og overnatter ikke ombord.",
     "how.risksKicker": "Hvorfor liveaboard-pleje betyder noget",
     "how.risksTitle": "En båd efterladt alene kan hurtigt udvikle alvorlige problemer",
     "how.risksText":
@@ -5251,7 +5303,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sikkerhedsalarmer, marinameddelelser, skadedyr eller kæledyr ombord kan kræve øjeblikkelig opmærksomhed.",
     "terms.liveaboard.title": "Liveaboard brug af fartøjet",
     "terms.liveaboard.text":
-      "Fortegnelser skal tilbyde et fartøj, der er sikkert, lovligt og rimeligt beboeligt, så den siddende kan bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dag-tjek-service. På de aftalte datoer må oppasseren kun bruge fartøjet som midlertidig bolig og til at udføre aftalt pleje. Medmindre ejeren giver udtrykkelig skriftlig tilladelse, må sitteren ikke navigere, flytte, chartre, udlåne, fremleje, bruge kommercielt eller være vært for uautoriserede overnattende gæster ombord på fartøjet. Sikkerheds- og nødinstruktioner har prioritet.",
+      "Fortegnelser skal tilbyde et fartøj, der er sikkert, lovligt og egnet til den aftalte sit-type. Liveaboard-sits kræver et rimeligt beboeligt fartøj, så sitteren kan bo og sove ombord. Dagkontroller er undtagelsen: pleje kun om dagen, uden overnatning. På de aftalte datoer må sitteren kun bruge fartøjet som midlertidig bolig, når vedkommende bor ombord, og til at udføre aftalt pleje. Medmindre ejeren giver udtrykkelig skriftlig tilladelse, må sitteren ikke navigere, flytte, chartre, udlåne, fremleje, bruge kommercielt eller være vært for uautoriserede overnattende gæster ombord på fartøyet. Sikkerheds- og nødinstruktioner har prioritet.",
     "notifications.items.sitAccepted":
       "{{actor}} accepterede din invitation til at sidde {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} accepterede din ansøgning om {{boat}}.",
@@ -5496,6 +5548,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10+ vuoden kokemus",
     "applications.filteredCount": "Näytetään {{count}} / {{total}}",
     "applications.filterEmpty": "Mikään sovellus ei vastaa näitä suodattimia",
+    "applications.filtersToggle": "Suodattimet",
+    "applications.filtersToggleActive": "Suodattimet ({{count}})",
     "applications.listMeta": "{{years}} v. · {{matches}}/{{total}} ottelu · ennen {{sits}}",
     "applications.priorSits": "Aiemmat istuimet",
     "applications.priorSitsCount_one": "Aiemmat venepaikat valmistuneet: 1",
@@ -5515,6 +5569,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "Taidot",
     "applications.languages": "Kielet",
     "applications.initialMessage": "Alkuviesti",
+    "applications.showDetails": "Lisätiedot",
+    "applications.hideDetails": "Vähemmän tietoja",
     "applications.action.shortlisted": "Suosikkilista",
     "applications.action.accepted": "Hyväksyä",
     "applications.action.declined": "Hylkää",
@@ -5643,9 +5699,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "Ihmisiä jäämässä",
     "detail.maxGuests_one": "Enintään 1 henkilö",
     "detail.maxGuests_other": "Enintään {{count}} henkilöä",
-    "how.liveaboardTitle": "Jokainen istunto on liveaboard",
+    "how.liveaboardTitle": "Useimmat istunnot ovat liveaboard",
     "how.liveaboardText":
-      "Boatstead on tarkoitettu majoituksiin, joissa hyväksytty lapsenvahti asuu ja nukkuu laivalla sovittuina päivinä. Alus on tilapäinen majoitus- ja hoitovastuu, ei laina-, vuokra- tai risteilyvene, ellei omistaja anna nimenomaisia kirjallisia ohjeita.",
+      "Boatstead on tarkoitettu majoituksiin, joissa hyväksytty hoitaja asuu ja nukkuu kyydissä sovittuina päivinä. Alus on tilapäinen majoitus- ja hoitovastuu, ei laina-, vuokra- tai risteilyvene, ellei omistaja anna nimenomaisia kirjallisia ohjeita. Päiväkäynnit ovat poikkeus: hoitaja huolehtii veneestä vain päivisin eikä yövy kyydissä.",
     "how.risksKicker": "Miksi liveaboard-hoidolla on merkitystä",
     "how.risksTitle": "Yksin jätetty vene voi aiheuttaa vakavia ongelmia nopeasti",
     "how.risksText":
@@ -5668,7 +5724,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Turvahälyttimet, venesataman ilmoitukset, tuholaiset tai laivan lemmikkieläimet voivat vaatia välitöntä huomiota.",
     "terms.liveaboard.title": "Aluksen käyttö laivalla",
     "terms.liveaboard.text":
-      "Listausten on tarjottava alus, joka on turvallinen, laillinen ja kohtuullisen asumiskelpoinen, jotta hoitaja voi asua ja nukkua siinä. Jokainen istunto on liveaboard-järjestely, ei päivätarkastuspalvelu. Sitteri saa käyttää alusta sovittuna aikana vain tilapäisenä majoituksena ja sovitun hoidon suorittamiseen. Ellei omistaja anna nimenomaista kirjallista lupaa, vahtimestari ei saa navigoida, siirtää, vuokrata, lainata, edelleenvuokrata, käyttää kaupallisesti tai vastaanottaa luvattomia yöpyjiä aluksella. Turvallisuus- ja hätäohjeet ovat etusijalla.",
+      "Listausten on tarjottava alus, joka on turvallinen, laillinen ja sopiva sovittuun istuntotyyppiin. Liveaboard-istunnot edellyttävät kohtuullisen asumiskelpoista alusta, jossa hoitaja voi asua ja nukkua. Päiväkäynnit ovat poikkeus: hoito vain päivisin, ilman yöpymistä. Sovittuna aikana hoitaja saa käyttää alusta vain tilapäisenä majoituksena asuessaan kyydissä sekä sovitun hoidon suorittamiseen. Ellei omistaja anna nimenomaista kirjallista lupaa, hoitaja ei saa navigoida, siirtää, vuokrata, lainata, edelleenvuokrata, käyttää kaupallisesti tai vastaanottaa luvattomia yöpyjiä aluksella. Turvallisuus- ja hätäohjeet ovat etusijalla.",
     "notifications.items.sitAccepted": "{{actor}} hyväksyi kutsusi istua {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} hyväksyi hakemuksesi {{boat}}.",
     "notifications.items.applicationUnaccepted":
@@ -5911,6 +5967,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.filterExperienceTenPlus": "10年以上の経験",
     "applications.filteredCount": "{{count}}/{{total}} を表示中",
     "applications.filterEmpty": "これらのフィルターに一致するアプリケーションはありません",
+    "applications.filtersToggle": "フィルター",
+    "applications.filtersToggleActive": "フィルター ({{count}})",
     "applications.listMeta": "{{years}} 年 · {{matches}}/{{total}} 一致 · 以前 {{sits}}",
     "applications.priorSits": "前の席",
     "applications.priorSitsCount_one": "前のボートが完成しました: 1",
@@ -5930,6 +5988,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.skills": "スキル",
     "applications.languages": "言語",
     "applications.initialMessage": "最初のメッセージ",
+    "applications.showDetails": "詳細を表示",
+    "applications.hideDetails": "詳細を隠す",
     "applications.action.shortlisted": "候補者リスト",
     "applications.action.accepted": "受け入れる",
     "applications.action.declined": "衰退",
@@ -6054,9 +6114,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.partySize": "宿泊する人",
     "detail.maxGuests_one": "最大1名様",
     "detail.maxGuests_other": "最大{{count}}人",
-    "how.liveaboardTitle": "すべての座席は船上に住んでいます",
+    "how.liveaboardTitle": "ほとんどのシットは船上滞在です",
     "how.liveaboardText":
-      "Boatsteadは、受け入れられたシッターが合意された期間中、船上で生活し、宿泊するための宿泊施設です。船は一時的な宿泊施設であり、管理責任があり、所有者が書面による明確な指示を出さない限り、借りたり、チャーターしたり、クルーズしたりするためのボートではありません。",
+      "Boatsteadは、受け入れられたシッターが合意された期間中、船上で生活し就寝するシット向けです。船は一時的な宿泊施設でありケアの責任でもあり、所有者から明示的な書面による指示がない限り、借りたりチャーターしたりクルーズしたりするためのものではありません。日中チェックが例外です。シッターは日中のみ船の世話をし、船上に宿泊しません。",
     "how.risksKicker": "なぜ住み込みケアが重要なのか",
     "how.risksTitle": "ボートを放っておくとすぐに深刻な問題が発生する可能性があります",
     "how.risksText":
@@ -6079,7 +6139,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "セキュリティアラーム、マリーナの通知、害虫、船内のペットなどには、直ちに対応が必要な場合があります。",
     "terms.liveaboard.title": "船舶の居住用使用",
     "terms.liveaboard.text":
-      "出品には、安全かつ合法で、乗員が船上で居住および就寝するのに合理的に適した船舶を提供する必要があります。すべてのシットは乗船手配であり、デイチェックサービスではありません。合意された日付の間、シッターは一時的な宿泊施設として、および合意されたケアを行うためにのみ船舶を使用できます。所有者が書面による明示的な許可を与えない限り、シッターは船舶の航行、移転、チャーター、貸し出し、転貸、商業利用、または許可されていない宿泊客の船上での宿泊を受け入れてはなりません。安全と緊急時の指示が優先されます。",
+      "出品には、安全かつ合法で、合意したシットの種類に適した船舶を提供する必要があります。船上滞在のシットでは、シッターが船上で居住および就寝するのに合理的に適した船舶が必要です。日中チェックが例外で、夜間滞在のない日中のみのケアです。合意された日付の間、シッターは船上に住む場合に限り一時的な宿泊施設として、および合意されたケアを行うためにのみ船舶を使用できます。所有者が書面による明示的な許可を与えない限り、シッターは船舶の航行、移転、チャーター、貸し出し、転貸、商業利用、または許可されていない宿泊客の船上での宿泊を受け入れてはなりません。安全と緊急時の指示が優先されます。",
     "notifications.items.sitAccepted":
       "{{actor}} は、{{boat}} に座るというあなたの招待を受け入れました。",
     "notifications.items.applicationAccepted": "{{actor}} が {{boat}} の申請を受理しました。",

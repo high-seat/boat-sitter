@@ -93,6 +93,11 @@ textarea[aria-disabled="true"] {
   font-weight: 700;
 }
 
+/* Field wrappers default to inline; blockify so space-y gaps apply between fields. */
+label:has(> .form-label) {
+  display: block;
+}
+
 .form-input {
   width: 100%;
   border: 1px solid var(--color-line);
@@ -370,6 +375,15 @@ select.select-control.select-variant-inline {
 @media (max-width: 767px) {
   .hero-image {
     box-shadow: 15px 15px 0 var(--color-seafoam);
+  }
+
+  /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+  .form-input,
+  select.select-control,
+  .phone-country-code .form-control,
+  .phone-country-code__input,
+  .phone-country-code .country-list .search-box {
+    font-size: 1rem !important;
   }
 }
 

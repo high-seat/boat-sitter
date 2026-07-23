@@ -8,8 +8,10 @@ function clearApplicationMessages(body: unknown) {
     const list = record[key];
     if (!Array.isArray(list)) continue;
     for (const app of list) {
-      if (app && typeof app === "object" && "messages" in app) {
-        (app as { messages: unknown[] }).messages = [];
+      if (app && typeof app === "object") {
+        const application = app as { messages?: unknown[]; initialMessage?: string };
+        application.messages = [];
+        application.initialMessage = "";
       }
     }
   }

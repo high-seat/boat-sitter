@@ -3,7 +3,7 @@
  * Used by the Worker `/api/applications?sitId=` route.
  */
 
-export const APPLICATIONS_PAGE_SIZE = 20;
+export const APPLICATIONS_PAGE_SIZE = 5;
 
 export type ApplicationListSort = "newest" | "experience" | "skillMatch" | "priorSits";
 

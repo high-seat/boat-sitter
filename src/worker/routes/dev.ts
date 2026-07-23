@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import type { AppEnv } from "../context";
 import { buildAuth } from "../auth";
 import { getDb } from "../db";
@@ -231,6 +231,8 @@ devRouter.post("/login", async (c) => {
     return c.json({ error: "Dev login created no session" }, 500);
   }
 
+  // Claim vessels whose owner matches this name. Include seed-user-* IDs so
+  // e2e tests can log in as seed owners and properly own their seed vessels.
   await db
     .update(vessels)
     .set({
@@ -239,12 +241,26 @@ devRouter.post("/login", async (c) => {
       ownerImage: sessionUser.image ?? image,
       updatedAt: sql`CURRENT_TIMESTAMP`,
     })
-    .where(and(eq(vessels.owner, name), isNull(vessels.ownerUserId)));
+    .where(
+      and(
+        eq(vessels.owner, name),
+        or(isNull(vessels.ownerUserId), sql`${vessels.ownerUserId} LIKE 'seed-user-%'`),
+      ),
+    );
 
+  // Claim applications whose applicant matches this name.
   await db
     .update(applications)
     .set({ applicantUserId: sessionUser.id })
-    .where(and(eq(applications.applicantName, name), isNull(applications.applicantUserId)));
+    .where(
+      and(
+        eq(applications.applicantName, name),
+        or(
+          isNull(applications.applicantUserId),
+          sql`${applications.applicantUserId} LIKE 'seed-user-%'`,
+        ),
+      ),
+    );
 
   // Prefer a JSON body for clients while preserving auth cookies.
   const headers = new Headers(authResponse.headers);
@@ -587,6 +603,8 @@ devRouter.post("/fixture", async (c) => {
   if (kind === "paginated-applications") {
     for (let n = 1; n <= 22; n += 1) {
       const id = `application-solstice-page-${n}`;
+      const createdAt = `2026-03-${String((n % 28) + 1).padStart(2, "0")}T12:00:00.000Z`;
+      const initialMessage = "Hello from the pagination suite.";
       await db
         .insert(applications)
         .values({
@@ -608,14 +626,25 @@ devRouter.post("/fixture", async (c) => {
             completedSits: n,
           },
           applicantName: `Pager Sitter ${n}`,
-          initialMessage: "Hello from the pagination suite.",
+          initialMessage,
           status: "new",
-          createdAt: `2026-03-${String((n % 28) + 1).padStart(2, "0")}T12:00:00.000Z`,
+          createdAt,
         })
         .onConflictDoUpdate({
           target: applications.id,
           set: { status: "new" },
         });
+      await db
+        .insert(applicationMessages)
+        .values({
+          id: `message-${id}-initial`,
+          applicationId: id,
+          senderName: `Pager Sitter ${n}`,
+          text: initialMessage,
+          kind: "user",
+          createdAt,
+        })
+        .onConflictDoNothing();
     }
     return c.json({ ok: true, count: 22 });
   }

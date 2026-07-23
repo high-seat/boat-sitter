@@ -71,6 +71,28 @@ function avatarSrcForSender(
   return "";
 }
 
+function messagesWithInitialApplication(application: SitApplication): ApplicationMessage[] {
+  const trimmed = application.initialMessage.trim();
+  if (!trimmed) return application.messages;
+  const alreadyPresent = application.messages.some(
+    (message) =>
+      (message.kind ?? "user") === "user" &&
+      message.senderName === application.applicant.name &&
+      message.text === trimmed,
+  );
+  if (alreadyPresent) return application.messages;
+  return [
+    {
+      id: `${application.id}-initial-message`,
+      senderName: application.applicant.name,
+      text: trimmed,
+      createdAt: application.createdAt,
+      kind: "user",
+    },
+    ...application.messages,
+  ];
+}
+
 export function ConversationPanel({
   application,
   currentUser,
@@ -117,7 +139,8 @@ export function ConversationPanel({
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const replyInputRef = useRef<HTMLTextAreaElement | null>(null);
-  const lastMessageKey = optimisticMessages.at(-1)?.id ?? application.messages.at(-1)?.id ?? "";
+  const lastMessageKey =
+    optimisticMessages.at(-1)?.id ?? messagesWithInitialApplication(application).at(-1)?.id ?? "";
 
   useEffect(() => {
     setReply("");
@@ -252,7 +275,7 @@ export function ConversationPanel({
   const visibleOptimistic = optimisticMessages.filter(
     (optimistic) => !isOptimisticMessageSynced(optimistic, application.messages),
   );
-  const threadMessages = [...application.messages, ...visibleOptimistic];
+  const threadMessages = [...messagesWithInitialApplication(application), ...visibleOptimistic];
   const hasOptimisticSend = visibleOptimistic.some((message) => message.pending);
 
   async function submitReply() {
@@ -755,11 +778,6 @@ export function ConversationPanel({
                 </button>
               </IconTooltip>
             </div>
-            {profilePhone ? (
-              <p className="mt-2 text-xs leading-5 text-slate">
-                {t("applications.sharePhoneInChatHint")}
-              </p>
-            ) : null}
           </div>
         </div>
       </div>

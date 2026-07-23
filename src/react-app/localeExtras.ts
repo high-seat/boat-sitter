@@ -327,6 +327,7 @@ const localeExtrasSource = {
     "owner.deleteBoatLabel": "Delete {{boat}}",
     "owner.deleteBoatTitle": "Delete {{boat}}?",
     "owner.deleteBoatConfirm": "This permanently removes the boat and cannot be undone.",
+    "owner.deleteSit": "Delete",
     "owner.deleteSitLabel": "Delete {{boat}} sit",
     "owner.deleteSitTitle": "Delete this sit?",
     "owner.deleteSitConfirm": "Delete the {{dates}} sit for {{boat}}?",
@@ -348,6 +349,7 @@ const localeExtrasSource = {
     "owner.deleteSitAcceptedWarning":
       "Someone has already been accepted for this sit. Please inform them before you delete it.",
     "owner.deleteSitCompletedError": "Completed sits cannot be deleted. Archive them instead.",
+    "owner.archiveSit": "Archive",
     "owner.archiveSitLabel": "Archive {{boat}} sit",
     "owner.archiveSitTitle": "Archive this sit?",
     "owner.archiveSitConfirm":
@@ -373,6 +375,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "This sit could not be cancelled. Please try again.",
     "owner.unarchiveSit": "Move to active sits",
     "owner.unarchiveSitLabel": "Restore {{boat}} sit",
+    "owner.manageSit": "Manage",
+    "owner.sitActions": "Sit actions",
     "owner.archivedSitsHeading": "Archived",
     "owner.archivedSitsCount_one": "1 sit",
     "owner.archivedSitsCount_other": "{{count}} sits",
@@ -492,7 +496,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Upload photos",
     "upload.processingMultiple": "Processing photos…",
     "upload.hintMultiple": "JPG, PNG or WebP up to 10 MB each.",
-    "sitEditor.kicker": "Sit availability",
     "sitEditor.editTitle": "Edit boat sit",
     "sitEditor.lockedBannerTitle": "Editing is locked",
     "sitEditor.lockedBanner":
@@ -1379,6 +1382,8 @@ const localeExtrasSource = {
       "Quelqu’un a déjà été accepté pour cette garde. Merci de l’en informer avant de la supprimer.",
     "owner.deleteSitCompletedError":
       "Les gardes terminées ne peuvent pas être supprimées. Archivez-les à la place.",
+    "owner.deleteSit": "Supprimer",
+    "owner.archiveSit": "Archiver",
     "owner.archiveSitLabel": "Archiver la garde {{boat}}",
     "owner.archiveSitTitle": "Archiver cette garde ?",
     "owner.archiveSitConfirm":
@@ -1404,6 +1409,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Impossible d’annuler cette garde. Réessayez.",
     "owner.unarchiveSit": "Remettre dans les gardes actives",
     "owner.unarchiveSitLabel": "Restaurer la garde {{boat}}",
+    "owner.manageSit": "Gérer",
+    "owner.sitActions": "Actions",
     "owner.archivedSitsHeading": "Archivées",
     "owner.archivedSitsCount_one": "1 garde",
     "owner.archivedSitsCount_other": "{{count}} gardes",
@@ -1527,7 +1534,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Téléverser des photos",
     "upload.processingMultiple": "Traitement des photos…",
     "upload.hintMultiple": "JPG, PNG ou WebP jusqu’à 10 Mo chacune.",
-    "sitEditor.kicker": "Disponibilité des places assises",
     "sitEditor.editTitle": "Modifier la garde",
     "sitEditor.lockedBannerTitle": "Modification verrouillée",
     "sitEditor.lockedBanner":
@@ -2427,6 +2433,8 @@ const localeExtrasSource = {
       "Alguien ya ha sido aceptado para esta estancia. Infórmale antes de eliminarla.",
     "owner.deleteSitCompletedError":
       "Las estancias completadas no se pueden eliminar. Archívalas en su lugar.",
+    "owner.deleteSit": "Eliminar",
+    "owner.archiveSit": "Archivar",
     "owner.archiveSitLabel": "Archivar estancia de {{boat}}",
     "owner.archiveSitTitle": "¿Archivar esta estancia?",
     "owner.archiveSitConfirm":
@@ -2452,6 +2460,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "No se pudo cancelar este sit. Inténtalo de nuevo.",
     "owner.unarchiveSit": "Mover a estancias activas",
     "owner.unarchiveSitLabel": "Restaurar estancia de {{boat}}",
+    "owner.manageSit": "Gestionar",
+    "owner.sitActions": "Acciones",
     "owner.archivedSitsHeading": "Archivadas",
     "owner.archivedSitsCount_one": "1 estancia",
     "owner.archivedSitsCount_other": "{{count}} estancias",
@@ -2575,7 +2585,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Subir fotos",
     "upload.processingMultiple": "Procesando fotos…",
     "upload.hintMultiple": "JPG, PNG o WebP de hasta 10 MB cada una.",
-    "sitEditor.kicker": "Disponibilidad de asiento",
     "sitEditor.editTitle": "Editar asiento en barco",
     "sitEditor.lockedBannerTitle": "Edición bloqueada",
     "sitEditor.lockedBanner":
@@ -3472,6 +3481,8 @@ const localeExtrasSource = {
       "Qualcuno è già stato accettato per questo soggiorno. Informalo prima di eliminarlo.",
     "owner.deleteSitCompletedError":
       "I soggiorni completati non possono essere eliminati. Archiviali invece.",
+    "owner.deleteSit": "Elimina",
+    "owner.archiveSit": "Archivia",
     "owner.archiveSitLabel": "Archivia soggiorno {{boat}}",
     "owner.archiveSitTitle": "Archiviare questo soggiorno?",
     "owner.archiveSitConfirm":
@@ -3497,6 +3508,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Impossibile annullare questo sit. Riprova.",
     "owner.unarchiveSit": "Sposta tra i soggiorni attivi",
     "owner.unarchiveSitLabel": "Ripristina soggiorno {{boat}}",
+    "owner.manageSit": "Gestisci",
+    "owner.sitActions": "Azioni",
     "owner.archivedSitsHeading": "Archiviati",
     "owner.archivedSitsCount_one": "1 soggiorno",
     "owner.archivedSitsCount_other": "{{count}} soggiorni",
@@ -3620,7 +3633,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Carica foto",
     "upload.processingMultiple": "Elaborazione foto…",
     "upload.hintMultiple": "JPG, PNG o WebP fino a 10 MB ciascuna.",
-    "sitEditor.kicker": "Disponibilità di posti a sedere",
     "sitEditor.editTitle": "Modifica la posizione della barca",
     "sitEditor.lockedBannerTitle": "Modifica bloccata",
     "sitEditor.lockedBanner":
@@ -4520,6 +4532,8 @@ const localeExtrasSource = {
       "Für diesen Sit wurde bereits jemand akzeptiert. Bitte informiere die Person, bevor du ihn löschst.",
     "owner.deleteSitCompletedError":
       "Abgeschlossene Sits können nicht gelöscht werden. Archiviere sie stattdessen.",
+    "owner.deleteSit": "Löschen",
+    "owner.archiveSit": "Archivieren",
     "owner.archiveSitLabel": "{{boat}}-Sit archivieren",
     "owner.archiveSitTitle": "Diesen Sit archivieren?",
     "owner.archiveSitConfirm":
@@ -4546,6 +4560,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Dieser Sit konnte nicht abgesagt werden. Bitte erneut versuchen.",
     "owner.unarchiveSit": "Zu aktiven Sits verschieben",
     "owner.unarchiveSitLabel": "{{boat}}-Sit wiederherstellen",
+    "owner.manageSit": "Verwalten",
+    "owner.sitActions": "Aktionen",
     "owner.archivedSitsHeading": "Archiviert",
     "owner.archivedSitsCount_one": "1 Sit",
     "owner.archivedSitsCount_other": "{{count}} Sits",
@@ -4669,7 +4685,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Fotos hochladen",
     "upload.processingMultiple": "Fotos werden verarbeitet…",
     "upload.hintMultiple": "JPG, PNG oder WebP bis je 10 MB.",
-    "sitEditor.kicker": "Sitzverfügbarkeit",
     "sitEditor.editTitle": "Bootssitz bearbeiten",
     "sitEditor.lockedBannerTitle": "Bearbeitung gesperrt",
     "sitEditor.lockedBanner":
@@ -5565,6 +5580,8 @@ const localeExtrasSource = {
       "Er is al iemand geaccepteerd voor deze sit. Informeer die persoon voordat je hem verwijdert.",
     "owner.deleteSitCompletedError":
       "Voltooide sits kunnen niet worden verwijderd. Archiveer ze in plaats daarvan.",
+    "owner.deleteSit": "Verwijderen",
+    "owner.archiveSit": "Archiveren",
     "owner.archiveSitLabel": "{{boat}}-sit archiveren",
     "owner.archiveSitTitle": "Deze sit archiveren?",
     "owner.archiveSitConfirm":
@@ -5590,6 +5607,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Deze sit kon niet worden geannuleerd. Probeer het opnieuw.",
     "owner.unarchiveSit": "Verplaatsen naar actieve sits",
     "owner.unarchiveSitLabel": "{{boat}}-sit herstellen",
+    "owner.manageSit": "Beheren",
+    "owner.sitActions": "Acties",
     "owner.archivedSitsHeading": "Gearchiveerd",
     "owner.archivedSitsCount_one": "1 sit",
     "owner.archivedSitsCount_other": "{{count}} sits",
@@ -5712,7 +5731,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Foto's uploaden",
     "upload.processingMultiple": "Foto's verwerken…",
     "upload.hintMultiple": "JPG, PNG of WebP tot 10 MB per stuk.",
-    "sitEditor.kicker": "Beschikbaarheid van zitplaatsen",
     "sitEditor.editTitle": "Bewerk bootzit",
     "sitEditor.lockedBannerTitle": "Bewerken vergrendeld",
     "sitEditor.lockedBanner":
@@ -6603,6 +6621,8 @@ const localeExtrasSource = {
       "Alguém já foi aceite para esta estadia. Informe essa pessoa antes de a eliminar.",
     "owner.deleteSitCompletedError":
       "Estadias concluídas não podem ser eliminadas. Arquive-as em vez disso.",
+    "owner.deleteSit": "Eliminar",
+    "owner.archiveSit": "Arquivar",
     "owner.archiveSitLabel": "Arquivar estadia de {{boat}}",
     "owner.archiveSitTitle": "Arquivar esta estadia?",
     "owner.archiveSitConfirm":
@@ -6628,6 +6648,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Não foi possível cancelar este sit. Tente novamente.",
     "owner.unarchiveSit": "Mover para estadias ativas",
     "owner.unarchiveSitLabel": "Restaurar estadia de {{boat}}",
+    "owner.manageSit": "Gerenciar",
+    "owner.sitActions": "Ações",
     "owner.archivedSitsHeading": "Arquivadas",
     "owner.archivedSitsCount_one": "1 estadia",
     "owner.archivedSitsCount_other": "{{count}} estadias",
@@ -6750,7 +6772,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Carregar fotos",
     "upload.processingMultiple": "A processar fotos…",
     "upload.hintMultiple": "JPG, PNG ou WebP até 10 MB cada.",
-    "sitEditor.kicker": "Disponibilidade de assento",
     "sitEditor.editTitle": "Editar assento de barco",
     "sitEditor.lockedBannerTitle": "Edição bloqueada",
     "sitEditor.lockedBanner":
@@ -7646,6 +7667,8 @@ const localeExtrasSource = {
       "Κάποιος έχει ήδη γίνει αποδεκτός για αυτή τη διαμονή. Ενημερώστε τον πριν τη διαγράψετε.",
     "owner.deleteSitCompletedError":
       "Οι ολοκληρωμένες διαμονές δεν μπορούν να διαγραφούν. Αρχειοθετήστε τις αντ’ αυτού.",
+    "owner.deleteSit": "Διαγραφή",
+    "owner.archiveSit": "Αρχειοθέτηση",
     "owner.archiveSitLabel": "Αρχειοθέτηση διαμονής {{boat}}",
     "owner.archiveSitTitle": "Αρχειοθέτηση αυτής της διαμονής;",
     "owner.archiveSitConfirm":
@@ -7672,6 +7695,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Δεν ήταν δυνατή η ακύρωση αυτού του sit. Δοκιμάστε ξανά.",
     "owner.unarchiveSit": "Μετακίνηση στις ενεργές διαμονές",
     "owner.unarchiveSitLabel": "Επαναφορά διαμονής {{boat}}",
+    "owner.manageSit": "Διαχείριση",
+    "owner.sitActions": "Ενέργειες",
     "owner.archivedSitsHeading": "Αρχειοθετημένα",
     "owner.archivedSitsCount_one": "1 διαμονή",
     "owner.archivedSitsCount_other": "{{count}} διαμονές",
@@ -7796,7 +7821,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Μεταφόρτωση φωτογραφιών",
     "upload.processingMultiple": "Επεξεργασία φωτογραφιών…",
     "upload.hintMultiple": "JPG, PNG ή WebP έως 10 MB η καθεμία.",
-    "sitEditor.kicker": "Διαθεσιμότητα καθιστικού",
     "sitEditor.editTitle": "Επεξεργαστείτε το καράβι",
     "sitEditor.lockedBannerTitle": "Η επεξεργασία είναι κλειδωμένη",
     "sitEditor.lockedBanner":
@@ -8699,6 +8723,8 @@ const localeExtrasSource = {
       "Netko je već prihvaćen za ovaj boravak. Obavijestite tu osobu prije brisanja.",
     "owner.deleteSitCompletedError":
       "Završeni boravci ne mogu se brisati. Umjesto toga ih arhivirajte.",
+    "owner.deleteSit": "Izbriši",
+    "owner.archiveSit": "Arhiviraj",
     "owner.archiveSitLabel": "Arhiviraj boravak {{boat}}",
     "owner.archiveSitTitle": "Arhivirati ovaj boravak?",
     "owner.archiveSitConfirm":
@@ -8724,6 +8750,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Ovaj sit nije moguće otkazati. Pokušajte ponovno.",
     "owner.unarchiveSit": "Premjesti među aktivne boravke",
     "owner.unarchiveSitLabel": "Vrati boravak {{boat}}",
+    "owner.manageSit": "Upravljaj",
+    "owner.sitActions": "Radnje",
     "owner.archivedSitsHeading": "Arhivirano",
     "owner.archivedSitsCount_one": "1 boravak",
     "owner.archivedSitsCount_other": "{{count}} boravaka",
@@ -8850,7 +8878,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Prenesi fotografije",
     "upload.processingMultiple": "Obrada fotografija…",
     "upload.hintMultiple": "JPG, PNG ili WebP do 10 MB po datoteci.",
-    "sitEditor.kicker": "Dostupnost sjediti",
     "sitEditor.editTitle": "Uredi boat sit",
     "sitEditor.lockedBannerTitle": "Uređivanje je zaključano",
     "sitEditor.lockedBanner":
@@ -9731,6 +9758,8 @@ const localeExtrasSource = {
     "owner.deleteSitAcceptedWarning":
       "Bu konaklama için biri zaten kabul edildi. Silmeden önce lütfen bilgilendirin.",
     "owner.deleteSitCompletedError": "Tamamlanan konaklamalar silinemez. Bunun yerine arşivleyin.",
+    "owner.deleteSit": "Sil",
+    "owner.archiveSit": "Arşivle",
     "owner.archiveSitLabel": "{{boat}} konaklamasını arşivle",
     "owner.archiveSitTitle": "Bu konaklama arşivlensin mi?",
     "owner.archiveSitConfirm":
@@ -9756,6 +9785,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Bu sit iptal edilemedi. Lütfen tekrar deneyin.",
     "owner.unarchiveSit": "Aktif konaklamalara taşı",
     "owner.unarchiveSitLabel": "{{boat}} konaklamasını geri yükle",
+    "owner.manageSit": "Yönet",
+    "owner.sitActions": "İşlemler",
     "owner.archivedSitsHeading": "Arşivlenmiş",
     "owner.archivedSitsCount_one": "1 konaklama",
     "owner.archivedSitsCount_other": "{{count}} konaklama",
@@ -9877,7 +9908,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Fotoğraf yükle",
     "upload.processingMultiple": "Fotoğraflar işleniyor…",
     "upload.hintMultiple": "Her biri en fazla 10 MB JPG, PNG veya WebP.",
-    "sitEditor.kicker": "Oturma durumu",
     "sitEditor.editTitle": "Tekne oturma yerini düzenle",
     "sitEditor.lockedBannerTitle": "Düzenleme kilitli",
     "sitEditor.lockedBanner":
@@ -10760,6 +10790,8 @@ const localeExtrasSource = {
       "Någon har redan blivit accepterad för denna sittning. Vänligen informera dem innan du raderar den.",
     "owner.deleteSitCompletedError":
       "Slutförda sittningar kan inte raderas. Arkivera dem istället.",
+    "owner.deleteSit": "Ta bort",
+    "owner.archiveSit": "Arkivera",
     "owner.archiveSitLabel": "Arkiv {{boat}} sitta",
     "owner.archiveSitTitle": "Arkivera den här sittningen?",
     "owner.archiveSitConfirm":
@@ -10785,6 +10817,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Denna sitt kunde inte avbokas. Försök igen.",
     "owner.unarchiveSit": "Flytta till aktiva sittningar",
     "owner.unarchiveSitLabel": "Återställ {{boat}} sit",
+    "owner.manageSit": "Hantera",
+    "owner.sitActions": "Åtgärder",
     "owner.archivedSitsHeading": "Arkiverad",
     "owner.archivedSitsCount_one": "1 sitta",
     "owner.archivedSitsCount_other": "{{count}} sitter",
@@ -10905,7 +10939,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Ladda upp bilder",
     "upload.processingMultiple": "Bearbetar foton...",
     "upload.hintMultiple": "JPG, PNG eller WebP upp till 10 MB vardera.",
-    "sitEditor.kicker": "Sitttillgänglighet",
     "sitEditor.editTitle": "Redigera båt sitta",
     "sitEditor.lockedBannerTitle": "Redigering är låst",
     "sitEditor.lockedBanner":
@@ -11786,6 +11819,8 @@ const localeExtrasSource = {
     "owner.deleteSitAcceptedWarning":
       "Noen har allerede blitt akseptert for dette setet. Vennligst informer dem før du sletter den.",
     "owner.deleteSitCompletedError": "Fullførte sets kan ikke slettes. Arkiver dem i stedet.",
+    "owner.deleteSit": "Slett",
+    "owner.archiveSit": "Arkiver",
     "owner.archiveSitLabel": "Arkiv {{boat}} sit",
     "owner.archiveSitTitle": "Arkivere denne siten?",
     "owner.archiveSitConfirm":
@@ -11811,6 +11846,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Denne siten kunne ikke avbestilles. Prøv igjen.",
     "owner.unarchiveSit": "Flytt til aktive sitter",
     "owner.unarchiveSitLabel": "Gjenopprett {{boat}} sit",
+    "owner.manageSit": "Administrer",
+    "owner.sitActions": "Handlinger",
     "owner.archivedSitsHeading": "Arkivert",
     "owner.archivedSitsCount_one": "1 sitte",
     "owner.archivedSitsCount_other": "{{count}} sitter",
@@ -11931,7 +11968,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Last opp bilder",
     "upload.processingMultiple": "Behandler bilder …",
     "upload.hintMultiple": "JPG, PNG eller WebP opptil 10 MB hver.",
-    "sitEditor.kicker": "Sitte tilgjengelighet",
     "sitEditor.editTitle": "Rediger båtsitt",
     "sitEditor.lockedBannerTitle": "Redigering er låst",
     "sitEditor.lockedBanner":
@@ -12811,6 +12847,8 @@ const localeExtrasSource = {
     "owner.deleteSitAcceptedWarning":
       "Nogen er allerede blevet accepteret til dette møde. Informer dem venligst, før du sletter det.",
     "owner.deleteSitCompletedError": "Fuldførte sits kan ikke slettes. Arkivér dem i stedet.",
+    "owner.deleteSit": "Slet",
+    "owner.archiveSit": "Arkivér",
     "owner.archiveSitLabel": "Arkiv {{boat}} sit",
     "owner.archiveSitTitle": "Arkiver dette møde?",
     "owner.archiveSitConfirm":
@@ -12836,6 +12874,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Denne sit kunne ikke annulleres. Prøv igen.",
     "owner.unarchiveSit": "Flyt til aktive siddepladser",
     "owner.unarchiveSitLabel": "Gendan {{boat}} sit",
+    "owner.manageSit": "Administrer",
+    "owner.sitActions": "Handlinger",
     "owner.archivedSitsHeading": "Arkiveret",
     "owner.archivedSitsCount_one": "1 sidde",
     "owner.archivedSitsCount_other": "{{count}} sidder",
@@ -12956,7 +12996,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Upload billeder",
     "upload.processingMultiple": "Behandler billeder...",
     "upload.hintMultiple": "JPG, PNG eller WebP op til 10 MB hver.",
-    "sitEditor.kicker": "Sidde tilgængelighed",
     "sitEditor.editTitle": "Rediger båd sit",
     "sitEditor.lockedBannerTitle": "Redigering er låst",
     "sitEditor.lockedBanner":
@@ -13838,6 +13877,8 @@ const localeExtrasSource = {
     "owner.deleteSitAcceptedWarning":
       "Joku on jo hyväksytty tähän istuntoon. Ilmoita heille ennen kuin poistat sen.",
     "owner.deleteSitCompletedError": "Valmiita istuntoja ei voi poistaa. Archive them instead.",
+    "owner.deleteSit": "Poista",
+    "owner.archiveSit": "Arkistoi",
     "owner.archiveSitLabel": "Arkisto {{boat}} sit",
     "owner.archiveSitTitle": "Arkistoidaanko tämä istunto?",
     "owner.archiveSitConfirm":
@@ -13863,6 +13904,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "Tätä sittiä ei voitu peruuttaa. Yritä uudelleen.",
     "owner.unarchiveSit": "Siirry aktiivisiin istuntoihin",
     "owner.unarchiveSitLabel": "Palauta {{boat}} sit",
+    "owner.manageSit": "Hallitse",
+    "owner.sitActions": "Toiminnot",
     "owner.archivedSitsHeading": "Arkistoitu",
     "owner.archivedSitsCount_one": "1 istua",
     "owner.archivedSitsCount_other": "{{count}} istuu",
@@ -13983,7 +14026,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Lataa kuvia",
     "upload.processingMultiple": "Käsitellään kuvia…",
     "upload.hintMultiple": "JPG, PNG tai WebP enintään 10 MB kappale.",
-    "sitEditor.kicker": "Istuin saatavuus",
     "sitEditor.editTitle": "Muokkaa veneen istumaa",
     "sitEditor.lockedBannerTitle": "Muokkaus on lukittu",
     "sitEditor.lockedBanner":
@@ -14864,6 +14906,8 @@ const localeExtrasSource = {
       "すでに誰かがこの座席への参加を受け入れています。削除する前にその旨を伝えてください。",
     "owner.deleteSitCompletedError":
       "完了したシートは削除できません。代わりにアーカイブしてください。",
+    "owner.deleteSit": "削除",
+    "owner.archiveSit": "アーカイブ",
     "owner.archiveSitLabel": "アーカイブ {{boat}} 座る",
     "owner.archiveSitTitle": "この席をアーカイブしますか?",
     "owner.archiveSitConfirm":
@@ -14889,6 +14933,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "このシットをキャンセルできませんでした。もう一度お試しください。",
     "owner.unarchiveSit": "アクティブな座り方に移行する",
     "owner.unarchiveSitLabel": "{{boat}} 座るを復元する",
+    "owner.manageSit": "管理",
+    "owner.sitActions": "操作",
     "owner.archivedSitsHeading": "アーカイブ済み",
     "owner.archivedSitsCount_one": "1 座る",
     "owner.archivedSitsCount_other": "{{count}}が座っています",
@@ -15010,7 +15056,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "写真をアップロードする",
     "upload.processingMultiple": "写真を処理中…",
     "upload.hintMultiple": "JPG、PNG、または WebP はそれぞれ最大 10 MB。",
-    "sitEditor.kicker": "座席の空き状況",
     "sitEditor.editTitle": "ボートシットを編集する",
     "sitEditor.lockedBannerTitle": "編集はロックされています",
     "sitEditor.lockedBanner":
@@ -15868,6 +15913,7 @@ const localeExtrasSource = {
     "owner.deleteBoatLabel": "Delete {{boat}}",
     "owner.deleteBoatTitle": "Delete {{boat}}?",
     "owner.deleteBoatConfirm": "This permanently removes the boat and cannot be undone.",
+    "owner.deleteSit": "Delete",
     "owner.deleteSitLabel": "Delete {{boat}} sit",
     "owner.deleteSitTitle": "Delete this sit?",
     "owner.deleteSitConfirm": "Delete the {{dates}} sit for {{boat}}?",
@@ -15889,6 +15935,7 @@ const localeExtrasSource = {
     "owner.deleteSitAcceptedWarning":
       "Someone has already been accepted for this sit. Please inform them before you delete it.",
     "owner.deleteSitCompletedError": "Completed sits cannot be deleted. Archive them instead.",
+    "owner.archiveSit": "Archive",
     "owner.archiveSitLabel": "Archive {{boat}} sit",
     "owner.archiveSitTitle": "Archive this sit?",
     "owner.archiveSitConfirm":
@@ -15914,6 +15961,8 @@ const localeExtrasSource = {
     "owner.cancelSitError": "This sit could not be cancelled. Please try again.",
     "owner.unarchiveSit": "Move to active sits",
     "owner.unarchiveSitLabel": "Restore {{boat}} sit",
+    "owner.manageSit": "Manage",
+    "owner.sitActions": "Sit actions",
     "owner.archivedSitsHeading": "Archived",
     "owner.archivedSitsCount_one": "1 sit",
     "owner.archivedSitsCount_other": "{{count}} sits",
@@ -16033,7 +16082,6 @@ const localeExtrasSource = {
     "upload.uploadMultiple": "Upload photos",
     "upload.processingMultiple": "Processing photos…",
     "upload.hintMultiple": "JPG, PNG or WebP up to 10 MB each.",
-    "sitEditor.kicker": "Sit availability",
     "sitEditor.editTitle": "Edit boat sit",
     "sitEditor.lockedBannerTitle": "Editing is locked",
     "sitEditor.lockedBanner":

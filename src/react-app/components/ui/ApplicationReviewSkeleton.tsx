@@ -19,8 +19,12 @@ export function ApplicationReviewSkeleton() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1 space-y-3">
           <ShimmerBlock className="h-10 w-72 max-w-full" />
+          <ShimmerBlock className="h-7 w-48 max-w-[70%]" />
+          <div className="flex flex-wrap items-center gap-2">
+            <ShimmerBlock className="h-4 w-36 max-w-[50%]" />
+            <ShimmerBlock className="h-6 w-28 rounded-full" />
+          </div>
           <ShimmerBlock className="h-4 w-56 max-w-[80%]" />
-          <ShimmerBlock className="h-7 w-36 rounded-full" />
         </div>
         <ShimmerBlock className="h-11 w-40 rounded-full" />
       </div>
@@ -53,8 +57,7 @@ export function ApplicationReviewSkeleton() {
         >
           <div className="space-y-2 border-b border-line pb-3">
             <ShimmerBlock className="h-11 w-full rounded-xl" />
-            <ShimmerBlock className="h-11 w-full rounded-xl" />
-            <ShimmerBlock className="h-11 w-full rounded-xl" />
+            <ShimmerBlock className="h-4 w-16" />
             <ShimmerBlock className="mt-1 h-3 w-24" />
           </div>
           <div className="mt-2 space-y-1">
@@ -67,21 +70,30 @@ export function ApplicationReviewSkeleton() {
 
         <div aria-hidden="true" className="pointer-events-none min-w-0 select-none space-y-6">
           <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-              <ShimmerBlock className="size-20 shrink-0 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <ShimmerBlock className="h-7 w-40 max-w-[60%]" />
-                  <ShimmerBlock className="h-6 w-20 rounded-full" />
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+              <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+                <ShimmerBlock className="size-16 shrink-0 rounded-full sm:size-20" />
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ShimmerBlock className="h-7 w-40 max-w-[60%]" />
+                    <ShimmerBlock className="h-6 w-20 rounded-full" />
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <ShimmerBlock className="h-4 w-32" />
+                    <ShimmerBlock className="h-4 w-24" />
+                    <ShimmerBlock className="h-4 w-20" />
+                  </div>
+                  <ShimmerBlock className="h-4 w-56 max-w-[80%]" />
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  <ShimmerBlock className="h-4 w-32" />
-                  <ShimmerBlock className="h-4 w-24" />
-                  <ShimmerBlock className="h-4 w-20" />
-                </div>
-                <ShimmerBlock className="h-4 w-[92%] max-w-lg" />
-                <ShimmerBlock className="h-4 w-[78%] max-w-md" />
               </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <ShimmerBlock className="h-4 w-28" />
+                <ShimmerBlock className="h-9 w-24 rounded-full" />
+                <ShimmerBlock className="h-9 w-24 rounded-full" />
+              </div>
+            </div>
+            <div className="mt-5">
+              <ShimmerBlock className="h-4 w-28" />
             </div>
             <div className="mt-6 flex flex-wrap gap-2 border-t border-line pt-5">
               <ShimmerBlock className="h-11 w-28 rounded-xl" />

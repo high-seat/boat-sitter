@@ -17,6 +17,8 @@ import {
   CircleCheck,
   Compass,
   Droplets,
+  Ellipsis,
+  Eye,
   Flame,
   Fuel,
   Gauge,
@@ -55,6 +57,7 @@ import {
   Zap,
   Users,
 } from "lucide-react";
+import * as Popover from "@radix-ui/react-popover";
 import {
   Link,
   Navigate,
@@ -3122,7 +3125,7 @@ function HowItWorksPage() {
           <span className="grid size-12 shrink-0 place-items-center rounded-full bg-coral text-white">
             <Anchor size={22} />
           </span>
-          <div>
+          <div data-testid="how-liveaboard-callout">
             <h2 className="font-display text-2xl font-bold text-navy">
               {t("how.liveaboardTitle")}
             </h2>
@@ -5439,7 +5442,6 @@ function SitEditor({
         <div className="order-2 min-w-0 rounded-3xl border border-line bg-white p-6 shadow-card md:p-8 lg:order-1">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">{t("sitEditor.kicker")}</p>
               <h1 className="font-display text-3xl font-bold text-navy">
                 {sit ? t("sitEditor.editTitle") : t("sitEditor.createTitle")}
               </h1>
@@ -5709,6 +5711,23 @@ function SitEditor({
                     </span>
                   </label>
                 ) : null}
+                <label data-testid="sit-editor-pets">
+                  <FormLabel optional>{t("sitEditor.pets")}</FormLabel>
+                  <div className="relative">
+                    <input
+                      className="form-input"
+                      maxLength={SIT_MAX_LENGTHS.pet}
+                      onChange={(event) => setForm({ ...form, pet: event.target.value })}
+                      placeholder={t("sitEditor.petsPlaceholder")}
+                      value={form.pet}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.pet.length}
+                      max={SIT_MAX_LENGTHS.pet}
+                    />
+                  </div>
+                </label>
                 <label data-testid="sit-editor-responsibilities">
                   <FormLabel optional>{t("sitEditor.responsibilities")}</FormLabel>
                   <div className="relative">
@@ -5847,23 +5866,6 @@ function SitEditor({
                       className="absolute right-3 bottom-2"
                       current={form.requirements.length}
                       max={SIT_MAX_LENGTHS.requirements}
-                    />
-                  </div>
-                </label>
-                <label data-testid="sit-editor-pets">
-                  <FormLabel optional>{t("sitEditor.pets")}</FormLabel>
-                  <div className="relative">
-                    <input
-                      className="form-input"
-                      maxLength={SIT_MAX_LENGTHS.pet}
-                      onChange={(event) => setForm({ ...form, pet: event.target.value })}
-                      placeholder={t("sitEditor.petsPlaceholder")}
-                      value={form.pet}
-                    />
-                    <CharacterCount
-                      className="absolute right-3 bottom-2"
-                      current={form.pet.length}
-                      max={SIT_MAX_LENGTHS.pet}
                     />
                   </div>
                 </label>
@@ -6265,81 +6267,147 @@ function OwnerBoatsPage() {
     const isArchived = Boolean(options?.archived);
     const sitDates = formatSitDates(i18n.language, sit.dateStart, sit.duration);
 
-    function renderSitArchiveOrDeleteAction() {
-      if (isArchived) {
-        return (
-          <IconTooltip label={t("owner.unarchiveSit")} wrap>
-            <button
-              aria-label={t("owner.unarchiveSitLabel", { boat: boat.name })}
-              className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
-              onClick={() => unarchiveSit(sit.id)}
-              type="button"
-            >
-              <ArchiveRestore aria-hidden="true" size={17} />
-            </button>
-          </IconTooltip>
-        );
-      }
-      if (phase === "stayUnderway") {
-        return (
-          <IconTooltip label={t("owner.sitDeleteUnderway")} wrap>
-            <button
-              aria-label={t("owner.sitDeleteUnderway")}
-              className="rounded-xl border border-line p-2.5 text-slate opacity-50"
-              disabled
-              type="button"
-            >
-              <Trash2 size={17} />
-            </button>
-          </IconTooltip>
-        );
-      }
-      if (phase === "stayCompleted") {
-        return (
-          <IconTooltip label={t("owner.archiveSitLabel", { boat: boat.name })} wrap>
-            <button
-              aria-label={t("owner.archiveSitLabel", { boat: boat.name })}
-              className="rounded-xl border border-line p-2.5 text-navy hover:border-teal hover:text-teal"
-              onClick={() => {
-                setDeleteConfirm({
-                  type: "archiveSit",
-                  id: sit.id,
-                  boatName: boat.name,
-                  dates: sitDates,
-                });
-              }}
-              type="button"
-            >
-              <Archive aria-hidden="true" size={17} />
-            </button>
-          </IconTooltip>
-        );
-      }
+    function renderSitActionsMenu() {
+      const canDelete = !isArchived && phase !== "stayUnderway" && phase !== "stayCompleted";
+      const canArchive = !isArchived && phase === "stayCompleted";
+      const canUnarchive = isArchived;
+
       return (
-        <button
-          aria-label={t("owner.deleteSitLabel", { boat: boat.name })}
-          className="rounded-xl border border-line p-2.5 text-slate hover:border-coral hover:text-coral"
-          onClick={() => {
-            setDeleteConfirm({
-              type: "sit",
-              id: sit.id,
-              boatName: boat.name,
-              dates: sitDates,
-              applicantCount,
-              hasAccepted: Boolean(sit.accepted),
-            });
-          }}
-          type="button"
-        >
-          <Trash2 size={17} />
-        </button>
+        <Popover.Root>
+          <Popover.Trigger asChild>
+            <button
+              aria-label={t("owner.sitActions")}
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-line text-slate transition hover:border-teal hover:text-navy"
+              data-testid={`owner-sit-actions-${sit.id}`}
+              onClick={(event) => event.stopPropagation()}
+              type="button"
+            >
+              <Ellipsis aria-hidden="true" size={18} />
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              align="end"
+              avoidCollisions
+              className="z-80 min-w-48 overflow-visible rounded-xl border border-line bg-white py-1 shadow-float outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+              collisionPadding={12}
+              data-testid={`owner-sit-actions-menu-${sit.id}`}
+              onClick={(event) => event.stopPropagation()}
+              role="menu"
+              side="bottom"
+              sideOffset={4}
+            >
+              <Link
+                className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream"
+                data-testid={`owner-sit-view-${sit.id}`}
+                role="menuitem"
+                to={`/boats/${sit.id}`}
+              >
+                <Eye aria-hidden="true" className="text-teal" size={15} />
+                {t("sits.viewListing")}
+              </Link>
+              {!isArchived &&
+                (editLocked ? (
+                  <IconTooltip
+                    className="w-full cursor-not-allowed"
+                    label={t("owner.sitEditLocked")}
+                    side="top"
+                    wrap
+                  >
+                    <button
+                      className="pointer-events-none flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-slate opacity-50"
+                      data-testid={`owner-sit-edit-${sit.id}`}
+                      disabled
+                      role="menuitem"
+                      type="button"
+                    >
+                      <Pencil aria-hidden="true" size={15} />
+                      {t("common.edit")}
+                    </button>
+                  </IconTooltip>
+                ) : (
+                  <Link
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream"
+                    data-testid={`owner-sit-edit-${sit.id}`}
+                    role="menuitem"
+                    to={`/owner/sits/${sit.id}/edit`}
+                  >
+                    <Pencil aria-hidden="true" className="text-teal" size={15} />
+                    {t("common.edit")}
+                  </Link>
+                ))}
+              {canUnarchive && (
+                <button
+                  className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream"
+                  data-testid={`owner-sit-unarchive-${sit.id}`}
+                  onClick={() => unarchiveSit(sit.id)}
+                  role="menuitem"
+                  type="button"
+                >
+                  <ArchiveRestore aria-hidden="true" className="text-teal" size={15} />
+                  {t("owner.unarchiveSit")}
+                </button>
+              )}
+              {canArchive && (
+                <button
+                  className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream"
+                  data-testid={`owner-sit-archive-${sit.id}`}
+                  onClick={() => {
+                    setDeleteConfirm({
+                      type: "archiveSit",
+                      id: sit.id,
+                      boatName: boat.name,
+                      dates: sitDates,
+                    });
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  <Archive aria-hidden="true" className="text-slate" size={15} />
+                  {t("owner.archiveSit")}
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-coral hover:bg-cream"
+                  data-testid={`owner-sit-delete-${sit.id}`}
+                  onClick={() => {
+                    setDeleteConfirm({
+                      type: "sit",
+                      id: sit.id,
+                      boatName: boat.name,
+                      dates: sitDates,
+                      applicantCount,
+                      hasAccepted: Boolean(sit.accepted),
+                    });
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  <Trash2 aria-hidden="true" size={15} />
+                  {t("owner.deleteSit")}
+                </button>
+              )}
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
       );
     }
 
     return (
       <article
-        className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center"
+        className="group flex cursor-pointer flex-col gap-5 rounded-2xl border border-line bg-white p-5 shadow-card transition hover:border-teal/50 sm:flex-row sm:items-center"
+        data-testid={`owner-sit-card-${sit.id}`}
         key={sit.id}
+        onClick={() => navigate(`/owner/sits/${sit.id}/applications`)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            navigate(`/owner/sits/${sit.id}/applications`);
+          }
+        }}
       >
         <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-seafoam text-teal">
           <CalendarDays size={24} />
@@ -6348,28 +6416,11 @@ function OwnerBoatsPage() {
           <p className="truncate text-xs font-bold uppercase tracking-wider text-teal">
             {boat.name} · {formatSitLocation(sit.location, sit.country)}
           </p>
-          <Link
-            className="mt-1 block truncate font-display text-xl font-bold text-navy hover:text-teal"
-            to={`/boats/${sit.id}`}
-          >
+          <p className="mt-1 truncate font-display text-xl font-bold text-navy group-hover:text-teal">
             {sitDates}
-          </Link>
+          </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <SitParticipationBadge role="owner" />
-            <SitPhaseBadge
-              cancelled={Boolean(sit.cancelledAt)}
-              phase={
-                sit.phase ??
-                getSitPhase({
-                  dateStart: sit.dateStart,
-                  duration: sit.duration,
-                  applicationsOpen: sit.applicationsOpen,
-                  accepted: sit.accepted,
-                  applicants: sit.applicants,
-                  cancelledAt: sit.cancelledAt,
-                })
-              }
-            />
             {!isAcceptingApplications(sit) &&
               (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
                 <span className="inline-flex rounded-full bg-cream px-2.5 py-1 text-[11px] font-bold text-slate">
@@ -6385,7 +6436,10 @@ function OwnerBoatsPage() {
             })}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div
+          className="flex flex-wrap items-center gap-2"
+          onClick={(event) => event.stopPropagation()}
+        >
           {!isArchived && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted ? (
             <button
               className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold disabled:opacity-60 ${
@@ -6438,48 +6492,14 @@ function OwnerBoatsPage() {
               </button>
             </>
           )}
-          {phase === "stayUnderway" || phase === "stayCompleted" ? (
-            <Link
-              className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-              data-testid="owner-sit-messages"
-              to={`/owner/sits/${sit.id}/applications`}
-            >
-              <MessageCircle size={16} /> {t("nav.messages")}
-            </Link>
-          ) : (
-            <button
-              className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-              data-testid="owner-sit-applicants"
-              onClick={() => navigate(`/owner/sits/${sit.id}/applications`)}
-              type="button"
-            >
-              <MessageCircle size={16} />{" "}
-              {t("applications.reviewCount", {
-                count: applicationCount,
-              })}
-            </button>
-          )}
-          {!isArchived &&
-            (editLocked ? (
-              <IconTooltip label={t("owner.sitEditLocked")} wrap>
-                <button
-                  className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy opacity-50"
-                  disabled
-                  type="button"
-                >
-                  <Pencil size={16} /> {t("common.edit")}
-                </button>
-              </IconTooltip>
-            ) : (
-              <button
-                className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-                onClick={() => navigate(`/owner/sits/${sit.id}/edit`)}
-                type="button"
-              >
-                <Pencil size={16} /> {t("common.edit")}
-              </button>
-            ))}
-          {renderSitArchiveOrDeleteAction()}
+          <Link
+            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+            data-testid="owner-sit-manage"
+            to={`/owner/sits/${sit.id}/applications`}
+          >
+            <Users size={16} /> {t("owner.manageSit")}
+          </Link>
+          {renderSitActionsMenu()}
         </div>
       </article>
     );
@@ -7767,7 +7787,10 @@ function SafetyPage() {
         </div>
       </section>
       <div className="mx-auto grid max-w-4xl gap-5 px-5 py-12">
-        <section className="rounded-2xl border border-coral/30 bg-coral/10 p-6">
+        <section
+          className="rounded-2xl border border-coral/30 bg-coral/10 p-6"
+          data-testid="safety-liveaboard-callout"
+        >
           <h2 className="font-display text-xl font-bold text-navy">{t("how.liveaboardTitle")}</h2>
           <p className="mt-2 leading-7 text-slate">{t("how.liveaboardText")}</p>
         </section>
@@ -7991,7 +8014,10 @@ function TermsPage() {
       </aside>
       <div className="mt-10 space-y-8">
         {TERMS_SECTIONS.map((section, index) => (
-          <section key={section}>
+          <section
+            data-testid={section === "liveaboard" ? "terms-liveaboard-section" : undefined}
+            key={section}
+          >
             <h2 className="font-display text-xl font-bold text-navy">
               {index + 1}. {t(`terms.${section}.title`)}
             </h2>
@@ -8364,7 +8390,10 @@ function ApplicationReviewPage() {
   const [experienceFilter, setExperienceFilter] = useState<
     "any" | "meetsMin" | "fivePlus" | "tenPlus"
   >("any");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [profileDetailsOpen, setProfileDetailsOpen] = useState(false);
   const [listPage, setListPage] = useState(0);
+  const activeFilterCount = (statusFilter !== "all" ? 1 : 0) + (experienceFilter !== "any" ? 1 : 0);
 
   const { data: sits = [], isLoading: sitsLoading } = useQuery({
     ...queries.sits.all,
@@ -8418,6 +8447,10 @@ function ApplicationReviewPage() {
   useEffect(() => {
     setListPage(0);
   }, [experienceFilter, sort, statusFilter]);
+
+  useEffect(() => {
+    setProfileDetailsOpen(false);
+  }, [selectedId]);
 
   useEffect(() => {
     if (listPage > listTotalPages - 1) setListPage(Math.max(0, listTotalPages - 1));
@@ -8589,13 +8622,29 @@ function ApplicationReviewPage() {
         <>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="section-title">
+              <h1 className="section-title" data-testid="applications-heading">
                 {chatFocusedSit && primaryAcceptedApplication
                   ? t("applications.activeSitTitle", {
                       name: primaryAcceptedApplication.applicant.name,
                     })
                   : t("applications.title", { boat: vessel?.name ?? "" })}
               </h1>
+              {sit ? (
+                <div className="mt-3 space-y-2" data-testid="applications-sit-meta">
+                  <p
+                    className="font-display text-xl font-bold text-navy"
+                    data-testid="applications-sit-dates"
+                  >
+                    {formatSitDates(i18n.language, sit.dateStart, sit.duration)}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold text-slate">
+                      {formatSitLocation(sit.location, sit.country)}
+                    </p>
+                    <SitTypeBadge sitType={sit.sitType} />
+                  </div>
+                </div>
+              ) : null}
               <p className="mt-3 text-slate">
                 {(() => {
                   if (chatFocusedSit && sit?.cancelledAt) {
@@ -8610,11 +8659,6 @@ function ApplicationReviewPage() {
                   return t("applications.subtitle", { count: sitTotal });
                 })()}
               </p>
-              {sit && sitPhase && (
-                <div className="mt-3">
-                  <SitPhaseBadge cancelled={Boolean(sit.cancelledAt)} phase={sitPhase} size="md" />
-                </div>
-              )}
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
               {sit && sitPhase === "acceptingApplicants" && (
@@ -8908,6 +8952,7 @@ function ApplicationReviewPage() {
                       <Select
                         variant="form"
                         aria-label={t("applications.sortLabel")}
+                        data-testid="application-sort"
                         onChange={(event) => setSort(event.target.value as typeof sort)}
                         value={sort}
                       >
@@ -8917,47 +8962,79 @@ function ApplicationReviewPage() {
                         <option value="priorSits">{t("applications.sortPriorSits")}</option>
                       </Select>
                     </label>
-                    <label className="block">
-                      <span className="sr-only">{t("applications.filterStatusLabel")}</span>
-                      <Select
-                        variant="form"
-                        aria-label={t("applications.filterStatusLabel")}
-                        onChange={(event) =>
-                          setStatusFilter(event.target.value as typeof statusFilter)
-                        }
-                        value={statusFilter}
+                    <button
+                      aria-controls="application-list-filters"
+                      aria-expanded={filtersOpen}
+                      className="inline-flex items-center gap-1.5 px-1 text-sm font-bold text-navy hover:text-teal"
+                      data-testid="application-filters-toggle"
+                      onClick={() => setFiltersOpen((open) => !open)}
+                      type="button"
+                    >
+                      {activeFilterCount > 0
+                        ? t("applications.filtersToggleActive", { count: activeFilterCount })
+                        : t("applications.filtersToggle")}
+                      <ChevronDown
+                        aria-hidden="true"
+                        className={`transition ${filtersOpen ? "rotate-180" : ""}`}
+                        size={16}
+                      />
+                    </button>
+                    {filtersOpen ? (
+                      <div
+                        className="space-y-2"
+                        data-testid="application-list-filters"
+                        id="application-list-filters"
                       >
-                        <option value="all">{t("applications.filterStatusAll")}</option>
-                        {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map(
-                          (status) => (
-                            <option key={status} value={status}>
-                              {t(`applications.status.${status}`)}
+                        <label className="block">
+                          <span className="sr-only">{t("applications.filterStatusLabel")}</span>
+                          <Select
+                            variant="form"
+                            aria-label={t("applications.filterStatusLabel")}
+                            data-testid="application-filter-status"
+                            onChange={(event) =>
+                              setStatusFilter(event.target.value as typeof statusFilter)
+                            }
+                            value={statusFilter}
+                          >
+                            <option value="all">{t("applications.filterStatusAll")}</option>
+                            {(
+                              ["new", "shortlisted", "accepted", "declined", "withdrawn"] as const
+                            ).map((status) => (
+                              <option key={status} value={status}>
+                                {t(`applications.status.${status}`)}
+                              </option>
+                            ))}
+                          </Select>
+                        </label>
+                        <label className="block">
+                          <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
+                          <Select
+                            variant="form"
+                            aria-label={t("applications.filterExperienceLabel")}
+                            data-testid="application-filter-experience"
+                            onChange={(event) =>
+                              setExperienceFilter(event.target.value as typeof experienceFilter)
+                            }
+                            value={experienceFilter}
+                          >
+                            <option value="any">{t("applications.filterExperienceAny")}</option>
+                            <option value="meetsMin">
+                              {t("applications.filterExperienceMeetsMin")}
                             </option>
-                          ),
-                        )}
-                      </Select>
-                    </label>
-                    <label className="block">
-                      <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
-                      <Select
-                        variant="form"
-                        aria-label={t("applications.filterExperienceLabel")}
-                        onChange={(event) =>
-                          setExperienceFilter(event.target.value as typeof experienceFilter)
-                        }
-                        value={experienceFilter}
-                      >
-                        <option value="any">{t("applications.filterExperienceAny")}</option>
-                        <option value="meetsMin">
-                          {t("applications.filterExperienceMeetsMin")}
-                        </option>
-                        <option value="fivePlus">
-                          {t("applications.filterExperienceFivePlus")}
-                        </option>
-                        <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
-                      </Select>
-                    </label>
-                    <p className="px-1 text-xs font-semibold text-slate">
+                            <option value="fivePlus">
+                              {t("applications.filterExperienceFivePlus")}
+                            </option>
+                            <option value="tenPlus">
+                              {t("applications.filterExperienceTenPlus")}
+                            </option>
+                          </Select>
+                        </label>
+                      </div>
+                    ) : null}
+                    <p
+                      className="px-1 text-xs font-semibold text-slate"
+                      data-testid="application-filtered-count"
+                    >
                       {t("applications.filteredCount", {
                         count:
                           statusFilter === "accepted"
@@ -9025,6 +9102,7 @@ function ApplicationReviewPage() {
                   {statusFilter !== "accepted" ? (
                     <ResultsPagination
                       className="mt-3 flex flex-col items-stretch gap-3 border-t border-line pt-3"
+                      compact
                       currentPage={currentListPage}
                       onPageChange={setListPage}
                       pageSize={APPLICATIONS_PAGE_SIZE}
@@ -9054,163 +9132,216 @@ function ApplicationReviewPage() {
                         })}
                       </button>
                     ) : null}
-                    <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-                      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                        <img
-                          alt={selected.applicant.name}
-                          className="size-20 rounded-full object-cover"
-                          src={selected.applicant.image}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <h2 className="font-display text-2xl font-bold text-navy">
-                              {selected.applicant.name}
-                            </h2>
-                            <ApplicationStatusBadge ownerView status={selected.status} />
-                          </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                            <p className="flex items-center gap-1.5">
-                              <MapPin size={14} /> {selected.applicant.location}
-                            </p>
-                            <p className="flex items-center gap-1.5">
-                              <CalendarDays size={14} />{" "}
-                              {t("member.since", { year: selected.applicant.memberSince })}
-                            </p>
-                            <SitterRatingBadge sitterName={selected.applicant.name} />
-                          </div>
-                          <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
-                          <div className="mt-4 flex flex-wrap items-center gap-3">
-                            <Link
-                              className="text-sm font-bold text-teal hover:text-navy"
-                              to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                    <section
+                      className="rounded-2xl border border-line bg-white p-6 shadow-card"
+                      data-testid="application-profile-card"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+                        <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+                          <img
+                            alt={selected.applicant.name}
+                            className="size-16 shrink-0 rounded-full object-cover sm:size-20"
+                            src={selected.applicant.image}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-3">
+                              <h2 className="font-display text-2xl font-bold text-navy">
+                                {selected.applicant.name}
+                              </h2>
+                              <ApplicationStatusBadge ownerView status={selected.status} />
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                              <p className="flex items-center gap-1.5">
+                                <MapPin size={14} /> {selected.applicant.location}
+                              </p>
+                              <p className="flex items-center gap-1.5">
+                                <CalendarDays size={14} />{" "}
+                                {t("member.since", { year: selected.applicant.memberSince })}
+                              </p>
+                              <SitterRatingBadge sitterName={selected.applicant.name} />
+                            </div>
+                            <p
+                              className="mt-3 text-sm font-semibold text-slate"
+                              data-testid="application-profile-summary"
                             >
-                              {t("reviews.viewProfile")}
-                            </Link>
-                            <UserSafetyActions
-                              image={selected.applicant.image}
-                              name={selected.applicant.name}
+                              {t("applications.listMeta", {
+                                years: selected.applicant.yearsExperience,
+                                matches: matchCount,
+                                total: matchTotal || 0,
+                                sits: selected.applicant.completedSits,
+                              })}
+                              <span className="mx-1.5 text-line" aria-hidden="true">
+                                ·
+                              </span>
+                              <span className="inline-flex items-center gap-1">
+                                <Users aria-hidden="true" size={14} />
+                                {selected.partySize}
+                              </span>
+                            </p>
+                            <BlockedUserBanner name={selected.applicant.name} />
+                          </div>
+                        </div>
+                        <div
+                          className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end"
+                          data-testid="application-profile-actions"
+                        >
+                          <Link
+                            className="text-sm font-bold text-navy hover:text-teal"
+                            to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                          >
+                            {t("reviews.viewProfile")}
+                          </Link>
+                          <UserSafetyActions
+                            image={selected.applicant.image}
+                            name={selected.applicant.name}
+                          />
+                        </div>
+                      </div>
+
+                      {profileDetailsOpen ? (
+                        <p
+                          className="mt-4 text-left leading-7 text-slate"
+                          data-testid="application-profile-bio"
+                        >
+                          {selected.applicant.bio}
+                        </p>
+                      ) : null}
+
+                      {profileDetailsOpen ? (
+                        <div
+                          data-testid="application-profile-details"
+                          id="application-profile-details"
+                        >
+                          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="rounded-xl bg-cream p-4">
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                                {t("applications.experience")}
+                              </p>
+                              <p className="mt-2 font-bold text-navy">
+                                {t("applications.yearsExperience", {
+                                  count: selected.applicant.yearsExperience,
+                                })}
+                              </p>
+                            </div>
+                            <div className="rounded-xl bg-cream p-4">
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                                {t("applications.requirementMatch")}
+                              </p>
+                              <p className="mt-2 font-bold text-navy">
+                                {matchTotal
+                                  ? t("applications.matchCount", {
+                                      count: matchCount,
+                                      total: matchTotal,
+                                    })
+                                  : t("applications.noSpecificRequirements")}
+                              </p>
+                            </div>
+                            <div className="rounded-xl bg-cream p-4">
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                                {t("applications.priorSits")}
+                              </p>
+                              <p className="mt-2 font-bold text-navy">
+                                {t("applications.priorSitsCount", {
+                                  count: selected.applicant.completedSits,
+                                })}
+                              </p>
+                            </div>
+                            <div className="rounded-xl bg-cream p-4">
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                                {t("applications.partySize")}
+                              </p>
+                              <p className="mt-2 flex items-center gap-2 font-bold text-navy">
+                                <Users size={17} /> {selected.partySize}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="mt-6">
+                            <SitterReviewsSection
+                              limit={3}
+                              profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                              showEmpty={false}
+                              sitterName={selected.applicant.name}
                             />
                           </div>
-                          <BlockedUserBanner name={selected.applicant.name} />
-                        </div>
-                      </div>
 
-                      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.experience")}
-                          </p>
-                          <p className="mt-2 font-bold text-navy">
-                            {t("applications.yearsExperience", {
-                              count: selected.applicant.yearsExperience,
-                            })}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.requirementMatch")}
-                          </p>
-                          <p className="mt-2 font-bold text-navy">
-                            {matchTotal
-                              ? t("applications.matchCount", {
-                                  count: matchCount,
-                                  total: matchTotal,
-                                })
-                              : t("applications.noSpecificRequirements")}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.priorSits")}
-                          </p>
-                          <p className="mt-2 font-bold text-navy">
-                            {t("applications.priorSitsCount", {
-                              count: selected.applicant.completedSits,
-                            })}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.partySize")}
-                          </p>
-                          <p className="mt-2 flex items-center gap-2 font-bold text-navy">
-                            <Users size={17} /> {selected.partySize}
-                          </p>
-                        </div>
-                      </div>
+                          {selected.status === "accepted" && sit && canLeaveReview(sit) ? (
+                            <div className="mt-6">
+                              <LeaveReviewForm application={selected} ownerName={user.name} />
+                            </div>
+                          ) : null}
 
-                      <div className="mt-6">
-                        <SitterReviewsSection
-                          limit={3}
-                          profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                          showEmpty={false}
-                          sitterName={selected.applicant.name}
+                          {[
+                            {
+                              label: t("applications.certifications"),
+                              values: selected.applicant.certifications,
+                              highlighted: [] as string[],
+                            },
+                            {
+                              label: t("applications.skills"),
+                              values: selected.applicant.skills,
+                              highlighted: requiredSkills,
+                            },
+                            {
+                              label: t("applications.languages"),
+                              values: selected.applicant.languages,
+                              highlighted: user.languages,
+                            },
+                            {
+                              label: t("profile.preferredCountries"),
+                              values: selected.applicant.preferredCountries ?? [],
+                              highlighted: [] as string[],
+                            },
+                          ].map(({ highlighted, label, values }) => (
+                            <div className="mt-5" key={label}>
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                                {label}
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {values.map((value) => {
+                                  const isHighlighted = highlighted.some(
+                                    (item) =>
+                                      item.toLocaleLowerCase() === value.toLocaleLowerCase(),
+                                  );
+                                  return (
+                                    <span
+                                      className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                                        isHighlighted
+                                          ? "border-teal/40 bg-seafoam text-teal"
+                                          : "border-line bg-white text-navy"
+                                      }`}
+                                      key={value}
+                                    >
+                                      {isHighlighted ? (
+                                        <Check aria-hidden="true" size={13} />
+                                      ) : null}
+                                      {value}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <button
+                        aria-controls="application-profile-details"
+                        aria-expanded={profileDetailsOpen}
+                        className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-navy hover:text-teal"
+                        data-testid="application-profile-details-toggle"
+                        onClick={() => setProfileDetailsOpen((open) => !open)}
+                        type="button"
+                      >
+                        {profileDetailsOpen
+                          ? t("applications.hideDetails")
+                          : t("applications.showDetails")}
+                        <ChevronDown
+                          aria-hidden="true"
+                          className={`transition ${profileDetailsOpen ? "rotate-180" : ""}`}
+                          size={16}
                         />
-                      </div>
-
-                      {selected.status === "accepted" && sit && canLeaveReview(sit) && (
-                        <div className="mt-6">
-                          <LeaveReviewForm application={selected} ownerName={user.name} />
-                        </div>
-                      )}
-
-                      {[
-                        {
-                          label: t("applications.certifications"),
-                          values: selected.applicant.certifications,
-                          highlighted: [] as string[],
-                        },
-                        {
-                          label: t("applications.skills"),
-                          values: selected.applicant.skills,
-                          highlighted: requiredSkills,
-                        },
-                        {
-                          label: t("applications.languages"),
-                          values: selected.applicant.languages,
-                          highlighted: user.languages,
-                        },
-                        {
-                          label: t("profile.preferredCountries"),
-                          values: selected.applicant.preferredCountries ?? [],
-                          highlighted: [] as string[],
-                        },
-                      ].map(({ highlighted, label, values }) => (
-                        <div className="mt-5" key={label}>
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {label}
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {values.map((value) => {
-                              const isHighlighted = highlighted.some(
-                                (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
-                              );
-                              return (
-                                <span
-                                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                                    isHighlighted
-                                      ? "border-teal/40 bg-seafoam text-teal"
-                                      : "border-line bg-white text-navy"
-                                  }`}
-                                  key={value}
-                                >
-                                  {isHighlighted && <Check aria-hidden="true" size={13} />}
-                                  {value}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-
-                      <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
-                        <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                          {t("applications.initialMessage")}
-                        </p>
-                        <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
-                          {selected.initialMessage}
-                        </p>
-                      </div>
+                      </button>
 
                       {anotherApplicantAccepted ? (
                         <div
