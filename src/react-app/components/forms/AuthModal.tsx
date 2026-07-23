@@ -48,6 +48,7 @@ export function AuthModal() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [pendingVerifyEmail, setPendingVerifyEmail] = useState("");
+  const [forgotMode, setForgotMode] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [form, setForm] = useState({ email: "", name: "", password: "" });
   const emailRef = useRef<HTMLInputElement>(null);
@@ -115,6 +116,10 @@ export function AuthModal() {
     event.preventDefault();
     setError("");
     setNotice("");
+    if (forgotMode) {
+      await forgotPassword();
+      return;
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       setError(t("auth.emailInvalid"));
       return;
@@ -224,6 +229,11 @@ export function AuthModal() {
   }
 
   if (!open) return null;
+
+  let titleText = t("auth.signupTitle");
+  if (forgotMode) titleText = t("auth.forgotTitle", "Reset your password");
+  else if (mode === "login") titleText = t("auth.loginTitle");
+
   return (
     <div
       className="fixed inset-0 z-70 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
@@ -240,7 +250,7 @@ export function AuthModal() {
         <div className="flex items-start justify-between">
           <div>
             <h2 className="font-display text-2xl font-bold text-navy" id="auth-title">
-              {mode === "login" ? t("auth.loginTitle") : t("auth.signupTitle")}
+              {titleText}
             </h2>
           </div>
           <button
@@ -260,7 +270,9 @@ export function AuthModal() {
               key={tab}
               onClick={() => {
                 setMode(tab);
+                setForgotMode(false);
                 setError("");
+                setNotice("");
               }}
               type="button"
             >
@@ -315,7 +327,7 @@ export function AuthModal() {
         </div>
 
         <form className="space-y-4" onSubmit={(event) => void submit(event)}>
-          {mode === "signup" && (
+          {mode === "signup" && !forgotMode && (
             <label className="block">
               <span className="form-label">{t("auth.name")}</span>
               <input
@@ -336,29 +348,48 @@ export function AuthModal() {
               value={form.email}
             />
           </label>
-          <label className="block">
-            <span className="form-label">{t("auth.password")}</span>
-            <input
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              className="form-input"
-              onChange={(event) => setForm({ ...form, password: event.target.value })}
-              type="password"
-              value={form.password}
-            />
-            {mode === "signup" && (
-              <span className="mt-1 block text-xs text-slate">{t("auth.passwordHint")}</span>
-            )}
-          </label>
-          {mode === "login" && (
+          {!forgotMode && (
+            <label className="block">
+              <span className="form-label">{t("auth.password")}</span>
+              <input
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                className="form-input"
+                onChange={(event) => setForm({ ...form, password: event.target.value })}
+                type="password"
+                value={form.password}
+              />
+              {mode === "signup" && (
+                <span className="mt-1 block text-xs text-slate">{t("auth.passwordHint")}</span>
+              )}
+            </label>
+          )}
+          {mode === "login" && !forgotMode && (
             <button
               className="-mt-1 self-start text-sm font-semibold text-teal hover:text-navy"
-              onClick={() => void forgotPassword()}
+              onClick={() => {
+                setForgotMode(true);
+                setError("");
+                setNotice("");
+              }}
               type="button"
             >
               {t("auth.forgotPassword", "Forgot password?")}
             </button>
           )}
-          {mode === "signup" && (
+          {forgotMode && (
+            <button
+              className="-mt-1 self-start text-sm font-semibold text-teal hover:text-navy"
+              onClick={() => {
+                setForgotMode(false);
+                setError("");
+                setNotice("");
+              }}
+              type="button"
+            >
+              {t("auth.backToSignIn", "← Back to sign in")}
+            </button>
+          )}
+          {mode === "signup" && !forgotMode && (
             <TermsAgreementCheckbox
               checked={acceptedTerms}
               i18nKey="auth.termsAgreement"
@@ -394,6 +425,7 @@ export function AuthModal() {
           >
             {(() => {
               if (pending) return t("auth.pending");
+              if (forgotMode) return t("auth.sendResetLink", "Send reset link");
               if (mode === "login") return t("auth.loginSubmit");
               return t("auth.signupSubmit");
             })()}
