@@ -2,12 +2,14 @@
 name: verify-ui-with-playwright
 description: >-
   Verifies every Boatstead UI change in a real browser using the Playwright
-  MCP, and keeps automated Playwright specs in tests/e2e in sync. Requires
-  data-testid on elements under test and getByTestId in specs. Use
+  MCP, posts screenshots of the feature in its different states into the chat
+  for review, and keeps automated Playwright specs in tests/e2e in sync.
+  Requires data-testid on elements under test and getByTestId in specs. Use
   automatically after changing components, pages, routes, forms, interactions,
   responsive behavior, or CSS in this repository. Do not call a UI task complete
-  until the affected flow has been exercised visually and matching e2e coverage
-  exists or has been updated.
+  until the affected flow has been exercised visually, screenshots of its
+  states are shown in chat, and matching e2e coverage exists or has been
+  updated.
 ---
 
 # Verify UI with Playwright
@@ -93,6 +95,31 @@ Current high-value coverage to extend rather than reinvent:
    targeted UI, point specs at `getByTestId`, then run the affected Playwright
    specs.
 8. Fix any issue found, then repeat the affected browser flow and screenshot.
+9. **Post screenshots in chat for review** before calling the feature done (see
+   below). Saving files under `.artifacts/playwright/` alone is not enough.
+
+## Post screenshots in chat for review
+
+After developing a feature (or finishing a UI change), put Playwright
+screenshots of it in its different states into the chat so they can be reviewed.
+
+1. Capture via Playwright MCP `browser_take_screenshot` for each meaningful
+   state the change introduces or touches. Typical set when applicable:
+   - Default / resting
+   - Empty
+   - Loading / shimmer
+   - Filled / success
+   - Error / validation
+   - Open modal, menu, or expanded panel
+   - Desktop and mobile (and German mobile when layout risk is high)
+2. Save under `.artifacts/playwright/` with clear names
+   (e.g. `cancel-sit-dialog-open-desktop.png`, `messages-empty-mobile-de.png`).
+3. Show those screenshots in the chat: use the MCP screenshot result and/or
+   Read each saved image path so the images appear inline for the user. Label
+   each with state, viewport, and locale.
+4. Do not mark the UI task complete until the relevant states have been
+   screenshotted and posted in chat (unless the Playwright MCP was unavailable
+   — then report that blocker explicitly).
 
 ## Minimum route coverage
 
@@ -108,7 +135,9 @@ Choose routes relevant to the change:
 ## Reporting
 
 State which route, viewport, locale (include German), interaction, and e2e
-specs were verified or updated. Never claim a visual check occurred if the
-Playwright MCP was unavailable or could not connect; report that blocker
-explicitly. Never claim e2e coverage was updated if `tests/e2e` was left
-unchanged for a flow that has or should have automated tests.
+specs were verified or updated. Include the in-chat screenshots of the feature
+in its different states so the user can review appearance without opening
+artifact paths. Never claim a visual check occurred if the Playwright MCP was
+unavailable or could not connect; report that blocker explicitly. Never claim
+e2e coverage was updated if `tests/e2e` was left unchanged for a flow that has
+or should have automated tests.
