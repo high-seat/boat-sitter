@@ -21,7 +21,12 @@ declare global {
   }
 }
 
-const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
+// A GA4 Measurement ID is not secret (it ships in the client bundle regardless),
+// so we commit it as the default. An env var can still override it (e.g. for a
+// separate staging property). Committing it means every build — any teammate's,
+// or CI — includes analytics without needing a local .env file.
+const MEASUREMENT_ID =
+  (import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined) ?? "G-QX5XWC25XK";
 const ENABLED = import.meta.env.PROD && Boolean(MEASUREMENT_ID);
 
 let initialised = false;
