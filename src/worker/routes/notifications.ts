@@ -7,13 +7,20 @@ import { requireUser } from "../middleware/auth";
 
 export const notificationsRouter = new Hono<AppEnv>();
 
+function notificationHref(row: typeof notifications.$inferSelect) {
+  // Welcome always opens the profile editor, including older rows that still
+  // point at /boats from before that destination changed.
+  if (row.type === "welcome") return "/members/me?edit=1";
+  return row.href;
+}
+
 function shape(row: typeof notifications.$inferSelect) {
   return {
     id: row.id,
     type: row.type,
     actor: row.actor ?? undefined,
     boatName: row.boatName ?? undefined,
-    href: row.href,
+    href: notificationHref(row),
     createdAt: row.createdAt,
     read: Boolean(row.readAt),
   };
@@ -43,7 +50,7 @@ notificationsRouter.get("/", requireUser, async (c) => {
         userId: user.id,
         userName: user.name,
         type: "welcome",
-        href: "/boats",
+        href: "/members/me?edit=1",
         createdAt,
         readAt: null,
       })

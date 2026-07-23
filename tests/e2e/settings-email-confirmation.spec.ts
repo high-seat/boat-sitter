@@ -16,4 +16,17 @@ test.describe("settings email confirmation", () => {
     await page.getByRole("button", { name: "Resend confirmation link" }).click();
     await expect(page.getByRole("status")).toHaveText("Confirmation email sent");
   });
+
+  test("change email dialog shows current email as text, not an input", async ({ page }) => {
+    await seedOwnerSession(page, { emailConfirmed: true });
+    await page.goto("/settings?tab=security");
+    await page.getByRole("button", { name: /Change email/i }).click();
+
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("heading", { name: /Change email/i })).toBeVisible();
+    await expect(dialog.getByText(/maya\.finn@boatstead\.mock/i)).toBeVisible();
+    await expect(dialog.locator('input[type="email"]')).toHaveCount(1);
+    await expect(dialog.getByLabel(/New email/i)).toBeVisible();
+    await expect(dialog.locator('input[readonly]')).toHaveCount(0);
+  });
 });

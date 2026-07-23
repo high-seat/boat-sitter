@@ -1,5 +1,9 @@
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut, ApiError } from "@/apiClient";
 import { lookupCoordinates } from "@/coordinates";
+import {
+  applicationsListQueryString,
+  type ApplicationsListParams,
+} from "../shared/applicationsSearch";
 import { boatsSearchQueryString, type BoatSearchParams } from "../shared/boatsSearch";
 
 export type ApiEngineType = string;
@@ -16,6 +20,7 @@ type Boat = {
   name: string;
   type: string;
   length: string;
+  yearBuilt?: number | null;
   location: string;
   country: string;
   latitude: number;
@@ -61,6 +66,7 @@ type Vessel = Pick<
   | "name"
   | "type"
   | "length"
+  | "yearBuilt"
   | "homePort"
   | "image"
   | "gallery"
@@ -132,6 +138,7 @@ type SitApplication = {
   sitId: string;
   boatName: string;
   ownerName: string;
+  ownerImage?: string;
   partySize: number;
   ownerPhone?: string;
   applicant: ApplicationApplicant;
@@ -187,6 +194,7 @@ type ApiBoat = {
   name: string;
   type: string;
   length: string;
+  yearBuilt?: number | null;
   location: string;
   country: string;
   latitude: number | null;
@@ -227,6 +235,7 @@ type ApiVessel = {
   name: string;
   type: string;
   length: string;
+  yearBuilt?: number | null;
   homePort: string;
   image: string;
   gallery: string[];
@@ -278,6 +287,7 @@ type ApiApplication = {
   sitId: string;
   boatName: string;
   ownerName: string;
+  ownerImage?: string;
   partySize?: number;
   ownerPhone?: string;
   applicant: {
@@ -408,6 +418,7 @@ export function normalizeApiBoat(row: ApiBoat): Boat {
     name: row.name,
     type: row.type,
     length: row.length,
+    yearBuilt: row.yearBuilt ?? null,
     location: row.location,
     country: row.country,
     latitude: coords.latitude,
@@ -469,6 +480,7 @@ export function normalizeApiVessel(row: ApiVessel): Vessel {
     name: row.name,
     type: row.type,
     length: row.length,
+    yearBuilt: row.yearBuilt ?? null,
     homePort: row.homePort,
     image: row.image,
     gallery: normalizeGallery(row.gallery),
@@ -523,6 +535,7 @@ export function vesselToApiBody(vessel: Vessel) {
     name: vessel.name,
     type: vessel.type,
     length: vessel.length,
+    yearBuilt: vessel.yearBuilt ?? null,
     homePort: vessel.homePort,
     image: vessel.image,
     gallery: galleryUrls(vessel.gallery),
@@ -578,6 +591,7 @@ export function normalizeApiApplication(row: ApiApplication): SitApplication {
     sitId: row.sitId,
     boatName: row.boatName,
     ownerName: row.ownerName,
+    ownerImage: row.ownerImage || undefined,
     partySize: row.partySize ?? 1,
     ownerPhone: row.ownerPhone,
     applicant: {
@@ -700,11 +714,49 @@ export async function apiDeleteSit(id: string): Promise<void> {
   await apiDelete(`/api/sits/${encodeURIComponent(id)}`);
 }
 
-export async function apiGetApplicationsForSit(sitId: string): Promise<SitApplication[]> {
-  const rows = await apiGet<ApiApplication[]>(
-    `/api/applications?sitId=${encodeURIComponent(sitId)}`,
-  );
-  return rows.map(normalizeApiApplication);
+export async function apiGetApplicationsForSit(
+  sitId: string,
+  params?: Omit<ApplicationsListParams, "sitId">,
+): Promise<{
+  applications: SitApplication[];
+  accepted: SitApplication[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  sitTotal: number;
+}> {
+  const qs = applicationsListQueryString({ sitId, ...params });
+  const res = await fetch(`/api/applications${qs}`, { credentials: "include" });
+  const body = (await res.json()) as {
+    data?: ApiApplication[];
+    accepted?: ApiApplication[];
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    sitTotal?: number;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(res.status, body.error || res.statusText, body);
+  }
+  const applications = (body.data ?? []).map(normalizeApiApplication);
+  const accepted = (body.accepted ?? []).map(normalizeApiApplication);
+  const total = body.total ?? applications.length;
+  const limit =
+    body.limit ?? (params?.limit && params.limit > 0 ? params.limit : applications.length || 1);
+  const page = body.page ?? 0;
+  const totalPages = body.totalPages ?? Math.max(1, Math.ceil(total / limit));
+  return {
+    applications,
+    accepted,
+    total,
+    page,
+    limit,
+    totalPages,
+    sitTotal: body.sitTotal ?? total,
+  };
 }
 
 export async function apiGetApplicationsForUser(userName: string): Promise<SitApplication[]> {

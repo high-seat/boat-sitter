@@ -2,6 +2,14 @@ import { zValidator } from "@hono/zod-validator";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import {
+  APPLICATIONS_PAGE_SIZE,
+  paginateApplicationList,
+  parseApplicationExperienceFilter,
+  parseApplicationListSort,
+  parseApplicationStatusFilter,
+  prepareApplicationReviewLists,
+} from "../../shared/applicationsSearch";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import {
@@ -81,12 +89,17 @@ function shapeMessage(m: MessageRow) {
 }
 
 /** Assemble the nested SitApplication the frontend expects. */
-function shape(app: ApplicationRow, messages: MessageRow[]) {
+function shape(
+  app: ApplicationRow,
+  messages: MessageRow[],
+  ownerImages: Map<string, string> = new Map(),
+) {
   return {
     id: app.id,
     sitId: app.sitId,
     boatName: app.boatName,
     ownerName: app.ownerName,
+    ownerImage: ownerImages.get(app.ownerName) || undefined,
     partySize: app.partySize ?? 1,
     applicant: {
       ...app.applicant,
@@ -102,6 +115,32 @@ function shape(app: ApplicationRow, messages: MessageRow[]) {
       .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
       .map(shapeMessage),
   };
+}
+
+async function loadOwnerImages(env: Env, apps: ApplicationRow[]): Promise<Map<string, string>> {
+  const names = [...new Set(apps.map((app) => app.ownerName))];
+  if (!names.length) return new Map();
+  const db = getDb(env);
+  const rows = await db
+    .select({ owner: vessels.owner, ownerImage: vessels.ownerImage })
+    .from(vessels);
+  const images = new Map<string, string>();
+  for (const row of rows) {
+    if (names.includes(row.owner) && row.ownerImage) {
+      images.set(row.owner, row.ownerImage);
+    }
+  }
+  return images;
+}
+
+async function shapeMany(env: Env, apps: ApplicationRow[], messages: MessageRow[]) {
+  const ownerImages = await loadOwnerImages(env, apps);
+  return apps.map((app) => shape(app, messages, ownerImages));
+}
+
+async function shapeOne(env: Env, app: ApplicationRow, messages: MessageRow[]) {
+  const [shaped] = await shapeMany(env, [app], messages);
+  return shaped;
 }
 
 async function loadMessages(env: Env, ids: string[]): Promise<MessageRow[]> {
@@ -137,6 +176,7 @@ async function insertSystemMessage(
 
 /**
  * GET /api/applications?sitId=…  — applications for one listing
+ *   Optional: sort, status, experience, page, limit (paginated review filters)
  * GET /api/applications?user=…   — applications where user is owner or applicant
  */
 applicationsRouter.get("/", async (c) => {
@@ -144,28 +184,76 @@ applicationsRouter.get("/", async (c) => {
   const sitId = c.req.query("sitId");
   const user = c.req.query("user");
 
-  let rows: ApplicationRow[];
   if (sitId) {
-    rows = await db
-      .select()
-      .from(applications)
-      .where(eq(applications.sitId, sitId))
-      .orderBy(desc(applications.createdAt));
-  } else if (user) {
-    rows = await db
+    const sort = parseApplicationListSort(c.req.query("sort"));
+    const status = parseApplicationStatusFilter(c.req.query("status"));
+    const experience = parseApplicationExperienceFilter(c.req.query("experience"));
+    const pageRaw = c.req.query("page");
+    const limitRaw = c.req.query("limit");
+    const pageNum = pageRaw != null && pageRaw !== "" ? Number(pageRaw) : 0;
+    const limitNum =
+      limitRaw != null && limitRaw !== "" ? Number(limitRaw) : APPLICATIONS_PAGE_SIZE;
+    const page = Number.isFinite(pageNum) ? pageNum : 0;
+    const limit = Number.isFinite(limitNum) ? limitNum : APPLICATIONS_PAGE_SIZE;
+
+    const [rows, sitRow] = await Promise.all([
+      db
+        .select()
+        .from(applications)
+        .where(eq(applications.sitId, sitId))
+        .orderBy(desc(applications.createdAt)),
+      db.select().from(sits).where(eq(sits.id, sitId)).limit(1),
+    ]);
+
+    const sit = sitRow[0]
+      ? {
+          minYearsExperience: sitRow[0].minYearsExperience,
+          requiredSkills: sitRow[0].requiredSkills,
+          requiredCertifications: sitRow[0].requiredCertifications,
+        }
+      : undefined;
+
+    const { list, accepted } = prepareApplicationReviewLists(rows, {
+      status,
+      experience,
+      sort,
+      sit,
+    });
+    const paged = paginateApplicationList(list, page, limit);
+    const messageIds = [
+      ...new Set([...paged.items.map((r) => r.id), ...accepted.map((r) => r.id)]),
+    ];
+    const messages = await loadMessages(c.env, messageIds);
+    const [shapedList, shapedAccepted] = await Promise.all([
+      shapeMany(c.env, paged.items, messages),
+      shapeMany(c.env, accepted, messages),
+    ]);
+
+    return c.json({
+      data: shapedList,
+      accepted: shapedAccepted,
+      total: paged.total,
+      page: paged.page,
+      limit: paged.limit,
+      totalPages: paged.totalPages,
+      sitTotal: rows.length,
+    });
+  }
+
+  if (user) {
+    const rows = await db
       .select()
       .from(applications)
       .where(or(eq(applications.ownerName, user), eq(applications.applicantName, user)))
       .orderBy(desc(applications.createdAt));
-  } else {
-    return c.json({ error: "Provide sitId or user" }, 400);
+    const messages = await loadMessages(
+      c.env,
+      rows.map((r) => r.id),
+    );
+    return c.json({ data: await shapeMany(c.env, rows, messages) });
   }
 
-  const messages = await loadMessages(
-    c.env,
-    rows.map((r) => r.id),
-  );
-  return c.json({ data: rows.map((r) => shape(r, messages)) });
+  return c.json({ error: "Provide sitId or user" }, 400);
 });
 
 applicationsRouter.post("/", requireUser, zValidator("json", createSchema), async (c) => {
@@ -187,7 +275,7 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
     .limit(1);
   if (existing.length) {
     const msgs = await loadMessages(c.env, [existing[0].id]);
-    return c.json({ data: shape(existing[0], msgs) });
+    return c.json({ data: await shapeOne(c.env, existing[0], msgs) });
   }
 
   const listing = await db
@@ -249,7 +337,7 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
 
   const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   const msgs = await loadMessages(c.env, [id]);
-  return c.json({ data: shape(row!, msgs) }, 201);
+  return c.json({ data: await shapeOne(c.env, row!, msgs) }, 201);
 });
 
 /** Look up a logged-in user's real email by their auth user id. */
@@ -369,7 +457,7 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
   }
 
   const msgs = await loadMessages(c.env, [id]);
-  return c.json({ data: shape(row, msgs) });
+  return c.json({ data: await shapeOne(c.env, row, msgs) });
 });
 
 applicationsRouter.post(
@@ -428,7 +516,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: shape(row, msgs) });
+    return c.json({ data: await shapeOne(c.env, row, msgs) });
   },
 );
 
@@ -480,7 +568,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: shape(app, msgs) });
+    return c.json({ data: await shapeOne(c.env, app, msgs) });
   },
 );
 
@@ -526,7 +614,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: shape(app, msgs) });
+    return c.json({ data: await shapeOne(c.env, app, msgs) });
   },
 );
 
@@ -572,7 +660,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: shape(app, msgs) });
+    return c.json({ data: await shapeOne(c.env, app, msgs) });
   },
 );
 
@@ -614,7 +702,7 @@ applicationsRouter.post("/:id/video-call/:messageId/accept", requireUser, async 
   });
 
   const next = await loadMessages(c.env, [id]);
-  return c.json({ data: shape(app, next) });
+  return c.json({ data: await shapeOne(c.env, app, next) });
 });
 
 applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async (c) => {
@@ -655,5 +743,5 @@ applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async
   });
 
   const next = await loadMessages(c.env, [id]);
-  return c.json({ data: shape(app, next) });
+  return c.json({ data: await shapeOne(c.env, app, next) });
 });

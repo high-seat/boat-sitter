@@ -17,21 +17,30 @@ type OwnerSeed = {
   role: "member" | "admin";
 };
 
+type SeedOwnerOptions = Partial<OwnerSeed> & {
+  featureFlags?: Record<string, boolean>;
+};
+
 /** Seeds a logged-in owner session before the app boots. */
-export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>) {
+export async function seedOwnerSession(page: Page, options?: SeedOwnerOptions) {
+  const { featureFlags, ...ownerOptions } = options ?? {};
   const owner: OwnerSeed = {
     ...MAYA_OWNER,
     verified: true,
     emailConfirmed: true,
     role: "member",
-    ...options,
+    ...ownerOptions,
   };
   const verificationKey = `harbourly-verification-${owner.name
     .toLowerCase()
     .replaceAll(/[^a-z0-9]+/g, "-")}`;
+  const flagOverrides = {
+    identityVerification: true,
+    ...featureFlags,
+  };
 
   await page.addInitScript(
-    ({ ownerState, verificationKey }) => {
+    ({ ownerState, verificationKey, flagOverrides }) => {
       localStorage.clear();
       localStorage.setItem("i18nextLng", "en-US");
       localStorage.setItem(
@@ -87,12 +96,12 @@ export async function seedOwnerSession(page: Page, options?: Partial<OwnerSeed>)
       localStorage.setItem(
         "boatstead-feature-flags",
         JSON.stringify({
-          state: { overrides: { identityVerification: true } },
+          state: { overrides: flagOverrides },
           version: 1,
         }),
       );
     },
-    { ownerState: owner, verificationKey },
+    { ownerState: owner, verificationKey, flagOverrides },
   );
 }
 

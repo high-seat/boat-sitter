@@ -30,6 +30,7 @@ Every user-facing string shipped to users must be translated through i18next. De
 9. Never use an em dash (`—`) in any user-facing string. Rewrite the sentence with punctuation or wording that reads naturally without one.
 10. Use US English spelling for the default source copy and translation keys. Keep UK English as a separate complete locale, never as the default.
 11. Never translate a string that is exclusively shown in development builds behind a compile-time `import.meta.env.DEV` guard. Keep it as hardcoded US English and do not add it to translation catalogs or wrap it in `t()`. This exception does not apply to production UI whose content merely varies by environment.
+12. Follow the Boatstead glossary (`.cursor/skills/boatstead-glossary/SKILL.md`): use **sit** for the product noun, not **stay**.
 
 ## Audit checklist
 

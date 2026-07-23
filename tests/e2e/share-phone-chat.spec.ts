@@ -21,5 +21,13 @@ test.describe("share phone in chat", () => {
     await expect(page.getByText(/Phone number shared/i).first()).toBeVisible();
     await expect(page.getByText(/Maya & Finn shared their phone number/i).first()).toBeVisible();
     await expect(page.getByRole("link", { name: /\+30 6912345678/ })).toBeVisible();
+
+    const phoneCard = page
+      .getByText(/Phone number shared/i)
+      .first()
+      .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
+    const phoneRow = phoneCard.locator("xpath=..");
+    await expect(phoneRow).toHaveClass(/justify-end/);
+    await expect(phoneRow).not.toHaveClass(/justify-center/);
   });
 });

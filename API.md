@@ -70,7 +70,7 @@ npm run build && npm run deploy
 
 | Method | Path                                                  | Notes                                                              |
 | ------ | ----------------------------------------------------- | ------------------------------------------------------------------ |
-| GET    | `/api/applications?sitId=`                            | Applications for one listing                                       |
+| GET    | `/api/applications?sitId=`                            | Applications for one listing; `sort` (`newest`/`experience`/`skillMatch`/`priorSits`), `status`, `experience` (`any`/`meetsMin`/`fivePlus`/`tenPlus`), `page`, `limit` (default 20, max 50). Response: `data`, `accepted`, `total`, `page`, `limit`, `totalPages`, `sitTotal`. |
 | GET    | `/api/applications?user=`                             | Where user is owner **or** applicant                               |
 | POST   | `/api/applications`                                   | `{ sitId, message, partySize?, applicant }`; identity from session |
 | PATCH  | `/api/applications/:id`                               | `{ status, ownerPhone? }`; owner only; emits system messages       |

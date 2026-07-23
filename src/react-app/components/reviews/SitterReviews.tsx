@@ -14,6 +14,7 @@ import {
   type SitApplication,
   type SitReview,
 } from "@/mockApi";
+import { SitterReviewsSkeleton } from "@/components/ui/MemberProfileSkeleton";
 
 function formatReviewDate(language: string, iso: string) {
   const date = new Date(iso);
@@ -316,7 +317,7 @@ export function SitterReviewsSection({
   const canRespond = currentUserName === sitterName;
 
   if (isLoading) {
-    return <div className="h-40 animate-pulse rounded-2xl bg-seafoam" />;
+    return <SitterReviewsSkeleton />;
   }
   if (!reviews.length) {
     if (!showEmpty) return null;

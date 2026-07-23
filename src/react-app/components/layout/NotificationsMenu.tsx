@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { IconTooltip } from "@/components/ui/IconTooltip";
-import { ShimmerBlock } from "@/components/ui/Shimmer";
+import { NotificationsMenuSkeleton } from "@/components/ui/NotificationsMenuSkeleton";
 import { getIntlLocale } from "@/i18n";
 import {
   getNotificationsForUser,
@@ -32,22 +32,6 @@ function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   return <CheckCircle2 className={className} />;
 }
 
-function NotificationsMenuSkeleton() {
-  return (
-    <div aria-busy="true" aria-live="polite" className="space-y-2 p-4">
-      {[0, 1, 2].map((index) => (
-        <div className="flex gap-3 rounded-xl px-1 py-2" key={index}>
-          <ShimmerBlock className="size-8 shrink-0 rounded-full" />
-          <div className="min-w-0 flex-1 space-y-2">
-            <ShimmerBlock className={`h-4 ${index === 1 ? "w-[88%]" : "w-[72%]"}`} />
-            <ShimmerBlock className="h-3 w-20" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function NotificationsMenu() {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user)!;
@@ -55,10 +39,12 @@ export function NotificationsMenu() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const queryKey = ["notifications", user.name] as const;
-  const { data: notifications = [], isLoading } = useQuery({
+  const { data, isPending, isFetching } = useQuery({
     queryKey,
     queryFn: () => getNotificationsForUser(user.name),
   });
+  const notifications = data ?? [];
+  const showSkeleton = isPending || (isFetching && data === undefined);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
   const relativeTime = new Intl.RelativeTimeFormat(getIntlLocale(i18n.language), {
     numeric: "auto",
@@ -155,8 +141,8 @@ export function NotificationsMenu() {
           <p className="border-b border-line px-4 py-3 font-display text-sm font-bold text-navy">
             {t("notifications.heading")}
           </p>
-          {isLoading ? <NotificationsMenuSkeleton /> : null}
-          {!isLoading && notifications.length ? (
+          {showSkeleton ? <NotificationsMenuSkeleton /> : null}
+          {!showSkeleton && notifications.length ? (
             <>
               <div className="max-h-96 overflow-y-auto p-2">
                 {notifications.map((notification) => (
@@ -205,7 +191,7 @@ export function NotificationsMenu() {
               </div>
             </>
           ) : null}
-          {!isLoading && !notifications.length ? (
+          {!showSkeleton && !notifications.length ? (
             <p className="m-4 rounded-xl bg-cream px-4 py-5 text-center text-sm text-slate">
               {t("notifications.empty")}
             </p>

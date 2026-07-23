@@ -10,6 +10,7 @@ import {
   BatteryCharging,
   CalendarDays,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleCheck,
@@ -79,6 +80,7 @@ import { ResultsPagination } from "@/components/ui/ResultsPagination";
 import { SitDetailSkeleton } from "@/components/ui/SitDetailSkeleton";
 import { MessagesPageSkeleton } from "@/components/ui/MessagesPageSkeleton";
 import { ApplicationReviewSkeleton } from "@/components/ui/ApplicationReviewSkeleton";
+import { MemberProfileSkeleton } from "@/components/ui/MemberProfileSkeleton";
 import { FeatureIcon } from "@/components/ui/FeatureIcon";
 import { IconTooltip } from "@/components/ui/IconTooltip";
 import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
@@ -90,6 +92,7 @@ import { AuthModal } from "@/components/forms/AuthModal";
 import { ConversationPanel } from "@/components/applications/ConversationPanel";
 import { formatApplicationSystemMessage } from "@/components/applications/formatApplicationSystemMessage";
 import { CloseApplicationsRequestsDialog } from "@/components/applications/CloseApplicationsRequestsDialog";
+import { SitEmergencyHelp } from "@/components/applications/SitEmergencyHelp";
 import { WithdrawInterestDialog } from "@/components/applications/WithdrawInterestDialog";
 import { AdminPage } from "@/components/admin/AdminPage";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -167,13 +170,22 @@ import { VesselPrivateAccessCard } from "@/components/listing/VesselPrivateAcces
 import {
   convertBoatLength,
   formatBoatLength,
+  lengthToMetres,
+  metresToUnit,
   normalizeLengthToMetres,
   parseBoatLength,
   type LengthUnit,
 } from "@/lengthUtils";
+import {
+  isValidYearBuilt,
+  maxYearBuilt,
+  MIN_YEAR_BUILT,
+  parseYearBuiltInput,
+} from "../shared/yearBuilt";
 import { coverPhotoClassName, coverPhotoStyle, optimizePhotoUrl } from "@/photoUtils";
 import { useFeatureFlag } from "@/featureFlags";
 import { setOwnerDashboardTab } from "@/ownerDashboardDev";
+import { APPLICATIONS_PAGE_SIZE } from "../shared/applicationsSearch";
 import { VESSEL_TYPES, vesselTypeFromParam, vesselTypeToSlug } from "../shared/vesselTypes";
 import {
   LeaveReviewForm,
@@ -874,6 +886,16 @@ function TrustItem({
   );
 }
 
+function vesselTypeLengthYear(
+  t: ReturnType<typeof useTranslation>["t"],
+  boat: { type: string; length: string; yearBuilt?: number | null },
+  measurementSystem: "metric" | "imperial",
+) {
+  const parts = [displayLabel(t, boat.type), formatBoatLength(boat.length, measurementSystem)];
+  if (boat.yearBuilt) parts.push(t("boat.yearBuiltShort", { year: boat.yearBuilt }));
+  return parts.join(" · ");
+}
+
 function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
@@ -941,7 +963,7 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
-                {displayLabel(t, boat.type)} · {formatBoatLength(boat.length, measurementSystem)}
+                {vesselTypeLengthYear(t, boat, measurementSystem)}
               </p>
               <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
                 {boat.name}
@@ -974,7 +996,7 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
-                {displayLabel(t, boat.type)} · {formatBoatLength(boat.length, measurementSystem)}
+                {vesselTypeLengthYear(t, boat, measurementSystem)}
               </p>
               <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
                 {boat.name}
@@ -1154,6 +1176,9 @@ function parseSitTypeParam(value: string | null): "all" | SitType {
 
 function BoatsPage() {
   const { t } = useTranslation();
+  const measurementSystem =
+    useAppStore((state) => state.user?.measurementSystem) ?? detectMeasurementSystem();
+  const lengthUnit: LengthUnit = measurementSystem === "imperial" ? "ft" : "m";
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get("q") ?? "");
   const [type, setType] = useState(() => vesselTypeFromParam(params.get("type")) ?? "All vessels");
@@ -1169,7 +1194,30 @@ function BoatsPage() {
     const value = params.get("availability");
     return value === "open" || value === "accepted" ? value : "all";
   });
-  const [view, setView] = useState<"list" | "map">("list");
+  const [minLengthDisplay, setMinLengthDisplay] = useState(() => {
+    const metres = Number.parseFloat(params.get("minLength") ?? "");
+    return Number.isFinite(metres) ? metresToUnit(metres, lengthUnit) : "";
+  });
+  const [maxLengthDisplay, setMaxLengthDisplay] = useState(() => {
+    const metres = Number.parseFloat(params.get("maxLength") ?? "");
+    return Number.isFinite(metres) ? metresToUnit(metres, lengthUnit) : "";
+  });
+  const [yearFrom, setYearFrom] = useState(params.get("yearFrom") ?? "");
+  const [yearTo, setYearTo] = useState(params.get("yearTo") ?? "");
+  const [advancedOpen, setAdvancedOpen] = useState(
+    () =>
+      Boolean(params.get("minLength")) ||
+      Boolean(params.get("maxLength")) ||
+      Boolean(params.get("yearFrom")) ||
+      Boolean(params.get("yearTo")) ||
+      params.get("pet") === "1" ||
+      params.get("pet") === "true" ||
+      params.get("availability") === "open" ||
+      params.get("availability") === "accepted",
+  );
+  const [view, setView] = useState<"list" | "map">(() =>
+    params.get("view") === "map" ? "map" : "list",
+  );
   const [sort, setSort] = useState<
     "recommended" | "soonest" | "latest" | "shortest" | "longest" | "popular"
   >(() => {
@@ -1190,7 +1238,18 @@ function BoatsPage() {
     const value = Number.parseInt(params.get("page") ?? "0", 10);
     return Number.isFinite(value) && value > 0 ? value : 0;
   });
+  const [mapBoats, setMapBoats] = useState<Boat[]>([]);
+  const [mapTotal, setMapTotal] = useState(0);
+  const [mapLoading, setMapLoading] = useState(false);
   const resultsTopRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+
+  function lengthDisplayToMetres(value: string): number | undefined {
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    const metres = lengthToMetres(`${trimmed} ${lengthUnit}`);
+    return Number.isFinite(metres) ? Math.round(metres * 100) / 100 : undefined;
+  }
 
   function syncBoatSearchUrl(next: {
     q?: string;
@@ -1200,8 +1259,13 @@ function BoatsPage() {
     to?: string;
     pet?: boolean;
     availability?: "all" | "open" | "accepted";
+    minLengthDisplay?: string;
+    maxLengthDisplay?: string;
+    yearFrom?: string;
+    yearTo?: string;
     sort?: typeof sort;
     page?: number;
+    view?: "list" | "map";
   }) {
     const nextParams = new URLSearchParams(window.location.search);
     const q = next.q ?? query;
@@ -1211,8 +1275,17 @@ function BoatsPage() {
     const to = next.to ?? dates.endDate;
     const pet = next.pet ?? petOnly;
     const avail = next.availability ?? availability;
+    const minDisplay = next.minLengthDisplay ?? minLengthDisplay;
+    const maxDisplay = next.maxLengthDisplay ?? maxLengthDisplay;
+    const yearFromValue = next.yearFrom ?? yearFrom;
+    const yearToValue = next.yearTo ?? yearTo;
     const sortValue = next.sort ?? sort;
     const pageValue = next.page ?? page;
+    const viewValue = next.view ?? view;
+    const minLengthM = lengthDisplayToMetres(minDisplay);
+    const maxLengthM = lengthDisplayToMetres(maxDisplay);
+    const yearFromNum = yearFromValue.trim() ? Number.parseInt(yearFromValue, 10) : undefined;
+    const yearToNum = yearToValue.trim() ? Number.parseInt(yearToValue, 10) : undefined;
 
     if (q) nextParams.set("q", q);
     else nextParams.delete("q");
@@ -1231,10 +1304,22 @@ function BoatsPage() {
     else nextParams.delete("pet");
     if (avail !== "all") nextParams.set("availability", avail);
     else nextParams.delete("availability");
+    if (minLengthM != null) nextParams.set("minLength", String(minLengthM));
+    else nextParams.delete("minLength");
+    if (maxLengthM != null) nextParams.set("maxLength", String(maxLengthM));
+    else nextParams.delete("maxLength");
+    if (yearFromNum != null && Number.isFinite(yearFromNum)) {
+      nextParams.set("yearFrom", String(yearFromNum));
+    } else nextParams.delete("yearFrom");
+    if (yearToNum != null && Number.isFinite(yearToNum)) {
+      nextParams.set("yearTo", String(yearToNum));
+    } else nextParams.delete("yearTo");
     if (sortValue !== "recommended") nextParams.set("sort", sortValue);
     else nextParams.delete("sort");
     if (pageValue > 0) nextParams.set("page", String(pageValue));
     else nextParams.delete("page");
+    if (viewValue === "map") nextParams.set("view", "map");
+    else nextParams.delete("view");
 
     const search = nextParams.toString();
     window.history.replaceState(
@@ -1244,7 +1329,7 @@ function BoatsPage() {
     );
   }
 
-  const searchParams = useMemo(
+  const filterParams = useMemo(
     () => ({
       q: query || undefined,
       type: type === "All vessels" ? undefined : type,
@@ -1253,35 +1338,96 @@ function BoatsPage() {
       to: dates.endDate || undefined,
       pet: petOnly || undefined,
       availability,
+      minLengthM: lengthDisplayToMetres(minLengthDisplay),
+      maxLengthM: lengthDisplayToMetres(maxLengthDisplay),
+      yearFrom: yearFrom.trim() ? Number.parseInt(yearFrom, 10) || undefined : undefined,
+      yearTo: yearTo.trim() ? Number.parseInt(yearTo, 10) || undefined : undefined,
       sort,
-      page: view === "map" ? 0 : page,
-      // Map needs the full filtered set; list uses server pages of BOATS_PER_PAGE.
-      limit: view === "map" ? 0 : BOATS_PER_PAGE,
     }),
     [
       availability,
       dates.endDate,
       dates.startDate,
-      page,
+      lengthUnit,
+      maxLengthDisplay,
+      minLengthDisplay,
       petOnly,
       query,
       sitTypeFilter,
       sort,
       type,
-      view,
+      yearFrom,
+      yearTo,
     ],
   );
 
+  const listSearchParams = useMemo(
+    () => ({
+      ...filterParams,
+      page,
+      limit: BOATS_PER_PAGE,
+    }),
+    [filterParams, page],
+  );
+
+  const mapFitKey = useMemo(() => JSON.stringify(filterParams), [filterParams]);
+
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["boats", "search", searchParams],
-    queryFn: () => getBoatsPage(searchParams),
+    queryKey: ["boats", "search", listSearchParams],
+    queryFn: () => getBoatsPage(listSearchParams),
     placeholderData: keepPreviousData,
   });
 
-  const boats = data?.boats ?? [];
-  const totalItems = data?.total ?? 0;
+  useEffect(() => {
+    if (view !== "map") return;
+    let cancelled = false;
+    setMapBoats([]);
+    setMapTotal(0);
+    setMapLoading(true);
+
+    void (async () => {
+      const seen = new Set<string>();
+      const accumulated: Boat[] = [];
+      let pageIdx = 0;
+      let totalPages = 1;
+      let total = 0;
+      try {
+        while (!cancelled && pageIdx < totalPages) {
+          const pageParams = { ...filterParams, page: pageIdx, limit: BOATS_PER_PAGE };
+          const result = await queryClient.fetchQuery({
+            queryKey: ["boats", "search", pageParams],
+            queryFn: () => getBoatsPage(pageParams),
+          });
+          if (cancelled) return;
+          total = result.total;
+          totalPages = Math.max(1, result.totalPages);
+          for (const boat of result.boats) {
+            if (!seen.has(boat.id)) {
+              seen.add(boat.id);
+              accumulated.push(boat);
+            }
+          }
+          setMapBoats([...accumulated]);
+          setMapTotal(total);
+          pageIdx += 1;
+          if (result.boats.length === 0) break;
+        }
+      } finally {
+        if (!cancelled) setMapLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [view, mapFitKey, filterParams, queryClient]);
+
+  const listBoats = data?.boats ?? [];
+  const listTotal = data?.total ?? 0;
+  const totalItems = view === "map" ? mapTotal : listTotal;
   const currentPage = data?.page ?? page;
   const totalPages = data?.totalPages ?? 1;
+  const mapToggleDisabled = view === "list" && !isLoading && listTotal === 0;
 
   function updateLocationQuery(value: string) {
     setQuery(value);
@@ -1293,9 +1439,27 @@ function BoatsPage() {
     syncBoatSearchUrl({ sitType: value, page: 0 });
   }
 
+  function updateView(next: "list" | "map") {
+    setView(next);
+    syncBoatSearchUrl({ view: next });
+  }
+
   useEffect(() => {
     setPage(0);
-  }, [availability, dates.endDate, dates.startDate, petOnly, query, sitTypeFilter, sort, type]);
+  }, [
+    availability,
+    dates.endDate,
+    dates.startDate,
+    maxLengthDisplay,
+    minLengthDisplay,
+    petOnly,
+    query,
+    sitTypeFilter,
+    sort,
+    type,
+    yearFrom,
+    yearTo,
+  ]);
 
   useEffect(() => {
     if (page > totalPages - 1) setPage(Math.max(0, totalPages - 1));
@@ -1308,12 +1472,35 @@ function BoatsPage() {
   }
 
   function renderFilteredResults() {
-    if (totalItems && view === "map") {
-      return (
-        <div className="mt-6">
-          <BoatMap boats={boats} />
-        </div>
-      );
+    if (view === "map") {
+      if (mapLoading && mapBoats.length === 0) {
+        return (
+          <div
+            aria-busy="true"
+            aria-live="polite"
+            className="mt-6"
+            role="status"
+          >
+            <span className="sr-only">{t("map.loadingMore")}</span>
+            <ShimmerBlock className="h-[min(68vh,44rem)] min-h-112 w-full rounded-3xl" />
+          </div>
+        );
+      }
+      if (mapBoats.length > 0 || mapLoading) {
+        return (
+          <div className="mt-6">
+            {mapLoading ? (
+              <p className="mb-3 text-sm font-semibold text-slate" role="status">
+                {t("map.loadingProgress", {
+                  loaded: mapBoats.length,
+                  total: mapTotal || mapBoats.length,
+                })}
+              </p>
+            ) : null}
+            <BoatMap boats={mapBoats} fitKey={mapFitKey} />
+          </div>
+        );
+      }
     }
     if (totalItems) {
       return (
@@ -1323,7 +1510,7 @@ function BoatsPage() {
               isFetching ? "opacity-70" : ""
             }`}
           >
-            {boats.map((boat) => (
+            {listBoats.map((boat) => (
               <BoatCard boat={boat} key={boat.id} />
             ))}
           </div>
@@ -1361,6 +1548,11 @@ function BoatsPage() {
     setDates({ startDate: "", endDate: "" });
     setPetOnly(false);
     setAvailability("all");
+    setMinLengthDisplay("");
+    setMaxLengthDisplay("");
+    setYearFrom("");
+    setYearTo("");
+    setAdvancedOpen(false);
     setSort("recommended");
     setPage(0);
     window.history.replaceState(null, "", window.location.pathname);
@@ -1373,7 +1565,11 @@ function BoatsPage() {
     Boolean(dates.startDate) ||
     Boolean(dates.endDate) ||
     petOnly ||
-    availability !== "all";
+    availability !== "all" ||
+    Boolean(minLengthDisplay.trim()) ||
+    Boolean(maxLengthDisplay.trim()) ||
+    Boolean(yearFrom.trim()) ||
+    Boolean(yearTo.trim());
 
   return (
     <main className="px-5 py-10 lg:px-8">
@@ -1418,38 +1614,135 @@ function BoatsPage() {
             <option value="liveaboard">{t("sitType.liveaboard")}</option>
             <option value="daytimeChecks">{t("sitType.daytimeChecks")}</option>
           </Select>
-          <label
-            className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${petOnly ? "border-teal bg-seafoam text-teal" : "border-line text-slate"}`}
-          >
-            <span className="flex cursor-pointer items-center gap-2">
-              <input
-                checked={petOnly}
-                className="size-4 accent-teal"
-                onChange={(event) => {
-                  const value = event.target.checked;
-                  setPetOnly(value);
-                  syncBoatSearchUrl({ pet: value, page: 0 });
-                }}
-                type="checkbox"
-              />
-              {t("boats.pets")}
-            </span>
-          </label>
-          <Select
-            aria-label={t("boats.availabilityLabel")}
-            onChange={(event) => {
-              const value = event.target.value as "all" | "open" | "accepted";
-              setAvailability(value);
-              syncBoatSearchUrl({ availability: value, page: 0 });
-            }}
-            value={availability}
-          >
-            <option value="all">{t("boats.availabilityAll")}</option>
-            <option value="open">{t("boats.availabilityOpen")}</option>
-            <option value="accepted">{t("boats.availabilityAccepted")}</option>
-          </Select>
         </div>
-        {isLoading ? (
+        <div className="mt-3">
+          <button
+            aria-controls="boats-advanced-filters"
+            aria-expanded={advancedOpen}
+            className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+            onClick={() => setAdvancedOpen((open) => !open)}
+            type="button"
+          >
+            {t("boats.advancedFilters")}
+            <ChevronDown
+              aria-hidden="true"
+              className={`transition ${advancedOpen ? "rotate-180" : ""}`}
+              size={16}
+            />
+          </button>
+          {advancedOpen ? (
+            <div
+              className="mt-3 grid gap-3 rounded-2xl border border-line bg-cream/40 p-4 sm:grid-cols-2 lg:grid-cols-4"
+              id="boats-advanced-filters"
+            >
+              <div className="flex h-full flex-col justify-end">
+                <label
+                  className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${petOnly ? "border-teal bg-seafoam text-teal" : "border-line bg-white text-slate"}`}
+                >
+                  <span className="flex cursor-pointer items-center gap-2">
+                    <input
+                      checked={petOnly}
+                      className="size-4 accent-teal"
+                      onChange={(event) => {
+                        const value = event.target.checked;
+                        setPetOnly(value);
+                        syncBoatSearchUrl({ pet: value, page: 0 });
+                      }}
+                      type="checkbox"
+                    />
+                    {t("boats.pets")}
+                  </span>
+                </label>
+              </div>
+              <label>
+                <span className="form-label">{t("boats.availabilityLabel")}</span>
+                <Select
+                  aria-label={t("boats.availabilityLabel")}
+                  onChange={(event) => {
+                    const value = event.target.value as "all" | "open" | "accepted";
+                    setAvailability(value);
+                    syncBoatSearchUrl({ availability: value, page: 0 });
+                  }}
+                  value={availability}
+                  variant="form"
+                >
+                  <option value="all">{t("boats.availabilityAll")}</option>
+                  <option value="open">{t("boats.availabilityOpen")}</option>
+                  <option value="accepted">{t("boats.availabilityAccepted")}</option>
+                </Select>
+              </label>
+              <label>
+                <span className="form-label">{t("boats.minLength", { unit: t(lengthUnit === "ft" ? "units.feet" : "units.meters") })}</span>
+                <input
+                  className="form-input"
+                  inputMode="decimal"
+                  min="0"
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setMinLengthDisplay(value);
+                    syncBoatSearchUrl({ minLengthDisplay: value, page: 0 });
+                  }}
+                  placeholder={t("boats.lengthPlaceholder")}
+                  step="0.1"
+                  type="number"
+                  value={minLengthDisplay}
+                />
+              </label>
+              <label>
+                <span className="form-label">{t("boats.maxLength", { unit: t(lengthUnit === "ft" ? "units.feet" : "units.meters") })}</span>
+                <input
+                  className="form-input"
+                  inputMode="decimal"
+                  min="0"
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setMaxLengthDisplay(value);
+                    syncBoatSearchUrl({ maxLengthDisplay: value, page: 0 });
+                  }}
+                  placeholder={t("boats.lengthPlaceholder")}
+                  step="0.1"
+                  type="number"
+                  value={maxLengthDisplay}
+                />
+              </label>
+              <label>
+                <span className="form-label">{t("boats.yearFrom")}</span>
+                <input
+                  className="form-input"
+                  inputMode="numeric"
+                  max={maxYearBuilt()}
+                  min={MIN_YEAR_BUILT}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setYearFrom(value);
+                    syncBoatSearchUrl({ yearFrom: value, page: 0 });
+                  }}
+                  placeholder={t("boats.yearPlaceholder")}
+                  type="number"
+                  value={yearFrom}
+                />
+              </label>
+              <label>
+                <span className="form-label">{t("boats.yearTo")}</span>
+                <input
+                  className="form-input"
+                  inputMode="numeric"
+                  max={maxYearBuilt()}
+                  min={MIN_YEAR_BUILT}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setYearTo(value);
+                    syncBoatSearchUrl({ yearTo: value, page: 0 });
+                  }}
+                  placeholder={t("boats.yearPlaceholder")}
+                  type="number"
+                  value={yearTo}
+                />
+              </label>
+            </div>
+          ) : null}
+        </div>
+        {isLoading && view === "list" ? (
           <BoatsPageLoadingSkeleton />
         ) : (
           <>
@@ -1460,10 +1753,10 @@ function BoatsPage() {
               <p className="text-sm text-slate">{t("boats.results", { count: totalItems })}</p>
               <div className="flex items-center gap-2">
                 <div
-                  aria-disabled={totalItems === 0}
+                  aria-disabled={mapToggleDisabled}
                   aria-label={t("map.viewLabel")}
                   className={`flex rounded-xl border border-line bg-white p-1 ${
-                    totalItems === 0 ? "opacity-50" : ""
+                    mapToggleDisabled ? "opacity-50" : ""
                   }`}
                   role="group"
                 >
@@ -1472,8 +1765,7 @@ function BoatsPage() {
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold disabled:cursor-not-allowed ${
                       view === "list" ? "bg-seafoam text-teal" : "text-slate"
                     }`}
-                    disabled={totalItems === 0}
-                    onClick={() => setView("list")}
+                    onClick={() => updateView("list")}
                     type="button"
                   >
                     <List size={16} /> {t("map.listView")}
@@ -1483,8 +1775,8 @@ function BoatsPage() {
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold disabled:cursor-not-allowed ${
                       view === "map" ? "bg-seafoam text-teal" : "text-slate"
                     }`}
-                    disabled={totalItems === 0}
-                    onClick={() => setView("map")}
+                    disabled={mapToggleDisabled}
+                    onClick={() => updateView("map")}
                     type="button"
                   >
                     <Map size={16} /> {t("map.mapView")}
@@ -2204,9 +2496,9 @@ function DetailPage() {
             <div className="flex items-start justify-between gap-5 border-b border-line pb-8">
               <div>
                 <p className="eyebrow">
-                  {displayLabel(t, boat.type)} ·{" "}
-                  {formatBoatLength(
-                    boat.length,
+                  {vesselTypeLengthYear(
+                    t,
+                    boat,
                     user?.measurementSystem ?? detectMeasurementSystem(),
                   )}
                 </p>
@@ -3268,10 +3560,24 @@ function ProfileEditor({ close }: { close: () => void }) {
 function MemberPage() {
   const { t } = useTranslation();
   const { id = "" } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentUser = useAppStore((state) => state.user);
   const isMe = id === "me";
   const memberKey = decodeURIComponent(id);
-  const [editing, setEditing] = useState(false);
+  const openEditorFromQuery = isMe && searchParams.get("edit") === "1";
+  const [editing, setEditing] = useState(openEditorFromQuery);
+
+  useEffect(() => {
+    if (openEditorFromQuery) setEditing(true);
+  }, [openEditorFromQuery]);
+
+  function closeProfileEditor() {
+    setEditing(false);
+    if (!searchParams.has("edit")) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("edit");
+    setSearchParams(next, { replace: true });
+  }
   const identityVerificationEnabled = useFeatureFlag("identityVerification");
   const queryClient = useQueryClient();
   const {
@@ -3374,10 +3680,10 @@ function MemberPage() {
   }
 
   if (!isMe && boatLoading) {
-    return <div className="mx-auto my-20 h-96 max-w-5xl animate-pulse rounded-3xl bg-seafoam" />;
+    return <MemberProfileSkeleton />;
   }
   if (isSitterNameProfile && namedLoading) {
-    return <div className="mx-auto my-20 h-96 max-w-5xl animate-pulse rounded-3xl bg-seafoam" />;
+    return <MemberProfileSkeleton />;
   }
   if (!isMe && !boat && !namedMember) return <NotFound />;
 
@@ -3669,7 +3975,7 @@ function MemberPage() {
           </aside>
         </div>
       </div>
-      {editing && <ProfileEditor close={() => setEditing(false)} />}
+      {editing && <ProfileEditor close={closeProfileEditor} />}
     </main>
   );
 }
@@ -3692,6 +3998,11 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
   );
   const [lengthValue, setLengthValue] = useState(initialLengthValue);
   const [lengthUnit, setLengthUnit] = useState<LengthUnit>(preferredLengthUnit);
+  const [yearUnknown, setYearUnknown] = useState(boat?.yearBuilt == null);
+  const [yearBuiltInput, setYearBuiltInput] = useState(
+    boat?.yearBuilt != null ? String(boat.yearBuilt) : "",
+  );
+  const [yearBuiltError, setYearBuiltError] = useState("");
   const [form, setForm] = useState({
     name: boat?.name ?? "",
     type: boat?.type ?? "Sailing yacht",
@@ -3766,6 +4077,14 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
           .toLowerCase()
           .replaceAll(/[^a-z0-9]+/g, "-")
           .replaceAll(/^-|-$/g, "")}-${Date.now().toString().slice(-5)}`;
+      let yearBuilt: number | null = null;
+      if (!yearUnknown) {
+        const parsed = parseYearBuiltInput(yearBuiltInput);
+        if (parsed == null || !isValidYearBuilt(parsed)) {
+          throw new Error("vesselEditor.yearBuiltInvalid");
+        }
+        yearBuilt = parsed;
+      }
       return saveVessel({
         id,
         name: form.name,
@@ -3777,6 +4096,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
         description: form.description,
         home: form.home,
         length: lengthValue ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`) : "",
+        yearBuilt,
         image: form.image || fallbackImage,
         gallery: gallery.map((photo) => ({
           url: photo.url,
@@ -3809,6 +4129,23 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
       close();
     },
   });
+
+  function submitVessel() {
+    setYearBuiltError("");
+    if (!yearUnknown) {
+      const parsed = parseYearBuiltInput(yearBuiltInput);
+      if (parsed == null || !isValidYearBuilt(parsed)) {
+        setYearBuiltError(
+          t("vesselEditor.yearBuiltInvalid", {
+            min: MIN_YEAR_BUILT,
+            max: maxYearBuilt(),
+          }),
+        );
+        return;
+      }
+    }
+    mutation.mutate();
+  }
 
   const fields: Array<{
     key: keyof typeof form;
@@ -3935,6 +4272,51 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 </Select>
               </span>
             </label>
+            <div>
+              <span className="form-label">{t("vesselEditor.yearBuilt")}</span>
+              <input
+                aria-invalid={Boolean(yearBuiltError)}
+                className="form-input"
+                disabled={yearUnknown}
+                inputMode="numeric"
+                max={maxYearBuilt()}
+                min={MIN_YEAR_BUILT}
+                onChange={(event) => {
+                  setYearBuiltInput(event.target.value);
+                  setYearBuiltError("");
+                  if (event.target.value.trim()) setYearUnknown(false);
+                }}
+                placeholder={t("vesselEditor.yearBuiltPlaceholder")}
+                type="number"
+                value={yearUnknown ? "" : yearBuiltInput}
+              />
+              <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate">
+                <input
+                  checked={yearUnknown}
+                  className="size-4 accent-teal"
+                  onChange={(event) => {
+                    const unknown = event.target.checked;
+                    setYearUnknown(unknown);
+                    setYearBuiltError("");
+                    if (unknown) setYearBuiltInput("");
+                  }}
+                  type="checkbox"
+                />
+                {t("vesselEditor.yearBuiltUnknown")}
+              </label>
+              {yearBuiltError ? (
+                <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                  {yearBuiltError}
+                </p>
+              ) : (
+                <p className="mt-2 text-xs leading-5 text-slate">
+                  {t("vesselEditor.yearBuiltHint", {
+                    min: MIN_YEAR_BUILT,
+                    max: maxYearBuilt(),
+                  })}
+                </p>
+              )}
+            </div>
             {fields.map((field) => (
               <label className={field.wide ? "sm:col-span-2" : ""} key={field.key}>
                 <span className="form-label">{field.label}</span>
@@ -4191,7 +4573,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             <button
               className="rounded-xl bg-coral px-6 py-3 text-sm font-bold text-white disabled:opacity-60"
               disabled={mutation.isPending || !form.name || !form.homePort}
-              onClick={() => mutation.mutate()}
+              onClick={submitVessel}
               type="button"
             >
               {vesselSaveButtonLabel}
@@ -4205,6 +4587,9 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                 name: form.name,
                 type: form.type,
                 length: lengthValue ? normalizeLengthToMetres(`${lengthValue} ${lengthUnit}`) : "",
+                yearBuilt: yearUnknown
+                  ? null
+                  : parseYearBuiltInput(yearBuiltInput) ?? null,
                 homePort: form.homePort,
                 image: form.image,
                 engineType: form.engineType,
@@ -4280,7 +4665,12 @@ function VesselEditorPage({ mode }: { mode: "new" | "edit" }) {
     );
   }
 
-  return <VesselEditor boat={boat} close={() => navigate("/my-boats")} />;
+  return (
+    <VesselEditor
+      boat={boat}
+      close={() => navigate("/my-boats")}
+    />
+  );
 }
 
 function SitEditor({
@@ -5471,13 +5861,16 @@ function OwnerBoatsPage() {
             </button>
           ) : null}
           {!isArchived && resolveSitPhase(sit) === "stayUnderway" && (
-            <button
-              className="flex items-center gap-2 rounded-xl border border-coral/40 bg-coral/10 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral"
-              onClick={() => setFlaggingSit(sit)}
-              type="button"
-            >
-              <Flag size={16} /> {t("sitIssue.flagButton")}
-            </button>
+            <>
+              <SitEmergencyHelp />
+              <button
+                className="flex items-center gap-2 rounded-xl border border-coral/40 bg-coral/10 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral"
+                onClick={() => setFlaggingSit(sit)}
+                type="button"
+              >
+                <Flag size={16} /> {t("sitIssue.flagButton")}
+              </button>
+            </>
           )}
           <button
             className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
@@ -5585,6 +5978,9 @@ function OwnerBoatsPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:justify-end">
+          {sit &&
+            application.status === "accepted" &&
+            resolveSitPhase(sit) === "stayUnderway" && <SitEmergencyHelp />}
           <Link
             className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
             to={`/boats/${application.sitId}`}
@@ -5763,9 +6159,9 @@ function OwnerBoatsPage() {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                    {displayLabel(t, boat.type)} ·{" "}
-                    {formatBoatLength(
-                      boat.length,
+                    {vesselTypeLengthYear(
+                      t,
+                      boat,
                       user?.measurementSystem ?? detectMeasurementSystem(),
                     )}
                   </p>
@@ -6952,6 +7348,41 @@ function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
   );
 }
 
+function patchApplicationInQueriesCache(
+  old: unknown,
+  updated: SitApplication,
+): unknown {
+  if (!old) return old;
+  if (Array.isArray(old)) {
+    return old.map((item) =>
+      item && typeof item === "object" && "id" in item && item.id === updated.id
+        ? updated
+        : item,
+    );
+  }
+  if (
+    typeof old === "object" &&
+    old !== null &&
+    "applications" in old &&
+    Array.isArray((old as { applications: unknown }).applications)
+  ) {
+    const page = old as {
+      applications: SitApplication[];
+      accepted?: SitApplication[];
+    };
+    return {
+      ...page,
+      applications: page.applications.map((item) =>
+        item.id === updated.id ? updated : item,
+      ),
+      accepted: Array.isArray(page.accepted)
+        ? page.accepted.map((item) => (item.id === updated.id ? updated : item))
+        : page.accepted,
+    };
+  }
+  return old;
+}
+
 function sitParticipationRole(application: SitApplication, userName: string) {
   return application.ownerName === userName ? "owner" : "sitter";
 }
@@ -7195,18 +7626,6 @@ function ApplicationReviewPage() {
   const navigate = useNavigate();
   const user = useAppStore((state) => state.user);
   const queryClient = useQueryClient();
-  const { data: applications = [], isLoading } = useQuery({
-    queryKey: ["applications", "sit", sitId],
-    queryFn: () => getApplicationsForSit(sitId),
-  });
-  const { data: sits = [], isLoading: sitsLoading } = useQuery({
-    queryKey: ["sits"],
-    queryFn: getSits,
-  });
-  const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
-    queryKey: ["vessels"],
-    queryFn: getVessels,
-  });
   const [selectedId, setSelectedId] = useState("");
   const [flaggingIssue, setFlaggingIssue] = useState(false);
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState(false);
@@ -7219,69 +7638,64 @@ function ApplicationReviewPage() {
   const [experienceFilter, setExperienceFilter] = useState<
     "any" | "meetsMin" | "fivePlus" | "tenPlus"
   >("any");
+  const [listPage, setListPage] = useState(0);
+
+  const { data: sits = [], isLoading: sitsLoading } = useQuery({
+    queryKey: ["sits"],
+    queryFn: getSits,
+  });
+  const { data: vessels = [], isLoading: vesselsLoading } = useQuery({
+    queryKey: ["vessels"],
+    queryFn: getVessels,
+  });
+
+  const listParams = useMemo(
+    () => ({
+      sort,
+      status: statusFilter,
+      experience: experienceFilter,
+      page: listPage,
+      limit: APPLICATIONS_PAGE_SIZE,
+    }),
+    [experienceFilter, listPage, sort, statusFilter],
+  );
+
+  const {
+    data: applicationsPage,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["applications", "sit", sitId, listParams],
+    queryFn: () => getApplicationsForSit(sitId, listParams),
+    placeholderData: keepPreviousData,
+    enabled: Boolean(sitId),
+  });
+
+  const visibleApplications = applicationsPage?.applications ?? [];
+  const acceptedApplications = applicationsPage?.accepted ?? [];
+  const filteredTotal = applicationsPage?.total ?? 0;
+  const sitTotal = applicationsPage?.sitTotal ?? 0;
+  const currentListPage = applicationsPage?.page ?? listPage;
+  const listTotalPages = applicationsPage?.totalPages ?? 1;
 
   const sit = sits.find((item) => item.id === sitId);
   const vessel = vessels.find((item) => item.id === sit?.boatId);
   const allowed = Boolean(user && vessel && vessel.owner === user.name);
-  const pageLoading = isLoading || sitsLoading || vesselsLoading;
-  const minimumYears = sit?.minYearsExperience ?? 0;
-
-  const acceptedApplications = useMemo(
-    () =>
-      applications
-        .filter((application) => application.status === "accepted")
-        .filter((application) => {
-          const years = application.applicant.yearsExperience;
-          return (
-            experienceFilter === "any" ||
-            (experienceFilter === "meetsMin" && (minimumYears <= 0 || years >= minimumYears)) ||
-            (experienceFilter === "fivePlus" && years >= 5) ||
-            (experienceFilter === "tenPlus" && years >= 10)
-          );
-        })
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-    [applications, experienceFilter, minimumYears],
-  );
-
-  const visibleApplications = useMemo(() => {
-    const filtered = applications.filter((application) => {
-      if (application.status === "accepted") return false;
-      const matchesStatus = statusFilter === "all" || application.status === statusFilter;
-      const years = application.applicant.yearsExperience;
-      const matchesExperience =
-        experienceFilter === "any" ||
-        (experienceFilter === "meetsMin" && (minimumYears <= 0 || years >= minimumYears)) ||
-        (experienceFilter === "fivePlus" && years >= 5) ||
-        (experienceFilter === "tenPlus" && years >= 10);
-      return matchesStatus && matchesExperience;
-    });
-    return [...filtered].sort((a, b) => {
-      if (sort === "experience") {
-        return (
-          b.applicant.yearsExperience - a.applicant.yearsExperience ||
-          b.createdAt.localeCompare(a.createdAt)
-        );
-      }
-      if (sort === "skillMatch") {
-        const aMatch = applicationRequirementMatch(a, sit).matchCount;
-        const bMatch = applicationRequirementMatch(b, sit).matchCount;
-        return bMatch - aMatch || b.applicant.yearsExperience - a.applicant.yearsExperience;
-      }
-      if (sort === "priorSits") {
-        return (
-          b.applicant.completedSits - a.applicant.completedSits ||
-          b.applicant.yearsExperience - a.applicant.yearsExperience
-        );
-      }
-      return b.createdAt.localeCompare(a.createdAt);
-    });
-  }, [applications, experienceFilter, minimumYears, sit, sort, statusFilter]);
+  const pageLoading = (isLoading && !applicationsPage) || sitsLoading || vesselsLoading;
 
   const selectableApplications = useMemo(() => {
     if (statusFilter === "accepted") return acceptedApplications;
     if (statusFilter !== "all") return visibleApplications;
     return [...acceptedApplications, ...visibleApplications];
   }, [acceptedApplications, statusFilter, visibleApplications]);
+
+  useEffect(() => {
+    setListPage(0);
+  }, [experienceFilter, sort, statusFilter]);
+
+  useEffect(() => {
+    if (listPage > listTotalPages - 1) setListPage(Math.max(0, listTotalPages - 1));
+  }, [listPage, listTotalPages]);
 
   useEffect(() => {
     if (!selectableApplications.length) {
@@ -7293,7 +7707,7 @@ function ApplicationReviewPage() {
     }
   }, [selectableApplications, selectedId]);
 
-  const selected = applications.find((application) => application.id === selectedId);
+  const selected = selectableApplications.find((application) => application.id === selectedId);
 
   const statusMutation = useMutation({
     mutationFn: ({
@@ -7328,7 +7742,10 @@ function ApplicationReviewPage() {
   const messageMutation = useMutation({
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       sendApplicationMessage(id, user!.name, text),
-    onSuccess: async () => {
+    onSuccess: async (updated) => {
+      queryClient.setQueriesData({ queryKey: ["applications"] }, (old) =>
+        patchApplicationInQueriesCache(old, updated),
+      );
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
   });
@@ -7415,69 +7832,15 @@ function ApplicationReviewPage() {
       {pageLoading ? <ApplicationReviewSkeleton /> : null}
       {!pageLoading ? (
         <>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h1 className="section-title">
-                {t("applications.title", { boat: vessel?.name ?? "" })}
-              </h1>
-              <p className="mt-3 text-slate">
-                {t("applications.subtitle", { count: applications.length })}
-              </p>
-              {sit && (
-                <div className="mt-3">
-                  <SitPhaseBadge
-                    phase={
-                      sit.phase ??
-                      getSitPhase({
-                        dateStart: sit.dateStart,
-                        duration: sit.duration,
-                        applicationsOpen: sit.applicationsOpen,
-                        accepted: sit.accepted,
-                        applicants: sit.applicants,
-                      })
-                    }
-                    size="md"
-                  />
-                </div>
-              )}
-            </div>
-            <div className="flex shrink-0 flex-wrap gap-2">
-              {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
-                <button
-                  className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
-                    isAcceptingApplications(sit)
-                      ? "border-line bg-white text-navy hover:border-teal"
-                      : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
-                  }`}
-                  disabled={toggleApplicationsMutation.isPending}
-                  onClick={() => {
-                    if (isAcceptingApplications(sit)) {
-                      setCloseApplicationsConfirm(true);
-                      return;
-                    }
-                    toggleApplicationsMutation.mutate();
-                  }}
-                  type="button"
-                >
-                  {isAcceptingApplications(sit)
-                    ? t("applications.closeRequests")
-                    : t("applications.openRequests")}
-                </button>
-              )}
-              {sit && resolveSitPhase(sit) === "stayUnderway" && (
-                <button
-                  className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
-                  onClick={() => setFlaggingIssue(true)}
-                  type="button"
-                >
-                  <Flag size={16} /> {t("sitIssue.flagButton")}
-                </button>
-              )}
-            </div>
-          </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="section-title">{t("applications.title", { boat: vessel?.name ?? "" })}</h1>
+          <p className="mt-3 text-slate">
+            {t("applications.subtitle", { count: sitTotal })}
+          </p>
           {sit && (
-            <div className="mt-6">
-              <SitPhaseStepper
+            <div className="mt-3">
+              <SitPhaseBadge
                 phase={
                   sit.phase ??
                   getSitPhase({
@@ -7488,294 +7851,167 @@ function ApplicationReviewPage() {
                     applicants: sit.applicants,
                   })
                 }
+                size="md"
               />
             </div>
           )}
-          {sit &&
-            !isAcceptingApplications(sit) &&
-            (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
-              <div
-                className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
-                role="status"
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
+            <button
+              className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
+                isAcceptingApplications(sit)
+                  ? "border-line bg-white text-navy hover:border-teal"
+                  : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
+              }`}
+              disabled={toggleApplicationsMutation.isPending}
+              onClick={() => {
+                if (isAcceptingApplications(sit)) {
+                  setCloseApplicationsConfirm(true);
+                  return;
+                }
+                toggleApplicationsMutation.mutate();
+              }}
+              type="button"
+            >
+              {isAcceptingApplications(sit)
+                ? t("applications.closeRequests")
+                : t("applications.openRequests")}
+            </button>
+          )}
+          {sit && resolveSitPhase(sit) === "stayUnderway" && (
+            <>
+              <SitEmergencyHelp shape="pill" />
+              <button
+                className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
+                onClick={() => setFlaggingIssue(true)}
+                type="button"
               >
-                {t("applications.requestsClosedNotice")}
-              </div>
-            )}
-          {sit &&
-            resolveSitPhase(sit) === "acceptingApplicants" &&
-            !sit.accepted &&
-            applications.length > 0 && (
-              <div
-                className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                role="status"
-              >
-                <Video className="mt-0.5 shrink-0 text-coral" size={22} />
-                <div>
-                  <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
-                  <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
-                </div>
-              </div>
-            )}
+                <Flag size={16} /> {t("sitIssue.flagButton")}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {sit && (
+        <div className="mt-6">
+          <SitPhaseStepper
+            phase={
+              sit.phase ??
+              getSitPhase({
+                dateStart: sit.dateStart,
+                duration: sit.duration,
+                applicationsOpen: sit.applicationsOpen,
+                accepted: sit.accepted,
+                applicants: sit.applicants,
+              })
+            }
+          />
+        </div>
+      )}
+      {sit &&
+        !isAcceptingApplications(sit) &&
+        (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
+          <div
+            className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
+            role="status"
+          >
+            {t("applications.requestsClosedNotice")}
+          </div>
+        )}
+      {sit &&
+        resolveSitPhase(sit) === "acceptingApplicants" &&
+        !sit.accepted &&
+        sitTotal > 0 && (
+          <div
+            className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+            role="status"
+          >
+            <Video className="mt-0.5 shrink-0 text-coral" size={22} />
+            <div>
+              <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
+              <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
+            </div>
+          </div>
+        )}
 
-          {applications.length ? (
-            <div className="mt-8 space-y-6">
-              {acceptedApplications.length > 0 &&
-                (statusFilter === "all" || statusFilter === "accepted") && (
-                  <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
-                        <h2 className="mt-1 font-display text-2xl font-bold text-navy">
-                          {acceptedApplications.length === 1
-                            ? t("applications.acceptedTitle")
-                            : t("applications.acceptedTitlePlural", {
-                                count: acceptedApplications.length,
-                              })}
-                        </h2>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
-                          {t("applications.acceptedHint")}
-                        </p>
-                      </div>
-                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
-                        <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
-                      </span>
-                    </div>
-                    {sit && resolveSitPhase(sit) === "applicantChosen" && (
-                      <div
-                        className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                        role="status"
-                      >
-                        <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
-                        <div>
-                          <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
-                          <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
-                        </div>
-                      </div>
-                    )}
-                    {sit && resolveSitPhase(sit) === "stayUnderway" && (
-                      <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                        <div className="flex gap-3">
-                          <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
-                          <div>
-                            <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
-                            <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
-                          </div>
-                        </div>
-                        <button
-                          className="shrink-0 rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
-                          onClick={() => setFlaggingIssue(true)}
-                          type="button"
-                        >
-                          {t("sitIssue.flagButton")}
-                        </button>
-                      </div>
-                    )}
-                    {sit && canLeaveReview(sit) && (
-                      <div
-                        className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                        role="status"
-                      >
-                        {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
-                      </div>
-                    )}
-                    <div className="mt-5 grid gap-3">
-                      {acceptedApplications.map((application) => {
-                        const isSelected = application.id === selected?.id;
-                        return (
-                          <button
-                            className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
-                              isSelected
-                                ? "border-teal shadow-card ring-2 ring-teal/25"
-                                : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
-                            }`}
-                            key={application.id}
-                            onClick={() => {
-                              setSelectedId(application.id);
-                              window.requestAnimationFrame(() => {
-                                document
-                                  .getElementById("application-detail-panel")
-                                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                              });
-                            }}
-                            type="button"
-                          >
-                            <img
-                              alt=""
-                              className="size-16 rounded-full object-cover"
-                              src={application.applicant.image}
-                            />
-                            <span className="min-w-0 flex-1">
-                              <span className="flex flex-wrap items-center gap-2">
-                                <span className="font-display text-xl font-bold text-navy">
-                                  {application.applicant.name}
-                                </span>
-                                <ApplicationStatusBadge status={application.status} />
-                              </span>
-                              <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                                <span className="flex items-center gap-1.5">
-                                  <MapPin size={14} /> {application.applicant.location}
-                                </span>
-                                <span className="flex items-center gap-1.5">
-                                  <Users size={14} /> {t("applications.partySize")}:{" "}
-                                  {application.partySize}
-                                </span>
-                                <SitterRatingBadge sitterName={application.applicant.name} />
-                              </span>
-                            </span>
-                            <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
-                              {isSelected ? (
-                                <>
-                                  <Check size={16} />
-                                  {t("applications.acceptedViewing")}
-                                </>
-                              ) : (
-                                <>
-                                  <ArrowLeft size={16} className="rotate-180" />
-                                  {t("applications.acceptedView")}
-                                </>
-                              )}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </section>
-                )}
-
-              <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-                <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
-                  <div className="space-y-2 border-b border-line pb-3">
-                    <label className="block">
-                      <span className="sr-only">{t("applications.sortLabel")}</span>
-                      <Select
-                        variant="form"
-                        aria-label={t("applications.sortLabel")}
-                        onChange={(event) => setSort(event.target.value as typeof sort)}
-                        value={sort}
-                      >
-                        <option value="newest">{t("applications.sortNewest")}</option>
-                        <option value="experience">{t("applications.sortExperience")}</option>
-                        <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
-                        <option value="priorSits">{t("applications.sortPriorSits")}</option>
-                      </Select>
-                    </label>
-                    <label className="block">
-                      <span className="sr-only">{t("applications.filterStatusLabel")}</span>
-                      <Select
-                        variant="form"
-                        aria-label={t("applications.filterStatusLabel")}
-                        onChange={(event) =>
-                          setStatusFilter(event.target.value as typeof statusFilter)
-                        }
-                        value={statusFilter}
-                      >
-                        <option value="all">{t("applications.filterStatusAll")}</option>
-                        {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map(
-                          (status) => (
-                            <option key={status} value={status}>
-                              {t(`applications.status.${status}`)}
-                            </option>
-                          ),
-                        )}
-                      </Select>
-                    </label>
-                    <label className="block">
-                      <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
-                      <Select
-                        variant="form"
-                        aria-label={t("applications.filterExperienceLabel")}
-                        onChange={(event) =>
-                          setExperienceFilter(event.target.value as typeof experienceFilter)
-                        }
-                        value={experienceFilter}
-                      >
-                        <option value="any">{t("applications.filterExperienceAny")}</option>
-                        <option value="meetsMin">
-                          {t("applications.filterExperienceMeetsMin")}
-                        </option>
-                        <option value="fivePlus">
-                          {t("applications.filterExperienceFivePlus")}
-                        </option>
-                        <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
-                      </Select>
-                    </label>
-                    <p className="px-1 text-xs font-semibold text-slate">
-                      {t("applications.filteredCount", {
-                        count:
-                          statusFilter === "accepted"
-                            ? acceptedApplications.length
-                            : visibleApplications.length,
-                        total:
-                          statusFilter === "accepted"
-                            ? applications.filter(
-                                (application) => application.status === "accepted",
-                              ).length
-                            : applications.filter(
-                                (application) => application.status !== "accepted",
-                              ).length,
-                      })}
+      {sitTotal > 0 ? (
+        <div className={`mt-8 space-y-6 ${isFetching ? "opacity-70" : ""}`}>
+          {acceptedApplications.length > 0 &&
+            (statusFilter === "all" || statusFilter === "accepted") && (
+              <section className="overflow-hidden rounded-3xl border border-teal/35 bg-[linear-gradient(135deg,#dff1ec_0%,#ffffff_55%)] p-5 shadow-card sm:p-6">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="eyebrow text-teal">{t("applications.acceptedKicker")}</p>
+                    <h2 className="mt-1 font-display text-2xl font-bold text-navy">
+                      {acceptedApplications.length === 1
+                        ? t("applications.acceptedTitle")
+                        : t("applications.acceptedTitlePlural", {
+                            count: acceptedApplications.length,
+                          })}
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
+                      {t("applications.acceptedHint")}
                     </p>
                   </div>
-                  <div className="mt-2 space-y-1">
-                    {statusFilter === "accepted" ? (
-                      <p className="px-3 py-6 text-center text-sm text-slate">
-                        {acceptedApplications.length
-                          ? t("applications.acceptedListHint")
-                          : t("applications.filterEmpty")}
-                      </p>
-                    ) : null}
-                    {statusFilter !== "accepted" && visibleApplications.length
-                      ? visibleApplications.map((application) => {
-                          const match = applicationRequirementMatch(application, sit);
-                          return (
-                            <button
-                              className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
-                                application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
-                              }`}
-                              key={application.id}
-                              onClick={() => setSelectedId(application.id)}
-                              type="button"
-                            >
-                              <img
-                                alt=""
-                                className="size-11 rounded-full object-cover"
-                                src={application.applicant.image}
-                              />
-                              <span className="min-w-0 flex-1">
-                                <span className="block truncate font-bold text-navy">
-                                  {application.applicant.name}
-                                </span>
-                                <span className="mt-1 block text-[11px] font-semibold text-slate">
-                                  {t("applications.listMeta", {
-                                    years: application.applicant.yearsExperience,
-                                    matches: match.matchCount,
-                                    total: match.matchTotal || 0,
-                                    sits: application.applicant.completedSits,
-                                  })}
-                                </span>
-                                <span className="mt-1 block">
-                                  <ApplicationStatusBadge status={application.status} />
-                                </span>
-                              </span>
-                            </button>
-                          );
-                        })
-                      : null}
-                    {statusFilter !== "accepted" && !visibleApplications.length ? (
-                      <p className="px-3 py-6 text-center text-sm text-slate">
-                        {t("applications.filterEmpty")}
-                      </p>
-                    ) : null}
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800">
+                    <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
+                  </span>
+                </div>
+                {sit && resolveSitPhase(sit) === "applicantChosen" && (
+                  <div
+                    className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                    role="status"
+                  >
+                    <KeyRound className="mt-0.5 shrink-0 text-teal" size={22} />
+                    <div>
+                      <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
+                      <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
+                    </div>
                   </div>
-                </aside>
-
-                {selected ? (
-                  <div className="space-y-6" id="application-detail-panel">
-                    {selected.status !== "accepted" && primaryAcceptedApplication ? (
+                )}
+                {sit && resolveSitPhase(sit) === "stayUnderway" && (
+                  <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div className="flex gap-3">
+                      <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
+                      <div>
+                        <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
+                        <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <SitEmergencyHelp shape="pill" />
                       <button
-                        className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
+                        className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
+                        onClick={() => setFlaggingIssue(true)}
+                        type="button"
+                      >
+                        {t("sitIssue.flagButton")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {sit && canLeaveReview(sit) && (
+                  <div
+                    className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                    role="status"
+                  >
+                    {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
+                  </div>
+                )}
+                <div className="mt-5 grid gap-3">
+                  {acceptedApplications.map((application) => {
+                    const isSelected = application.id === selected?.id;
+                    return (
+                      <button
+                        className={`flex w-full flex-col gap-4 rounded-2xl border bg-white/90 p-4 text-left transition sm:flex-row sm:items-center ${
+                          isSelected
+                            ? "border-teal shadow-card ring-2 ring-teal/25"
+                            : "border-teal/40 hover:border-teal hover:bg-seafoam/40"
+                        }`}
+                        key={application.id}
                         onClick={() => {
-                          setSelectedId(primaryAcceptedApplication.id);
+                          setSelectedId(application.id);
                           window.requestAnimationFrame(() => {
                             document
                               .getElementById("application-detail-panel")
@@ -7784,300 +8020,476 @@ function ApplicationReviewPage() {
                         }}
                         type="button"
                       >
-                        <ArrowLeft size={16} />
-                        {t("applications.returnToAccepted", {
-                          name: primaryAcceptedApplication.applicant.name,
-                        })}
-                      </button>
-                    ) : null}
-                    <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
-                      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
                         <img
-                          alt={selected.applicant.name}
-                          className="size-20 rounded-full object-cover"
-                          src={selected.applicant.image}
+                          alt=""
+                          className="size-16 rounded-full object-cover"
+                          src={application.applicant.image}
                         />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <h2 className="font-display text-2xl font-bold text-navy">
-                              {selected.applicant.name}
-                            </h2>
-                            <ApplicationStatusBadge status={selected.status} />
-                          </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
-                            <p className="flex items-center gap-1.5">
-                              <MapPin size={14} /> {selected.applicant.location}
-                            </p>
-                            <p className="flex items-center gap-1.5">
-                              <CalendarDays size={14} />{" "}
-                              {t("member.since", { year: selected.applicant.memberSince })}
-                            </p>
-                            <SitterRatingBadge sitterName={selected.applicant.name} />
-                          </div>
-                          <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
-                          <div className="mt-4 flex flex-wrap items-center gap-3">
-                            <Link
-                              className="text-sm font-bold text-teal hover:text-navy"
-                              to={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                            >
-                              {t("reviews.viewProfile")}
-                            </Link>
-                            <UserSafetyActions
-                              image={selected.applicant.image}
-                              name={selected.applicant.name}
-                            />
-                          </div>
-                          <BlockedUserBanner name={selected.applicant.name} />
-                        </div>
-                      </div>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="font-display text-xl font-bold text-navy">
+                              {application.applicant.name}
+                            </span>
+                            <ApplicationStatusBadge status={application.status} />
+                          </span>
+                          <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                            <span className="flex items-center gap-1.5">
+                              <MapPin size={14} /> {application.applicant.location}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Users size={14} /> {t("applications.partySize")}:{" "}
+                              {application.partySize}
+                            </span>
+                            <SitterRatingBadge sitterName={application.applicant.name} />
+                          </span>
+                        </span>
+                        <span className="inline-flex items-center gap-2 text-sm font-bold text-teal">
+                          {isSelected ? (
+                            <>
+                              <Check size={16} />
+                              {t("applications.acceptedViewing")}
+                            </>
+                          ) : (
+                            <>
+                              <ArrowLeft size={16} className="rotate-180" />
+                              {t("applications.acceptedView")}
+                            </>
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
-                      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.experience")}
-                          </p>
-                          <p className="mt-2 font-bold text-navy">
-                            {t("applications.yearsExperience", {
-                              count: selected.applicant.yearsExperience,
-                            })}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.requirementMatch")}
-                          </p>
-                          <p className="mt-2 font-bold text-navy">
-                            {matchTotal
-                              ? t("applications.matchCount", {
-                                  count: matchCount,
-                                  total: matchTotal,
-                                })
-                              : t("applications.noSpecificRequirements")}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.priorSits")}
-                          </p>
-                          <p className="mt-2 font-bold text-navy">
-                            {t("applications.priorSitsCount", {
-                              count: selected.applicant.completedSits,
-                            })}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-cream p-4">
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {t("applications.partySize")}
-                          </p>
-                          <p className="mt-2 flex items-center gap-2 font-bold text-navy">
-                            <Users size={17} /> {selected.partySize}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-6">
-                        <SitterReviewsSection
-                          limit={3}
-                          profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
-                          showEmpty={false}
-                          sitterName={selected.applicant.name}
-                        />
-                      </div>
-
-                      {selected.status === "accepted" && sit && canLeaveReview(sit) && (
-                        <div className="mt-6">
-                          <LeaveReviewForm application={selected} ownerName={user.name} />
-                        </div>
-                      )}
-
-                      {[
-                        {
-                          label: t("applications.certifications"),
-                          values: selected.applicant.certifications,
-                          highlighted: [] as string[],
-                        },
-                        {
-                          label: t("applications.skills"),
-                          values: selected.applicant.skills,
-                          highlighted: requiredSkills,
-                        },
-                        {
-                          label: t("applications.languages"),
-                          values: selected.applicant.languages,
-                          highlighted: user.languages,
-                        },
-                        {
-                          label: t("profile.preferredCountries"),
-                          values: selected.applicant.preferredCountries ?? [],
-                          highlighted: [] as string[],
-                        },
-                      ].map(({ highlighted, label, values }) => (
-                        <div className="mt-5" key={label}>
-                          <p className="text-xs font-bold uppercase tracking-wider text-slate">
-                            {label}
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {values.map((value) => {
-                              const isHighlighted = highlighted.some(
-                                (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
-                              );
-                              return (
-                                <span
-                                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                                    isHighlighted
-                                      ? "border-teal/40 bg-seafoam text-teal"
-                                      : "border-line bg-white text-navy"
-                                  }`}
-                                  key={value}
-                                >
-                                  {isHighlighted && <Check aria-hidden="true" size={13} />}
-                                  {value}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-
-                      <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
-                        <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                          {t("applications.initialMessage")}
-                        </p>
-                        <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
-                          {selected.initialMessage}
-                        </p>
-                      </div>
-
-                      {anotherApplicantAccepted ? (
-                        <div
-                          className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
-                          role="status"
+          <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+            <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
+              <div className="space-y-2 border-b border-line pb-3">
+                <label className="block">
+                  <span className="sr-only">{t("applications.sortLabel")}</span>
+                  <Select
+                    variant="form"
+                    aria-label={t("applications.sortLabel")}
+                    onChange={(event) => setSort(event.target.value as typeof sort)}
+                    value={sort}
+                  >
+                    <option value="newest">{t("applications.sortNewest")}</option>
+                    <option value="experience">{t("applications.sortExperience")}</option>
+                    <option value="skillMatch">{t("applications.sortSkillMatch")}</option>
+                    <option value="priorSits">{t("applications.sortPriorSits")}</option>
+                  </Select>
+                </label>
+                <label className="block">
+                  <span className="sr-only">{t("applications.filterStatusLabel")}</span>
+                  <Select
+                    variant="form"
+                    aria-label={t("applications.filterStatusLabel")}
+                    onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}
+                    value={statusFilter}
+                  >
+                    <option value="all">{t("applications.filterStatusAll")}</option>
+                    {(["new", "shortlisted", "accepted", "declined", "withdrawn"] as const).map(
+                      (status) => (
+                        <option key={status} value={status}>
+                          {t(`applications.status.${status}`)}
+                        </option>
+                      ),
+                    )}
+                  </Select>
+                </label>
+                <label className="block">
+                  <span className="sr-only">{t("applications.filterExperienceLabel")}</span>
+                  <Select
+                    variant="form"
+                    aria-label={t("applications.filterExperienceLabel")}
+                    onChange={(event) =>
+                      setExperienceFilter(event.target.value as typeof experienceFilter)
+                    }
+                    value={experienceFilter}
+                  >
+                    <option value="any">{t("applications.filterExperienceAny")}</option>
+                    <option value="meetsMin">{t("applications.filterExperienceMeetsMin")}</option>
+                    <option value="fivePlus">{t("applications.filterExperienceFivePlus")}</option>
+                    <option value="tenPlus">{t("applications.filterExperienceTenPlus")}</option>
+                  </Select>
+                </label>
+                <p className="px-1 text-xs font-semibold text-slate">
+                  {t("applications.filteredCount", {
+                    count:
+                      statusFilter === "accepted"
+                        ? acceptedApplications.length
+                        : visibleApplications.length,
+                    total: statusFilter === "accepted" ? acceptedApplications.length : filteredTotal,
+                  })}
+                </p>
+              </div>
+              <div className={`mt-2 space-y-1 ${isFetching ? "opacity-70" : ""}`}>
+                {statusFilter === "accepted" ? (
+                  <p className="px-3 py-6 text-center text-sm text-slate">
+                    {acceptedApplications.length
+                      ? t("applications.acceptedListHint")
+                      : t("applications.filterEmpty")}
+                  </p>
+                ) : null}
+                {statusFilter !== "accepted" && visibleApplications.length
+                  ? visibleApplications.map((application) => {
+                      const match = applicationRequirementMatch(application, sit);
+                      return (
+                        <button
+                          className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${
+                            application.id === selected?.id ? "bg-seafoam" : "hover:bg-cream"
+                          }`}
+                          key={application.id}
+                          onClick={() => setSelectedId(application.id)}
+                          type="button"
                         >
-                          <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
-                          <div>
-                            <p className="font-bold">
-                              {t("applications.anotherAcceptedBannerTitle")}
-                            </p>
-                            <p className="mt-1">
-                              {t("applications.anotherAcceptedBanner", {
-                                name: primaryAcceptedApplication.applicant.name,
+                          <img
+                            alt=""
+                            className="size-11 rounded-full object-cover"
+                            src={application.applicant.image}
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate font-bold text-navy">
+                              {application.applicant.name}
+                            </span>
+                            <span className="mt-1 block text-[11px] font-semibold text-slate">
+                              {t("applications.listMeta", {
+                                years: application.applicant.yearsExperience,
+                                matches: match.matchCount,
+                                total: match.matchTotal || 0,
+                                sits: application.applicant.completedSits,
                               })}
-                            </p>
-                          </div>
-                        </div>
-                      ) : null}
-                      {!anotherApplicantAccepted && selected.status === "accepted" ? (
-                        <div className="mt-6">
-                          <button
-                            className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
-                            disabled={statusMutation.isPending}
-                            onClick={() => {
-                              setSharePhone(false);
-                              setConfirmingStatus("unaccept");
-                            }}
-                            type="button"
-                          >
-                            {t("applications.action.unaccept")}
-                          </button>
-                        </div>
-                      ) : null}
-                      {!anotherApplicantAccepted && selected.status !== "accepted" ? (
-                        <div className="mt-6 flex flex-wrap gap-2">
-                          <label
-                            className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
-                              selected.status === "shortlisted"
-                                ? "border-amber-400 bg-amber-100 text-amber-900"
-                                : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                            }`}
-                          >
-                            <input
-                              checked={selected.status === "shortlisted"}
-                              className="size-4 accent-amber-600"
-                              disabled={statusMutation.isPending}
-                              onChange={(event) =>
-                                statusMutation.mutate({
-                                  id: selected.id,
-                                  status: event.target.checked ? "shortlisted" : "new",
-                                })
-                              }
-                              type="checkbox"
-                            />
-                            {t("applications.action.shortlisted")}
-                          </label>
-                          {(["accepted", "declined"] as const).map((status) => (
-                            <button
-                              className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
-                                selected.status === status
-                                  ? "ring-2 ring-current/25 ring-offset-2"
-                                  : ""
-                              }`}
-                              disabled={statusMutation.isPending}
-                              key={status}
-                              onClick={() => {
-                                setSharePhone(false);
-                                setConfirmingStatus(status);
-                              }}
-                              type="button"
-                            >
-                              {t(`applications.action.${status}`)}
-                            </button>
-                          ))}
-                        </div>
-                      ) : null}
-                    </section>
+                            </span>
+                            <span className="mt-1 block">
+                              <ApplicationStatusBadge status={application.status} />
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })
+                  : null}
+                {statusFilter !== "accepted" && !visibleApplications.length ? (
+                  <p className="px-3 py-6 text-center text-sm text-slate">
+                    {t("applications.filterEmpty")}
+                  </p>
+                ) : null}
+              </div>
+              {statusFilter !== "accepted" ? (
+                <ResultsPagination
+                  className="mt-3 flex flex-col items-stretch gap-3 border-t border-line pt-3"
+                  currentPage={currentListPage}
+                  onPageChange={setListPage}
+                  pageSize={APPLICATIONS_PAGE_SIZE}
+                  totalItems={filteredTotal}
+                />
+              ) : null}
+            </aside>
 
-                    <ConversationPanel
-                      application={selected}
-                      currentUser={user.name}
-                      onRequestVideoCall={(proposal) =>
-                        videoCallMutation.mutate({ id: selected.id, proposal })
-                      }
-                      onRespondToVideoCall={({ action, messageId, proposal }) => {
-                        if (action === "accept") {
-                          videoCallAcceptMutation.mutate({ id: selected.id, messageId });
-                          return;
-                        }
-                        if (action === "decline") {
-                          videoCallDeclineMutation.mutate({ id: selected.id, messageId });
-                          return;
-                        }
-                        if (proposal) {
-                          videoCallMutation.mutate({
-                            id: selected.id,
-                            proposal,
-                            counter: true,
-                          });
-                        }
-                      }}
-                      onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
-                      onSharePhone={(phoneNumber) =>
-                        sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
-                      }
-                      pending={
-                        messageMutation.isPending ||
-                        videoCallMutation.isPending ||
-                        videoCallAcceptMutation.isPending ||
-                        videoCallDeclineMutation.isPending ||
-                        sharePhoneMutation.isPending
-                      }
-                      translationLanguage={user.preferredLanguage}
+            {selected ? (
+              <div className="space-y-6" id="application-detail-panel">
+                {selected.status !== "accepted" && primaryAcceptedApplication ? (
+                  <button
+                    className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-seafoam px-4 py-2 text-sm font-bold text-teal transition hover:border-teal hover:bg-white"
+                    onClick={() => {
+                      setSelectedId(primaryAcceptedApplication.id);
+                      window.requestAnimationFrame(() => {
+                        document
+                          .getElementById("application-detail-panel")
+                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      });
+                    }}
+                    type="button"
+                  >
+                    <ArrowLeft size={16} />
+                    {t("applications.returnToAccepted", {
+                      name: primaryAcceptedApplication.applicant.name,
+                    })}
+                  </button>
+                ) : null}
+                <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                    <img
+                      alt={selected.applicant.name}
+                      className="size-20 rounded-full object-cover"
+                      src={selected.applicant.image}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="font-display text-2xl font-bold text-navy">
+                          {selected.applicant.name}
+                        </h2>
+                        <ApplicationStatusBadge status={selected.status} />
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
+                        <p className="flex items-center gap-1.5">
+                          <MapPin size={14} /> {selected.applicant.location}
+                        </p>
+                        <p className="flex items-center gap-1.5">
+                          <CalendarDays size={14} />{" "}
+                          {t("member.since", { year: selected.applicant.memberSince })}
+                        </p>
+                        <SitterRatingBadge sitterName={selected.applicant.name} />
+                      </div>
+                      <p className="mt-3 leading-7 text-slate">{selected.applicant.bio}</p>
+                      <div className="mt-4 flex flex-wrap items-center gap-3">
+                        <Link
+                          className="text-sm font-bold text-teal hover:text-navy"
+                          to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                        >
+                          {t("reviews.viewProfile")}
+                        </Link>
+                        <UserSafetyActions
+                          image={selected.applicant.image}
+                          name={selected.applicant.name}
+                        />
+                      </div>
+                      <BlockedUserBanner name={selected.applicant.name} />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.experience")}
+                      </p>
+                      <p className="mt-2 font-bold text-navy">
+                        {t("applications.yearsExperience", {
+                          count: selected.applicant.yearsExperience,
+                        })}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.requirementMatch")}
+                      </p>
+                      <p className="mt-2 font-bold text-navy">
+                        {matchTotal
+                          ? t("applications.matchCount", { count: matchCount, total: matchTotal })
+                          : t("applications.noSpecificRequirements")}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.priorSits")}
+                      </p>
+                      <p className="mt-2 font-bold text-navy">
+                        {t("applications.priorSitsCount", {
+                          count: selected.applicant.completedSits,
+                        })}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-cream p-4">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {t("applications.partySize")}
+                      </p>
+                      <p className="mt-2 flex items-center gap-2 font-bold text-navy">
+                        <Users size={17} /> {selected.partySize}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <SitterReviewsSection
+                      limit={3}
+                      profilePath={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                      showEmpty={false}
+                      sitterName={selected.applicant.name}
                     />
                   </div>
-                ) : (
-                  <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
-                    <MessageCircle className="mx-auto text-teal" size={38} />
-                    <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
+
+                  {selected.status === "accepted" && sit && canLeaveReview(sit) && (
+                    <div className="mt-6">
+                      <LeaveReviewForm application={selected} ownerName={user.name} />
+                    </div>
+                  )}
+
+                  {[
+                    {
+                      label: t("applications.certifications"),
+                      values: selected.applicant.certifications,
+                      highlighted: [] as string[],
+                    },
+                    {
+                      label: t("applications.skills"),
+                      values: selected.applicant.skills,
+                      highlighted: requiredSkills,
+                    },
+                    {
+                      label: t("applications.languages"),
+                      values: selected.applicant.languages,
+                      highlighted: user.languages,
+                    },
+                    {
+                      label: t("profile.preferredCountries"),
+                      values: selected.applicant.preferredCountries ?? [],
+                      highlighted: [] as string[],
+                    },
+                  ].map(({ highlighted, label, values }) => (
+                    <div className="mt-5" key={label}>
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate">
+                        {label}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {values.map((value) => {
+                          const isHighlighted = highlighted.some(
+                            (item) => item.toLocaleLowerCase() === value.toLocaleLowerCase(),
+                          );
+                          return (
+                            <span
+                              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                                isHighlighted
+                                  ? "border-teal/40 bg-seafoam text-teal"
+                                  : "border-line bg-white text-navy"
+                              }`}
+                              key={value}
+                            >
+                              {isHighlighted && <Check aria-hidden="true" size={13} />}
+                              {value}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="mt-6 rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
+                    <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                      {t("applications.initialMessage")}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap leading-7 text-navy">
+                      {selected.initialMessage}
+                    </p>
                   </div>
-                )}
+
+                  {anotherApplicantAccepted ? (
+                    <div
+                      className="mt-6 flex gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950"
+                      role="status"
+                    >
+                      <TriangleAlert className="mt-0.5 shrink-0 text-amber-700" size={20} />
+                      <div>
+                        <p className="font-bold">{t("applications.anotherAcceptedBannerTitle")}</p>
+                        <p className="mt-1">
+                          {t("applications.anotherAcceptedBanner", {
+                            name: primaryAcceptedApplication.applicant.name,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+                  {!anotherApplicantAccepted && selected.status === "accepted" ? (
+                    <div className="mt-6">
+                      <button
+                        className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
+                        disabled={statusMutation.isPending}
+                        onClick={() => {
+                          setSharePhone(false);
+                          setConfirmingStatus("unaccept");
+                        }}
+                        type="button"
+                      >
+                        {t("applications.action.unaccept")}
+                      </button>
+                    </div>
+                  ) : null}
+                  {!anotherApplicantAccepted && selected.status !== "accepted" ? (
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <label
+                        className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${
+                          selected.status === "shortlisted"
+                            ? "border-amber-400 bg-amber-100 text-amber-900"
+                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                        }`}
+                      >
+                        <input
+                          checked={selected.status === "shortlisted"}
+                          className="size-4 accent-amber-600"
+                          disabled={statusMutation.isPending}
+                          onChange={(event) =>
+                            statusMutation.mutate({
+                              id: selected.id,
+                              status: event.target.checked ? "shortlisted" : "new",
+                            })
+                          }
+                          type="checkbox"
+                        />
+                        {t("applications.action.shortlisted")}
+                      </label>
+                      {(["accepted", "declined"] as const).map((status) => (
+                        <button
+                          className={`rounded-xl border px-4 py-2.5 text-sm font-bold transition ${actionClasses[status]} ${
+                            selected.status === status ? "ring-2 ring-current/25 ring-offset-2" : ""
+                          }`}
+                          disabled={statusMutation.isPending}
+                          key={status}
+                          onClick={() => {
+                            setSharePhone(false);
+                            setConfirmingStatus(status);
+                          }}
+                          type="button"
+                        >
+                          {t(`applications.action.${status}`)}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </section>
+
+                <ConversationPanel
+                  application={selected}
+                  currentUser={user.name}
+                  onRequestVideoCall={(proposal) =>
+                    videoCallMutation.mutate({ id: selected.id, proposal })
+                  }
+                  onRespondToVideoCall={({ action, messageId, proposal }) => {
+                    if (action === "accept") {
+                      videoCallAcceptMutation.mutate({ id: selected.id, messageId });
+                      return;
+                    }
+                    if (action === "decline") {
+                      videoCallDeclineMutation.mutate({ id: selected.id, messageId });
+                      return;
+                    }
+                    if (proposal) {
+                      videoCallMutation.mutate({
+                        id: selected.id,
+                        proposal,
+                        counter: true,
+                      });
+                    }
+                  }}
+                  onSend={async (text) => {
+                    await messageMutation.mutateAsync({ id: selected.id, text });
+                  }}
+                  onSharePhone={(phoneNumber) =>
+                    sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
+                  }
+                  pending={
+                    messageMutation.isPending ||
+                    videoCallMutation.isPending ||
+                    videoCallAcceptMutation.isPending ||
+                    videoCallDeclineMutation.isPending ||
+                    sharePhoneMutation.isPending
+                  }
+                  translationLanguage={user.preferredLanguage}
+                />
               </div>
-            </div>
-          ) : null}
-          {!applications.length ? (
-            <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
-              <MessageCircle className="mx-auto text-teal" size={38} />
-              <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
-            </div>
-          ) : null}
+            ) : (
+              <div className="rounded-2xl border border-dashed border-line bg-white py-16 text-center">
+                <MessageCircle className="mx-auto text-teal" size={38} />
+                <p className="mt-4 font-bold text-navy">{t("applications.filterEmpty")}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+      {!sitTotal ? (
+        <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
+          <MessageCircle className="mx-auto text-teal" size={38} />
+          <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
+        </div>
+      ) : null}
         </>
       ) : null}
       {confirmingStatus && selected && (
@@ -8301,7 +8713,10 @@ function MessagesPage() {
   const messageMutation = useMutation({
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       sendApplicationMessage(id, user!.name, text),
-    onSuccess: async () => {
+    onSuccess: async (updated) => {
+      queryClient.setQueriesData({ queryKey: ["applications"] }, (old) =>
+        patchApplicationInQueriesCache(old, updated),
+      );
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
     },
   });
@@ -8468,7 +8883,8 @@ function MessagesPage() {
                   const otherImage =
                     selected.ownerName === user.name
                       ? selected.applicant.image
-                      : `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(otherName)}`;
+                      : selected.ownerImage ||
+                        `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(otherName)}`;
                   const otherProfilePath =
                     selected.ownerName === user.name
                       ? `/members/${encodeURIComponent(selected.applicant.name)}`
@@ -8514,6 +8930,11 @@ function MessagesPage() {
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                           <ApplicationStatusBadge status={selected.status} />
+                          {selected.status === "accepted" &&
+                            selectedSit &&
+                            resolveSitPhase(selectedSit) === "stayUnderway" && (
+                              <SitEmergencyHelp />
+                            )}
                           <IconTooltip
                             label={isArchived ? t("messages.unarchive") : t("messages.archive")}
                           >
@@ -8570,7 +8991,9 @@ function MessagesPage() {
                       });
                     }
                   }}
-                  onSend={(text) => messageMutation.mutate({ id: selected.id, text })}
+                  onSend={async (text) => {
+                    await messageMutation.mutateAsync({ id: selected.id, text });
+                  }}
                   onSharePhone={(phoneNumber) =>
                     sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
                   }
@@ -8660,7 +9083,7 @@ export default function App() {
         <Route path="/boats/:id" element={<DetailPage />} />
         <Route path="/my-boats" element={<OwnerBoatsPage />} />
         <Route path="/my-sits" element={<OwnerBoatsPage />} />
-        <Route path="/owner/boats" element={<Navigate replace to="/my-sits" />} />
+        <Route path="/owner/boats" element={<Navigate replace to="/my-boats" />} />
         <Route path="/owner/boats/new" element={<VesselEditorPage mode="new" />} />
         <Route path="/owner/boats/:boatId/edit" element={<VesselEditorPage mode="edit" />} />
         <Route path="/owner/sits/new" element={<SitEditorPage mode="new" />} />

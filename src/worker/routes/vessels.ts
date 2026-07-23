@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import { isValidYearBuilt, maxYearBuilt, MIN_YEAR_BUILT } from "../../shared/yearBuilt";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { sits, vessels } from "../db/schema";
@@ -33,6 +34,14 @@ const vesselSchema = z.object({
   name: z.string().min(1),
   type: z.string().min(1),
   length: z.string().min(1),
+  yearBuilt: z
+    .number()
+    .int()
+    .nullable()
+    .optional()
+    .refine((value) => value == null || isValidYearBuilt(value), {
+      message: `yearBuilt must be null or between ${MIN_YEAR_BUILT} and ${maxYearBuilt()}`,
+    }),
   homePort: z.string().min(1),
   image: z.string().min(1),
   gallery: z.array(z.string()).default([]),
@@ -114,6 +123,7 @@ vesselsRouter.put("/:id", requireUser, zValidator("json", vesselSchema), async (
     name: body.name,
     type: body.type,
     length: body.length,
+    yearBuilt: body.yearBuilt ?? null,
     homePort: body.homePort,
     image: body.image,
     gallery: body.gallery,

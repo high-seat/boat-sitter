@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Ellipsis, Flag, Languages, Phone, Send, Video, X } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { Ellipsis, Flag, Languages, LoaderCircle, Phone, Send, Video, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getIntlLocale } from "@/i18n";
 import { type ApplicationMessage, type SitApplication } from "@/mockApi";
@@ -17,6 +17,19 @@ import {
 } from "@/components/applications/formatApplicationSystemMessage";
 import { VideoCallCalendarLinks } from "@/components/applications/VideoCallCalendarLinks";
 
+function isOptimisticMessageSynced(
+  optimistic: ApplicationMessage,
+  messages: ApplicationMessage[],
+) {
+  return messages.some(
+    (message) =>
+      !message.pending &&
+      message.senderName === optimistic.senderName &&
+      message.text === optimistic.text &&
+      message.createdAt >= optimistic.createdAt,
+  );
+}
+
 export function ConversationPanel({
   application,
   currentUser,
@@ -29,7 +42,7 @@ export function ConversationPanel({
 }: {
   application: SitApplication;
   currentUser: string;
-  onSend: (message: string) => void;
+  onSend: (message: string) => void | Promise<unknown>;
   onRequestVideoCall: (proposal: VideoCallScheduleValues) => void;
   onRespondToVideoCall: (input: {
     action: "accept" | "decline" | "counter";
@@ -43,6 +56,7 @@ export function ConversationPanel({
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
   const [reply, setReply] = useState("");
+  const [optimisticMessages, setOptimisticMessages] = useState<ApplicationMessage[]>([]);
   const [typingUser, setTypingUser] = useState("");
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [translationPending, setTranslationPending] = useState<Record<string, boolean>>({});
@@ -56,16 +70,48 @@ export function ConversationPanel({
   const channelRef = useRef<BroadcastChannel | null>(null);
   const localTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const remoteTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const lastMessageKey =
+    optimisticMessages.at(-1)?.id ?? application.messages.at(-1)?.id ?? "";
 
   useEffect(() => {
     setReply("");
     setOpenMenuId(null);
+    setOptimisticMessages([]);
   }, [application.id]);
   useEffect(() => {
     setTranslations({});
     setTranslationPending({});
     setTranslationErrors({});
   }, [application.id, i18n.resolvedLanguage]);
+  useEffect(() => {
+    setOptimisticMessages((current) => {
+      if (!current.length) return current;
+      return current.filter(
+        (optimistic) => !isOptimisticMessageSynced(optimistic, application.messages),
+      );
+    });
+  }, [application.messages]);
+  useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const scrollToLatest = () => {
+      container.scrollTop = container.scrollHeight;
+    };
+
+    scrollToLatest();
+    const frame = requestAnimationFrame(scrollToLatest);
+    const timeout = window.setTimeout(scrollToLatest, 0);
+    const observer = new ResizeObserver(scrollToLatest);
+    observer.observe(container);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+      observer.disconnect();
+    };
+  }, [application.id, lastMessageKey, typingUser]);
   useEffect(() => {
     if (!("BroadcastChannel" in window)) return;
     const channel = new BroadcastChannel("boatstead-chat-typing");
@@ -152,6 +198,54 @@ export function ConversationPanel({
     ? `${user.phoneCountryCode} ${user.phoneNumber.trim()}`
     : "";
   const latestPendingProposal = getLatestPendingVideoCallProposal(application.messages);
+  const visibleOptimistic = optimisticMessages.filter(
+    (optimistic) => !isOptimisticMessageSynced(optimistic, application.messages),
+  );
+  const threadMessages = [...application.messages, ...visibleOptimistic];
+  const hasOptimisticSend = visibleOptimistic.some((message) => message.pending);
+
+  async function submitReply() {
+    const text = reply.trim();
+    if (!text || pending || hasOptimisticSend) return;
+    const optimisticId = `optimistic-${crypto.randomUUID()}`;
+    const optimistic: ApplicationMessage = {
+      id: optimisticId,
+      senderName: currentUser,
+      text,
+      createdAt: new Date().toISOString(),
+      kind: "user",
+      pending: true,
+    };
+    setOptimisticMessages((current) => [...current, optimistic]);
+    setReply("");
+    publishTyping(false);
+    try {
+      await Promise.resolve(onSend(text));
+    } catch {
+      setOptimisticMessages((current) => current.filter((message) => message.id !== optimisticId));
+      setReply(text);
+    }
+  }
+
+  function handleReplyKeyDown(event: ReactKeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter" || event.nativeEvent.isComposing) return;
+    if (event.metaKey || event.ctrlKey) {
+      event.preventDefault();
+      const field = event.currentTarget;
+      const start = field.selectionStart;
+      const end = field.selectionEnd;
+      const next = `${reply.slice(0, start)}\n${reply.slice(end)}`;
+      updateReply(next);
+      const cursor = start + 1;
+      queueMicrotask(() => {
+        field.setSelectionRange(cursor, cursor);
+      });
+      return;
+    }
+    if (event.shiftKey) return;
+    event.preventDefault();
+    void submitReply();
+  }
 
   function formatVideoCallDetails(message: ApplicationMessage) {
     if (!message.videoCall) return null;
@@ -162,6 +256,13 @@ export function ConversationPanel({
       }),
     });
   }
+
+  const newlineShortcut =
+    typeof navigator !== "undefined" &&
+    (/Mac|iPhone|iPad|iPod/i.test(navigator.platform) ||
+      /Mac OS/i.test(navigator.userAgent))
+      ? "⌘ Enter"
+      : "Ctrl+Enter";
 
   return (
     <section className="min-w-0 overflow-hidden rounded-2xl border border-line bg-white">
@@ -184,16 +285,25 @@ export function ConversationPanel({
           </a>
         </div>
       )}
-      <div className="max-h-96 space-y-4 overflow-y-auto p-5">
-        {application.messages.map((message) => {
+      <div
+        className="max-h-96 space-y-4 overflow-y-auto p-5"
+        data-testid="conversation-messages"
+        ref={messagesContainerRef}
+      >
+        {threadMessages.map((message) => {
           if (message.kind === "system") {
             if (message.systemKind === "phoneShared" && message.sharedPhone) {
+              const mine = message.senderName === currentUser;
               return (
-                <div className="flex justify-center" key={message.id}>
-                  <div className="flex max-w-[90%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
+                <div
+                  className={`flex ${mine ? "justify-end" : "justify-start"}`}
+                  key={message.id}
+                >
+                  <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Phone aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
-                      <p className="font-bold text-navy">
+                      <p className="text-xs font-bold text-teal">{message.senderName}</p>
+                      <p className="mt-1 font-bold text-navy">
                         {t("applications.systemMessage.phoneSharedTitle")}
                       </p>
                       <p className="mt-1 text-slate">
@@ -257,17 +367,22 @@ export function ConversationPanel({
                 titleKey = "applications.systemMessage.videoCallAcceptedTitle";
               }
               const details = formatVideoCallDetails(message);
+              const mine = message.senderName === currentUser;
               const canRespond =
                 latestPendingProposal?.id === message.id &&
-                message.senderName !== currentUser &&
+                !mine &&
                 (message.systemKind === "videoCallRequest" ||
                   message.systemKind === "videoCallCounter");
               return (
-                <div className="flex justify-center" key={message.id}>
-                  <div className="flex max-w-[90%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
+                <div
+                  className={`flex ${mine ? "justify-end" : "justify-start"}`}
+                  key={message.id}
+                >
+                  <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Video aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
-                      <p className="font-bold text-navy">{t(titleKey)}</p>
+                      <p className="text-xs font-bold text-teal">{message.senderName}</p>
+                      <p className="mt-1 font-bold text-navy">{t(titleKey)}</p>
                       <p className="mt-1 text-slate">
                         {formatApplicationSystemMessage(t, message, application, currentUser)}
                       </p>
@@ -349,8 +464,19 @@ export function ConversationPanel({
 
           const mine = message.senderName === currentUser;
           return (
-            <div className={`flex ${mine ? "justify-end" : "justify-start"}`} key={message.id}>
+            <div
+              className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}
+              key={message.id}
+            >
+              {message.pending ? (
+                <LoaderCircle
+                  aria-label={t("applications.sending")}
+                  className="mb-3 shrink-0 animate-spin text-teal"
+                  size={16}
+                />
+              ) : null}
               <div
+                aria-busy={message.pending || undefined}
                 className={`relative max-w-[85%] rounded-2xl px-4 py-3 ${
                   mine ? "bg-navy text-white" : "bg-cream text-navy"
                 }`}
@@ -412,6 +538,7 @@ export function ConversationPanel({
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
       <div className="min-h-8 px-5 pb-3" aria-live="polite">
         {typingUser && (
@@ -432,23 +559,27 @@ export function ConversationPanel({
             className="form-input min-h-24 resize-y"
             onBlur={() => publishTyping(false)}
             onChange={(event) => updateReply(event.target.value)}
+            onKeyDown={handleReplyKeyDown}
             placeholder={t("applications.replyPlaceholder")}
             value={reply}
           />
         </label>
+        <p className="mt-2 text-xs text-slate">
+          {t("applications.replyHint", { shortcut: newlineShortcut })}
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             className="flex items-center gap-2 rounded-xl bg-coral px-5 py-3 text-sm font-bold text-white disabled:opacity-50"
-            disabled={pending || !reply.trim()}
+            disabled={pending || hasOptimisticSend || !reply.trim()}
             onClick={() => {
-              publishTyping(false);
-              onSend(reply.trim());
-              setReply("");
+              void submitReply();
             }}
             type="button"
           >
             <Send size={16} />
-            {pending ? t("applications.sending") : t("applications.sendReply")}
+            {pending || hasOptimisticSend
+              ? t("applications.sending")
+              : t("applications.sendReply")}
           </button>
           <button
             className="flex items-center gap-2 rounded-xl border border-teal/40 bg-seafoam px-5 py-3 text-sm font-bold text-teal hover:border-teal disabled:opacity-50"

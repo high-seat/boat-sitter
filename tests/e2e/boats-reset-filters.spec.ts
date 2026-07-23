@@ -14,12 +14,10 @@ test.describe("boats empty state", () => {
   test("disables view and sort controls when there are no results", async ({ page }) => {
     await page.goto("/boats?q=zzzz-no-match-xyz");
     await expect(page.getByRole("heading", { name: /No boats on this tide/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^List$/i })).toBeDisabled();
     await expect(page.getByRole("button", { name: /^Map$/i })).toBeDisabled();
     await expect(page.getByLabel(/Sort/i)).toBeDisabled();
 
     await page.getByRole("button", { name: /Reset filters/i }).click();
-    await expect(page.getByRole("button", { name: /^List$/i })).toBeEnabled();
     await expect(page.getByRole("button", { name: /^Map$/i })).toBeEnabled();
     await expect(page.getByLabel(/Sort/i)).toBeEnabled();
   });

@@ -19,6 +19,7 @@ export const seedVessels: NewVessel[] = [
     name: "Solstice",
     type: "Sailing yacht",
     length: "42 ft",
+    yearBuilt: 2008,
     homePort: "Lefkada, Greece",
     image:
       "https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&w=1400&q=85",
@@ -60,6 +61,7 @@ export const seedVessels: NewVessel[] = [
     name: "Blue Hour",
     type: "Catamaran",
     length: "46 ft",
+    yearBuilt: 2015,
     homePort: "St. George's, Grenada",
     image:
       "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=1400&q=85",
@@ -90,6 +92,7 @@ export const seedVessels: NewVessel[] = [
     name: "Northern Light",
     type: "Motor yacht",
     length: "38 ft",
+    yearBuilt: 1998,
     homePort: "Bergen, Norway",
     image:
       "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85",
@@ -114,6 +117,7 @@ export const seedVessels: NewVessel[] = [
     name: "Kingfisher",
     type: "Sailing yacht",
     length: "36 ft",
+    yearBuilt: 2012,
     homePort: "Whangarei, New Zealand",
     image:
       "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1400&q=85",
@@ -136,6 +140,7 @@ export const seedVessels: NewVessel[] = [
     name: "Saltwood",
     type: "Sailing yacht",
     length: "31 ft",
+    yearBuilt: 2004,
     homePort: "Falmouth, United Kingdom",
     image:
       "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1400&q=85",
@@ -158,6 +163,7 @@ export const seedVessels: NewVessel[] = [
     name: "Sea Glass",
     type: "Motor yacht",
     length: "34 ft",
+    yearBuilt: 2019,
     homePort: "Sausalito, United States",
     image:
       "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1400&q=85",

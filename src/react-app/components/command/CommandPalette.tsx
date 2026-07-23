@@ -296,7 +296,7 @@ export function CommandPalette() {
             }
           >
             <CalendarPlus className="size-4" />
-            Create random stay
+            Create random sit
           </CommandItem>,
         );
       }
@@ -660,6 +660,16 @@ export function CommandPalette() {
                 >
                   <RotateCcw className="size-4" />
                   Refresh all queries
+                </CommandItem>
+                <CommandItem
+                  onSelect={() =>
+                    run(() => {
+                      queryClient.clear();
+                    })
+                  }
+                >
+                  <Eraser className="size-4" />
+                  Clear all React Query caches
                 </CommandItem>
               </CommandGroup>
             </>

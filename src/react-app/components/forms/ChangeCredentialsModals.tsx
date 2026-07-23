@@ -49,15 +49,12 @@ export function ChangeEmailModal({
     >
       <p className="text-sm leading-6 text-slate">{t("settings.changeEmailHint")}</p>
       <form className="mt-8 space-y-4" onSubmit={(event) => void submit(event)}>
-        <label className="block">
+        <div>
           <span className="form-label">{t("settings.currentEmail")}</span>
-          <input
-            className="form-input bg-cream/80 text-slate"
-            readOnly
-            type="email"
-            value={currentEmail}
-          />
-        </label>
+          <p className="mt-1 wrap-break-word text-base font-semibold text-navy">
+            {currentEmail}
+          </p>
+        </div>
         <label className="block">
           <span className="form-label">{t("settings.newEmail")}</span>
           <input

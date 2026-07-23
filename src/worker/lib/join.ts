@@ -11,6 +11,7 @@ export interface Boat {
   name: string;
   type: string;
   length: string;
+  yearBuilt: number | null;
   location: string;
   country: string;
   latitude: number | null;
@@ -51,6 +52,7 @@ export function joinBoat(vessel: Vessel, sit: Sit): Boat {
     name: vessel.name,
     type: vessel.type,
     length: vessel.length,
+    yearBuilt: vessel.yearBuilt ?? null,
     location: sit.location,
     country: sit.country,
     latitude: sit.latitude,

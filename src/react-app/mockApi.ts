@@ -40,6 +40,15 @@ import {
   hasApiSession,
 } from "@/apiRemote";
 import { ApiError } from "@/apiClient";
+import {
+  APPLICATIONS_PAGE_SIZE,
+  paginateApplicationList,
+  parseApplicationExperienceFilter,
+  parseApplicationListSort,
+  parseApplicationStatusFilter,
+  prepareApplicationReviewLists,
+  type ApplicationsListParams,
+} from "../shared/applicationsSearch";
 import { paginateBoats, type BoatSearchParams } from "../shared/boatsSearch";
 
 export type { SitPhase };
@@ -97,6 +106,8 @@ export type Boat = {
   name: string;
   type: string;
   length: string;
+  /** Year of manufacture; null when unknown. */
+  yearBuilt?: number | null;
   location: string;
   country: string;
   latitude: number;
@@ -157,6 +168,7 @@ export type Vessel = Pick<
   | "name"
   | "type"
   | "length"
+  | "yearBuilt"
   | "homePort"
   | "image"
   | "gallery"
@@ -397,6 +409,7 @@ const boats: Boat[] = [
     name: "Solstice",
     type: "Sailing yacht",
     length: feetToMetresString(42),
+    yearBuilt: 2008,
     location: "Lefkada, Greece",
     country: "Greece",
     latitude: 38.7066,
@@ -452,6 +465,7 @@ const boats: Boat[] = [
     name: "Blue Hour",
     type: "Catamaran",
     length: feetToMetresString(46),
+    yearBuilt: 2015,
     location: "St. George’s, Grenada",
     country: "Grenada",
     latitude: 12.0561,
@@ -500,6 +514,7 @@ const boats: Boat[] = [
     name: "Mistral",
     type: "Motor yacht",
     length: feetToMetresString(55),
+    yearBuilt: 1998,
     location: "Palma, Mallorca",
     country: "Spain",
     latitude: 39.5696,
@@ -550,6 +565,7 @@ const boats: Boat[] = [
     name: "Little Wren",
     type: "Narrowboat",
     length: feetToMetresString(58),
+    yearBuilt: 2012,
     location: "Bath, England",
     country: "United Kingdom",
     latitude: 51.3811,
@@ -588,6 +604,7 @@ const boats: Boat[] = [
     name: "North Star",
     type: "Trawler",
     length: feetToMetresString(48),
+    yearBuilt: 2004,
     location: "Vancouver, Canada",
     country: "Canada",
     latitude: 49.2827,
@@ -637,6 +654,7 @@ const boats: Boat[] = [
     name: "Sea Glass",
     type: "Houseboat",
     length: feetToMetresString(62),
+    yearBuilt: 2019,
     location: "Sausalito, California",
     country: "United States",
     latitude: 37.8591,
@@ -827,6 +845,7 @@ const generatedBoats: Boat[] = Array.from({ length: 50 }, (_, index) => {
     name,
     type,
     length: feetToMetresString(30 + ((index * 3) % 35)),
+    yearBuilt: 1990 + ((index * 7) % 35),
     location: `${location}, ${country}`,
     country,
     latitude,
@@ -932,6 +951,7 @@ const toVessel = (boat: Boat): Vessel => ({
   name: boat.name,
   type: boat.type,
   length: normalizeLengthToMetres(boat.length),
+  yearBuilt: boat.yearBuilt ?? null,
   homePort: boat.homePort ?? formatHomePort(boat.location, boat.country),
   image: boat.image,
   gallery: normalizeGallery(boat.gallery),
@@ -1107,6 +1127,7 @@ function readVessels(): Vessel[] {
         return withDemoGallery({
           ...vessel,
           length: normalizeLengthToMetres(vessel.length),
+          yearBuilt: vessel.yearBuilt ?? null,
           image: ensureVesselCover(vessel),
           gallery: normalizeGallery(vessel.gallery).map((photo) => ({
             ...photo,
@@ -1239,7 +1260,7 @@ function fromApiSit(sit: Awaited<ReturnType<typeof apiGetSits>>[number]): Sit {
 }
 
 function fromApiApplication(
-  application: Awaited<ReturnType<typeof apiGetApplicationsForSit>>[number],
+  application: Awaited<ReturnType<typeof apiGetApplicationsForUser>>[number],
 ): SitApplication {
   return application as SitApplication;
 }
@@ -1414,6 +1435,7 @@ export async function saveVessel(vessel: Vessel): Promise<Vessel> {
   const normalized: Vessel = {
     ...vessel,
     length: vessel.length ? normalizeLengthToMetres(vessel.length) : "",
+    yearBuilt: vessel.yearBuilt ?? null,
     gallery: normalizeGallery(vessel.gallery),
     ...(privateAccess ? { privateAccess } : { privateAccess: undefined }),
   };
@@ -1521,6 +1543,7 @@ export async function updateOwnerOnVessels(
     readApplications().map((application) => ({
       ...application,
       ownerName: application.ownerName === previousName ? owner.name : application.ownerName,
+      ownerImage: application.ownerName === previousName ? owner.image : application.ownerImage,
       applicant:
         application.applicant.name === previousName
           ? {
@@ -1622,6 +1645,7 @@ export async function createDevRandomVessel(owner: {
     name,
     type,
     length: feetToMetresString(28 + Math.floor(Math.random() * 40)),
+    yearBuilt: 1990 + Math.floor(Math.random() * 35),
     homePort: `${location}, ${country}`,
     image: uniqueCoverForVesselId(id),
     gallery: [{ url: secondaryGalleryForVesselId(id) }],
@@ -1815,6 +1839,8 @@ export type ApplicationMessage = {
   };
   /** Profile phone shared into the thread (E.164-ish display string). */
   sharedPhone?: string;
+  /** Client-only: message is shown optimistically while the send request is in flight. */
+  pending?: boolean;
 };
 
 export type SitApplication = {
@@ -1822,6 +1848,8 @@ export type SitApplication = {
   sitId: string;
   boatName: string;
   ownerName: string;
+  /** Profile photo for the boat owner; used when the sitter views the thread. */
+  ownerImage?: string;
   applicant: ApplicationApplicant;
   partySize: number;
   initialMessage: string;
@@ -1837,6 +1865,7 @@ const seededApplications: SitApplication[] = [
     sitId: "solstice",
     boatName: "Solstice",
     ownerName: "Maya & Finn",
+    ownerImage: "https://i.pravatar.cc/160?img=47",
     applicant: {
       name: "Alex Morgan",
       image: "https://i.pravatar.cc/160?img=11",
@@ -1889,6 +1918,7 @@ const seededApplications: SitApplication[] = [
     sitId: "solstice",
     boatName: "Solstice",
     ownerName: "Maya & Finn",
+    ownerImage: "https://i.pravatar.cc/160?img=47",
     applicant: {
       name: "Samira Costa",
       image: "https://i.pravatar.cc/160?img=45",
@@ -1921,6 +1951,7 @@ const seededApplications: SitApplication[] = [
     sitId: "solstice",
     boatName: "Solstice",
     ownerName: "Maya & Finn",
+    ownerImage: "https://i.pravatar.cc/160?img=47",
     applicant: {
       name: "Theo Janssen",
       image: "https://i.pravatar.cc/160?img=15",
@@ -1953,6 +1984,7 @@ const seededApplications: SitApplication[] = [
     sitId: "blue-hour",
     boatName: "Blue Hour",
     ownerName: "Jonas",
+    ownerImage: "https://i.pravatar.cc/160?img=12",
     applicant: {
       name: "Alex Morgan",
       image: "https://i.pravatar.cc/160?img=11",
@@ -1984,6 +2016,7 @@ const seededApplications: SitApplication[] = [
     sitId: "mistral",
     boatName: "Mistral",
     ownerName: "Elena",
+    ownerImage: "https://i.pravatar.cc/160?img=32",
     applicant: {
       name: "Samira Costa",
       image: "https://i.pravatar.cc/160?img=45",
@@ -2017,6 +2050,7 @@ const seededApplications: SitApplication[] = [
       sitId: `generated-sit-${sitNumber}`,
       boatName: `Generated ${sitNumber}`,
       ownerName: "Generated Owner",
+      ownerImage: "https://i.pravatar.cc/160?img=5",
       applicant: {
         name: "Alex Morgan",
         image: "https://i.pravatar.cc/160?img=11",
@@ -2344,6 +2378,7 @@ export async function sendApplication(
     sitId,
     boatName: listing.name,
     ownerName: listing.owner,
+    ownerImage: listing.ownerImage,
     partySize: normalizedPartySize,
     applicant: applicantProfile,
     initialMessage: message.trim(),
@@ -2369,18 +2404,59 @@ export async function sendApplication(
   return application;
 }
 
-export async function getApplicationsForSit(sitId: string): Promise<SitApplication[]> {
+export async function getApplicationsForSit(
+  sitId: string,
+  params?: Omit<ApplicationsListParams, "sitId">,
+): Promise<{
+  applications: SitApplication[];
+  accepted: SitApplication[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  sitTotal: number;
+}> {
   if (await hasApiSession()) {
     try {
-      return (await apiGetApplicationsForSit(sitId)).map(fromApiApplication);
+      const result = await apiGetApplicationsForSit(sitId, params);
+      return {
+        ...result,
+        applications: result.applications.map(fromApiApplication),
+        accepted: result.accepted.map(fromApiApplication),
+      };
     } catch {
       // Fall through.
     }
   }
   await wait(250);
-  return readApplications()
-    .filter((application) => application.sitId === sitId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const sit = readSits().find((item) => item.id === sitId);
+  const rows = readApplications().filter((application) => application.sitId === sitId);
+  const { list, accepted } = prepareApplicationReviewLists(rows, {
+    status: parseApplicationStatusFilter(params?.status),
+    experience: parseApplicationExperienceFilter(params?.experience),
+    sort: parseApplicationListSort(params?.sort),
+    sit: sit
+      ? {
+          minYearsExperience: sit.minYearsExperience,
+          requiredSkills: sit.requiredSkills,
+          requiredCertifications: sit.requiredCertifications,
+        }
+      : undefined,
+  });
+  const paged = paginateApplicationList(
+    list,
+    params?.page,
+    params?.limit ?? APPLICATIONS_PAGE_SIZE,
+  );
+  return {
+    applications: paged.items,
+    accepted,
+    total: paged.total,
+    page: paged.page,
+    limit: paged.limit,
+    totalPages: paged.totalPages,
+    sitTotal: rows.length,
+  };
 }
 
 export async function getApplicationsForUser(userName: string): Promise<SitApplication[]> {
@@ -2555,6 +2631,12 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
   }
 
   await wait(250);
+  try {
+    const extraDelay = Number(localStorage.getItem("boatstead-e2e-notification-delay-ms") || 0);
+    if (Number.isFinite(extraDelay) && extraDelay > 0) await wait(extraDelay);
+  } catch {
+    // ignore storage access errors
+  }
   const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60 * 1_000).toISOString();
   let seenIds: string[] = [];
   try {
@@ -2625,7 +2707,7 @@ export async function getNotificationsForUser(userName: string): Promise<MockNot
   return withRead([
     {
       createdAt: minutesAgo(5),
-      href: "/boats",
+      href: "/members/me?edit=1",
       id: `welcome-${userName}`,
       type: "welcome",
     },
@@ -3227,7 +3309,9 @@ export async function createReview(input: {
     applicationId: application.id,
     sitterName: application.applicant.name,
     ownerName: application.ownerName,
-    ownerImage: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(application.ownerName)}`,
+    ownerImage:
+      application.ownerImage ||
+      `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(application.ownerName)}`,
     rating,
     text,
     createdAt: new Date().toISOString(),

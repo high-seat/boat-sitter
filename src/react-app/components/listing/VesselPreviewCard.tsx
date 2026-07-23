@@ -45,6 +45,7 @@ export type VesselPreviewFields = {
   type: string;
   /** Stored length string (e.g. "12.5 m"), or empty while unset. */
   length: string;
+  yearBuilt?: number | null;
   homePort: string;
   image: string;
   engineType: string;
@@ -63,6 +64,11 @@ export function VesselPreviewCard({ vessel }: { vessel: VesselPreviewFields }) {
   const lengthLabel = vessel.length
     ? formatBoatLength(vessel.length, measurementSystem)
     : t("editorPreview.lengthPending");
+  const typeLength = `${labelFor(t, vessel.type)} · ${lengthLabel}`;
+  const specsLine =
+    vessel.yearBuilt != null
+      ? `${typeLength} · ${t("boat.yearBuiltShort", { year: vessel.yearBuilt })}`
+      : typeLength;
 
   return (
     <article className="pointer-events-none flex select-none flex-col gap-5 rounded-2xl border border-line bg-white p-4 shadow-card sm:flex-row sm:items-center">
@@ -75,9 +81,7 @@ export function VesselPreviewCard({ vessel }: { vessel: VesselPreviewFields }) {
         src={optimizePhotoUrl(image, 480)}
       />
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-bold uppercase tracking-wider text-teal">
-          {labelFor(t, vessel.type)} · {lengthLabel}
-        </p>
+        <p className="text-xs font-bold uppercase tracking-wider text-teal">{specsLine}</p>
         <p className="mt-1 font-display text-xl font-bold text-navy">{name}</p>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-slate">
           <MapPin aria-hidden="true" className="shrink-0" size={14} />

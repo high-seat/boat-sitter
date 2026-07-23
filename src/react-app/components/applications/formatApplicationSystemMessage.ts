@@ -18,7 +18,11 @@ export function formatApplicationSystemMessage(
       : t("applications.systemMessage.accepted");
   }
   if (message.systemKind === "declined") {
-    return t("applications.systemMessage.declined");
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.declinedOwner", {
+          name: application.applicant.name,
+        })
+      : t("applications.systemMessage.declined");
   }
   if (message.systemKind === "applicantsClosed") {
     return t("applications.systemMessage.applicantsClosed");

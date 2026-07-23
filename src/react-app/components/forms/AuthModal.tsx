@@ -260,14 +260,16 @@ export function AuthModal() {
               <span className="mt-1 block text-xs text-slate">{t("auth.passwordHint")}</span>
             )}
           </label>
-          <TermsAgreementCheckbox
-            checked={acceptedTerms}
-            i18nKey="auth.termsAgreement"
-            onChange={(checked) => {
-              setAcceptedTerms(checked);
-              if (checked && error === t("auth.termsRequired")) setError("");
-            }}
-          />
+          {mode === "signup" && (
+            <TermsAgreementCheckbox
+              checked={acceptedTerms}
+              i18nKey="auth.termsAgreement"
+              onChange={(checked) => {
+                setAcceptedTerms(checked);
+                if (checked && error === t("auth.termsRequired")) setError("");
+              }}
+            />
+          )}
           {error && (
             <p className="text-sm font-semibold text-coral" role="alert">
               {error}

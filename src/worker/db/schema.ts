@@ -28,6 +28,8 @@ export const vessels = sqliteTable(
     name: text("name").notNull(),
     type: text("type").notNull(),
     length: text("length").notNull(),
+    /** Calendar year the vessel was built; null when the owner does not know. */
+    yearBuilt: integer("year_built"),
     homePort: text("home_port").notNull(),
     image: text("image").notNull(),
     gallery: jsonArray("gallery"),

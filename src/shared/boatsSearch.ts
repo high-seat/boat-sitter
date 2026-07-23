@@ -5,10 +5,27 @@
 
 import { vesselTypeFromParam, vesselTypeToSlug } from "./vesselTypes";
 
+const METERS_PER_FOOT = 0.3048;
+
+/** Parse a stored length string into metres; NaN when unusable. */
+export function boatLengthMetres(length: string | undefined | null): number {
+  if (!length?.trim()) return Number.NaN;
+  const match = length.trim().match(/^(\d+(?:[.,]\d+)?)\s*(m|ft|feet)?$/i);
+  if (!match?.[1]) return Number.NaN;
+  const amount = Number.parseFloat(match[1].replace(",", "."));
+  if (!Number.isFinite(amount)) return Number.NaN;
+  const unit = match[2]?.toLowerCase();
+  return unit === "ft" || unit === "feet" ? amount * METERS_PER_FOOT : amount;
+}
+
 export type BoatSearchItem = {
   id: string;
   name: string;
   type: string;
+  /** Stored length string (e.g. "12.8 m" or "42 ft"). */
+  length?: string;
+  /** Year of manufacture; null/undefined when unknown. */
+  yearBuilt?: number | null;
   location: string;
   country: string;
   dateStart: string;
@@ -42,6 +59,14 @@ export type BoatSearchParams = {
   to?: string;
   pet?: boolean;
   availability?: "all" | "open" | "accepted";
+  /** Minimum overall length in metres (inclusive). */
+  minLengthM?: number;
+  /** Maximum overall length in metres (inclusive). */
+  maxLengthM?: number;
+  /** Inclusive earliest year of manufacture. */
+  yearFrom?: number;
+  /** Inclusive latest year of manufacture. */
+  yearTo?: number;
   sort?: BoatSearchSort;
   page?: number;
   limit?: number;
@@ -126,13 +151,33 @@ export function filterBoats<T extends BoatSearchItem>(boats: T[], params: BoatSe
       availability === "all" ||
       (availability === "accepted" ? Boolean(boat.accepted) : isOpen(boat));
     const matchesPet = !petOnly || Boolean(boat.pet);
+
+    const metres = boatLengthMetres(boat.length);
+    const matchesMinLength =
+      params.minLengthM == null ||
+      (Number.isFinite(metres) && metres >= params.minLengthM);
+    const matchesMaxLength =
+      params.maxLengthM == null ||
+      (Number.isFinite(metres) && metres <= params.maxLengthM);
+    const year = boat.yearBuilt;
+    const matchesYearFrom =
+      params.yearFrom == null ||
+      (typeof year === "number" && Number.isFinite(year) && year >= params.yearFrom);
+    const matchesYearTo =
+      params.yearTo == null ||
+      (typeof year === "number" && Number.isFinite(year) && year <= params.yearTo);
+
     return (
       matchesQuery &&
       matchesType &&
       matchesSitType &&
       matchesDates &&
       matchesAvailability &&
-      matchesPet
+      matchesPet &&
+      matchesMinLength &&
+      matchesMaxLength &&
+      matchesYearFrom &&
+      matchesYearTo
     );
   });
 }
@@ -204,6 +249,18 @@ export function boatsSearchQueryString(params: BoatSearchParams): string {
   if (params.availability && params.availability !== "all") {
     search.set("availability", params.availability);
   }
+  if (params.minLengthM != null && Number.isFinite(params.minLengthM)) {
+    search.set("minLength", String(params.minLengthM));
+  }
+  if (params.maxLengthM != null && Number.isFinite(params.maxLengthM)) {
+    search.set("maxLength", String(params.maxLengthM));
+  }
+  if (params.yearFrom != null && Number.isFinite(params.yearFrom)) {
+    search.set("yearFrom", String(params.yearFrom));
+  }
+  if (params.yearTo != null && Number.isFinite(params.yearTo)) {
+    search.set("yearTo", String(params.yearTo));
+  }
   if (params.sort && params.sort !== "recommended") search.set("sort", params.sort);
   if (params.page != null) search.set("page", String(params.page));
   if (params.limit != null) search.set("limit", String(params.limit));
@@ -234,6 +291,18 @@ export function parseBoatsSearchParams(
       : "recommended";
   const page = get("page");
   const limit = get("limit");
+  const minLengthRaw = get("minLength");
+  const maxLengthRaw = get("maxLength");
+  const yearFromRaw = get("yearFrom");
+  const yearToRaw = get("yearTo");
+  const minLengthM =
+    minLengthRaw != null && minLengthRaw !== "" ? Number.parseFloat(minLengthRaw) : undefined;
+  const maxLengthM =
+    maxLengthRaw != null && maxLengthRaw !== "" ? Number.parseFloat(maxLengthRaw) : undefined;
+  const yearFrom =
+    yearFromRaw != null && yearFromRaw !== "" ? Number.parseInt(yearFromRaw, 10) : undefined;
+  const yearTo =
+    yearToRaw != null && yearToRaw !== "" ? Number.parseInt(yearToRaw, 10) : undefined;
   return {
     q: get("q") || undefined,
     type: vesselTypeFromParam(get("type")),
@@ -242,6 +311,10 @@ export function parseBoatsSearchParams(
     to: get("to") || undefined,
     pet: get("pet") === "1" || get("pet") === "true",
     availability,
+    minLengthM: minLengthM != null && Number.isFinite(minLengthM) ? minLengthM : undefined,
+    maxLengthM: maxLengthM != null && Number.isFinite(maxLengthM) ? maxLengthM : undefined,
+    yearFrom: yearFrom != null && Number.isFinite(yearFrom) ? yearFrom : undefined,
+    yearTo: yearTo != null && Number.isFinite(yearTo) ? yearTo : undefined,
     sort,
     page: page != null && page !== "" ? Number.parseInt(page, 10) || 0 : undefined,
     limit: limit != null && limit !== "" ? Number.parseInt(limit, 10) : undefined,

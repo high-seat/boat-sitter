@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { seedUnverifiedOwner, seedVerifiedOwner } from "./helpers/auth";
+import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
 import {
   fillMinimalCreateSitForm,
   openCreateSitModal,
@@ -131,7 +131,10 @@ test.describe("sit creation flow", () => {
   });
 
   test("blocks create when identity verification is incomplete", async ({ page }) => {
-    await seedUnverifiedOwner(page);
+    await seedOwnerSession(page, {
+      verified: false,
+      featureFlags: { requireVerificationToSit: true },
+    });
     await page.goto("/my-sits");
     await waitForOwnedBoats(page);
     await page.getByRole("button", { name: /Create a sit/i }).click();

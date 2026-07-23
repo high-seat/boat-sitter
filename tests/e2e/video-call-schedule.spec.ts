@@ -87,6 +87,14 @@ test.describe("video call scheduling", () => {
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
     await expect(page.getByText(/Maya & Finn proposed a video call/i).first()).toBeVisible();
     await expect(page.getByText(/45 minutes/i).first()).toBeVisible();
+
+    const videoCard = page
+      .getByText(/Video call proposed/i)
+      .first()
+      .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
+    const videoRow = videoCard.locator("xpath=..");
+    await expect(videoRow).toHaveClass(/justify-end/);
+    await expect(videoRow).not.toHaveClass(/justify-center/);
   });
 
   test("other party can suggest a different time", async ({ page, browser }) => {
@@ -126,6 +134,11 @@ test.describe("video call scheduling", () => {
         .first()
         .click();
       await expect(sitterPage.getByRole("button", { name: /Accept time/i })).toBeVisible();
+      const incomingCard = sitterPage
+        .getByText(/Video call proposed/i)
+        .first()
+        .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
+      await expect(incomingCard.locator("xpath=..")).toHaveClass(/justify-start/);
       await sitterPage.getByRole("button", { name: /Suggest different time/i }).click();
       const adjust = sitterPage.getByRole("dialog");
       await expect(

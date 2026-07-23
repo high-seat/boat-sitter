@@ -71,6 +71,26 @@ function buildWhere(params: BoatSearchParams): SQL | undefined {
     parts.push(sql`${sits.dateStart} <= ${params.to}`);
   }
 
+  const lengthMetres = sql`(
+    CASE
+      WHEN lower(${vessels.length}) LIKE '%ft%' OR lower(${vessels.length}) LIKE '%feet%'
+        THEN CAST(trim(replace(replace(replace(lower(${vessels.length}), 'feet', ''), 'ft', ''), ' ', '')) AS REAL) * 0.3048
+      ELSE CAST(trim(replace(replace(lower(${vessels.length}), 'm', ''), ' ', '')) AS REAL)
+    END
+  )`;
+  if (params.minLengthM != null && Number.isFinite(params.minLengthM)) {
+    parts.push(sql`${lengthMetres} >= ${params.minLengthM}`);
+  }
+  if (params.maxLengthM != null && Number.isFinite(params.maxLengthM)) {
+    parts.push(sql`${lengthMetres} <= ${params.maxLengthM}`);
+  }
+  if (params.yearFrom != null && Number.isFinite(params.yearFrom)) {
+    parts.push(sql`${vessels.yearBuilt} is not null AND ${vessels.yearBuilt} >= ${params.yearFrom}`);
+  }
+  if (params.yearTo != null && Number.isFinite(params.yearTo)) {
+    parts.push(sql`${vessels.yearBuilt} is not null AND ${vessels.yearBuilt} <= ${params.yearTo}`);
+  }
+
   return and(...parts);
 }
 

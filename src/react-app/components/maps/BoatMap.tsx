@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { divIcon, latLngBounds } from "leaflet";
 import { ExternalLink, MapPin } from "lucide-react";
 import { MapContainer, Marker, Popup, TileLayer, useMap, ZoomControl } from "react-leaflet";
@@ -16,20 +16,34 @@ const markerIcon = divIcon({
   popupAnchor: [0, -20],
 });
 
-function MapViewport({ boats }: { boats: Boat[] }) {
+function MapViewport({ boats, fitKey }: { boats: Boat[]; fitKey: string }) {
   const map = useMap();
+  const fittedKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!boats.length) return;
     if (boats.length === 1) {
       map.setView([boats[0].latitude, boats[0].longitude], 12);
+      fittedKeyRef.current = fitKey;
       return;
     }
-    map.fitBounds(
-      latLngBounds(boats.map((boat) => [boat.latitude, boat.longitude] as [number, number])),
-      { maxZoom: 10, padding: [45, 45] },
+    const bounds = latLngBounds(
+      boats.map((boat) => [boat.latitude, boat.longitude] as [number, number]),
     );
-  }, [boats, map]);
+    const isNewSearch = fittedKeyRef.current !== fitKey;
+    if (isNewSearch) {
+      fittedKeyRef.current = fitKey;
+      map.fitBounds(bounds, { maxZoom: 10, padding: [45, 45] });
+      return;
+    }
+    const current = map.getBounds();
+    const needsExpand = boats.some(
+      (boat) => !current.contains([boat.latitude, boat.longitude]),
+    );
+    if (needsExpand) {
+      map.fitBounds(bounds, { maxZoom: 10, padding: [45, 45], animate: false });
+    }
+  }, [boats, fitKey, map]);
 
   return null;
 }
@@ -61,7 +75,16 @@ function SitMapFooter({ boat }: { boat: Boat }) {
   );
 }
 
-export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: boolean }) {
+export function BoatMap({
+  boats,
+  compact = false,
+  fitKey = "default",
+}: {
+  boats: Boat[];
+  compact?: boolean;
+  /** Changes when the search filters change so progressive loads do not keep re-zooming. */
+  fitKey?: string;
+}) {
   const { t } = useTranslation();
   const center = useMemo<[number, number]>(
     () => (boats[0] ? [boats[0].latitude, boats[0].longitude] : [20, 0]),
@@ -88,7 +111,7 @@ export function BoatMap({ boats, compact = false }: { boats: Boat[]; compact?: b
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MapViewport boats={boats} />
+          <MapViewport boats={boats} fitKey={fitKey} />
           {boats.map((boat) => (
             <Marker
               eventHandlers={{

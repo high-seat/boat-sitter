@@ -6,12 +6,14 @@ export function ResultsPagination({
   totalItems,
   pageSize,
   onPageChange,
+  className,
 }: {
   /** 0-based page index */
   currentPage: number;
   totalItems: number;
   pageSize: number;
   onPageChange: (page: number) => void;
+  className?: string;
 }) {
   const { t } = useTranslation();
   if (totalItems <= pageSize) return null;
@@ -24,7 +26,10 @@ export function ResultsPagination({
   return (
     <nav
       aria-label={t("boats.paginationNav")}
-      className="mt-10 flex flex-col items-center gap-4 border-t border-line pt-8 sm:flex-row sm:justify-between"
+      className={
+        className ??
+        "mt-10 flex flex-col items-center gap-4 border-t border-line pt-8 sm:flex-row sm:justify-between"
+      }
     >
       <p className="text-sm text-slate">
         {t("boats.paginationRange", {

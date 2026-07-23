@@ -78,7 +78,7 @@ test.describe("owner sit delete and archive", () => {
     });
 
     await page.goto("/my-sits");
-    await expect(page.getByRole("heading", { name: /Stay completed/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Sit completed/i })).toBeVisible();
 
     const completedCard = page
       .locator("article")
