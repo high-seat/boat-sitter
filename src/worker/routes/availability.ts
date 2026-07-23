@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { sits, sitterAvailability } from "../db/schema";
+import { sits, sitterAvailability, vessels } from "../db/schema";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -227,6 +227,62 @@ availabilityRouter.get("/match", async (c) => {
     sit: { id: sit.id, dateStart: sitStart, dateEnd: sitEnd, country: sit.country },
   });
 });
+
+/**
+ * GET /api/availability/:id/sits — the reverse match (sitter's view).
+ *
+ * Given one of the signed-in sitter's own windows, return the published sits in
+ * that window's region whose dates overlap it — i.e. "sits you could apply to
+ * during this window". Same predicate as /match, run from the other side.
+ *
+ * Auth + ownership: these are the sitter's own matches.
+ */
+availabilityRouter.get("/:id/sits", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const id = c.req.param("id");
+
+  const win = await db.query.sitterAvailability.findFirst({
+    where: eq(sitterAvailability.id, id),
+  });
+  if (!win) return c.json({ error: "Availability not found" }, 404);
+  if (win.sitterUserId !== user.id) {
+    return c.json({ error: "You do not own this availability" }, 403);
+  }
+
+  // Small dataset: fetch published sits joined to their vessel, refine in JS.
+  const rows = await db
+    .select({
+      id: sits.id,
+      dateStart: sits.dateStart,
+      duration: sits.duration,
+      location: sits.location,
+      country: sits.country,
+      vesselName: vessels.name,
+      vesselImage: vessels.image,
+    })
+    .from(sits)
+    .innerJoin(vessels, eq(sits.vesselId, vessels.id))
+    .where(eq(sits.published, true));
+
+  const winRegions = win.regions.map((r) => r.toLowerCase());
+  const matches = rows
+    .map((s) => ({ ...s, endDate: addNights(s.dateStart, sitNights(s.duration)) }))
+    .filter((s) => s.dateStart <= win.dateEnd && s.endDate >= win.dateStart)
+    .filter((s) => winRegions.length === 0 || winRegions.includes(s.country.toLowerCase()))
+    .sort((a, b) => a.dateStart.localeCompare(b.dateStart));
+
+  return c.json({
+    data: matches,
+    window: { id: win.id, dateStart: win.dateStart, dateEnd: win.dateEnd, regions: win.regions },
+  });
+});
+
+/** Parse a sit's `duration` (nights) safely; 0 when unparseable. */
+function sitNights(duration: string): number {
+  const n = Number.parseInt(duration, 10);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
 
 /** Add whole days to a YYYY-MM-DD date, returning YYYY-MM-DD (UTC-safe). */
 function addNights(dateStart: string, nights: number): string {

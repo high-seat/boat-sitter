@@ -95,6 +95,7 @@ import { CloseApplicationsRequestsDialog } from "@/components/applications/Close
 import { SitEmergencyHelp } from "@/components/applications/SitEmergencyHelp";
 import { WithdrawInterestDialog } from "@/components/applications/WithdrawInterestDialog";
 import { AdminPage } from "@/components/admin/AdminPage";
+import { SitterAvailabilityPage } from "@/components/availability/SitterAvailabilityPage";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { isAdminUser } from "@/adminAccess";
 import { DateRangePicker } from "@/components/forms/DateRangePicker";
@@ -586,6 +587,15 @@ function Header() {
                     <MessageCircle size={19} />
                   </Link>
                 </IconTooltip>
+                <IconTooltip label="Availability">
+                  <Link
+                    aria-label="Availability"
+                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                    to="/availability"
+                  >
+                    <CalendarDays size={19} />
+                  </Link>
+                </IconTooltip>
                 {showAdmin ? (
                   <IconTooltip label={t("nav.admin")}>
                     <Link
@@ -647,6 +657,15 @@ function Header() {
                     to="/messages"
                   >
                     <MessageCircle size={19} />
+                  </Link>
+                </IconTooltip>
+                <IconTooltip label="Availability">
+                  <Link
+                    aria-label="Availability"
+                    className="rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+                    to="/availability"
+                  >
+                    <CalendarDays size={19} />
                   </Link>
                 </IconTooltip>
                 {showAdmin ? (
@@ -9125,6 +9144,7 @@ export default function App() {
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/safety" element={<SafetyPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/availability" element={<SitterAvailabilityPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/terms" element={<TermsPage />} />
