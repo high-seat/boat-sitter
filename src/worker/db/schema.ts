@@ -114,6 +114,55 @@ export const sits = sqliteTable(
   ],
 );
 
+/**
+ * Sitter availability — the supply side of the marketplace.
+ *
+ * A sitter publishes a window (date range + optional regions) when they are
+ * free to take a sit. The matching engine intersects these Open windows with a
+ * sit's dates + country to surface "available sitters for this sit" (and, from
+ * the sitter's side, "sits that fit my window").
+ *
+ * Net-new and fully additive: nothing in the existing owner → sit → application
+ * flow reads or writes this table, so it cannot change current behaviour.
+ *
+ * Lifecycle (see design diagrams): Open → Booked (an accepted application on an
+ * overlapping sit) → back to Open if released, or Withdrawn (sitter cancels).
+ * Completed / Expired are DERIVED from the dates, never stored.
+ */
+export const sitterAvailability = sqliteTable(
+  "sitter_availability",
+  {
+    id: text("id").primaryKey(),
+    // Better Auth user id of the sitter who owns this window.
+    sitterUserId: text("sitter_user_id").notNull(),
+    // Point-in-time display-name snapshot (mirrors applications.applicantName).
+    sitterName: text("sitter_name").notNull().default(""),
+    // Inclusive ISO date range (YYYY-MM-DD) the sitter is available.
+    dateStart: text("date_start").notNull(),
+    dateEnd: text("date_end").notNull(),
+    // Preferred countries/regions; empty array = open to anywhere.
+    regions: jsonArray("regions"),
+    notes: text("notes").notNull().default(""),
+    // open | booked | withdrawn. completed/expired are derived from the dates.
+    status: text("status").notNull().default("open"),
+    // The application that booked this window (couples to the request flow);
+    // null while Open. Plain text ref, no FK, to stay decoupled + non-breaking.
+    bookedApplicationId: text("booked_application_id"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("sitter_availability_sitter_idx").on(t.sitterUserId),
+    index("sitter_availability_status_idx").on(t.status),
+    index("sitter_availability_date_start_idx").on(t.dateStart),
+    index("sitter_availability_date_end_idx").on(t.dateEnd),
+  ],
+);
+
 export const applications = sqliteTable(
   "applications",
   {
@@ -360,6 +409,8 @@ export type Vessel = typeof vessels.$inferSelect;
 export type NewVessel = typeof vessels.$inferInsert;
 export type Sit = typeof sits.$inferSelect;
 export type NewSit = typeof sits.$inferInsert;
+export type SitterAvailability = typeof sitterAvailability.$inferSelect;
+export type NewSitterAvailability = typeof sitterAvailability.$inferInsert;
 export type Application = typeof applications.$inferSelect;
 export type NewApplication = typeof applications.$inferInsert;
 export type ApplicationMessage = typeof applicationMessages.$inferSelect;
