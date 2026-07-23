@@ -97,7 +97,7 @@ export async function fillMinimalCreateSitForm(
   await pickFutureSitDates(modal, page);
 
   await modal
-    .getByPlaceholder(/Street, marina berth|Straße|marina/i)
+    .getByTestId("sit-full-address-input")
     .fill(options?.fullAddress ?? "Berth A4, Demo Marina, Harbor Road 12");
 
   if (sitType !== "daytimeChecks") {

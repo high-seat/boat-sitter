@@ -11,6 +11,7 @@ test.describe("messages chat avatar", () => {
           state: {
             saved: [],
             archivedConversations: [],
+            deletedConversations: [],
             archivedSits: [],
             blockedUsers: [],
             userReports: [],

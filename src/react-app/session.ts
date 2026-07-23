@@ -32,6 +32,7 @@ export async function hydrateSession(): Promise<void> {
         measurementSystem: "metric" | "imperial";
         emailNotifications: Record<string, boolean>;
         sitDefaults: Record<string, unknown>;
+        applicationDefaults: Record<string, unknown>;
         memberSince: number;
         phoneCountryCode: string;
         phoneNumber: string;
@@ -79,6 +80,10 @@ export async function hydrateSession(): Promise<void> {
                 ...state.user.sitDefaults,
                 ...(profile.sitDefaults as typeof state.user.sitDefaults),
               },
+              applicationDefaults: {
+                ...state.user.applicationDefaults,
+                ...(profile.applicationDefaults as typeof state.user.applicationDefaults),
+              },
               memberSince: profile.memberSince,
               phoneCountryCode: profile.phoneCountryCode,
               phoneNumber: profile.phoneNumber,
@@ -111,6 +116,7 @@ export async function hydrateSession(): Promise<void> {
       useAppStore.getState().hydratePrefs({
         saved: prefs.saved,
         archivedConversations: prefs.archivedConversations,
+        deletedConversations: prefs.deletedConversations ?? [],
         archivedSits: prefs.archivedSits,
         blockedUsers: prefs.blockedUsers,
         userReports: prefs.userReports.map((report) => ({
@@ -123,6 +129,7 @@ export async function hydrateSession(): Promise<void> {
       useAppStore.getState().hydratePrefs({
         saved: [],
         archivedConversations: [],
+        deletedConversations: [],
         archivedSits: [],
         blockedUsers: [],
         userReports: [],

@@ -9,9 +9,10 @@ test.describe("notifications menu", () => {
     });
 
     await page.goto("/");
-    await page.getByRole("button", { name: /Open notifications/i }).click();
+    // Open before the delayed notifications query settles (also started by the messages badge).
+    await page.getByTestId("notifications-open").first().click();
 
-    const menu = page.getByRole("menu", { name: /Notifications/i });
+    const menu = page.getByTestId("notifications-menu");
     await expect(menu).toBeVisible();
     const skeleton = menu.locator('[aria-busy="true"]');
     await expect(skeleton).toBeVisible();
@@ -22,19 +23,27 @@ test.describe("notifications menu", () => {
   });
 
   test("lists notifications and marks them read", async ({ page }) => {
-    await seedVerifiedOwner(page);
+    // Fresh account so the unread welcome notification is deterministic.
+    await seedOwnerSession(page, {
+      name: "Notify Reader",
+      email: "notify.reader@boatstead.mock",
+      image: "https://i.pravatar.cc/160?img=15",
+      phoneNumber: "6911112244",
+      verified: true,
+    });
     await page.goto("/");
 
-    const open = page.getByRole("button", { name: /Open notifications/i });
+    const open = page.getByTestId("notifications-open").first();
     await expect(open).toBeVisible();
+    await expect(page.getByTestId("notifications-unread-count").first()).toBeVisible();
     await open.click();
 
-    const menu = page.getByRole("menu", { name: /Notifications/i });
+    const menu = page.getByTestId("notifications-menu");
     await expect(menu).toBeVisible();
     await expect(menu.getByRole("menuitem").first()).toBeVisible();
 
     await menu.getByRole("button", { name: /Mark all as read/i }).click();
-    await expect(open.locator("span").filter({ hasText: /^\d+$/ })).toHaveCount(0);
+    await expect(page.getByTestId("notifications-unread-count")).toHaveCount(0);
   });
 
   test("welcome notification opens the edit profile screen", async ({ page }) => {
@@ -47,8 +56,8 @@ test.describe("notifications menu", () => {
     });
     await page.goto("/");
 
-    await page.getByRole("button", { name: /Open notifications/i }).click();
-    const menu = page.getByRole("menu", { name: /Notifications/i });
+    await page.getByTestId("notifications-open").first().click();
+    const menu = page.getByTestId("notifications-menu");
     await expect(menu).toBeVisible();
 
     const welcome = menu.getByRole("menuitem", {
@@ -66,8 +75,9 @@ test.describe("notifications menu", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
 
-    await page.getByRole("button", { name: /Open notifications/i }).click();
-    const menu = page.getByRole("menu", { name: /Notifications/i });
+    // Mobile header mounts the second notifications control; desktop one is hidden.
+    await page.getByTestId("notifications-open").last().click();
+    const menu = page.getByTestId("notifications-menu");
     await expect(menu).toBeVisible();
 
     const box = await menu.boundingBox();

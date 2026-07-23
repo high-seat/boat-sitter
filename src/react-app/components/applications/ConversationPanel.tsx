@@ -5,6 +5,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+import * as Popover from "@radix-ui/react-popover";
 import { Ellipsis, Flag, Languages, LoaderCircle, Phone, Send, Video, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getIntlLocale } from "@/i18n";
@@ -23,6 +24,8 @@ import {
   getLatestPendingVideoCallProposal,
 } from "@/components/applications/formatApplicationSystemMessage";
 import { VideoCallCalendarLinks } from "@/components/applications/VideoCallCalendarLinks";
+import { AvatarImage } from "@/components/ui/AvatarImage";
+import { SpeechBubbleTail } from "@/components/ui/SpeechBubbleTail";
 
 function isOptimisticMessageSynced(optimistic: ApplicationMessage, messages: ApplicationMessage[]) {
   return messages.some(
@@ -32,6 +35,40 @@ function isOptimisticMessageSynced(optimistic: ApplicationMessage, messages: App
       message.text === optimistic.text &&
       message.createdAt >= optimistic.createdAt,
   );
+}
+
+function isUserChatMessage(message: ApplicationMessage) {
+  return message.kind === "user";
+}
+
+/** Avatar only on the last bubble in a consecutive run from the same sender. */
+function isLastInSenderStack(messages: ApplicationMessage[], index: number) {
+  const message = messages[index];
+  if (!message || !isUserChatMessage(message)) return false;
+  const next = messages[index + 1];
+  if (!next || !isUserChatMessage(next)) return true;
+  return next.senderName !== message.senderName;
+}
+
+function isStackContinuation(messages: ApplicationMessage[], index: number) {
+  const message = messages[index];
+  if (!message || !isUserChatMessage(message) || index === 0) return false;
+  const prev = messages[index - 1];
+  return isUserChatMessage(prev) && prev.senderName === message.senderName;
+}
+
+function avatarSrcForSender(
+  senderName: string,
+  application: SitApplication,
+  currentUser: string,
+  currentUserImage: string | undefined,
+) {
+  if (senderName === currentUser && currentUserImage) return currentUserImage;
+  if (senderName === application.applicant.name) return application.applicant.image;
+  if (senderName === application.ownerName && application.ownerImage) {
+    return application.ownerImage;
+  }
+  return "";
 }
 
 export function ConversationPanel({
@@ -299,16 +336,26 @@ export function ConversationPanel({
         </div>
       )}
       <div
-        className="max-h-96 space-y-4 overflow-y-auto p-5"
+        className="max-h-96 overflow-y-auto p-5"
         data-testid="conversation-messages"
         ref={messagesContainerRef}
       >
-        {threadMessages.map((message) => {
+        {threadMessages.length === 0 ? (
+          <p className="py-10 text-center text-sm text-slate" data-testid="conversation-empty">
+            {t("applications.noMessagesYet")}
+          </p>
+        ) : null}
+        {threadMessages.map((message, index) => {
+          const stackGap = isStackContinuation(threadMessages, index) ? "mt-1" : "mt-4";
+          const rowOffset = index === 0 ? "mt-0" : stackGap;
           if (message.kind === "system") {
             if (message.systemKind === "phoneShared" && message.sharedPhone) {
               const mine = message.senderName === currentUser;
               return (
-                <div className={`flex ${mine ? "justify-end" : "justify-start"}`} key={message.id}>
+                <div
+                  className={`flex ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
+                  key={message.id}
+                >
                   <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Phone aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
@@ -340,7 +387,7 @@ export function ConversationPanel({
               const body = formatApplicationSystemMessage(t, message, application, currentUser);
               if (message.text.trim()) {
                 return (
-                  <div className="flex justify-center" key={message.id}>
+                  <div className={`flex justify-center ${rowOffset}`} key={message.id}>
                     <div className="max-w-[90%] rounded-2xl border border-slate/20 bg-cream px-4 py-3 text-sm leading-6 text-navy">
                       <p className="font-bold text-navy">
                         {t("applications.systemMessage.withdrawnTitle")}
@@ -357,7 +404,7 @@ export function ConversationPanel({
                 );
               }
               return (
-                <div className="flex justify-center" key={message.id}>
+                <div className={`flex justify-center ${rowOffset}`} key={message.id}>
                   <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
                     {body}
                   </p>
@@ -386,7 +433,10 @@ export function ConversationPanel({
                 (message.systemKind === "videoCallRequest" ||
                   message.systemKind === "videoCallCounter");
               return (
-                <div className={`flex ${mine ? "justify-end" : "justify-start"}`} key={message.id}>
+                <div
+                  className={`flex ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
+                  key={message.id}
+                >
                   <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
                     <Video aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
                     <div className="min-w-0">
@@ -472,11 +522,12 @@ export function ConversationPanel({
               );
             }
             return (
-              <div className="flex justify-center" key={message.id}>
+              <div className={`flex justify-center ${rowOffset}`} key={message.id}>
                 <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
                   {message.systemKind === "accepted" ||
                   message.systemKind === "declined" ||
                   message.systemKind === "unaccepted" ||
+                  message.systemKind === "sitCancelled" ||
                   message.systemKind === "applicantsClosed"
                     ? formatApplicationSystemMessage(t, message, application, currentUser)
                     : message.text}
@@ -486,11 +537,52 @@ export function ConversationPanel({
           }
 
           const mine = message.senderName === currentUser;
+          const showAvatar = isLastInSenderStack(threadMessages, index);
+          const avatarSrc = avatarSrcForSender(
+            message.senderName,
+            application,
+            currentUser,
+            user?.image,
+          );
+          const avatar = showAvatar ? (
+            <AvatarImage
+              className="relative z-10 size-8 shrink-0 translate-y-2 rounded-full object-cover"
+              name={message.senderName}
+              src={avatarSrc}
+              testId={mine ? "conversation-message-avatar-own" : "conversation-message-avatar-peer"}
+            />
+          ) : (
+            <div
+              aria-hidden="true"
+              className="size-8 shrink-0"
+              data-testid={
+                mine
+                  ? "conversation-message-avatar-own-spacer"
+                  : "conversation-message-avatar-peer-spacer"
+              }
+            />
+          );
+
+          let bubbleClass =
+            "relative max-w-[min(85%,calc(100%-2.5rem))] overflow-visible px-5 py-3.5";
+          if (mine) {
+            bubbleClass += " bg-navy text-white";
+            bubbleClass += showAvatar
+              ? " rounded-tl-[1.25rem] rounded-tr-[1.25rem] rounded-bl-[1.25rem] rounded-br-none"
+              : " rounded-[1.25rem]";
+          } else {
+            bubbleClass += " bg-cream text-navy";
+            bubbleClass += showAvatar
+              ? " rounded-tl-[1.25rem] rounded-tr-[1.25rem] rounded-br-[1.25rem] rounded-bl-none"
+              : " rounded-[1.25rem]";
+          }
+
           return (
             <div
-              className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}
+              className={`flex items-end gap-3 ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
               key={message.id}
             >
+              {mine ? null : avatar}
               {message.pending ? (
                 <LoaderCircle
                   aria-label={t("applications.sending")}
@@ -500,11 +592,18 @@ export function ConversationPanel({
               ) : null}
               <div
                 aria-busy={message.pending || undefined}
-                className={`relative max-w-[85%] rounded-2xl px-4 py-3 ${
-                  mine ? "bg-navy text-white" : "bg-cream text-navy"
-                }`}
+                className={bubbleClass}
                 data-testid={mine ? "conversation-message-own" : "conversation-message-peer"}
               >
+                {showAvatar ? (
+                  <SpeechBubbleTail
+                    side={mine ? "right" : "left"}
+                    testId={
+                      mine ? "conversation-message-tail-own" : "conversation-message-tail-peer"
+                    }
+                    tone={mine ? "navy" : "cream"}
+                  />
+                ) : null}
                 <div className={`flex items-start justify-between gap-2 ${mine ? "" : "pr-1"}`}>
                   <p className={`text-xs font-bold ${mine ? "text-aqua" : "text-teal"}`}>
                     {mine ? t("messages.you") : message.senderName}
@@ -513,14 +612,11 @@ export function ConversationPanel({
                     <MessageActionsMenu
                       hasTranslation={Boolean(translations[message.id])}
                       isOpen={openMenuId === message.id}
-                      onClose={() => setOpenMenuId(null)}
+                      onOpenChange={(open) => setOpenMenuId(open ? message.id : null)}
                       onReport={() => {
                         setOpenMenuId(null);
                         openMessageReport(message);
                       }}
-                      onToggle={() =>
-                        setOpenMenuId((current) => (current === message.id ? null : message.id))
-                      }
                       onTranslate={() => {
                         setOpenMenuId(null);
                         if (translations[message.id]) {
@@ -559,6 +655,7 @@ export function ConversationPanel({
                   </p>
                 )}
               </div>
+              {mine ? avatar : null}
             </div>
           );
         })}
@@ -585,17 +682,11 @@ export function ConversationPanel({
           }
         >
           {user ? (
-            <img
-              alt=""
+            <AvatarImage
               className="size-12 self-center rounded-full object-cover"
-              data-testid="conversation-composer-avatar"
-              onError={(event) => {
-                const img = event.currentTarget;
-                const fallback = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`;
-                if (img.src !== fallback) img.src = fallback;
-              }}
-              referrerPolicy="no-referrer"
+              name={user.name}
               src={user.image}
+              testId="conversation-composer-avatar"
             />
           ) : null}
           <label className="min-w-0">
@@ -732,58 +823,46 @@ export function ConversationPanel({
 function MessageActionsMenu({
   hasTranslation,
   isOpen,
-  onClose,
+  onOpenChange,
   onReport,
-  onToggle,
   onTranslate,
   translatePending,
 }: {
   hasTranslation: boolean;
   isOpen: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   onReport: () => void;
-  onToggle: () => void;
   onTranslate: () => void;
   translatePending: boolean;
 }) {
   const { t } = useTranslation();
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    function handlePointerDown(event: MouseEvent) {
-      if (!menuRef.current?.contains(event.target as Node)) onClose();
-    }
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-    window.addEventListener("pointerdown", handlePointerDown);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
 
   return (
-    <div className="relative shrink-0" ref={menuRef}>
-      <button
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-        aria-label={t("applications.messageActions")}
-        className="-mr-1 -mt-0.5 rounded-full p-1 text-slate hover:bg-white/80 hover:text-navy"
-        onClick={onToggle}
-        type="button"
-      >
-        <Ellipsis aria-hidden="true" size={16} />
-      </button>
-      {isOpen && (
-        <div
-          className="absolute top-full right-0 z-20 mt-1 min-w-52 overflow-hidden rounded-xl border border-line bg-white py-1 shadow-float"
+    <Popover.Root onOpenChange={onOpenChange} open={isOpen}>
+      <Popover.Trigger asChild>
+        <button
+          aria-label={t("applications.messageActions")}
+          className="-mr-1 -mt-0.5 rounded-full p-1 text-slate hover:bg-white/80 hover:text-navy"
+          data-testid="conversation-message-actions"
+          type="button"
+        >
+          <Ellipsis aria-hidden="true" size={16} />
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          align="end"
+          avoidCollisions
+          className="z-80 min-w-52 overflow-hidden rounded-xl border border-line bg-white py-1 shadow-float outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+          collisionPadding={12}
+          data-testid="conversation-message-actions-menu"
           role="menu"
+          side="bottom"
+          sideOffset={4}
         >
           <button
             className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream disabled:opacity-60"
+            data-testid="conversation-message-translate"
             disabled={translatePending}
             onClick={onTranslate}
             role="menuitem"
@@ -798,6 +877,7 @@ function MessageActionsMenu({
           </button>
           <button
             className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-semibold text-navy hover:bg-cream"
+            data-testid="conversation-message-report"
             onClick={onReport}
             role="menuitem"
             type="button"
@@ -805,9 +885,9 @@ function MessageActionsMenu({
             <Flag aria-hidden="true" className="text-slate" size={15} />
             {t("messageReport.report")}
           </button>
-        </div>
-      )}
-    </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 

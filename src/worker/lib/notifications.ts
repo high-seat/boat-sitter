@@ -11,6 +11,7 @@ export type NotificationType =
   | "newApplication"
   | "newMessage"
   | "sitAccepted"
+  | "sitCancelled"
   | "sitReminder"
   | "sitSittersFound"
   | "welcome";

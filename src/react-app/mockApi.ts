@@ -9,6 +9,7 @@ import {
   apiGetBoat,
   apiGetBoats,
   apiGetBoatsPage,
+  apiSearchAddresses,
   apiSearchDestinations,
   apiGetNotifications,
   apiMarkAllNotificationsRead,
@@ -30,12 +31,14 @@ import {
   apiSendApplicationMessage,
   apiShareApplicationPhone,
   apiStartSitEarly,
+  apiCancelSit,
   apiSubmitSupportRequest,
   apiUpdateApplicationStatus,
   apiWithdrawApplication,
 } from "@/apiRemote";
 import { ApiError } from "@/apiClient";
 import { type ApplicationsListParams } from "../shared/applicationsSearch";
+import { type AddressSearchParams, type AddressSuggestion } from "../shared/addressSearch";
 import { type BoatSearchParams } from "../shared/boatsSearch";
 import { type DestinationSearchParams } from "../shared/destinationsSearch";
 import type { Destination } from "@/destinations";
@@ -141,6 +144,18 @@ export type Boat = {
   applicationsOpen?: boolean;
   /** Derived lifecycle phase for this sit. */
   phase?: SitPhase;
+  /**
+   * Typical owner reply latency from application chats.
+   * Only present on detail payloads when enough reply samples exist.
+   */
+  ownerResponseTime?:
+    | "withinHour"
+    | "withinTwoHours"
+    | "withinHalfDay"
+    | "withinDay"
+    | "withinTwoDays"
+    | "withinFewDays"
+    | null;
 };
 
 /** Details such as Wi-Fi and access codes; never included on public Boat listings. */
@@ -245,6 +260,8 @@ export type Sit = {
   accepted?: boolean;
   /** When false, sitters cannot submit new applications. Defaults to true. */
   applicationsOpen?: boolean;
+  /** ISO timestamp when the owner cancelled an underway sit. */
+  cancelledAt?: string | null;
   /** Derived lifecycle phase for this sit. */
   phase?: SitPhase;
 };
@@ -535,6 +552,12 @@ export async function searchDestinations(
   return apiSearchDestinations(params);
 }
 
+export async function searchAddresses(
+  params: AddressSearchParams = {},
+): Promise<AddressSuggestion[]> {
+  return apiSearchAddresses(params);
+}
+
 export async function getBoat(id: string): Promise<Boat | undefined> {
   const remote = await apiGetBoat(id);
   return remote ? fromApiBoat(remote) : undefined;
@@ -764,6 +787,13 @@ export async function startSitEarly(id: string): Promise<Sit> {
   return fromApiSit(await apiStartSitEarly(id));
 }
 
+export async function cancelSit(
+  id: string,
+  options: { reopenApplications?: boolean } = {},
+): Promise<Sit> {
+  return fromApiSit(await apiCancelSit(id, options));
+}
+
 export type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined" | "withdrawn";
 export type MockNotification = {
   actor?: string;
@@ -781,6 +811,7 @@ export type MockNotification = {
     | "newApplication"
     | "newMessage"
     | "sitAccepted"
+    | "sitCancelled"
     | "sitReminder"
     | "sitSittersFound"
     | "welcome";
@@ -816,7 +847,8 @@ export type ApplicationMessage = {
     | "videoCallAccepted"
     | "videoCallDeclined"
     | "phoneShared"
-    | "withdrawn";
+    | "withdrawn"
+    | "sitCancelled";
   videoCall?: {
     startsAt: string;
     durationMinutes: number;
@@ -1016,6 +1048,12 @@ function mapApiNotification(
 }
 
 export async function getNotificationsForUser(_userName: string): Promise<MockNotification[]> {
+  if (typeof localStorage !== "undefined") {
+    const delayMs = Number(localStorage.getItem("boatstead-e2e-notification-delay-ms") || 0);
+    if (Number.isFinite(delayMs) && delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
   const remote = await apiGetNotifications();
   return remote.map(mapApiNotification);
 }

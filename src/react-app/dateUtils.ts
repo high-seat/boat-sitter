@@ -74,9 +74,12 @@ export function getSitPhase(
     applicationsOpen?: boolean;
     accepted?: boolean;
     applicants?: number;
+    cancelledAt?: string | null;
   },
   now = new Date(),
 ): SitPhase {
+  if (sit.cancelledAt) return "stayCompleted";
+
   const today = startOfLocalDay(now);
   const start = parseSitDate(sit.dateStart);
   const end = sitEndDate(sit.dateStart, sit.duration);

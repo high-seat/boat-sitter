@@ -7,11 +7,11 @@ export function EditorLivePreview({ children, hint }: { children: ReactNode; hin
   return (
     <aside
       aria-label={t("editorPreview.label")}
-      className="rounded-2xl border border-line bg-cream/50 p-4 sm:p-5"
+      className="min-w-0 overflow-hidden rounded-2xl border border-line bg-cream/50 p-4 sm:p-5"
     >
       <h3 className="font-display text-lg font-bold text-navy">{t("editorPreview.title")}</h3>
       {hint ? <p className="mt-1 text-sm text-slate">{hint}</p> : null}
-      <div className="mt-4">{children}</div>
+      <div className="mt-4 min-w-0 overflow-hidden">{children}</div>
     </aside>
   );
 }

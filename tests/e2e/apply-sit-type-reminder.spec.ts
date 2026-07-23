@@ -43,8 +43,20 @@ test("apply modal reiterates liveaboard sit type", async ({ page }) => {
 
   const message = page.getByTestId("apply-message-input");
   const hint = page.getByTestId("apply-message-hint");
+  const partySizeHint = page.getByTestId("apply-party-size-hint");
   await expect(hint).toBeVisible();
   await expect(hint).toHaveText(/Mention your experience with catamaran boats/i);
+  await expect(hint).toHaveClass(/text-xs/);
+  await expect(hint).toHaveClass(/text-slate/);
+  const partySizeHintStyles = await partySizeHint.evaluate((el) => {
+    const styles = getComputedStyle(el);
+    return { fontSize: styles.fontSize, fontWeight: styles.fontWeight, color: styles.color };
+  });
+  const hintStyles = await hint.evaluate((el) => {
+    const styles = getComputedStyle(el);
+    return { fontSize: styles.fontSize, fontWeight: styles.fontWeight, color: styles.color };
+  });
+  expect(hintStyles).toEqual(partySizeHintStyles);
   const messageBottom = await message.evaluate((el) => el.getBoundingClientRect().bottom);
   const hintTop = await hint.evaluate((el) => el.getBoundingClientRect().top);
   expect(hintTop).toBeGreaterThanOrEqual(messageBottom - 1);
@@ -68,6 +80,8 @@ test("apply modal reiterates daytime checks sit type", async ({ page }) => {
   const hint = page.getByTestId("apply-message-hint");
   await expect(hint).toBeVisible();
   await expect(hint).toHaveText(/Mention your experience with motor yacht boats/i);
+  await expect(hint).toHaveClass(/text-xs/);
+  await expect(hint).toHaveClass(/text-slate/);
   const messageBottom = await message.evaluate((el) => el.getBoundingClientRect().bottom);
   const hintTop = await hint.evaluate((el) => el.getBoundingClientRect().top);
   expect(hintTop).toBeGreaterThanOrEqual(messageBottom - 1);

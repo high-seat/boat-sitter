@@ -2,10 +2,17 @@ import { zValidator } from "@hono/zod-validator";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { computeStartEarlySchedule } from "../../shared/sitSchedule";
+import { computeStartEarlySchedule, isSitUnderway } from "../../shared/sitSchedule";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { applications, sits, sitterAvailability, user, vessels } from "../db/schema";
+import {
+  applicationMessages,
+  applications,
+  sits,
+  sitterAvailability,
+  user,
+  vessels,
+} from "../db/schema";
 import { sendNotificationEmail } from "../email";
 import { insertNotification } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
@@ -74,6 +81,7 @@ sitsRouter.get("/", async (c) => {
         boatId: vesselId,
         accepted: isAccepted,
         applicationsOpen: rest.published !== false && !isAccepted,
+        cancelledAt: rest.cancelledAt ?? null,
       };
     }),
   });
@@ -173,9 +181,186 @@ sitsRouter.post("/:id/start-early", requireUser, async (c) => {
       boatId: vesselId,
       accepted: true,
       applicationsOpen: false,
+      cancelledAt: rest.cancelledAt ?? null,
     },
   });
 });
+
+/**
+ * Owner-only: cancel an underway sit.
+ * - Default: end the sit entirely (cancelled, closed, sitter notified).
+ * - reopenApplications: unaccept the sitter and reopen for new applicants.
+ */
+sitsRouter.post(
+  "/:id/cancel",
+  requireUser,
+  zValidator(
+    "json",
+    z.object({
+      reopenApplications: z.boolean().optional().default(false),
+    }),
+  ),
+  async (c) => {
+    const db = getDb(c.env);
+    const sessionUser = c.get("user")!;
+    const id = c.req.param("id");
+    const { reopenApplications } = c.req.valid("json");
+
+    const sit = await db.query.sits.findFirst({ where: eq(sits.id, id) });
+    if (!sit) return c.json({ error: "Sit not found" }, 404);
+
+    const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+    if (!vessel) return c.json({ error: "Vessel not found" }, 404);
+    if (vessel.ownerUserId != null && vessel.ownerUserId !== sessionUser.id) {
+      return c.json({ error: "You do not own this listing" }, 403);
+    }
+    if (vessel.ownerUserId == null && vessel.owner !== sessionUser.name) {
+      return c.json({ error: "You do not own this listing" }, 403);
+    }
+
+    if (sit.cancelledAt) {
+      return c.json({ error: "SIT_CANCEL_NOT_ALLOWED" }, 400);
+    }
+
+    const acceptedApps = await db
+      .select()
+      .from(applications)
+      .where(and(eq(applications.sitId, sit.id), eq(applications.status, "accepted")));
+    if (!acceptedApps.length) {
+      return c.json({ error: "SIT_CANCEL_NOT_ALLOWED" }, 400);
+    }
+
+    if (
+      !isSitUnderway({
+        dateStart: sit.dateStart,
+        duration: sit.duration,
+        accepted: true,
+        cancelledAt: sit.cancelledAt,
+      })
+    ) {
+      return c.json({ error: "SIT_CANCEL_NOT_ALLOWED" }, 400);
+    }
+
+    const nowIso = new Date().toISOString();
+
+    if (reopenApplications) {
+      const [saved] = await db
+        .update(sits)
+        .set({
+          published: true,
+          cancelledAt: null,
+          updatedAt: sql`CURRENT_TIMESTAMP`,
+        })
+        .where(eq(sits.id, sit.id))
+        .returning();
+
+      for (const app of acceptedApps) {
+        await db
+          .update(applications)
+          .set({ status: "new", ownerPhone: null })
+          .where(eq(applications.id, app.id));
+
+        await db.insert(applicationMessages).values({
+          id: `message-unaccepted-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          applicationId: app.id,
+          senderName: sessionUser.name,
+          text: `${sessionUser.name} unaccepted this application`,
+          kind: "system",
+          systemKind: "unaccepted",
+          payload: null,
+          createdAt: nowIso,
+        });
+        if (app.applicantUserId || app.applicantName) {
+          await insertNotification(db, {
+            userId: app.applicantUserId,
+            userName: app.applicantName,
+            type: "applicationUnaccepted",
+            actor: sessionUser.name,
+            boatName: app.boatName,
+            href: `/messages?application=${app.id}`,
+          });
+        }
+        const applicantEmail = app.applicantUserId
+          ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
+          : undefined;
+        await sendNotificationEmail(c.env, {
+          subject: `Update on your sit for ${app.boatName}`,
+          heading: "Sit update",
+          body: `${sessionUser.name} is no longer confirming you for ${app.boatName}. The owner has reopened the sit for other applicants.`,
+          actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
+          actionLabel: "View conversation",
+          to: applicantEmail,
+        });
+      }
+
+      const { vesselId, ...rest } = saved;
+      return c.json({
+        data: {
+          ...rest,
+          boatId: vesselId,
+          accepted: false,
+          applicationsOpen: true,
+          cancelledAt: null,
+        },
+      });
+    }
+
+    const [saved] = await db
+      .update(sits)
+      .set({
+        cancelledAt: nowIso,
+        published: false,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(sits.id, sit.id))
+      .returning();
+
+    for (const app of acceptedApps) {
+      await db.insert(applicationMessages).values({
+        id: `message-sitCancelled-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        applicationId: app.id,
+        senderName: sessionUser.name,
+        text: `${sessionUser.name} cancelled this sit`,
+        kind: "system",
+        systemKind: "sitCancelled",
+        payload: null,
+        createdAt: nowIso,
+      });
+      if (app.applicantUserId || app.applicantName) {
+        await insertNotification(db, {
+          userId: app.applicantUserId,
+          userName: app.applicantName,
+          type: "sitCancelled",
+          actor: sessionUser.name,
+          boatName: app.boatName,
+          href: `/messages?application=${app.id}`,
+        });
+      }
+      const applicantEmail = app.applicantUserId
+        ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
+        : undefined;
+      await sendNotificationEmail(c.env, {
+        subject: `Sit cancelled: ${app.boatName}`,
+        heading: "Sit cancelled",
+        body: `${sessionUser.name} cancelled the sit for ${app.boatName}. You can still open the conversation for any follow-up.`,
+        actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
+        actionLabel: "View conversation",
+        to: applicantEmail,
+      });
+    }
+
+    const { vesselId, ...rest } = saved;
+    return c.json({
+      data: {
+        ...rest,
+        boatId: vesselId,
+        accepted: true,
+        applicationsOpen: false,
+        cancelledAt: rest.cancelledAt ?? nowIso,
+      },
+    });
+  },
+);
 
 sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => {
   const id = c.req.param("id");

@@ -66,6 +66,13 @@ export function formatApplicationSystemMessage(
         })
       : t("applications.systemMessage.withdrawn");
   }
+  if (message.systemKind === "sitCancelled") {
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.sitCancelledOwner", {
+          name: application.applicant.name,
+        })
+      : t("applications.systemMessage.sitCancelled");
+  }
   return message.text;
 }
 

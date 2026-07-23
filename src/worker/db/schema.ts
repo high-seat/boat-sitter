@@ -97,6 +97,8 @@ export const sits = sqliteTable(
     published: integer("published", { mode: "boolean" }).notNull().default(true),
     /** liveaboard | daytimeChecks — matches the frontend SitType. */
     sitType: text("sit_type").notNull().default("liveaboard"),
+    /** Set when the owner cancels an underway sit; sit is treated as completed. */
+    cancelledAt: text("cancelled_at"),
 
     createdAt: text("created_at")
       .notNull()
@@ -266,6 +268,10 @@ export const profiles = sqliteTable(
       .$type<Record<string, unknown>>()
       .notNull()
       .default(sql`'{}'`),
+    applicationDefaults: text("application_defaults", { mode: "json" })
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'`),
     phoneCountryCode: text("phone_country_code").notNull().default("+44"),
     phoneNumber: text("phone_number").notNull().default(""),
     memberSince: integer("member_since").notNull().default(2024),
@@ -353,6 +359,18 @@ export const userArchivedConversations = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("user_archived_conversations_user_idx").on(t.userId)],
+);
+
+export const userDeletedConversations = sqliteTable(
+  "user_deleted_conversations",
+  {
+    userId: text("user_id").notNull(),
+    applicationId: text("application_id").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [index("user_deleted_conversations_user_idx").on(t.userId)],
 );
 
 export const userArchivedSits = sqliteTable(

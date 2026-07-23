@@ -7,7 +7,7 @@ test.describe("boat access details", () => {
     await seedVerifiedOwner(page);
     await page.goto("/boats/solstice");
 
-    const access = page.getByRole("region", { name: /Boat access details/i });
+    const access = page.getByTestId("boat-access-details");
     await expect(access).toBeVisible();
 
     const address = "Berth B12, Lefkas Marina, Lefkada 311 00, Greece";

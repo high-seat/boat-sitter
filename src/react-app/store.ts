@@ -89,6 +89,14 @@ export const DEFAULT_SIT_CREATION_DEFAULTS: SitCreationDefaults = {
   nonSmokerRequired: false,
 };
 
+export type ApplicationDefaults = {
+  defaultPartySize: number;
+};
+
+export const DEFAULT_APPLICATION_DEFAULTS: ApplicationDefaults = {
+  defaultPartySize: 1,
+};
+
 export type UserProfile = {
   email: string;
   emailConfirmed: boolean;
@@ -105,6 +113,7 @@ export type UserProfile = {
   measurementSystem: MeasurementSystem;
   emailNotifications: EmailNotificationPrefs;
   sitDefaults: SitCreationDefaults;
+  applicationDefaults: ApplicationDefaults;
   memberSince: number;
   phoneCountryCode: string;
   phoneNumber: string;
@@ -114,6 +123,7 @@ export type UserProfile = {
 type AppStore = {
   saved: string[];
   archivedConversations: string[];
+  deletedConversations: string[];
   archivedSits: string[];
   blockedUsers: BlockedUser[];
   userReports: UserReport[];
@@ -121,6 +131,7 @@ type AppStore = {
   hydratePrefs: (prefs: {
     saved: string[];
     archivedConversations: string[];
+    deletedConversations: string[];
     archivedSits: string[];
     blockedUsers: BlockedUser[];
     userReports: UserReport[];
@@ -129,6 +140,7 @@ type AppStore = {
   archiveConversation: (id: string) => void;
   unarchiveConversation: (id: string) => void;
   isConversationArchived: (id: string) => boolean;
+  deleteConversation: (id: string) => void;
   archiveSit: (id: string) => void;
   unarchiveSit: (id: string) => void;
   isSitArchived: (id: string) => boolean;
@@ -163,6 +175,7 @@ export const useAppStore = create<AppStore>()(
     (set, get) => ({
       saved: [],
       archivedConversations: [],
+      deletedConversations: [],
       archivedSits: [],
       blockedUsers: [],
       userReports: [],
@@ -171,6 +184,7 @@ export const useAppStore = create<AppStore>()(
         set({
           saved: prefs.saved,
           archivedConversations: prefs.archivedConversations,
+          deletedConversations: prefs.deletedConversations,
           archivedSits: prefs.archivedSits,
           blockedUsers: prefs.blockedUsers,
           userReports: prefs.userReports.map((report) => ({
@@ -192,6 +206,7 @@ export const useAppStore = create<AppStore>()(
       },
       archiveConversation: (id) => {
         if (get().archivedConversations.includes(id)) return;
+        if (get().deletedConversations.includes(id)) return;
         set((state) => ({
           archivedConversations: [...state.archivedConversations, id],
         }));
@@ -212,6 +227,19 @@ export const useAppStore = create<AppStore>()(
         });
       },
       isConversationArchived: (id) => get().archivedConversations.includes(id),
+      deleteConversation: (id) => {
+        if (get().deletedConversations.includes(id)) return;
+        set((state) => ({
+          deletedConversations: [...state.deletedConversations, id],
+          archivedConversations: state.archivedConversations.filter(
+            (conversationId) => conversationId !== id,
+          ),
+        }));
+        void withApiSession(async () => {
+          const m = await import("@/apiRemote");
+          await m.apiDeleteConversation(id);
+        });
+      },
       archiveSit: (id) => {
         if (get().archivedSits.includes(id)) return;
         set((state) => ({ archivedSits: [...state.archivedSits, id] }));
@@ -325,6 +353,7 @@ export const useAppStore = create<AppStore>()(
             measurementSystem: detectMeasurementSystem(),
             emailNotifications: { ...DEFAULT_EMAIL_NOTIFICATIONS },
             sitDefaults: { ...DEFAULT_SIT_CREATION_DEFAULTS },
+            applicationDefaults: { ...DEFAULT_APPLICATION_DEFAULTS },
             memberSince: 2024,
             phoneCountryCode: phoneCountryCodeFromLocation(location),
             phoneNumber: "",
@@ -374,6 +403,7 @@ export const useAppStore = create<AppStore>()(
         set({
           saved: [],
           archivedConversations: [],
+          deletedConversations: [],
           archivedSits: [],
           blockedUsers: [],
           userReports: [],
@@ -390,12 +420,13 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: "harbourly",
-      version: 16,
+      version: 18,
       migrate: (persistedState) => {
         const state = persistedState as AppStore;
         const next = {
           ...state,
           archivedConversations: state.archivedConversations ?? [],
+          deletedConversations: state.deletedConversations ?? [],
           archivedSits: state.archivedSits ?? [],
           blockedUsers: state.blockedUsers ?? [],
           userReports: state.userReports ?? [],
@@ -427,6 +458,10 @@ export const useAppStore = create<AppStore>()(
             sitDefaults: {
               ...DEFAULT_SIT_CREATION_DEFAULTS,
               ...next.user.sitDefaults,
+            },
+            applicationDefaults: {
+              ...DEFAULT_APPLICATION_DEFAULTS,
+              ...next.user.applicationDefaults,
             },
             memberSince: next.user.memberSince ?? 2024,
             phoneNumber,

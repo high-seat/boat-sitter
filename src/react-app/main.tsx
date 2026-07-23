@@ -37,6 +37,14 @@ queryClient.setQueryDefaults(["notifications"], {
   staleTime: 0,
 });
 
+/** Dev-only crash trigger so Playwright can exercise the error boundary UI. */
+function DevCrashProbe() {
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("crash")) {
+    throw new Error("Dev crash probe");
+  }
+  return null;
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -44,6 +52,7 @@ createRoot(document.getElementById("root")!).render(
         <ErrorBoundary>
           <AnalyticsListener />
           <ConsentBanner />
+          <DevCrashProbe />
           <ResetPasswordPage />
           <EmailVerifiedBanner />
           <App />

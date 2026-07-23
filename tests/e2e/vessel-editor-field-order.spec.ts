@@ -43,6 +43,9 @@ test.describe("vessel editor field order", () => {
     await uploadVesselGalleryPhoto(page);
     const caption = page.getByTestId("vessel-gallery-caption");
     const remove = page.getByTestId("vessel-gallery-remove");
+    const coverRemove = page.getByTestId("vessel-cover-remove");
+    await expect(coverRemove).toContainText(/Remove photo/i);
+    await expect(remove).toContainText(/Remove photo/i);
     const gap = await caption.evaluate((el, removeTestId) => {
       const removeEl = document.querySelector(`[data-testid="${removeTestId}"]`);
       if (!removeEl) return 0;
@@ -52,5 +55,7 @@ test.describe("vessel editor field order", () => {
     }, "vessel-gallery-remove");
     expect(gap).toBeGreaterThanOrEqual(12);
     await expect(remove).toBeVisible();
+    await expect(coverRemove.locator("svg")).toHaveCount(1);
+    await expect(remove.locator("svg")).toHaveCount(1);
   });
 });

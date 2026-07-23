@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
-import { seedDevFixture } from "./helpers/fixtures";
+import { seedDevFixture, seedLifecycleSit } from "./helpers/fixtures";
 
 test.describe("sit emergency help during underway", () => {
   test("owner can open emergency guidance from My sits", async ({ page }) => {
@@ -21,10 +21,7 @@ test.describe("sit emergency help during underway", () => {
     await expect(dialog).toHaveCount(0);
   });
 
-  test("sitter can open emergency guidance from My sits and Messages", async ({
-    page,
-    browser,
-  }) => {
+  test("sitter can open emergency guidance from My sits", async ({ page, browser }) => {
     const mayaContext = await browser.newContext();
     const mayaPage = await mayaContext.newPage();
     await seedVerifiedOwner(mayaPage);
@@ -49,9 +46,18 @@ test.describe("sit emergency help during underway", () => {
       .getByRole("button", { name: /Got it/i })
       .click();
 
+    // Messages chat chrome stays free of Emergency; My sits owns that CTA.
     await page.goto("/messages?application=application-underway-emergency-e2e");
-    await expect(page.getByTestId("sit-emergency-help")).toBeVisible();
-    await page.getByTestId("sit-emergency-help").click();
-    await expect(page.getByRole("dialog").getByText(/Ambulance/i)).toBeVisible();
+    await expect(page.getByTestId("conversation-messages")).toBeVisible();
+    await expect(page.getByTestId("sit-emergency-help")).toHaveCount(0);
+  });
+
+  test("does not show Emergency in chat for a non-confirmed applicant", async ({ page }) => {
+    await seedVerifiedOwner(page);
+    await seedLifecycleSit(page, "underway");
+
+    await page.goto("/messages?application=application-lifecycle-prior-e2e");
+    await expect(page.getByTestId("conversation-messages")).toBeVisible();
+    await expect(page.getByTestId("sit-emergency-help")).toHaveCount(0);
   });
 });

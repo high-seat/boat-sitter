@@ -76,8 +76,9 @@ export function VesselPrivateAccessCard({
 
   return (
     <section
-      className="overflow-hidden rounded-2xl border border-teal/35 bg-seafoam/60"
       aria-label={t("privateAccess.title")}
+      className="overflow-hidden rounded-2xl border border-teal/35 bg-seafoam/60"
+      data-testid="boat-access-details"
     >
       <div className="border-b border-teal/25 px-5 py-4">
         <div className="flex items-start gap-3">

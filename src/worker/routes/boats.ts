@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { getDb } from "../db";
 import { sits, vessels } from "../db/schema";
 import { joinBoat } from "../lib/join";
+import { getOwnerResponseTimeBucket } from "../lib/responseTime";
 import { queryBoatsPage } from "../lib/boatsQuery";
 import { parseBoatsSearchParams } from "../../shared/boatsSearch";
 
@@ -39,5 +40,12 @@ boatsRouter.get("/:id", async (c) => {
     .limit(1);
 
   if (!row.length) return c.json({ error: "Boat not found" }, 404);
-  return c.json({ data: joinBoat(row[0].vessel, row[0].sit) });
+  const boat = joinBoat(row[0].vessel, row[0].sit);
+  const ownerResponseTime = await getOwnerResponseTimeBucket(db, boat.owner);
+  return c.json({
+    data: {
+      ...boat,
+      ownerResponseTime,
+    },
+  });
 });

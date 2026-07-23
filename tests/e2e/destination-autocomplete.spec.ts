@@ -118,7 +118,14 @@ test.describe("destination autocomplete gazetteer", () => {
       .getByRole("option", { name: /^Austria/i })
       .first()
       .click();
-    await expect(field.getByText(/^Austria$/)).toBeVisible();
+    const austriaChip = field.getByTestId("destination-chip").filter({ hasText: /^Austria$/ });
+    await expect(austriaChip).toBeVisible();
+    await expect(austriaChip).toHaveAttribute("data-destination-kind", "country");
+    await expect(austriaChip.getByTestId("destination-chip-flag")).toBeVisible();
+    await expect(austriaChip.getByTestId("destination-chip-flag")).toHaveAttribute(
+      "src",
+      /flagcdn\.com\/at\.svg/i,
+    );
     await expect(input).toHaveValue("");
 
     await input.fill("Vien");
@@ -129,8 +136,37 @@ test.describe("destination autocomplete gazetteer", () => {
       .getByRole("option", { name: /^Vienna/i })
       .first()
       .click();
-    await expect(field.getByText(/^Vienna$/)).toBeVisible();
+    const viennaChip = field.getByTestId("destination-chip").filter({ hasText: /^Vienna$/ });
+    await expect(viennaChip).toBeVisible();
+    await expect(viennaChip).toHaveAttribute("data-destination-kind", "city");
+    await expect(viennaChip.getByTestId("destination-chip-flag")).toBeVisible();
+    await expect(viennaChip.getByTestId("destination-chip-flag")).toHaveAttribute(
+      "src",
+      /flagcdn\.com\/at\.svg/i,
+    );
     await expect(input).toHaveValue("");
     await expect(input).not.toHaveValue(/\|/);
+  });
+
+  test("shows country flags on city chips from the empty-state ports", async ({ page }) => {
+    await page.goto("/");
+    const field = page.getByTestId("home-destination");
+    const input = page.getByTestId("home-destination-input");
+    await input.click();
+    const list = page.getByTestId("destination-suggestions");
+    await expect(list).toBeVisible({ timeout: 10_000 });
+    await list.getByRole("option", { name: /Lefkada/i }).click();
+    await list.getByRole("option", { name: /Split/i }).click();
+
+    const lefkada = field.getByTestId("destination-chip").filter({ hasText: /^Lefkada$/ });
+    const split = field.getByTestId("destination-chip").filter({ hasText: /^Split$/ });
+    await expect(lefkada.getByTestId("destination-chip-flag")).toHaveAttribute(
+      "src",
+      /flagcdn\.com\/gr\.svg/i,
+    );
+    await expect(split.getByTestId("destination-chip-flag")).toHaveAttribute(
+      "src",
+      /flagcdn\.com\/hr\.svg/i,
+    );
   });
 });

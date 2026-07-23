@@ -45,13 +45,22 @@ test.describe("sit creation flow", () => {
     await expect(
       modal.getByTestId("form-label-required").filter({ hasText: /Full address/i }),
     ).toBeVisible();
+    await expect(
+      modal.getByTestId("form-label-required").filter({ hasText: /Sit type/i }),
+    ).toBeVisible();
+    await expect(
+      modal.getByTestId("form-label-required").filter({ hasText: /Sit location/i }),
+    ).toBeVisible();
     await expect(modal.getByText(/Not shared until you accept an applicant/i)).toBeVisible();
     const publish = modal.getByTestId("sit-publish");
     await expect(publish).toBeDisabled();
     await expect(publish).not.toHaveAttribute("title");
     await publish.hover({ force: true });
-    await expect(page.getByRole("tooltip", { name: /Still needed:.*Sit dates/i })).toBeVisible();
-    await expect(page.getByRole("tooltip", { name: /Full address/i })).toBeVisible();
+    const blocked = page.getByRole("tooltip", { name: /Still needed:/i });
+    await expect(blocked).toBeVisible();
+    await expect(blocked).toContainText(/Sit dates/i);
+    await expect(blocked).toContainText(/Full address/i);
+    await expect(blocked).not.toContainText(/Full address.*Full address/i);
     await expect(modal.getByRole("complementary", { name: /Live preview/i })).toBeVisible();
     await expect(modal.getByText(/How it will look/i)).toBeVisible();
     await expect(modal.getByText(/Solstice/i).first()).toBeVisible();

@@ -14,14 +14,22 @@ function ErrorFallback({ error, onReset }: { error: Error; onReset: () => void }
   const { t } = useTranslation();
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-5 py-16 text-center">
+    <main
+      className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-5 py-16 text-center"
+      data-testid="error-boundary"
+    >
       <span className="grid size-14 place-items-center rounded-full bg-coral/10 text-coral">
         <TriangleAlert size={28} />
       </span>
-      <h1 className="mt-6 font-display text-3xl font-extrabold text-navy">
+      <h1
+        className="mt-6 font-display text-3xl font-extrabold text-navy"
+        data-testid="error-boundary-title"
+      >
         {t("errorBoundary.title")}
       </h1>
-      <p className="mt-3 leading-7 text-slate">{t("errorBoundary.text")}</p>
+      <p className="mt-3 leading-7 text-slate" data-testid="error-boundary-text">
+        {t("errorBoundary.text")}
+      </p>
       {import.meta.env.DEV && (
         <pre className="mt-6 max-h-64 w-full overflow-auto rounded-2xl border border-line bg-cream p-4 text-left text-xs leading-5 whitespace-pre-wrap text-navy">
           {error.stack || error.message || String(error)}
@@ -30,6 +38,7 @@ function ErrorFallback({ error, onReset }: { error: Error; onReset: () => void }
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <button
           className="rounded-full bg-coral px-6 py-3 font-bold text-white hover:bg-coral-dark"
+          data-testid="error-boundary-try-again"
           onClick={onReset}
           type="button"
         >
@@ -37,6 +46,7 @@ function ErrorFallback({ error, onReset }: { error: Error; onReset: () => void }
         </button>
         <button
           className="rounded-full border border-line px-6 py-3 font-bold text-navy hover:border-teal"
+          data-testid="error-boundary-go-home"
           onClick={() => {
             window.location.assign("/");
           }}

@@ -10,6 +10,7 @@ import {
   parseApplicationStatusFilter,
   prepareApplicationReviewLists,
 } from "../../shared/applicationsSearch";
+import { isSitUnderway } from "../../shared/sitSchedule";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import {
@@ -384,6 +385,26 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
   if (!appRow) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
   if ((await ownerIdForApplication(c.env, appRow)) !== user.id) {
     return c.json({ error: "Only the listing owner can change this" }, 403);
+  }
+
+  // Once a sit is underway (or already cancelled), owners must cancel the sit
+  // rather than unaccept the sitter.
+  if (appRow.status === "accepted" && status !== "accepted") {
+    const sit = await db.query.sits.findFirst({ where: eq(sits.id, appRow.sitId) });
+    if (sit?.cancelledAt) {
+      return c.json({ error: "SIT_UNACCEPT_NOT_ALLOWED" }, 400);
+    }
+    if (
+      sit &&
+      isSitUnderway({
+        dateStart: sit.dateStart,
+        duration: sit.duration,
+        accepted: true,
+        cancelledAt: sit.cancelledAt,
+      })
+    ) {
+      return c.json({ error: "SIT_UNACCEPT_NOT_ALLOWED" }, 400);
+    }
   }
 
   const [row] = await db

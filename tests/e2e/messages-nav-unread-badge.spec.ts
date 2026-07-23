@@ -34,15 +34,29 @@ test.describe("messages nav unread badge", () => {
     await sitterContext.close();
 
     await page.goto("/");
-    const messagesLink = page.getByRole("link", { name: /Messages, 1 unread/i }).first();
-    await expect(messagesLink).toBeVisible({ timeout: 15_000 });
-    await expect(messagesLink.locator("span").filter({ hasText: /^1$/ })).toBeVisible();
+    // Desktop + mobile nav both mount the same controls.
+    const messagesLink = page.getByTestId("messages-nav-link").first();
+    await expect(messagesLink).toHaveAttribute("aria-label", /Messages, 1 unread/i, {
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId("messages-unread-count").first()).toHaveText("1");
+
+    // Chat messages stay off the notifications bell; the messages badge owns unread.
+    await page.getByTestId("notifications-open").first().click();
+    const menu = page.getByTestId("notifications-menu");
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /sent you a new message/i })).toHaveCount(0);
+    await page.keyboard.press("Escape");
 
     await page.goto("/messages?application=application-alex-solstice");
     await expect(page.getByTestId("conversation-messages")).toBeVisible();
-    await expect(page.getByRole("link", { name: /^Messages$/i }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(page.getByRole("link", { name: /Messages, \d+ unread/i })).toHaveCount(0);
+    await expect(page.getByTestId("messages-nav-link").first()).toHaveAttribute(
+      "aria-label",
+      /^Messages$/i,
+      {
+        timeout: 15_000,
+      },
+    );
+    await expect(page.getByTestId("messages-unread-count")).toHaveCount(0);
   });
 });

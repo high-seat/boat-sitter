@@ -74,31 +74,37 @@ export function VesselPreviewCard({ vessel }: { vessel: VesselPreviewFields }) {
       : typeLength;
 
   return (
-    <article className="pointer-events-none flex select-none flex-col gap-5 rounded-2xl border border-line bg-white p-4 shadow-card sm:flex-row sm:items-center">
+    <article className="pointer-events-none flex max-w-full min-w-0 select-none flex-col gap-5 overflow-hidden rounded-2xl border border-line bg-white p-4 shadow-card sm:flex-row sm:items-center">
       <img
         alt=""
-        className="aspect-2/1 w-full rounded-xl object-cover sm:size-32"
+        className="aspect-2/1 w-full shrink-0 rounded-xl object-cover sm:size-32"
         onError={(event) => {
           event.currentTarget.src = FALLBACK_IMAGE;
         }}
         src={optimizePhotoUrl(image, 480)}
       />
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-bold uppercase tracking-wider text-teal">{specsLine}</p>
-        <p className="mt-1 font-display text-xl font-bold text-navy">{name}</p>
-        <p className="mt-1 flex items-center gap-1.5 text-sm text-slate">
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <p className="truncate text-xs font-bold uppercase tracking-wider text-teal">{specsLine}</p>
+        <p
+          className="mt-1 truncate font-display text-xl font-bold text-navy"
+          data-testid="vessel-preview-name"
+          title={name}
+        >
+          {name}
+        </p>
+        <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm text-slate">
           <MapPin aria-hidden="true" className="shrink-0" size={14} />
-          <span className="truncate" data-testid="vessel-preview-location">
+          <span className="truncate" data-testid="vessel-preview-location" title={homePortLabel}>
             {homePortLabel}
           </span>
         </p>
-        <p className="mt-1 text-xs text-slate">
+        <p className="mt-1 truncate text-xs text-slate">
           {t("owner.engineSummary", { engine: labelFor(t, vessel.engineType) })}
         </p>
-        <p className="mt-1 text-xs text-slate">
+        <p className="mt-1 truncate text-xs text-slate">
           {t("owner.voltageSummary", { voltage: labelFor(t, vessel.voltageType) })}
         </p>
-        <p className="mt-1 text-xs text-slate">
+        <p className="mt-1 truncate text-xs text-slate">
           {t("owner.stoveSummary", { fuel: labelFor(t, vessel.stoveFuelType) })}
         </p>
       </div>

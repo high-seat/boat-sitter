@@ -2,14 +2,14 @@
 name: verify-ui-with-playwright
 description: >-
   Verifies every Boatstead UI change in a real browser using the Playwright
-  MCP, posts screenshots of the feature in its different states into the chat
-  for review, and keeps automated Playwright specs in tests/e2e in sync.
-  Requires data-testid on elements under test and getByTestId in specs. Use
-  automatically after changing components, pages, routes, forms, interactions,
-  responsive behavior, or CSS in this repository. Do not call a UI task complete
-  until the affected flow has been exercised visually, screenshots of its
-  states are shown in chat, and matching e2e coverage exists or has been
-  updated.
+  MCP, posts English screenshots of the feature in its different states into
+  the chat for review, and keeps automated Playwright specs in tests/e2e in
+  sync. Requires data-testid on elements under test and getByTestId in specs.
+  Use automatically after changing components, pages, routes, forms,
+  interactions, responsive behavior, or CSS in this repository. Do not call a
+  UI task complete until the affected flow has been exercised visually,
+  English screenshots of its states are shown in chat, and matching e2e
+  coverage exists or has been updated.
 ---
 
 # Verify UI with Playwright
@@ -45,8 +45,9 @@ they are missing, add them.
    selectors in `tests/e2e` to `getByTestId`.
 6. Run the affected specs with `pnpm test:e2e` (or
    `pnpm exec playwright test path/to/spec`) before calling the task done.
-7. Keep MCP visual checks for layout, responsive German, and exploratory QA;
-   keep `tests/e2e` for repeatable regression coverage of critical flows.
+7. Keep MCP visual checks for layout, responsive German stress-testing, and
+   exploratory QA; keep `tests/e2e` for repeatable regression coverage of
+   critical flows. Chat review screenshots stay English-only.
 
 ### Test id conventions
 
@@ -80,30 +81,41 @@ Current high-value coverage to extend rather than reinvent:
      screenshots or other verification artifacts in the repository root.
 4. For authenticated states, press `Meta+K` (`Control+K` outside macOS) and
    select the relevant mock sitter or owner.
-5. When testing changes, test in German too, which tends to be longer text and
-   can break UIs. Switch the footer `LanguageSelect` to **Deutsch** (`de`),
-   re-run the affected flow at mobile width especially, and look for truncation,
-   overflow, wrapping that breaks buttons/nav, and clipped labels. Prefer
-   German screenshots with a `-de` suffix (e.g. `feature-mobile-de.png`).
-6. Check:
+5. When testing changes, also stress-test in German (longer copy can break
+   layouts). Switch the footer `LanguageSelect` to **Deutsch** (`de`), re-run
+   the affected flow at mobile width especially, and look for truncation,
+   overflow, wrapping that breaks buttons/nav, and clipped labels. Save any
+   German layout-check captures with a `-de` suffix only as local artifacts
+   (e.g. `feature-mobile-de.png`); do **not** post German screenshots in chat
+   for review.
+6. **Always show review screenshots in English.** Before capturing screenshots
+   that will be posted in chat, set the UI language to **English (US)**
+   (`en-US`) via the footer `LanguageSelect` (or ensure it is already
+   selected). Every screenshot shown to the user for visual review must be in
+   English, regardless of any German (or other-locale) layout checks you also
+   ran.
+7. Check:
    - Layout, spacing, alignment, typography, and image loading.
    - Overflow and clipping with narrow screens and long content.
    - Keyboard operation, focus behavior, modals, and form validation.
    - Route transitions and persisted localStorage state.
    - Loading, empty, error, and successful mutation states where relevant.
-7. Update or add `tests/e2e` coverage for the same change: add `data-testid`s on
+8. Update or add `tests/e2e` coverage for the same change: add `data-testid`s on
    targeted UI, point specs at `getByTestId`, then run the affected Playwright
    specs.
-8. Fix any issue found, then repeat the affected browser flow and screenshot.
-9. **Post screenshots in chat for review** before calling the feature done (see
-   below). Saving files under `.artifacts/playwright/` alone is not enough.
+9. Fix any issue found, then repeat the affected browser flow and screenshot.
+10. **Post screenshots in chat for review** before calling the feature done (see
+    below). Saving files under `.artifacts/playwright/` alone is not enough.
+    Those review screenshots must be in English (see workflow step 6).
 
 ## Post screenshots in chat for review
 
 After developing a feature (or finishing a UI change), put Playwright
 screenshots of it in its different states into the chat so they can be reviewed.
 
-1. Capture via Playwright MCP `browser_take_screenshot` for each meaningful
+1. Switch the UI to **English (US)** before any screenshot that will be shown
+   in chat. Do not post German (or other non-English) screenshots for review.
+2. Capture via Playwright MCP `browser_take_screenshot` for each meaningful
    state the change introduces or touches. Typical set when applicable:
    - Default / resting
    - Empty
@@ -111,15 +123,16 @@ screenshots of it in its different states into the chat so they can be reviewed.
    - Filled / success
    - Error / validation
    - Open modal, menu, or expanded panel
-   - Desktop and mobile (and German mobile when layout risk is high)
-2. Save under `.artifacts/playwright/` with clear names
-   (e.g. `cancel-sit-dialog-open-desktop.png`, `messages-empty-mobile-de.png`).
-3. Show those screenshots in the chat: use the MCP screenshot result and/or
-   Read each saved image path so the images appear inline for the user. Label
-   each with state, viewport, and locale.
-4. Do not mark the UI task complete until the relevant states have been
-   screenshotted and posted in chat (unless the Playwright MCP was unavailable
-   — then report that blocker explicitly).
+   - Desktop and mobile
+3. Save under `.artifacts/playwright/` with clear names
+   (e.g. `cancel-sit-dialog-open-desktop.png`). German layout-check artifacts
+   may use a `-de` suffix but stay local only.
+4. Show the English screenshots in the chat: use the MCP screenshot result
+   and/or Read each saved image path so the images appear inline for the user.
+   Label each with state and viewport.
+5. Do not mark the UI task complete until the relevant states have been
+   screenshotted in English and posted in chat (unless the Playwright MCP was
+   unavailable — then report that blocker explicitly).
 
 ## Minimum route coverage
 
@@ -134,10 +147,11 @@ Choose routes relevant to the change:
 
 ## Reporting
 
-State which route, viewport, locale (include German), interaction, and e2e
-specs were verified or updated. Include the in-chat screenshots of the feature
-in its different states so the user can review appearance without opening
-artifact paths. Never claim a visual check occurred if the Playwright MCP was
-unavailable or could not connect; report that blocker explicitly. Never claim
-e2e coverage was updated if `tests/e2e` was left unchanged for a flow that has
-or should have automated tests.
+State which route, viewport, interaction, and e2e specs were verified or
+updated. Mention if a German layout stress-check was also run. Include the
+in-chat **English** screenshots of the feature in its different states so the
+user can review appearance without opening artifact paths. Never claim a
+visual check occurred if the Playwright MCP was unavailable or could not
+connect; report that blocker explicitly. Never claim e2e coverage was updated
+if `tests/e2e` was left unchanged for a flow that has or should have automated
+tests.

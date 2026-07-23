@@ -4,9 +4,13 @@ import { useTranslation } from "react-i18next";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { countryIsoFromName } from "@/countryUtils";
 import type { Destination } from "@/destinations";
+import { curatedMarinaCities } from "@/destinations";
 import { queries } from "@/queries";
 import { ShimmerBlock } from "@/components/ui/Shimmer";
-import { TOP_BOAT_SITTING_PORT_CITY_LIMIT } from "../../../shared/popularPortCities";
+import {
+  TOP_BOAT_SITTING_PORT_CITIES,
+  TOP_BOAT_SITTING_PORT_CITY_LIMIT,
+} from "../../../shared/popularPortCities";
 
 function DestinationSuggestionsSkeleton() {
   return (
@@ -35,6 +39,19 @@ function selectedCountryCode(selected: string) {
     .filter(Boolean);
   if (parts.length >= 2) return countryIsoFromName(parts.at(-1)!);
   return countryIsoFromName(selected);
+}
+
+const CITY_COUNTRY_BY_NAME = new Map<string, string>([
+  ...TOP_BOAT_SITTING_PORT_CITIES.map((city) => [city.name, city.countryName] as const),
+  ...curatedMarinaCities.map((city) => [city.name, city.detail] as const),
+]);
+
+function chipCountryCode(selected: string, remembered?: string) {
+  if (remembered) return remembered;
+  const direct = selectedCountryCode(selected);
+  if (direct) return direct;
+  const countryName = CITY_COUNTRY_BY_NAME.get(selected);
+  return countryName ? countryIsoFromName(countryName) : undefined;
 }
 
 export function DestinationAutocomplete({
@@ -69,6 +86,7 @@ export function DestinationAutocomplete({
   const [draft, setDraft] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [editing, setEditing] = useState(!value.trim());
+  const [chipCodes, setChipCodes] = useState<Record<string, string>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const selectedDestinations = useMemo(
     () =>
@@ -171,6 +189,10 @@ export function DestinationAutocomplete({
       includeCountry && destination.kind === "City"
         ? `${destination.name}, ${destination.detail}`
         : destination.name;
+    const code = suggestionCountryCode(destination);
+    if (code) {
+      setChipCodes((prev) => ({ ...prev, [selection]: code }));
+    }
     if (multiple) {
       onChange([...selectedDestinations, selection].join("|"));
       setDraft("");
@@ -185,6 +207,11 @@ export function DestinationAutocomplete({
   }
 
   function removeSelection(selection: string) {
+    setChipCodes((prev) => {
+      const next = { ...prev };
+      delete next[selection];
+      return next;
+    });
     onChange(selectedDestinations.filter((destination) => destination !== selection).join("|"));
     inputRef.current?.focus();
   }
@@ -265,23 +292,38 @@ export function DestinationAutocomplete({
           </span>
         )}
         <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-          {selectedDestinations.map((destination) => (
-            <span
-              className="flex max-w-full items-center gap-1 rounded-full bg-seafoam px-2.5 py-1 text-xs font-semibold text-navy"
-              key={destination}
-            >
-              <span className="truncate">{destination}</span>
-              <button
-                aria-label={t("destination.remove", { destination })}
-                className="shrink-0 rounded-full p-0.5 text-slate hover:bg-white hover:text-navy"
-                onClick={() => removeSelection(destination)}
-                onMouseDown={(event) => event.preventDefault()}
-                type="button"
+          {selectedDestinations.map((destination) => {
+            const pillCode = chipCountryCode(destination, chipCodes[destination]);
+            const isCountry = Boolean(countryIsoFromName(destination));
+            return (
+              <span
+                className="flex max-w-full items-center gap-1 rounded-full bg-seafoam px-2.5 py-1 text-xs font-semibold text-navy"
+                data-testid="destination-chip"
+                data-destination-kind={isCountry ? "country" : "city"}
+                key={destination}
               >
-                <X size={11} />
-              </button>
-            </span>
-          ))}
+                {pillCode ? (
+                  <img
+                    alt=""
+                    aria-hidden="true"
+                    className="size-3.5 shrink-0 rounded-[2px] object-cover"
+                    data-testid="destination-chip-flag"
+                    src={`https://flagcdn.com/${pillCode.toLowerCase()}.svg`}
+                  />
+                ) : null}
+                <span className="truncate">{destination}</span>
+                <button
+                  aria-label={t("destination.remove", { destination })}
+                  className="shrink-0 rounded-full p-0.5 text-slate hover:bg-white hover:text-navy"
+                  onClick={() => removeSelection(destination)}
+                  onMouseDown={(event) => event.preventDefault()}
+                  type="button"
+                >
+                  <X size={11} />
+                </button>
+              </span>
+            );
+          })}
           <input
             ref={inputRef}
             aria-autocomplete="list"
@@ -349,6 +391,7 @@ export function DestinationAutocomplete({
           onClick={() => {
             onChange("");
             setDraft("");
+            setChipCodes({});
             setEditing(true);
             setActiveIndex(0);
             setOpen(true);

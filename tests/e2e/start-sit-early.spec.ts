@@ -38,9 +38,12 @@ test.describe("start sit early", () => {
     await expect(ownerCard.getByText(/^Sit underway$/i)).toBeVisible();
     await expect(ownerCard.getByRole("button", { name: /Start sit early/i })).toHaveCount(0);
     await expect(ownerCard.getByTestId("sit-emergency-help")).toBeVisible();
+    await expect(ownerCard.getByTestId("owner-sit-applicants")).toHaveCount(0);
+    await expect(ownerCard.getByTestId("owner-sit-messages")).toBeVisible();
 
     await ownerPage.goto(`/owner/sits/${LIFECYCLE_SIT_ID}/applications`);
-    await expect(ownerPage.getByRole("heading", { name: /Applications for/i })).toBeVisible();
+    await expect(ownerPage.getByRole("heading", { name: /Sit with Alex Morgan/i })).toBeVisible();
+    await expect(ownerPage.getByTestId("active-sit-chat")).toBeVisible();
     await expect(ownerPage.getByRole("button", { name: /Start sit early/i })).toHaveCount(0);
     const underwayStep = ownerPage.getByRole("listitem").filter({ hasText: /Sit underway/i });
     await expect(underwayStep).toHaveClass(/bg-seafoam/);
@@ -69,5 +72,8 @@ test.describe("start sit early", () => {
     await expect(page.getByText(/^Sit underway$/i).first()).toBeVisible();
     await expect(page.getByRole("button", { name: /Start sit early/i })).toHaveCount(0);
     await expect(page.getByTestId("sit-emergency-help").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Sit with Alex Morgan/i })).toBeVisible();
+    await expect(page.getByTestId("active-sit-chat")).toBeVisible();
+    await expect(page.getByTestId("application-applicant-list")).toHaveCount(0);
   });
 });

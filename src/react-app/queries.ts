@@ -16,6 +16,7 @@ import {
   getSitPrivateAccessForViewer,
   getSits,
   getVessels,
+  searchAddresses,
   searchDestinations,
 } from "@/mockApi";
 import { getMemberVerificationChecks, getVerificationStatus } from "@/verificationService";
@@ -102,6 +103,12 @@ const managed = createQueryKeys({
   destinations: {
     root: defineQueryOptions({
       queryKey: ["destinations"],
+      queryFn: async () => [] as const,
+    }),
+  },
+  addresses: {
+    root: defineQueryOptions({
+      queryKey: ["addresses"],
       queryFn: async () => [] as const,
     }),
   },
@@ -318,6 +325,21 @@ export const queries = {
             q,
             kind,
             limit: q.trim() ? 12 : 5,
+          }),
+        staleTime: 30_000,
+      }),
+  },
+
+  addresses: {
+    getQueryKey: managed.addresses.getQueryKey,
+    search: (q: string, lang: string) =>
+      queryOptions({
+        queryKey: ["addresses", lang, q] as const,
+        queryFn: () =>
+          searchAddresses({
+            q,
+            lang,
+            limit: 8,
           }),
         staleTime: 30_000,
       }),

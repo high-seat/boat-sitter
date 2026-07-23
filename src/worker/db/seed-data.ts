@@ -405,6 +405,18 @@ export const seedApplications: SeedApplication[] = [
         text: "Thanks Alex. Your systems experience looks like a strong fit. Are you available for a video handover next week?",
         createdAt: "2026-07-18T13:15:00.000Z",
       },
+      {
+        id: "message-alex-followup",
+        senderName: "Alex Morgan",
+        text: "Yes, mid-week works well for me. Happy to do a walkthrough of bilge, batteries and lines.",
+        createdAt: "2026-07-18T14:00:00.000Z",
+      },
+      {
+        id: "message-maya-followup",
+        senderName: "Maya & Finn",
+        text: "Perfect. We will send a few photos of the systems locker before then.",
+        createdAt: "2026-07-18T14:35:00.000Z",
+      },
     ],
   },
   {
@@ -433,6 +445,12 @@ export const seedApplications: SeedApplication[] = [
         senderName: "Samira Costa",
         text: "Hello, Solstice looks wonderful. I have completed several Mediterranean passages and have cared for boats and pets in Portugal, Spain and Greece.",
         createdAt: "2026-07-19T16:45:00.000Z",
+      },
+      {
+        id: "message-maya-samira-reply",
+        senderName: "Maya & Finn",
+        text: "Thanks Samira. We are still reviewing applicants and will follow up soon.",
+        createdAt: "2026-07-19T18:10:00.000Z",
       },
     ],
   },

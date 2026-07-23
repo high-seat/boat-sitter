@@ -15,9 +15,10 @@ import { IconTooltip } from "@/components/ui/IconTooltip";
 import { NavCountBadge } from "@/components/ui/NavCountBadge";
 import { NotificationsMenuSkeleton } from "@/components/ui/NotificationsMenuSkeleton";
 import { getIntlLocale } from "@/i18n";
-import { markAllNotificationsRead, markNotificationRead, type MockNotification } from "@/mockApi";
+import { markNotificationRead, type MockNotification } from "@/mockApi";
 import { queries } from "@/queries";
 import { useAppStore } from "@/store";
+import { isChatMessageNotification, notificationsForBell } from "@/unreadMessages";
 
 function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   const className = "size-4";
@@ -29,7 +30,11 @@ function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   }
   if (type === "sitSittersFound") return <UserPlus className={className} />;
   if (type === "welcome") return <ShipWheel className={className} />;
-  if (type === "applicationDeclined" || type === "applicationUnaccepted") {
+  if (
+    type === "applicationDeclined" ||
+    type === "applicationUnaccepted" ||
+    type === "sitCancelled"
+  ) {
     return <XCircle className={className} />;
   }
   return <CheckCircle2 className={className} />;
@@ -44,7 +49,7 @@ export function NotificationsMenu() {
   const notificationsQuery = queries.notifications.user(user.name);
   const queryKey = notificationsQuery.queryKey;
   const { data, isPending, isFetching } = useQuery(notificationsQuery);
-  const notifications = data ?? [];
+  const notifications = notificationsForBell(data ?? []);
   const showSkeleton = isPending || (isFetching && data === undefined);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
   const relativeTime = new Intl.RelativeTimeFormat(getIntlLocale(i18n.language), {
@@ -70,12 +75,17 @@ export function NotificationsMenu() {
   });
 
   const markAll = useMutation({
-    mutationFn: () => markAllNotificationsRead(user.name),
+    mutationFn: async () => {
+      const current = queryClient.getQueryData<MockNotification[]>(queryKey) ?? [];
+      const unreadBell = notificationsForBell(current).filter((item) => !item.read);
+      await Promise.all(unreadBell.map((item) => markNotificationRead(item.id, user.name)));
+    },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<MockNotification[]>(queryKey);
+      // Leave chat unread markers alone; they power the messages nav badge.
       queryClient.setQueryData<MockNotification[]>(queryKey, (current = []) =>
-        current.map((item) => ({ ...item, read: true })),
+        current.map((item) => (isChatMessageNotification(item) ? item : { ...item, read: true })),
       );
       return { previous };
     },
@@ -119,17 +129,19 @@ export function NotificationsMenu() {
           aria-haspopup="menu"
           aria-label={t("notifications.open")}
           className="relative inline-flex items-center justify-center rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+          data-testid="notifications-open"
           onClick={() => setOpen((current) => !current)}
           type="button"
         >
           <Bell size={19} />
-          <NavCountBadge count={unreadCount} />
+          <NavCountBadge count={unreadCount} testId="notifications-unread-count" />
         </button>
       </IconTooltip>
       {open && (
         <div
           aria-label={t("notifications.heading")}
           className="fixed top-[4.75rem] right-4 left-4 z-60 flex max-h-[calc(100dvh-5.5rem)] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-float md:absolute md:top-[calc(100%+0.5rem)] md:right-0 md:left-auto md:w-80 md:max-w-[calc(100vw-2rem)] md:max-h-none"
+          data-testid="notifications-menu"
           role="menu"
         >
           <p className="shrink-0 border-b border-line px-4 py-3 font-display text-sm font-bold text-navy">

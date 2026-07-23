@@ -6,6 +6,11 @@ import {
 } from "../shared/applicationsSearch";
 import { boatsSearchQueryString, type BoatSearchParams } from "../shared/boatsSearch";
 import {
+  addressSearchQueryString,
+  type AddressSearchParams,
+  type AddressSuggestion,
+} from "../shared/addressSearch";
+import {
   destinationsSearchQueryString,
   type DestinationSearchParams,
 } from "../shared/destinationsSearch";
@@ -63,6 +68,14 @@ type Boat = {
   nonSmokerRequired?: boolean;
   accepted?: boolean;
   applicationsOpen?: boolean;
+  ownerResponseTime?:
+    | "withinHour"
+    | "withinTwoHours"
+    | "withinHalfDay"
+    | "withinDay"
+    | "withinTwoDays"
+    | "withinFewDays"
+    | null;
 };
 
 type Vessel = Pick<
@@ -122,6 +135,7 @@ type Sit = {
   nonSmokerRequired?: boolean;
   accepted?: boolean;
   applicationsOpen?: boolean;
+  cancelledAt?: string | null;
 };
 
 type ApplicationApplicant = {
@@ -166,7 +180,8 @@ type SitApplication = {
       | "videoCallAccepted"
       | "videoCallDeclined"
       | "phoneShared"
-      | "withdrawn";
+      | "withdrawn"
+      | "sitCancelled";
     videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
     sharedPhone?: string;
   }>;
@@ -234,6 +249,14 @@ type ApiBoat = {
   sitType?: "liveaboard" | "daytimeChecks";
   accepted?: boolean;
   applicationsOpen?: boolean;
+  ownerResponseTime?:
+    | "withinHour"
+    | "withinTwoHours"
+    | "withinHalfDay"
+    | "withinDay"
+    | "withinTwoDays"
+    | "withinFewDays"
+    | null;
 };
 
 type ApiVessel = {
@@ -288,6 +311,7 @@ type ApiSit = {
   sitType?: "liveaboard" | "daytimeChecks";
   accepted?: boolean;
   applicationsOpen?: boolean;
+  cancelledAt?: string | null;
 };
 
 type ApiApplication = {
@@ -343,6 +367,7 @@ export type ApiProfile = {
   measurementSystem: "metric" | "imperial";
   emailNotifications: Record<string, boolean>;
   sitDefaults: Record<string, unknown>;
+  applicationDefaults: Record<string, unknown>;
   memberSince: number;
   phoneCountryCode: string;
   phoneNumber: string;
@@ -463,6 +488,7 @@ export function normalizeApiBoat(row: ApiBoat): Boat {
     maxGuests: 2,
     applicationsOpen: row.applicationsOpen ?? true,
     accepted: Boolean(row.accepted),
+    ownerResponseTime: row.ownerResponseTime ?? null,
   };
 }
 
@@ -539,6 +565,7 @@ export function normalizeApiSit(row: ApiSit): Sit {
       row.applicationsOpen != null
         ? Boolean(row.applicationsOpen)
         : row.published !== false && !accepted,
+    cancelledAt: row.cancelledAt ?? null,
   };
 }
 
@@ -648,6 +675,13 @@ export async function apiSearchDestinations(
   return apiGet<Destination[]>(`/api/destinations${qs}`);
 }
 
+export async function apiSearchAddresses(
+  params: AddressSearchParams = {},
+): Promise<AddressSuggestion[]> {
+  const qs = addressSearchQueryString(params);
+  return apiGet<AddressSuggestion[]>(`/api/addresses${qs}`);
+}
+
 export async function apiGetBoatsPage(params: BoatSearchParams): Promise<{
   boats: Boat[];
   total: number;
@@ -736,6 +770,16 @@ export async function apiDeleteSit(id: string): Promise<void> {
 
 export async function apiStartSitEarly(id: string): Promise<Sit> {
   const row = await apiPost<ApiSit>(`/api/sits/${encodeURIComponent(id)}/start-early`, {});
+  return normalizeApiSit(row);
+}
+
+export async function apiCancelSit(
+  id: string,
+  options: { reopenApplications?: boolean } = {},
+): Promise<Sit> {
+  const row = await apiPost<ApiSit>(`/api/sits/${encodeURIComponent(id)}/cancel`, {
+    reopenApplications: Boolean(options.reopenApplications),
+  });
   return normalizeApiSit(row);
 }
 
@@ -932,6 +976,7 @@ export async function apiUploadImage(blob: Blob, filename = "image.webp"): Promi
 export type ApiUserPrefs = {
   saved: string[];
   archivedConversations: string[];
+  deletedConversations: string[];
   archivedSits: string[];
   blockedUsers: Array<{ name: string; image: string; blockedAt: string }>;
   userReports: Array<{
@@ -972,6 +1017,10 @@ export async function apiSetArchivedConversation(
   const path = `/api/prefs/archived-conversations/${encodeURIComponent(applicationId)}`;
   if (archived) await apiPut(path, {});
   else await apiDelete(path);
+}
+
+export async function apiDeleteConversation(applicationId: string): Promise<void> {
+  await apiPut(`/api/prefs/deleted-conversations/${encodeURIComponent(applicationId)}`, {});
 }
 
 export async function apiSetArchivedSit(sitId: string, archived: boolean): Promise<void> {

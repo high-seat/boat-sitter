@@ -43,6 +43,7 @@ shared form controls belong on list/form screens.
 | Select                            | `@/components/ui/Select`                      |
 | Date range                        | `@/components/forms/DateRangePicker`          |
 | Country / city autocomplete       | `@/components/search/DestinationAutocomplete` |
+| Street / marina address search    | `@/components/search/AddressAutocomplete`     |
 | Hover tooltip (incl. blocked CTA) | `@/components/ui/IconTooltip`                 |
 | Confirm dialog                    | `@/components/ui/ConfirmDialog`               |
 | Loading placeholder               | `@/components/ui/Shimmer` (`ShimmerBlock`)    |

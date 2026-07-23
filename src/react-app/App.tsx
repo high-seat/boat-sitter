@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { RESPONSE_TIME_I18N_KEY } from "../shared/responseTime";
 import {
   Anchor,
   Archive,
@@ -47,6 +48,7 @@ import {
   Video,
   KeyRound,
   Flag,
+  Ban,
   Waves,
   Wrench,
   X,
@@ -93,18 +95,23 @@ import { SegmentedTab, SegmentedTabs, segmentedTabClassName } from "@/components
 import { ShimmerBlock } from "@/components/ui/Shimmer";
 import { VesselPicker } from "@/components/ui/VesselPicker";
 import { DestinationAutocomplete } from "@/components/search/DestinationAutocomplete";
+import { AddressAutocomplete } from "@/components/search/AddressAutocomplete";
 import { AuthModal } from "@/components/forms/AuthModal";
 import { ConversationPanel } from "@/components/applications/ConversationPanel";
+import { ConversationRowActions } from "@/components/applications/ConversationRowActions";
 import { formatApplicationSystemMessage } from "@/components/applications/formatApplicationSystemMessage";
 import { CloseApplicationsRequestsDialog } from "@/components/applications/CloseApplicationsRequestsDialog";
 import { SitEmergencyHelp } from "@/components/applications/SitEmergencyHelp";
+import { CancelSitDialog } from "@/components/applications/CancelSitDialog";
 import { WithdrawInterestDialog } from "@/components/applications/WithdrawInterestDialog";
 import { AdminPage } from "@/components/admin/AdminPage";
 import { SitterAvailabilityPage } from "@/components/availability/SitterAvailabilityPage";
+import { CollapsiblePills } from "@/components/ui/CollapsiblePills";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { isAdminUser } from "@/adminAccess";
 import { DateRangePicker } from "@/components/forms/DateRangePicker";
 import { ImageUploadControl } from "@/components/forms/ImageUploadControl";
+import { RemovePhotoButton } from "@/components/forms/RemovePhotoButton";
 import { PhoneCountryCodeSelect } from "@/components/forms/PhoneCountryCodeSelect";
 import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
 import {
@@ -128,6 +135,7 @@ import { deleteMockAccount } from "@/mockAuth";
 import { LanguageSelect } from "@/components/layout/LanguageSelect";
 import { MessagesNavLink } from "@/components/layout/MessagesNavLink";
 import { NotificationsMenu } from "@/components/layout/NotificationsMenu";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import {
   containsOffPlatformContactDetails,
   deleteSit,
@@ -141,6 +149,7 @@ import {
   sendApplicationMessage,
   shareApplicationPhoneNumber,
   startSitEarly,
+  cancelSit,
   requestApplicationVideoCall,
   acceptApplicationVideoCall,
   declineApplicationVideoCall,
@@ -166,6 +175,7 @@ import {
   type Vessel,
 } from "@/mockApi";
 import { VesselPrivateAccessCard } from "@/components/listing/VesselPrivateAccessCard";
+import { SitterSitPrivateAccess } from "@/components/listing/SitterSitPrivateAccess";
 import {
   convertBoatLength,
   formatBoatLength,
@@ -193,6 +203,7 @@ import {
   SitterReviewsSection,
 } from "@/components/reviews/SitterReviews";
 import {
+  DEFAULT_APPLICATION_DEFAULTS,
   DEFAULT_EMAIL_NOTIFICATIONS,
   DEFAULT_SIT_CREATION_DEFAULTS,
   detectMeasurementSystem,
@@ -533,10 +544,10 @@ function Header() {
         <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 lg:px-8">
           <Logo />
           <nav className="hidden items-center gap-8 text-sm md:flex">
-            <NavLink className={navClass} to="/boats">
+            <NavLink className={navClass} data-testid="nav-find" to="/boats">
               {t("nav.find")}
             </NavLink>
-            <NavLink className={navClass} to="/how-it-works">
+            <NavLink className={navClass} data-testid="nav-how" to="/how-it-works">
               {t("nav.how")}
             </NavLink>
             {user ? (
@@ -896,7 +907,7 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
   );
 
   return (
-    <article className={preview ? "pointer-events-none select-none" : "group"}>
+    <article className={preview ? "min-w-0 pointer-events-none select-none" : "group min-w-0"}>
       <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-seafoam">
         {preview ? image : <Link to={`/boats/${boat.id}`}>{image}</Link>}
         <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
@@ -937,65 +948,77 @@ function BoatCard({ boat, preview = false }: { boat: Boat; preview?: boolean }) 
         )}
       </div>
       {preview ? (
-        <div className="block pt-4">
+        <div className="block min-w-0 pt-4">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="truncate text-xs font-bold uppercase tracking-[0.12em] text-teal">
                 {vesselTypeLengthYear(t, boat, measurementSystem)}
               </p>
-              <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
+              <h3
+                className="mt-1 truncate font-display text-xl font-bold tracking-tight text-navy"
+                data-testid="boat-card-name"
+                title={boat.name}
+              >
                 {boat.name}
               </h3>
             </div>
-            <span className="flex items-center gap-1 text-sm font-semibold">
+            <span className="flex shrink-0 items-center gap-1 text-sm font-semibold">
               <Star className="fill-sun text-sun" size={15} /> {boat.rating}
             </span>
           </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
-            <MapPin size={15} />{" "}
-            {formatSitLocation(boat.location, boat.country).trim() ||
-              t("editorPreview.locationUnknown")}
+          <p className="mt-1.5 flex min-w-0 items-center gap-1.5 text-sm text-slate">
+            <MapPin className="shrink-0" size={15} />
+            <span className="truncate">
+              {formatSitLocation(boat.location, boat.country).trim() ||
+                t("editorPreview.locationUnknown")}
+            </span>
           </p>
-          <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
+          <div className="mt-3 flex min-w-0 items-center justify-between gap-3 border-t border-line pt-3 text-sm">
             {boat.dateStart ? (
               <>
-                <span className="font-semibold text-navy">
+                <span className="min-w-0 truncate font-semibold text-navy">
                   {formatSitDates(i18n.language, boat.dateStart, boat.duration)}
                 </span>
-                <span className="text-slate">
+                <span className="shrink-0 text-slate">
                   {t("duration.nights", { count: Number.parseInt(boat.duration, 10) || 0 })}
                 </span>
               </>
             ) : (
-              <span className="text-slate">{t("editorPreview.datesPending")}</span>
+              <span className="truncate text-slate">{t("editorPreview.datesPending")}</span>
             )}
           </div>
         </div>
       ) : (
-        <Link className="block pt-4" to={`/boats/${boat.id}`}>
+        <Link className="block min-w-0 pt-4" to={`/boats/${boat.id}`}>
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-teal">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="truncate text-xs font-bold uppercase tracking-[0.12em] text-teal">
                 {vesselTypeLengthYear(t, boat, measurementSystem)}
               </p>
-              <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-navy">
+              <h3
+                className="mt-1 truncate font-display text-xl font-bold tracking-tight text-navy"
+                data-testid="boat-card-name"
+                title={boat.name}
+              >
                 {boat.name}
               </h3>
             </div>
-            <span className="flex items-center gap-1 text-sm font-semibold">
+            <span className="flex shrink-0 items-center gap-1 text-sm font-semibold">
               <Star className="fill-sun text-sun" size={15} /> {boat.rating}
             </span>
           </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-sm text-slate">
-            <MapPin size={15} />{" "}
-            {formatSitLocation(boat.location, boat.country).trim() ||
-              t("editorPreview.locationUnknown")}
+          <p className="mt-1.5 flex min-w-0 items-center gap-1.5 text-sm text-slate">
+            <MapPin className="shrink-0" size={15} />
+            <span className="truncate">
+              {formatSitLocation(boat.location, boat.country).trim() ||
+                t("editorPreview.locationUnknown")}
+            </span>
           </p>
-          <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-sm">
-            <span className="font-semibold text-navy">
+          <div className="mt-3 flex min-w-0 items-center justify-between gap-3 border-t border-line pt-3 text-sm">
+            <span className="min-w-0 truncate font-semibold text-navy">
               {formatSitDates(i18n.language, boat.dateStart, boat.duration)}
             </span>
-            <span className="text-slate">
+            <span className="shrink-0 text-slate">
               {t("duration.nights", { count: Number.parseInt(boat.duration, 10) })}
             </span>
           </div>
@@ -1999,7 +2022,7 @@ function ApplyModal({
   const [message, setMessage] = useState(
     t("apply.defaultMessage", { owner: boat.owner, boat: boat.name }),
   );
-  const [partySize, setPartySize] = useState(1);
+  const [partySize, setPartySize] = useState(() => user.applicationDefaults?.defaultPartySize ?? 1);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState("");
   const maxGuests = boat.maxGuests ?? 2;
@@ -2201,7 +2224,10 @@ function ApplyModal({
                 </option>
               ))}
             </Select>
-            <span className="mt-1.5 block text-xs leading-5 text-slate">
+            <span
+              className="mt-1.5 block text-xs leading-5 text-slate"
+              data-testid="apply-party-size-hint"
+            >
               {t("apply.partySizeHint", { count: maxGuests })}
             </span>
           </label>
@@ -2217,7 +2243,7 @@ function ApplyModal({
           onChange={(event) => setMessage(event.target.value)}
           value={message}
         />
-        <p className="mt-2 text-sm leading-6 text-slate" data-testid="apply-message-hint">
+        <p className="mt-1.5 text-xs leading-5 text-slate" data-testid="apply-message-hint">
           {t("apply.hint", { type: displayLabel(t, boat.type).toLocaleLowerCase() })}
         </p>
         {hasBlockedContactDetails && (
@@ -2506,28 +2532,33 @@ function DetailPage() {
           </button>
         </div>
         <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_22rem]">
-          <div>
+          <div className="min-w-0 overflow-hidden">
             <div className="flex items-start justify-between gap-5 border-b border-line pb-8">
-              <div>
-                <p className="eyebrow">
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <p className="eyebrow truncate">
                   {vesselTypeLengthYear(
                     t,
                     boat,
                     user?.measurementSystem ?? detectMeasurementSystem(),
                   )}
                 </p>
-                <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy md:text-5xl">
+                <h1
+                  className="truncate font-display text-4xl font-extrabold tracking-[-0.045em] text-navy md:text-5xl"
+                  data-testid="listing-boat-name"
+                  title={boat.name}
+                >
                   {boat.name}
                 </h1>
-                <p className="mt-3 flex items-center gap-2 text-slate">
-                  <MapPin size={17} /> {formatSitLocation(boat.location, boat.country)}
+                <p className="mt-3 flex min-w-0 items-center gap-2 text-slate">
+                  <MapPin className="shrink-0" size={17} />
+                  <span className="truncate">{formatSitLocation(boat.location, boat.country)}</span>
                 </p>
               </div>
               <button
                 aria-label={
                   user && saved.includes(boat.id) ? t("boat.removeSaved") : t("boat.save")
                 }
-                className="grid size-11 place-items-center rounded-full border border-line bg-white"
+                className="grid size-11 shrink-0 place-items-center rounded-full border border-line bg-white"
                 onClick={() => {
                   if (!user) {
                     openAuth("signup");
@@ -2562,10 +2593,15 @@ function DetailPage() {
                     <Star className="fill-sun text-sun" size={15} /> {boat.rating} ·{" "}
                     {t("detail.ownerReviews", { count: boat.reviews })}
                   </p>
-                  <p className="mt-1 flex items-center gap-2 text-xs font-semibold text-teal">
-                    <MessageCircle aria-hidden="true" size={14} />
-                    {t("detail.respondsWithinDay")}
-                  </p>
+                  {boat.ownerResponseTime ? (
+                    <p
+                      className="mt-1 flex items-center gap-2 text-xs font-semibold text-teal"
+                      data-testid="owner-response-time"
+                    >
+                      <MessageCircle aria-hidden="true" size={14} />
+                      {t(RESPONSE_TIME_I18N_KEY[boat.ownerResponseTime])}
+                    </p>
+                  ) : null}
                 </div>
               </Link>
               {identityVerificationEnabled && ownerVerification && (
@@ -3432,16 +3468,13 @@ function ProfileEditor({ close }: { close: () => void }) {
                 pending={coverUploading}
               />
               {form.coverImage && (
-                <button
-                  className="self-start text-xs font-bold text-coral"
+                <RemovePhotoButton
                   onClick={() => {
                     setForm({ ...form, coverImage: "" });
                     setCoverError("");
                   }}
-                  type="button"
-                >
-                  {t("upload.remove")}
-                </button>
+                  testId="profile-cover-remove"
+                />
               )}
             </div>
           </div>
@@ -3491,6 +3524,8 @@ function ProfileEditor({ close }: { close: () => void }) {
               cityOnly
               includeCountry
               onChange={(location) => setForm({ ...form, location })}
+              requireSelection
+              testId="profile-location"
               value={form.location}
               variant="profile"
             />
@@ -3979,7 +4014,12 @@ function MemberPage() {
                 <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-teal">
                   {t("member.theirBoat")}
                 </p>
-                <p className="mt-1 font-display text-lg font-bold text-navy">{boat.name}</p>
+                <p
+                  className="mt-1 truncate font-display text-lg font-bold text-navy"
+                  title={boat.name}
+                >
+                  {boat.name}
+                </p>
               </Link>
             )}
           </aside>
@@ -4001,6 +4041,13 @@ const VESSEL_MAX_LENGTHS = {
   wifiPassword: 64,
   accessCodes: 500,
   otherPrivateNotes: 1000,
+} as const;
+
+const SIT_MAX_LENGTHS = {
+  fullAddress: 300,
+  responsibilities: 2000,
+  requirements: 1500,
+  pet: 200,
 } as const;
 
 function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
@@ -4370,18 +4417,14 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                     />
                   </div>
                   {form.image && (
-                    <button
-                      className="self-start text-xs font-bold text-coral"
-                      data-testid="vessel-cover-remove"
+                    <RemovePhotoButton
                       onClick={() => {
                         setForm({ ...form, image: "" });
                         setImageError("");
                         setGalleryOpen(false);
                       }}
-                      type="button"
-                    >
-                      {t("upload.remove")}
-                    </button>
+                      testId="vessel-cover-remove"
+                    />
                   )}
                 </div>
               </div>
@@ -4446,15 +4489,10 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                                     value={photo.caption ?? ""}
                                   />
                                 </label>
-                                <button
-                                  className="inline-flex items-center gap-1.5 self-start text-xs font-bold text-coral"
-                                  data-testid="vessel-gallery-remove"
+                                <RemovePhotoButton
                                   onClick={() => removeGalleryPhoto(index)}
-                                  type="button"
-                                >
-                                  <Trash2 size={14} />
-                                  {t("vesselEditor.removeGalleryPhoto")}
-                                </button>
+                                  testId="vessel-gallery-remove"
+                                />
                               </div>
                             </li>
                           ))}
@@ -4963,7 +5001,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             </div>
           </div>
         </div>
-        <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
+        <div className="order-1 min-w-0 overflow-hidden lg:sticky lg:top-24 lg:order-2 lg:self-start">
           <EditorLivePreview hint={t("editorPreview.vesselHint")}>
             <VesselPreviewCard
               vessel={{
@@ -5126,6 +5164,9 @@ function SitEditor({
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState("");
   const [discardOpen, setDiscardOpen] = useState(false);
+  const [expandedRequirementGroups, setExpandedRequirementGroups] = useState<
+    Record<string, boolean>
+  >({});
   const requireVerificationToSit = useFeatureFlag("requireVerificationToSit");
   const isCreating = !sit;
   const sitCreateBaseline = useRef(
@@ -5355,7 +5396,6 @@ function SitEditor({
     if (!sameAsHomePort && !form.location.trim()) reasons.push(t("sitEditor.location"));
     if (!sameAsHomePort && !form.country.trim()) reasons.push(t("sitEditor.country"));
     if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
-    if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
     if (form.sitType !== "daytimeChecks") {
       const guests = Number(form.maxGuests);
       if (!Number.isFinite(guests) || guests < 1 || guests > 12) {
@@ -5515,8 +5555,9 @@ function SitEditor({
                   value={form.boatId}
                   vessels={vessels}
                 />
-                <section className="rounded-2xl border border-line bg-cream/60 p-4">
-                  <label className="flex cursor-pointer items-start gap-3">
+                <div className="space-y-3">
+                  <FormLabel required>{t("sitEditor.location")}</FormLabel>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream/60 p-3">
                     <input
                       checked={sameAsHomePort}
                       className="mt-0.5 size-4 accent-teal"
@@ -5547,53 +5588,44 @@ function SitEditor({
                       </span>
                     </span>
                   </label>
-                </section>
-                {!sameAsHomePort && (
-                  <section className="grid gap-4 rounded-2xl border border-line p-4 sm:grid-cols-2">
-                    <div>
-                      <FormLabel required>{t("sitEditor.location")}</FormLabel>
-                      <DestinationAutocomplete
-                        cityOnly
-                        onChange={(location) => setForm({ ...form, location })}
-                        onSelect={(destination) =>
-                          setForm({
-                            ...form,
-                            location: destination.name,
-                            country: destination.detail,
-                          })
-                        }
-                        placeholder={t("sitEditor.locationPlaceholder")}
-                        value={form.location}
-                        variant="profile"
-                      />
-                    </div>
-                    <div>
-                      <FormLabel required>{t("sitEditor.country")}</FormLabel>
-                      <DestinationAutocomplete
-                        countryOnly
-                        onChange={(country) => setForm({ ...form, country })}
-                        placeholder={t("sitEditor.countryPlaceholder")}
-                        value={form.country}
-                        variant="profile"
-                      />
-                    </div>
-                  </section>
-                )}
-                <section className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
-                  <label className="block">
-                    <FormLabel required>{t("sitEditor.fullAddress")}</FormLabel>
-                    <textarea
-                      className="form-input mt-1 min-h-24"
-                      data-testid="sit-full-address"
-                      onChange={(event) => setForm({ ...form, fullAddress: event.target.value })}
+                  {!sameAsHomePort && (
+                    <DestinationAutocomplete
+                      includeCountry
+                      onSelect={(destination) =>
+                        setForm({
+                          ...form,
+                          location: destination.name,
+                          country: destination.detail,
+                        })
+                      }
+                      onChange={() => {}}
+                      placeholder={t("search.destination")}
+                      requireSelection
+                      testId="sit-location"
+                      value={
+                        form.location && form.country
+                          ? `${form.location}, ${form.country}`
+                          : form.location
+                      }
+                      variant="profile"
+                    />
+                  )}
+                </div>
+                <div>
+                  <FormLabel required>{t("sitEditor.fullAddress")}</FormLabel>
+                  <div className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
+                    <AddressAutocomplete
+                      maxLength={SIT_MAX_LENGTHS.fullAddress}
+                      onChange={(fullAddress) => setForm({ ...form, fullAddress })}
                       placeholder={t("sitEditor.fullAddressPlaceholder")}
+                      testId="sit-full-address"
                       value={form.fullAddress}
                     />
-                  </label>
-                  <p className="mt-2 text-xs leading-5 text-slate" role="note">
-                    {t("sitEditor.fullAddressHint")}
-                  </p>
-                </section>
+                    <p className="mt-2 text-xs leading-5 text-slate" role="note">
+                      {t("sitEditor.fullAddressHint")}
+                    </p>
+                  </div>
+                </div>
                 <div>
                   <FormLabel required>{t("sitEditor.dates")}</FormLabel>
                   <DateRangePicker
@@ -5604,7 +5636,9 @@ function SitEditor({
                   />
                 </div>
                 <fieldset>
-                  <FormLabel as="legend">{t("sitEditor.sitType")}</FormLabel>
+                  <FormLabel as="legend" required>
+                    {t("sitEditor.sitType")}
+                  </FormLabel>
                   <div className="mt-2 grid gap-3 sm:grid-cols-2">
                     <label
                       className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
@@ -5675,14 +5709,24 @@ function SitEditor({
                     </span>
                   </label>
                 ) : null}
-                <label>
+                <label data-testid="sit-editor-responsibilities">
                   <FormLabel optional>{t("sitEditor.responsibilities")}</FormLabel>
-                  <textarea
-                    className="form-input min-h-28 resize-y"
-                    onChange={(event) => setForm({ ...form, responsibilities: event.target.value })}
-                    placeholder={t("sitEditor.responsibilitiesPlaceholder")}
-                    value={form.responsibilities}
-                  />
+                  <div className="relative">
+                    <textarea
+                      className="form-input min-h-28 resize-y"
+                      maxLength={SIT_MAX_LENGTHS.responsibilities}
+                      onChange={(event) =>
+                        setForm({ ...form, responsibilities: event.target.value })
+                      }
+                      placeholder={t("sitEditor.responsibilitiesPlaceholder")}
+                      value={form.responsibilities}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.responsibilities.length}
+                      max={SIT_MAX_LENGTHS.responsibilities}
+                    />
+                  </div>
                 </label>
                 <section className="rounded-2xl border border-line bg-cream/60 p-5">
                   <p className="eyebrow">{t("sitEditor.requirementsKicker")}</p>
@@ -5725,31 +5769,51 @@ function SitEditor({
                       field: "requiredSkills" as const,
                       options: SITTER_SKILLS,
                     },
-                  ].map((group) => (
-                    <div className="mt-5" key={group.field}>
-                      <FormLabel as="p">{group.title}</FormLabel>
-                      <div className="flex flex-wrap gap-2">
-                        {group.options.map((option) => {
-                          const selected = form[group.field].includes(option);
-                          return (
-                            <button
-                              className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
-                                selected
-                                  ? "border-teal bg-seafoam text-teal"
-                                  : "border-line bg-white text-slate hover:border-teal"
-                              }`}
-                              key={option}
-                              onClick={() => toggleRequirement(group.field, option)}
-                              type="button"
-                            >
-                              {selected && <Check className="mr-1 inline" size={13} />}
-                              {displayLabel(t, option)}
-                            </button>
-                          );
-                        })}
+                  ].map((group) => {
+                    const expanded = Boolean(expandedRequirementGroups[group.field]);
+                    return (
+                      <div
+                        className="mt-5"
+                        data-testid={`sit-requirement-group-${group.field}`}
+                        key={group.field}
+                      >
+                        <FormLabel as="p">{group.title}</FormLabel>
+                        <CollapsiblePills
+                          expanded={expanded}
+                          getKey={(option) => option}
+                          items={group.options}
+                          lessLabel={t("sitEditor.requirementsShowLess")}
+                          lessTestId="sit-requirement-group-show-less"
+                          moreLabel={(count) => t("sitEditor.requirementsMore", { count })}
+                          moreTestId="sit-requirement-group-more"
+                          onExpandedChange={(next) =>
+                            setExpandedRequirementGroups((prev) => ({
+                              ...prev,
+                              [group.field]: next,
+                            }))
+                          }
+                          renderItem={(option) => {
+                            const selected = form[group.field].includes(option);
+                            return (
+                              <button
+                                className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                                  selected
+                                    ? "border-teal bg-seafoam text-teal"
+                                    : "border-line bg-white text-slate hover:border-teal"
+                                }`}
+                                onClick={() => toggleRequirement(group.field, option)}
+                                type="button"
+                              >
+                                {selected ? <Check className="mr-1 inline" size={13} /> : null}
+                                {displayLabel(t, option)}
+                              </button>
+                            );
+                          }}
+                          selectedKeys={form[group.field]}
+                        />
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <label className="mt-5 flex items-start gap-3 rounded-xl border border-line bg-white px-4 py-3">
                     <input
                       checked={form.nonSmokerRequired}
@@ -5769,34 +5833,52 @@ function SitEditor({
                     </span>
                   </label>
                 </section>
-                <label>
+                <label data-testid="sit-editor-additional">
                   <FormLabel optional>{t("sitEditor.additional")}</FormLabel>
-                  <textarea
-                    className="form-input min-h-24 resize-y"
-                    onChange={(event) => setForm({ ...form, requirements: event.target.value })}
-                    placeholder={t("sitEditor.additionalPlaceholder")}
-                    value={form.requirements}
-                  />
+                  <div className="relative">
+                    <textarea
+                      className="form-input min-h-24 resize-y"
+                      maxLength={SIT_MAX_LENGTHS.requirements}
+                      onChange={(event) => setForm({ ...form, requirements: event.target.value })}
+                      placeholder={t("sitEditor.additionalPlaceholder")}
+                      value={form.requirements}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.requirements.length}
+                      max={SIT_MAX_LENGTHS.requirements}
+                    />
+                  </div>
                 </label>
-                <label>
+                <label data-testid="sit-editor-pets">
                   <FormLabel optional>{t("sitEditor.pets")}</FormLabel>
-                  <input
-                    className="form-input"
-                    onChange={(event) => setForm({ ...form, pet: event.target.value })}
-                    placeholder={t("sitEditor.petsPlaceholder")}
-                    value={form.pet}
-                  />
+                  <div className="relative">
+                    <input
+                      className="form-input"
+                      maxLength={SIT_MAX_LENGTHS.pet}
+                      onChange={(event) => setForm({ ...form, pet: event.target.value })}
+                      placeholder={t("sitEditor.petsPlaceholder")}
+                      value={form.pet}
+                    />
+                    <CharacterCount
+                      className="absolute right-3 bottom-2"
+                      current={form.pet.length}
+                      max={SIT_MAX_LENGTHS.pet}
+                    />
+                  </div>
                 </label>
                 {!locked && (
-                  <TermsAgreementCheckbox
-                    checked={acceptedTerms}
-                    i18nKey="sitEditor.termsAgreement"
-                    onChange={(checked) => {
-                      setAcceptedTerms(checked);
-                      if (checked) setTermsError("");
-                    }}
-                    required
-                  />
+                  <div className="mt-4">
+                    <TermsAgreementCheckbox
+                      checked={acceptedTerms}
+                      i18nKey="sitEditor.termsAgreement"
+                      onChange={(checked) => {
+                        setAcceptedTerms(checked);
+                        if (checked) setTermsError("");
+                      }}
+                      required
+                    />
+                  </div>
                 )}
                 {termsError && (
                   <p className="text-sm font-semibold text-coral" role="alert">
@@ -5842,7 +5924,7 @@ function SitEditor({
             </>
           ) : null}
         </div>
-        <div className="order-1 lg:sticky lg:top-24 lg:order-2 lg:self-start">
+        <div className="order-1 min-w-0 overflow-hidden lg:sticky lg:top-24 lg:order-2 lg:self-start">
           <EditorLivePreview hint={t("editorPreview.sitHint")}>
             {previewBoat ? (
               <BoatCard boat={previewBoat} preview />
@@ -5992,6 +6074,7 @@ function OwnerBoatsPage() {
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState<Sit | null>(null);
   const [withdrawConfirm, setWithdrawConfirm] = useState<SitApplication | null>(null);
   const [startEarlyConfirm, setStartEarlyConfirm] = useState<string | null>(null);
+  const [cancelSitConfirm, setCancelSitConfirm] = useState<Sit | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<
     | { type: "boat"; id: string; name: string }
     | {
@@ -6072,6 +6155,16 @@ function OwnerBoatsPage() {
       await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
       await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
       setStartEarlyConfirm(null);
+    },
+  });
+  const cancelSitMutation = useMutation({
+    mutationFn: ({ id, reopenApplications }: { id: string; reopenApplications: boolean }) =>
+      cancelSit(id, { reopenApplications }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      setCancelSitConfirm(null);
     },
   });
   const withdrawMutation = useMutation({
@@ -6251,12 +6344,12 @@ function OwnerBoatsPage() {
         <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-seafoam text-teal">
           <CalendarDays size={24} />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold uppercase tracking-wider text-teal">
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <p className="truncate text-xs font-bold uppercase tracking-wider text-teal">
             {boat.name} · {formatSitLocation(sit.location, sit.country)}
           </p>
           <Link
-            className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
+            className="mt-1 block truncate font-display text-xl font-bold text-navy hover:text-teal"
             to={`/boats/${sit.id}`}
           >
             {sitDates}
@@ -6264,6 +6357,7 @@ function OwnerBoatsPage() {
           <div className="mt-2 flex flex-wrap gap-2">
             <SitParticipationBadge role="owner" />
             <SitPhaseBadge
+              cancelled={Boolean(sit.cancelledAt)}
               phase={
                 sit.phase ??
                 getSitPhase({
@@ -6272,6 +6366,7 @@ function OwnerBoatsPage() {
                   applicationsOpen: sit.applicationsOpen,
                   accepted: sit.accepted,
                   applicants: sit.applicants,
+                  cancelledAt: sit.cancelledAt,
                 })
               }
             />
@@ -6323,7 +6418,7 @@ function OwnerBoatsPage() {
               <Play size={16} /> {t("owner.startSitEarly")}
             </button>
           )}
-          {!isArchived && resolveSitPhase(sit) === "stayUnderway" && (
+          {!isArchived && phase === "stayUnderway" && (
             <>
               <SitEmergencyHelp />
               <button
@@ -6333,18 +6428,37 @@ function OwnerBoatsPage() {
               >
                 <Flag size={16} /> {t("sitIssue.flagButton")}
               </button>
+              <button
+                className="flex items-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-bold text-red-700 hover:border-red-400"
+                data-testid="owner-sit-cancel"
+                onClick={() => setCancelSitConfirm(sit)}
+                type="button"
+              >
+                <Ban size={16} /> {t("owner.cancelSit")}
+              </button>
             </>
           )}
-          <button
-            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-            onClick={() => navigate(`/owner/sits/${sit.id}/applications`)}
-            type="button"
-          >
-            <MessageCircle size={16} />{" "}
-            {t("applications.reviewCount", {
-              count: ownerApplications.filter((application) => application.sitId === sit.id).length,
-            })}
-          </button>
+          {phase === "stayUnderway" || phase === "stayCompleted" ? (
+            <Link
+              className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+              data-testid="owner-sit-messages"
+              to={`/owner/sits/${sit.id}/applications`}
+            >
+              <MessageCircle size={16} /> {t("nav.messages")}
+            </Link>
+          ) : (
+            <button
+              className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+              data-testid="owner-sit-applicants"
+              onClick={() => navigate(`/owner/sits/${sit.id}/applications`)}
+              type="button"
+            >
+              <MessageCircle size={16} />{" "}
+              {t("applications.reviewCount", {
+                count: applicationCount,
+              })}
+            </button>
+          )}
           {!isArchived &&
             (editLocked ? (
               <IconTooltip label={t("owner.sitEditLocked")} wrap>
@@ -6376,97 +6490,111 @@ function OwnerBoatsPage() {
     const vessel = vessels.find((item) => item.id === (sit?.boatId ?? application.sitId));
     const boatImage = vessel?.image;
     const isWithdrawn = application.status === "withdrawn";
+    const isAccepted = application.status === "accepted";
     return (
       <article
-        className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-5 shadow-card sm:flex-row sm:items-center sm:gap-5"
+        className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-5 shadow-card"
+        data-testid={`sitter-sit-card-${application.sitId}`}
         key={application.id}
       >
-        <div className="flex min-w-0 flex-1 gap-4">
-          <Link
-            aria-label={t("sits.viewListing")}
-            className="block size-20 shrink-0 self-start overflow-hidden rounded-xl bg-cream sm:size-24"
-            to={`/boats/${application.sitId}`}
-          >
-            {boatImage ? (
-              <img
-                alt={t("boat.imageAlt", {
-                  name: application.boatName,
-                  type: displayLabel(t, vessel?.type ?? "Boat"),
-                })}
-                className="size-full object-cover"
-                onError={(event) => {
-                  event.currentTarget.src = fallbackImage;
-                }}
-                src={optimizePhotoUrl(boatImage, 320)}
-              />
-            ) : (
-              <span className="grid size-full place-items-center text-navy">
-                <Anchor aria-hidden="true" size={28} />
-              </span>
-            )}
-          </Link>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-teal">
-              {application.boatName}
-            </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+          <div className="flex min-w-0 flex-1 gap-4">
             <Link
-              className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
+              aria-label={t("sits.viewListing")}
+              className="block size-20 shrink-0 self-start overflow-hidden rounded-xl bg-cream sm:size-24"
               to={`/boats/${application.sitId}`}
             >
-              {sit
-                ? formatSitDates(i18n.language, sit.dateStart, sit.duration)
-                : application.boatName}
+              {boatImage ? (
+                <img
+                  alt={t("boat.imageAlt", {
+                    name: application.boatName,
+                    type: displayLabel(t, vessel?.type ?? "Boat"),
+                  })}
+                  className="size-full object-cover"
+                  onError={(event) => {
+                    event.currentTarget.src = fallbackImage;
+                  }}
+                  src={optimizePhotoUrl(boatImage, 320)}
+                />
+              ) : (
+                <span className="grid size-full place-items-center text-navy">
+                  <Anchor aria-hidden="true" size={28} />
+                </span>
+              )}
             </Link>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <SitParticipationBadge role="sitter" />
-              <ApplicationStatusBadge status={application.status} />
-              {sit && (
-                <SitPhaseBadge
-                  phase={
-                    sit.phase ??
-                    getSitPhase({
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                {application.boatName}
+              </p>
+              <Link
+                className="mt-1 block font-display text-xl font-bold text-navy hover:text-teal"
+                to={`/boats/${application.sitId}`}
+              >
+                {sit
+                  ? formatSitDates(i18n.language, sit.dateStart, sit.duration)
+                  : application.boatName}
+              </Link>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <SitParticipationBadge role="sitter" />
+                <ApplicationStatusBadge status={application.status} />
+                {sit && (
+                  <SitPhaseBadge
+                    cancelled={Boolean(sit.cancelledAt)}
+                    phase={getSitPhase({
                       dateStart: sit.dateStart,
                       duration: sit.duration,
                       applicationsOpen: sit.applicationsOpen,
-                      accepted: sit.accepted,
+                      // Phase for this card follows whether THIS application is confirmed.
+                      accepted: isAccepted,
                       applicants: sit.applicants,
-                    })
-                  }
-                />
-              )}
+                      cancelledAt: sit.cancelledAt,
+                    })}
+                  />
+                )}
+              </div>
+              <p className="mt-1 text-sm text-slate">
+                {t("sits.withOwner", { owner: application.ownerName })}
+              </p>
             </div>
-            <p className="mt-1 text-sm text-slate">
-              {t("sits.withOwner", { owner: application.ownerName })}
-            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            {sit &&
+              isAccepted &&
+              getSitPhase({
+                dateStart: sit.dateStart,
+                duration: sit.duration,
+                applicationsOpen: sit.applicationsOpen,
+                accepted: true,
+                applicants: sit.applicants,
+                cancelledAt: sit.cancelledAt,
+              }) === "stayUnderway" && <SitEmergencyHelp />}
+            <Link
+              className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+              to={`/boats/${application.sitId}`}
+            >
+              <Anchor size={16} /> {t("sits.viewListing")}
+            </Link>
+            <Link
+              className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
+              to={`/messages?application=${encodeURIComponent(application.id)}`}
+            >
+              <MessageCircle size={16} /> {t("nav.messages")}
+            </Link>
+            {!isWithdrawn && application.status !== "declined" && (
+              <button
+                className="flex items-center gap-2 rounded-xl border border-coral/40 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-60"
+                disabled={withdrawMutation.isPending}
+                onClick={() => setWithdrawConfirm(application)}
+                type="button"
+              >
+                {t("sits.withdrawInterest")}
+              </button>
+            )}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 sm:justify-end">
-          {sit && application.status === "accepted" && resolveSitPhase(sit) === "stayUnderway" && (
-            <SitEmergencyHelp />
-          )}
-          <Link
-            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-            to={`/boats/${application.sitId}`}
-          >
-            <Anchor size={16} /> {t("sits.viewListing")}
-          </Link>
-          <Link
-            className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-bold text-navy hover:border-teal"
-            to={`/messages?application=${encodeURIComponent(application.id)}`}
-          >
-            <MessageCircle size={16} /> {t("nav.messages")}
-          </Link>
-          {!isWithdrawn && application.status !== "declined" && (
-            <button
-              className="flex items-center gap-2 rounded-xl border border-coral/40 px-4 py-2.5 text-sm font-bold text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-60"
-              disabled={withdrawMutation.isPending}
-              onClick={() => setWithdrawConfirm(application)}
-              type="button"
-            >
-              {t("sits.withdrawInterest")}
-            </button>
-          )}
-        </div>
+        {isAccepted && user?.name ? (
+          <SitterSitPrivateAccess sitId={application.sitId} viewerName={user.name} />
+        ) : null}
       </article>
     );
   }
@@ -6596,6 +6724,14 @@ function OwnerBoatsPage() {
           {t("owner.startSitEarlyError")}
         </p>
       )}
+      {cancelSitMutation.isError && (
+        <p
+          className="mt-5 rounded-xl bg-coral/10 px-4 py-3 text-sm font-semibold text-coral"
+          role="alert"
+        >
+          {t("owner.cancelSitError")}
+        </p>
+      )}
       {isLoading && activeTab === "boats" ? <OwnerBoatsLoadingSkeleton /> : null}
       {isLoading && activeTab !== "boats" ? <OwnerSitsLoadingSkeleton /> : null}
       {!isLoading && activeTab === "boats" && ownedBoats.length ? (
@@ -6629,25 +6765,30 @@ function OwnerBoatsPage() {
                   className="aspect-2/1 w-full rounded-xl object-cover sm:size-32"
                   src={boat.image}
                 />
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-teal">
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <p className="truncate text-xs font-bold uppercase tracking-wider text-teal">
                     {vesselTypeLengthYear(
                       t,
                       boat,
                       user?.measurementSystem ?? detectMeasurementSystem(),
                     )}
                   </p>
-                  <p className="mt-1 font-display text-xl font-bold text-navy">{boat.name}</p>
-                  <p className="mt-1 text-sm text-slate">
+                  <p
+                    className="mt-1 truncate font-display text-xl font-bold text-navy"
+                    title={boat.name}
+                  >
+                    {boat.name}
+                  </p>
+                  <p className="mt-1 truncate text-sm text-slate">
                     {t("detail.homePort", { homePort: boat.homePort })}
                   </p>
-                  <p className="mt-1 text-xs text-slate">
+                  <p className="mt-1 truncate text-xs text-slate">
                     {t("owner.engineSummary", { engine: displayLabel(t, boat.engineType) })}
                   </p>
-                  <p className="mt-1 text-xs text-slate">
+                  <p className="mt-1 truncate text-xs text-slate">
                     {t("owner.voltageSummary", { voltage: displayLabel(t, boat.voltageType) })}
                   </p>
-                  <p className="mt-1 text-xs text-slate">
+                  <p className="mt-1 truncate text-xs text-slate">
                     {t("owner.stoveSummary", { fuel: displayLabel(t, boat.stoveFuelType) })}
                   </p>
                   <p className="mt-2 text-xs font-semibold text-teal">
@@ -6982,6 +7123,16 @@ function OwnerBoatsPage() {
           tone="warning"
         />
       )}
+      {cancelSitConfirm && (
+        <CancelSitDialog
+          onCancel={() => setCancelSitConfirm(null)}
+          onConfirm={({ reopenApplications }) => {
+            cancelSitMutation.mutate({ id: cancelSitConfirm.id, reopenApplications });
+          }}
+          pending={cancelSitMutation.isPending}
+          titleId="cancel-sit-confirm-title"
+        />
+      )}
     </main>
   );
 }
@@ -7110,6 +7261,10 @@ function SettingsPage() {
     ...DEFAULT_SIT_CREATION_DEFAULTS,
     ...member.sitDefaults,
   };
+  const applicationDefaults = {
+    ...DEFAULT_APPLICATION_DEFAULTS,
+    ...member.applicationDefaults,
+  };
 
   return (
     <>
@@ -7177,6 +7332,8 @@ function SettingsPage() {
                               ),
                         }))
                       }
+                      requireSelection
+                      testId="settings-location"
                       value={personalForm.location}
                       variant="profile"
                     />
@@ -7401,6 +7558,41 @@ function SettingsPage() {
                   </span>
                 </span>
               </label>
+            </section>
+
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-xl font-bold text-navy">
+                {t("settings.applicationDefaultsTitle")}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate">
+                {t("settings.applicationDefaultsHint")}
+              </p>
+              <div className="mt-5" data-testid="settings-default-party-size">
+                <label className="block">
+                  <span className="form-label">{t("settings.applicationDefaults.partySize")}</span>
+                  <Select
+                    variant="form"
+                    onChange={(event) =>
+                      updateProfile({
+                        applicationDefaults: {
+                          ...applicationDefaults,
+                          defaultPartySize: Number(event.target.value),
+                        },
+                      })
+                    }
+                    value={applicationDefaults.defaultPartySize}
+                  >
+                    {[1, 2, 3, 4, 5, 6].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </Select>
+                </label>
+                <p className="mt-3 text-sm leading-6 text-slate">
+                  {t("settings.applicationDefaults.partySizeHint")}
+                </p>
+              </div>
             </section>
           </div>
         )}
@@ -7906,7 +8098,15 @@ function SitTypeBadge({
   );
 }
 
-function SitPhaseBadge({ phase, size = "sm" }: { phase: SitPhase; size?: "sm" | "md" }) {
+function SitPhaseBadge({
+  phase,
+  size = "sm",
+  cancelled = false,
+}: {
+  phase: SitPhase;
+  size?: "sm" | "md";
+  cancelled?: boolean;
+}) {
   const { t } = useTranslation();
   const colors: Record<SitPhase, string> = {
     acceptingApplicants: "bg-aqua/20 text-teal",
@@ -7914,13 +8114,14 @@ function SitPhaseBadge({ phase, size = "sm" }: { phase: SitPhase; size?: "sm" | 
     stayUnderway: "bg-coral/15 text-coral",
     stayCompleted: "bg-navy/10 text-navy",
   };
+  const label = cancelled ? t("sitPhase.stayCancelled") : t(`sitPhase.${phase}`);
   return (
     <span
       className={`inline-flex items-center rounded-full font-bold ${colors[phase]} ${
         size === "md" ? "px-3 py-1.5 text-xs" : "px-2.5 py-1 text-[11px]"
       }`}
     >
-      {t(`sitPhase.${phase}`)}
+      {label}
     </span>
   );
 }
@@ -7962,6 +8163,7 @@ function resolveSitPhase(sit: Sit): SitPhase {
       applicationsOpen: sit.applicationsOpen,
       accepted: sit.accepted,
       applicants: sit.applicants,
+      cancelledAt: sit.cancelledAt,
     })
   );
 }
@@ -7975,6 +8177,7 @@ function resolveSitPhaseWithAcceptance(sit: Sit, hasAcceptedApplicant: boolean):
     applicationsOpen: false,
     accepted: true,
     applicants: sit.applicants,
+    cancelledAt: sit.cancelledAt,
   });
 }
 
@@ -8151,6 +8354,7 @@ function ApplicationReviewPage() {
   const [flaggingIssue, setFlaggingIssue] = useState(false);
   const [closeApplicationsConfirm, setCloseApplicationsConfirm] = useState(false);
   const [startEarlyConfirm, setStartEarlyConfirm] = useState(false);
+  const [cancelSitConfirm, setCancelSitConfirm] = useState(false);
   const [confirmingStatus, setConfirmingStatus] = useState<
     "accepted" | "declined" | "unaccept" | null
   >(null);
@@ -8202,12 +8406,14 @@ function ApplicationReviewPage() {
   const allowed = Boolean(user && vessel && vessel.owner === user.name);
   const pageLoading = (isLoading && !applicationsPage) || sitsLoading || vesselsLoading;
   const sitPhase = sit ? resolveSitPhaseWithAcceptance(sit, acceptedApplications.length > 0) : null;
+  const chatFocusedSit = sitPhase === "stayUnderway" || sitPhase === "stayCompleted";
 
   const selectableApplications = useMemo(() => {
+    if (chatFocusedSit) return acceptedApplications;
     if (statusFilter === "accepted") return acceptedApplications;
     if (statusFilter !== "all") return visibleApplications;
     return [...acceptedApplications, ...visibleApplications];
-  }, [acceptedApplications, statusFilter, visibleApplications]);
+  }, [acceptedApplications, chatFocusedSit, statusFilter, visibleApplications]);
 
   useEffect(() => {
     setListPage(0);
@@ -8274,6 +8480,18 @@ function ApplicationReviewPage() {
       await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
       await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
       setStartEarlyConfirm(false);
+    },
+  });
+  const cancelSitMutation = useMutation({
+    mutationFn: ({ reopenApplications }: { reopenApplications: boolean }) => {
+      if (!sit) throw new Error("APPLICATION_SIT_NOT_FOUND");
+      return cancelSit(sit.id, { reopenApplications });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queries.sits.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      setCancelSitConfirm(false);
     },
   });
   const messageMutation = useMutation({
@@ -8372,12 +8590,29 @@ function ApplicationReviewPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="section-title">
-                {t("applications.title", { boat: vessel?.name ?? "" })}
+                {chatFocusedSit && primaryAcceptedApplication
+                  ? t("applications.activeSitTitle", {
+                      name: primaryAcceptedApplication.applicant.name,
+                    })
+                  : t("applications.title", { boat: vessel?.name ?? "" })}
               </h1>
-              <p className="mt-3 text-slate">{t("applications.subtitle", { count: sitTotal })}</p>
+              <p className="mt-3 text-slate">
+                {(() => {
+                  if (chatFocusedSit && sit?.cancelledAt) {
+                    return t("applications.cancelledSitSubtitle");
+                  }
+                  if (chatFocusedSit && sitPhase === "stayCompleted") {
+                    return t("applications.completedSitSubtitle");
+                  }
+                  if (chatFocusedSit) {
+                    return t("applications.activeSitSubtitle");
+                  }
+                  return t("applications.subtitle", { count: sitTotal });
+                })()}
+              </p>
               {sit && sitPhase && (
                 <div className="mt-3">
-                  <SitPhaseBadge phase={sitPhase} size="md" />
+                  <SitPhaseBadge cancelled={Boolean(sit.cancelledAt)} phase={sitPhase} size="md" />
                 </div>
               )}
             </div>
@@ -8416,13 +8651,21 @@ function ApplicationReviewPage() {
               )}
               {sit && sitPhase === "stayUnderway" && (
                 <>
-                  <SitEmergencyHelp shape="pill" />
+                  {selected?.status === "accepted" ? <SitEmergencyHelp shape="pill" /> : null}
                   <button
                     className="flex items-center gap-2 rounded-full border border-coral/40 bg-coral/10 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral"
                     onClick={() => setFlaggingIssue(true)}
                     type="button"
                   >
                     <Flag size={16} /> {t("sitIssue.flagButton")}
+                  </button>
+                  <button
+                    className="flex items-center gap-2 rounded-full border border-red-300 bg-red-50 px-5 py-2.5 text-sm font-bold text-red-700 hover:border-red-400"
+                    data-testid="active-sit-cancel"
+                    onClick={() => setCancelSitConfirm(true)}
+                    type="button"
+                  >
+                    <Ban size={16} /> {t("owner.cancelSit")}
                   </button>
                 </>
               )}
@@ -8454,7 +8697,107 @@ function ApplicationReviewPage() {
             </div>
           )}
 
-          {sitTotal > 0 ? (
+          {chatFocusedSit && selected ? (
+            <div
+              className={`mt-8 space-y-6 ${isFetching ? "opacity-70" : ""}`}
+              data-testid="active-sit-chat"
+            >
+              {sit && canLeaveReview(sit) ? (
+                <div
+                  className="rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+                  role="status"
+                >
+                  {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
+                </div>
+              ) : null}
+              {selected.status === "accepted" && sit && canLeaveReview(sit) ? (
+                <LeaveReviewForm application={selected} ownerName={user.name} />
+              ) : null}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <Link
+                    aria-label={t("reviews.viewProfile")}
+                    className="shrink-0 rounded-full ring-2 ring-transparent transition hover:ring-aqua"
+                    to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                  >
+                    <img
+                      alt=""
+                      className="size-12 rounded-full object-cover"
+                      src={selected.applicant.image}
+                    />
+                  </Link>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        className="font-display text-xl font-bold text-navy hover:text-teal"
+                        to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                      >
+                        {selected.applicant.name}
+                      </Link>
+                      <ApplicationStatusBadge ownerView status={selected.status} />
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate">
+                      <span className="flex items-center gap-1.5">
+                        <MapPin size={14} /> {selected.applicant.location}
+                      </span>
+                      <Link
+                        className="font-bold text-teal hover:text-navy"
+                        to={`/members/${encodeURIComponent(selected.applicant.name)}`}
+                      >
+                        {t("reviews.viewProfile")}
+                      </Link>
+                    </div>
+                    <BlockedUserBanner name={selected.applicant.name} />
+                  </div>
+                </div>
+                <UserSafetyActions
+                  image={selected.applicant.image}
+                  name={selected.applicant.name}
+                />
+              </div>
+              <ConversationPanel
+                application={selected}
+                composerFocusKey={composerFocusKey}
+                currentUser={user.name}
+                onRequestVideoCall={(proposal) =>
+                  videoCallMutation.mutate({ id: selected.id, proposal })
+                }
+                onRespondToVideoCall={({ action, messageId, proposal }) => {
+                  if (action === "accept") {
+                    videoCallAcceptMutation.mutate({ id: selected.id, messageId });
+                    return;
+                  }
+                  if (action === "decline") {
+                    videoCallDeclineMutation.mutate({ id: selected.id, messageId });
+                    return;
+                  }
+                  if (proposal) {
+                    videoCallMutation.mutate({
+                      id: selected.id,
+                      proposal,
+                      counter: true,
+                    });
+                  }
+                }}
+                onSend={async (text) => {
+                  await messageMutation.mutateAsync({ id: selected.id, text });
+                }}
+                onSharePhone={(phoneNumber) =>
+                  sharePhoneMutation.mutate({ id: selected.id, phoneNumber })
+                }
+                pending={
+                  messageMutation.isPending ||
+                  videoCallMutation.isPending ||
+                  videoCallAcceptMutation.isPending ||
+                  videoCallDeclineMutation.isPending ||
+                  sharePhoneMutation.isPending
+                }
+                translationLanguage={user.preferredLanguage}
+              />
+            </div>
+          ) : null}
+
+          {!chatFocusedSit && sitTotal > 0 ? (
             <div className={`mt-8 space-y-6 ${isFetching ? "opacity-70" : ""}`}>
               {acceptedApplications.length > 0 &&
                 (statusFilter === "all" || statusFilter === "accepted") && (
@@ -8487,35 +8830,6 @@ function ApplicationReviewPage() {
                           <p className="font-bold">{t("applications.handoverBannerTitle")}</p>
                           <p className="mt-1 text-slate">{t("applications.handoverBanner")}</p>
                         </div>
-                      </div>
-                    )}
-                    {sit && sitPhase === "stayUnderway" && (
-                      <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                        <div className="flex gap-3">
-                          <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
-                          <div>
-                            <p className="font-bold">{t("sitIssue.bannerTitle")}</p>
-                            <p className="mt-1 text-slate">{t("sitIssue.bannerHint")}</p>
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 flex-wrap gap-2">
-                          <SitEmergencyHelp shape="pill" />
-                          <button
-                            className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white"
-                            onClick={() => setFlaggingIssue(true)}
-                            type="button"
-                          >
-                            {t("sitIssue.flagButton")}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    {sit && canLeaveReview(sit) && (
-                      <div
-                        className="mt-5 rounded-2xl border border-teal/25 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                        role="status"
-                      >
-                        {t("reviews.windowBanner", { days: reviewDaysRemaining(sit) })}
                       </div>
                     )}
                     <div className="mt-5 grid gap-3">
@@ -8584,7 +8898,10 @@ function ApplicationReviewPage() {
                 )}
 
               <div className="grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-                <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card">
+                <aside
+                  className="h-fit min-w-0 rounded-2xl border border-line bg-white p-3 shadow-card"
+                  data-testid="application-applicant-list"
+                >
                   <div className="space-y-2 border-b border-line pb-3">
                     <label className="block">
                       <span className="sr-only">{t("applications.sortLabel")}</span>
@@ -9022,7 +9339,7 @@ function ApplicationReviewPage() {
               </div>
             </div>
           ) : null}
-          {!sitTotal ? (
+          {!chatFocusedSit && !sitTotal ? (
             <div className="mt-8 rounded-2xl border border-dashed border-line bg-white py-16 text-center">
               <MessageCircle className="mx-auto text-teal" size={38} />
               <p className="mt-4 font-bold text-navy">{t("applications.empty")}</p>
@@ -9173,6 +9490,16 @@ function ApplicationReviewPage() {
           tone="warning"
         />
       )}
+      {cancelSitConfirm && sit && (
+        <CancelSitDialog
+          onCancel={() => setCancelSitConfirm(false)}
+          onConfirm={({ reopenApplications }) => {
+            cancelSitMutation.mutate({ reopenApplications });
+          }}
+          pending={cancelSitMutation.isPending}
+          titleId="cancel-sit-review-confirm-title"
+        />
+      )}
     </main>
   );
 }
@@ -9181,8 +9508,10 @@ function MessagesPage() {
   const { t } = useTranslation();
   const user = useAppStore((state) => state.user);
   const archivedConversations = useAppStore((state) => state.archivedConversations);
+  const deletedConversations = useAppStore((state) => state.deletedConversations);
   const archiveConversation = useAppStore((state) => state.archiveConversation);
   const unarchiveConversation = useAppStore((state) => state.unarchiveConversation);
+  const deleteConversation = useAppStore((state) => state.deleteConversation);
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const requestedApplicationId = searchParams.get("application");
@@ -9199,13 +9528,23 @@ function MessagesPage() {
   const [composerFocusKey, setComposerFocusKey] = useState(0);
   const [conversationPage, setConversationPage] = useState(0);
 
+  const visibleUserApplications = useMemo(
+    () => applications.filter((application) => !deletedConversations.includes(application.id)),
+    [applications, deletedConversations],
+  );
   const inboxApplications = useMemo(
-    () => applications.filter((application) => !archivedConversations.includes(application.id)),
-    [applications, archivedConversations],
+    () =>
+      visibleUserApplications.filter(
+        (application) => !archivedConversations.includes(application.id),
+      ),
+    [visibleUserApplications, archivedConversations],
   );
   const archivedApplications = useMemo(
-    () => applications.filter((application) => archivedConversations.includes(application.id)),
-    [applications, archivedConversations],
+    () =>
+      visibleUserApplications.filter((application) =>
+        archivedConversations.includes(application.id),
+      ),
+    [visibleUserApplications, archivedConversations],
   );
   const tabApplications = messagesTab === "inbox" ? inboxApplications : archivedApplications;
 
@@ -9339,21 +9678,37 @@ function MessagesPage() {
     },
   });
 
+  function handleArchiveConversation(applicationId: string) {
+    const remaining = inboxApplications.filter((application) => application.id !== applicationId);
+    archiveConversation(applicationId);
+    if (selectedId === applicationId) {
+      setSelectedId(remaining[0]?.id ?? "");
+    }
+    setMessagesTab("inbox");
+  }
+
+  function handleUnarchiveConversation(applicationId: string) {
+    unarchiveConversation(applicationId);
+    setMessagesTab("inbox");
+    setSelectedId(applicationId);
+  }
+
+  function handleDeleteConversation(applicationId: string) {
+    const remaining = tabApplications.filter((application) => application.id !== applicationId);
+    deleteConversation(applicationId);
+    if (selectedId === applicationId) {
+      setSelectedId(remaining[0]?.id ?? "");
+    }
+  }
+
   function handleArchiveSelected() {
     if (!selected) return;
-    const currentId = selected.id;
-    const remaining = inboxApplications.filter((application) => application.id !== currentId);
-    archiveConversation(currentId);
-    setSelectedId(remaining[0]?.id ?? "");
-    setMessagesTab("inbox");
+    handleArchiveConversation(selected.id);
   }
 
   function handleUnarchiveSelected() {
     if (!selected) return;
-    const currentId = selected.id;
-    unarchiveConversation(currentId);
-    setMessagesTab("inbox");
-    setSelectedId(currentId);
+    handleUnarchiveConversation(selected.id);
   }
 
   return (
@@ -9387,46 +9742,64 @@ function MessagesPage() {
           {isLoading ? <MessagesPageSkeleton /> : null}
           {!isLoading && tabApplications.length && selected ? (
             <div className="mt-8 grid min-w-0 gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-              <aside className="h-fit min-w-0 rounded-2xl border border-line bg-white p-2 shadow-card">
+              <aside
+                className="h-fit min-w-0 rounded-2xl border border-line bg-white p-2 shadow-card"
+                data-testid="messages-conversation-list"
+              >
                 {visibleApplications.map((application) => {
                   const otherName =
                     application.ownerName === user.name
                       ? application.applicant.name
                       : application.ownerName;
                   const participationRole = sitParticipationRole(application, user.name);
+                  const isRowArchived = archivedConversations.includes(application.id);
+                  const isSelected = application.id === selected.id;
                   return (
-                    <button
-                      className={`w-full rounded-xl p-3 text-left transition ${
-                        application.id === selected.id ? "bg-seafoam" : "hover:bg-cream"
+                    <div
+                      className={`flex w-full items-start gap-1 rounded-xl p-3 transition ${
+                        isSelected ? "bg-seafoam" : "hover:bg-cream"
                       }`}
+                      data-testid={`conversation-row-${application.id}`}
                       key={application.id}
-                      onClick={() => {
-                        setSelectedId(application.id);
-                        setComposerFocusKey((key) => key + 1);
-                      }}
-                      type="button"
                     >
-                      <span className="flex items-center justify-between gap-2">
-                        <span className="truncate font-bold text-navy">{otherName}</span>
-                        <ApplicationStatusBadge
-                          ownerView={participationRole === "owner"}
-                          status={application.status}
-                        />
-                      </span>
-                      <span className="mt-1 flex items-center gap-2 text-xs text-slate">
-                        <SitParticipationBadge role={participationRole} />
-                        <span className="truncate">{application.boatName}</span>
-                      </span>
-                      <span className="mt-2 block truncate text-sm text-slate">
-                        {(() => {
-                          const last = application.messages.at(-1);
-                          if (!last) return "";
-                          return last.kind === "system"
-                            ? formatApplicationSystemMessage(t, last, application, user.name)
-                            : last.text;
-                        })()}
-                      </span>
-                    </button>
+                      <button
+                        className="min-w-0 flex-1 text-left"
+                        onClick={() => {
+                          setSelectedId(application.id);
+                          setComposerFocusKey((key) => key + 1);
+                        }}
+                        type="button"
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="truncate font-bold text-navy">{otherName}</span>
+                          <ApplicationStatusBadge
+                            ownerView={participationRole === "owner"}
+                            status={application.status}
+                          />
+                        </span>
+                        <span className="mt-1 flex items-center gap-2 text-xs text-slate">
+                          <SitParticipationBadge role={participationRole} />
+                          <span className="truncate">{application.boatName}</span>
+                        </span>
+                        <span className="mt-2 block truncate text-sm text-slate">
+                          {(() => {
+                            const last = application.messages.at(-1);
+                            if (!last) return "";
+                            return last.kind === "system"
+                              ? formatApplicationSystemMessage(t, last, application, user.name)
+                              : last.text;
+                          })()}
+                        </span>
+                      </button>
+                      <ConversationRowActions
+                        applicationId={application.id}
+                        isArchived={isRowArchived}
+                        onArchive={() => handleArchiveConversation(application.id)}
+                        onDelete={() => handleDeleteConversation(application.id)}
+                        onUnarchive={() => handleUnarchiveConversation(application.id)}
+                        otherName={otherName}
+                      />
+                    </div>
                   );
                 })}
                 {tabApplications.length > CONVERSATIONS_PER_PAGE && (
@@ -9520,9 +9893,6 @@ function MessagesPage() {
                             ownerView={sitParticipationRole(selected, user.name) === "owner"}
                             status={selected.status}
                           />
-                          {selected.status === "accepted" &&
-                            selectedSit &&
-                            resolveSitPhase(selectedSit) === "stayUnderway" && <SitEmergencyHelp />}
                           <IconTooltip
                             label={isArchived ? t("messages.unarchive") : t("messages.archive")}
                           >
@@ -9608,7 +9978,7 @@ function MessagesPage() {
               <p className="mt-4 font-bold text-navy">
                 {(() => {
                   if (messagesTab === "archived") return t("messages.emptyArchived");
-                  if (applications.length > 0) return t("messages.emptyInbox");
+                  if (visibleUserApplications.length > 0) return t("messages.emptyInbox");
                   return t("messages.empty");
                 })()}
               </p>
@@ -9665,6 +10035,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-cream text-ink">
+      <ScrollToTop />
       <Header />
       <Routes>
         <Route index element={<HomePage />} />

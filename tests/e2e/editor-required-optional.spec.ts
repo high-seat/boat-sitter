@@ -42,8 +42,10 @@ test.describe("editor required vs optional fields", () => {
 
     const requiredLabels = editor.getByTestId("form-label-required");
     await expect(requiredLabels.filter({ hasText: /^Boat/i })).toContainText("*");
+    await expect(requiredLabels.filter({ hasText: /Sit location/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Full address/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Sit dates/i })).toContainText("*");
+    await expect(requiredLabels.filter({ hasText: /Sit type/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Maximum number of people/i })).toContainText(
       "*",
     );

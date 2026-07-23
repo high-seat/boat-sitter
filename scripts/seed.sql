@@ -214,7 +214,10 @@ INSERT INTO application_messages (
 ) VALUES
   ('message-alex-initial', 'application-alex-solstice', 'Alex Morgan', 'Hi Maya and Finn, I would love to care for Solstice. I have seven years of liveaboard sailing experience and can confidently handle routine diesel, battery, bilge and line checks.', '2026-07-18T09:30:00.000Z'),
   ('message-maya-reply', 'application-alex-solstice', 'Maya & Finn', 'Thanks Alex. Your systems experience looks like a strong fit. Are you available for a video handover next week?', '2026-07-18T13:15:00.000Z'),
+  ('message-alex-followup', 'application-alex-solstice', 'Alex Morgan', 'Yes, mid-week works well for me. Happy to do a walkthrough of bilge, batteries and lines.', '2026-07-18T14:00:00.000Z'),
+  ('message-maya-followup', 'application-alex-solstice', 'Maya & Finn', 'Perfect. We will send a few photos of the systems locker before then.', '2026-07-18T14:35:00.000Z'),
   ('message-samira-initial', 'application-samira-solstice', 'Samira Costa', 'Hello, Solstice looks wonderful. I have completed several Mediterranean passages and have cared for boats and pets in Portugal, Spain and Greece.', '2026-07-19T16:45:00.000Z'),
+  ('message-maya-samira-reply', 'application-samira-solstice', 'Maya & Finn', 'Thanks Samira. We are still reviewing applicants and will follow up soon.', '2026-07-19T18:10:00.000Z'),
   ('seed-msg-2-1', 'seed-app-2-1', 'Nadia Rahman', 'Hi Liam, I''d love to look after Tempest. I have 3 years of experience and I''m confident with the routine checks.', '2026-04-11T09:30:00.000Z'),
   ('seed-msg-3-1', 'seed-app-3-1', 'Oskar Nowak', 'Hi Yuki, I''d love to look after Meridian. I have 6 years of experience and I''m confident with the routine checks.', '2026-04-12T09:30:00.000Z'),
   ('seed-msg-3-2', 'seed-app-3-2', 'Chloe Dubois', 'Hi Yuki, I''d love to look after Meridian. I have 4 years of experience and I''m confident with the routine checks.', '2026-04-13T09:30:00.000Z'),

@@ -21,6 +21,7 @@ const DEFAULT_EMAIL_NOTIFICATIONS = {
 };
 
 const DEFAULT_SIT_DEFAULTS = { nonSmokerRequired: false };
+const DEFAULT_APPLICATION_DEFAULTS = { defaultPartySize: 1 };
 
 const profilePatchSchema = z.object({
   name: z.string().min(1).optional(),
@@ -36,6 +37,7 @@ const profilePatchSchema = z.object({
   measurementSystem: z.enum(["metric", "imperial"]).optional(),
   emailNotifications: z.record(z.string(), z.boolean()).optional(),
   sitDefaults: z.record(z.string(), z.unknown()).optional(),
+  applicationDefaults: z.record(z.string(), z.unknown()).optional(),
   phoneCountryCode: z.string().optional(),
   phoneNumber: z.string().optional(),
   yearsExperience: z.number().int().min(0).optional(),
@@ -66,6 +68,10 @@ function shapeProfile(row: typeof profiles.$inferSelect) {
     sitDefaults: {
       ...DEFAULT_SIT_DEFAULTS,
       ...(row.sitDefaults ?? {}),
+    },
+    applicationDefaults: {
+      ...DEFAULT_APPLICATION_DEFAULTS,
+      ...(row.applicationDefaults ?? {}),
     },
     memberSince: row.memberSince,
     phoneCountryCode: row.phoneCountryCode,
@@ -106,6 +112,7 @@ async function ensureProfile(
       measurementSystem: "metric",
       emailNotifications: DEFAULT_EMAIL_NOTIFICATIONS,
       sitDefaults: DEFAULT_SIT_DEFAULTS,
+      applicationDefaults: DEFAULT_APPLICATION_DEFAULTS,
       phoneCountryCode: "+44",
       phoneNumber: "",
       memberSince: year,

@@ -26,10 +26,11 @@ export function MessagesNavLink() {
       <Link
         aria-label={ariaLabel}
         className="relative inline-flex items-center justify-center rounded-full p-2.5 text-slate hover:bg-white hover:text-navy"
+        data-testid="messages-nav-link"
         to="/messages"
       >
         <MessageCircle size={19} />
-        <NavCountBadge count={unreadCount} />
+        <NavCountBadge count={unreadCount} testId="messages-unread-count" />
       </Link>
     </IconTooltip>
   );

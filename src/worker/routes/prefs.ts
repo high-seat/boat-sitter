@@ -9,6 +9,7 @@ import {
   userArchivedConversations,
   userArchivedSits,
   userBlocks,
+  userDeletedConversations,
   userReports,
   userSaved,
   vessels,
@@ -34,21 +35,27 @@ prefsRouter.get("/", requireUser, async (c) => {
   const db = getDb(c.env);
   const user = c.get("user")!;
 
-  const [savedRows, archivedConvRows, archivedSitRows, blockRows, reportRows] = await Promise.all([
-    db.select().from(userSaved).where(eq(userSaved.userId, user.id)),
-    db
-      .select()
-      .from(userArchivedConversations)
-      .where(eq(userArchivedConversations.userId, user.id)),
-    db.select().from(userArchivedSits).where(eq(userArchivedSits.userId, user.id)),
-    db.select().from(userBlocks).where(eq(userBlocks.userId, user.id)),
-    db.select().from(userReports).where(eq(userReports.reporterUserId, user.id)),
-  ]);
+  const [savedRows, archivedConvRows, deletedConvRows, archivedSitRows, blockRows, reportRows] =
+    await Promise.all([
+      db.select().from(userSaved).where(eq(userSaved.userId, user.id)),
+      db
+        .select()
+        .from(userArchivedConversations)
+        .where(eq(userArchivedConversations.userId, user.id)),
+      db
+        .select()
+        .from(userDeletedConversations)
+        .where(eq(userDeletedConversations.userId, user.id)),
+      db.select().from(userArchivedSits).where(eq(userArchivedSits.userId, user.id)),
+      db.select().from(userBlocks).where(eq(userBlocks.userId, user.id)),
+      db.select().from(userReports).where(eq(userReports.reporterUserId, user.id)),
+    ]);
 
   return c.json({
     data: {
       saved: [...new Set(savedRows.map((r) => r.sitId))],
       archivedConversations: [...new Set(archivedConvRows.map((r) => r.applicationId))],
+      deletedConversations: [...new Set(deletedConvRows.map((r) => r.applicationId))],
       archivedSits: [...new Set(archivedSitRows.map((r) => r.sitId))],
       blockedUsers: blockRows.map((r) => ({
         name: r.blockedName,
@@ -170,6 +177,45 @@ prefsRouter.delete("/archived-conversations/:id", requireUser, async (c) => {
       ),
     );
   return c.json({ data: { archived: false, applicationId } });
+});
+
+prefsRouter.put("/deleted-conversations/:id", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const applicationId = c.req.param("id");
+  await db
+    .delete(userArchivedConversations)
+    .where(
+      and(
+        eq(userArchivedConversations.userId, user.id),
+        eq(userArchivedConversations.applicationId, applicationId),
+      ),
+    );
+  await db
+    .delete(userDeletedConversations)
+    .where(
+      and(
+        eq(userDeletedConversations.userId, user.id),
+        eq(userDeletedConversations.applicationId, applicationId),
+      ),
+    );
+  await db.insert(userDeletedConversations).values({ userId: user.id, applicationId });
+  return c.json({ data: { deleted: true, applicationId } });
+});
+
+prefsRouter.delete("/deleted-conversations/:id", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const user = c.get("user")!;
+  const applicationId = c.req.param("id");
+  await db
+    .delete(userDeletedConversations)
+    .where(
+      and(
+        eq(userDeletedConversations.userId, user.id),
+        eq(userDeletedConversations.applicationId, applicationId),
+      ),
+    );
+  return c.json({ data: { deleted: false, applicationId } });
 });
 
 prefsRouter.put("/archived-sits/:sitId", requireUser, async (c) => {

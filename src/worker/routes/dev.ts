@@ -339,7 +339,7 @@ devRouter.post("/fixture", async (c) => {
         requiredExperience: [],
         requiredCertifications: [],
         requiredSkills: [],
-        applicants: 1,
+        applicants: 2,
         pet: null,
         featured: false,
         published,
@@ -351,8 +351,9 @@ devRouter.post("/fixture", async (c) => {
           dateStart,
           dates,
           duration,
-          applicants: 1,
+          applicants: 2,
           published,
+          cancelledAt: null,
           updatedAt: sql`CURRENT_TIMESTAMP`,
         },
       });
@@ -390,11 +391,61 @@ devRouter.post("/fixture", async (c) => {
         },
       });
 
+    const priorApplicationId = "application-lifecycle-prior-e2e";
+    await db
+      .insert(applications)
+      .values({
+        id: priorApplicationId,
+        sitId,
+        boatName: "Solstice",
+        ownerName: "Maya & Finn",
+        applicant: {
+          name: "Prior Applicant E2E",
+          image: "https://i.pravatar.cc/160?img=32",
+          location: "Athens, Greece",
+          bio: "Prior applicant for lifecycle tests",
+          languages: ["English"],
+          preferredCountries: [],
+          skills: [],
+          yearsExperience: 3,
+          certifications: [],
+          memberSince: 2021,
+          completedSits: 1,
+        },
+        applicantName: "Prior Applicant E2E",
+        initialMessage: "I also applied for the lifecycle sit.",
+        status: accepted ? "declined" : "new",
+        createdAt: new Date(Date.now() - 60_000).toISOString(),
+      })
+      .onConflictDoUpdate({
+        target: applications.id,
+        set: {
+          status: accepted ? "declined" : "new",
+          ownerPhone: null,
+        },
+      });
+
+    await db
+      .update(sits)
+      .set({
+        applicants: 2,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(sits.id, sitId));
+
     await db
       .delete(userArchivedSits)
       .where(and(eq(userArchivedSits.userId, sessionUser.id), eq(userArchivedSits.sitId, sitId)));
 
-    return c.json({ ok: true, sitId, applicationId, phase, dateStart, duration });
+    return c.json({
+      ok: true,
+      sitId,
+      applicationId,
+      priorApplicationId,
+      phase,
+      dateStart,
+      duration,
+    });
   }
 
   if (kind === "completed-sit" || kind === "underway-sit") {
@@ -441,6 +492,7 @@ devRouter.post("/fixture", async (c) => {
           duration,
           applicants: 1,
           published: true,
+          cancelledAt: null,
           updatedAt: sql`CURRENT_TIMESTAMP`,
         },
       });
@@ -474,8 +526,17 @@ devRouter.post("/fixture", async (c) => {
       })
       .onConflictDoUpdate({
         target: applications.id,
-        set: { status: "accepted" },
+        set: { status: "accepted", ownerPhone: null },
       });
+
+    await db
+      .delete(applicationMessages)
+      .where(
+        and(
+          eq(applicationMessages.applicationId, applicationId),
+          sql`${applicationMessages.systemKind} in ('sitCancelled', 'unaccepted')`,
+        ),
+      );
 
     await db
       .insert(applicationMessages)

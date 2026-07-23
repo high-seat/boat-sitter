@@ -40,7 +40,13 @@ async function expectPhaseOn(locator: Locator, phase: keyof typeof PHASE_BADGE) 
 
 async function expectOwnerApplicationsPhase(page: Page, phase: keyof typeof PHASE_LABEL) {
   await page.goto(`/owner/sits/${LIFECYCLE_SIT_ID}/applications`);
-  await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
+  if (phase === "underway" || phase === "completed") {
+    await expect(page.getByRole("heading", { name: /Sit with Alex Morgan/i })).toBeVisible();
+    await expect(page.getByTestId("active-sit-chat")).toBeVisible();
+    await expect(page.getByTestId("application-applicant-list")).toHaveCount(0);
+  } else {
+    await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
+  }
   const currentStep = page.getByRole("listitem").filter({ hasText: PHASE_LABEL[phase] });
   await expect(currentStep).toBeVisible();
   await expect(currentStep).toHaveClass(/bg-seafoam/);
@@ -109,7 +115,8 @@ test.describe("sit lifecycle phase transitions", () => {
 
     await expectOwnerApplicationsPhase(ownerPage, "underway");
     await sitterPage.goto(`/messages?application=${LIFECYCLE_APPLICATION_ID}`);
-    await expect(sitterPage.getByTestId("sit-emergency-help")).toBeVisible();
+    await expect(sitterPage.getByTestId("conversation-messages")).toBeVisible();
+    await expect(sitterPage.getByTestId("sit-emergency-help")).toHaveCount(0);
 
     // 4) Dates advance → Sit completed
     await seedLifecycleSit(ownerPage, "completed");

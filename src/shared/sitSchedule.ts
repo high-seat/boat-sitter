@@ -43,6 +43,28 @@ export type StartEarlySchedule = {
 };
 
 /**
+ * True when an accepted sit has started and has not yet ended or been cancelled.
+ * Used for cancel-sit eligibility (and similar underway-only actions).
+ */
+export function isSitUnderway(
+  input: {
+    dateStart: string;
+    duration: string;
+    accepted?: boolean;
+    cancelledAt?: string | null;
+  },
+  now = new Date(),
+): boolean {
+  if (input.cancelledAt) return false;
+  if (!input.accepted) return false;
+  const start = parseYmd(input.dateStart);
+  const end = sitInclusiveEndDate(input.dateStart, input.duration);
+  if (!start || !end) return false;
+  const today = startOfDay(now);
+  return today.getTime() >= start.getTime() && today.getTime() <= end.getTime();
+}
+
+/**
  * Move an accepted future sit to start today while keeping the same end date.
  * Returns null when the sit cannot be started early (already started/completed/invalid).
  */

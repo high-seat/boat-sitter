@@ -31,6 +31,7 @@ test.describe("vessel editor cover required", () => {
 
     await uploadVesselCover(page);
     await expect(page.getByTestId("vessel-add-more-photos")).toBeVisible();
+    await expect(page.getByTestId("vessel-cover-remove")).toContainText(/Remove photo/i);
     await expect(page.getByTestId("vessel-add-more-photos")).toHaveAttribute(
       "aria-expanded",
       "false",

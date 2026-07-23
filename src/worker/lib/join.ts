@@ -1,4 +1,5 @@
 import type { Sit, Vessel } from "../db/schema";
+import type { ResponseTimeBucket } from "../../shared/responseTime";
 
 /**
  * Joined listing, matching the frontend `Boat` type exactly.
@@ -43,6 +44,8 @@ export interface Boat {
   pet: string | null;
   featured: boolean;
   sitType: "liveaboard" | "daytimeChecks";
+  /** Typical owner chat reply latency bucket; only set on detail when known. */
+  ownerResponseTime?: ResponseTimeBucket | null;
 }
 
 export function joinBoat(vessel: Vessel, sit: Sit): Boat {

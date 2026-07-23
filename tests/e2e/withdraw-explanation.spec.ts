@@ -11,6 +11,7 @@ test.describe("withdraw with explanation", () => {
           state: {
             saved: [],
             archivedConversations: [],
+            deletedConversations: [],
             archivedSits: [],
             blockedUsers: [],
             userReports: [],
