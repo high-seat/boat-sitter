@@ -24,7 +24,7 @@ Everything runs on the existing stack: Better Auth on the Cloudflare Worker, ses
 
 - Enable Better Auth account linking, trusting Google:
   `account: { accountLinking: { enabled: true, trustedProviders: ["google"] } }`.
-- **Security rule that makes this safe:** only auto-link when the email is *verified*. Otherwise someone could register `you@gmail.com` with a password before you ever Google-login, then capture your account. Mitigation:
+- **Security rule that makes this safe:** only auto-link when the email is _verified_. Otherwise someone could register `you@gmail.com` with a password before you ever Google-login, then capture your account. Mitigation:
   - Email+password sign-up **requires email verification** (below).
   - Google emails are verified by Google, so they're trusted.
 - Flows:
@@ -106,4 +106,4 @@ Verification and reset emails go through Resend. In test mode Resend only delive
 
 - **Resend domain** required before verification/reset emails reach anyone but you.
 - **Google secret rotation** still outstanding (treat current one as compromised).
-- **Account-linking takeover** avoided *only* if email verification is enforced — don't skip it.
+- **Account-linking takeover** avoided _only_ if email verification is enforced — don't skip it.

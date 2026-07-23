@@ -18,7 +18,7 @@ Work top to bottom. Test on the canonical URL only: **https://boatstead.sharukru
 - [ ] Open the site logged out → click **Continue with Google**.
 - [ ] Google consent screen appears → approve.
 - [ ] Redirected back, and the header shows your name/avatar (logged in).
-- [ ] A new row appears in `user` and in `account` (`provider_id = google`). *(I can verify in D1.)*
+- [ ] A new row appears in `user` and in `account` (`provider_id = google`). _(I can verify in D1.)_
 
 ## C. Returning-user sign-in
 
@@ -29,14 +29,14 @@ Work top to bottom. Test on the canonical URL only: **https://boatstead.sharukru
 ## D. Session behaves
 
 - [ ] After login, refresh the page → still logged in (session cookie persists).
-- [ ] `GET /api/me` returns your user (not null). *(DevTools → Network, or I can confirm server-side.)*
+- [ ] `GET /api/me` returns your user (not null). _(DevTools → Network, or I can confirm server-side.)_
 - [ ] Open a new tab → still logged in.
 - [ ] Sign out → header shows logged-out; `/api/me` returns `{ user: null }`; protected actions prompt login.
 
 ## E. Login actually powers the app (the real test)
 
 - [ ] While logged in, create a boat + sit → it appears after refresh (written to D1, not localStorage).
-- [ ] The new vessel row has your `owner_user_id` populated (not null). *(I can verify in D1.)*
+- [ ] The new vessel row has your `owner_user_id` populated (not null). _(I can verify in D1.)_
 - [ ] Apply to a sit / send a message → works and persists.
 
 ## F. Failure & edge handling
@@ -54,9 +54,11 @@ Work top to bottom. Test on the canonical URL only: **https://boatstead.sharukru
 ---
 
 ### How I verify the D1-backed items for you
+
 Tell me when you've done a fresh Google sign-in and I'll query prod to confirm: a `user`/`account` row was created, an active `session` exists, and any boat you create has `owner_user_id` set.
 
 ### Next phases (after Gmail passes)
+
 - Phase 2: Email + password (sign-up, sign-in, **email verification**).
 - Phase 3: Password reset + change password/email.
 - Phase 4: Account linking (same email → one account) + security hardening.
