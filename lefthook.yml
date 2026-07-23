@@ -1,0 +1,11 @@
+# https://lefthook.dev/configuration/
+pre-commit:
+  parallel: false
+  commands:
+    format:
+      run: pnpm fmt
+      stage_fixed: true
+    typecheck:
+      run: pnpm typecheck
+    lint:
+      run: pnpm lint

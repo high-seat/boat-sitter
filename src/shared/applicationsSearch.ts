@@ -1,6 +1,6 @@
 /**
  * Shared application-review filter / sort / pagination.
- * Used by the Worker `/api/applications?sitId=` route and the SPA localStorage fallback.
+ * Used by the Worker `/api/applications?sitId=` route.
  */
 
 export const APPLICATIONS_PAGE_SIZE = 20;

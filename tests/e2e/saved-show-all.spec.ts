@@ -1,81 +1,29 @@
 import { expect, test } from "@playwright/test";
+import { seedOwnerSession } from "./helpers/auth";
+import { seedDevFixture } from "./helpers/fixtures";
 
 test.describe("saved listings filter", () => {
   test("show-all checkbox switches open vs all saved listings", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.clear();
-      localStorage.setItem("i18nextLng", "en-US");
-      localStorage.setItem(
-        "harbourly",
-        JSON.stringify({
-          state: {
-            saved: ["solstice"],
-            archivedConversations: [],
-            archivedSits: [],
-            blockedUsers: [],
-            userReports: [],
-            user: {
-              name: "Alex Morgan",
-              email: "alex.morgan@boatstead.mock",
-              emailConfirmed: true,
-              legalName: "Alex Morgan",
-              image: "https://i.pravatar.cc/160?img=11",
-              bio: "Sitter",
-              location: "Brighton, United Kingdom",
-              languages: ["English"],
-              preferredCountries: [],
-              skills: [],
-              preferredLanguage: "en-US",
-              measurementSystem: "metric",
-              emailNotifications: {
-                newApplications: true,
-                applicationUpdates: true,
-                messages: true,
-                sitReminders: true,
-                productUpdates: false,
-              },
-              sitDefaults: { nonSmokerRequired: false },
-              memberSince: 2020,
-              phoneCountryCode: "+44",
-              phoneNumber: "7700900123",
-              role: "member",
-            },
-          },
-          version: 16,
-        }),
-      );
-      // Mark Solstice as accepted so the open filter hides it.
-      localStorage.setItem(
-        "harbourly-applications",
-        JSON.stringify([
-          {
-            id: "application-alex-solstice",
-            sitId: "solstice",
-            boatName: "Solstice",
-            ownerName: "Maya & Finn",
-            status: "accepted",
-            createdAt: "2026-07-18T10:00:00.000Z",
-            partySize: 1,
-            applicant: {
-              name: "Alex Morgan",
-              image: "https://i.pravatar.cc/160?img=11",
-              location: "Brighton, United Kingdom",
-              bio: "Sitter",
-              languages: ["English"],
-              preferredCountries: [],
-              skills: [],
-              yearsExperience: 7,
-              certifications: [],
-              memberSince: 2020,
-              completedSits: 8,
-            },
-            messages: [],
-          },
-        ]),
-      );
-      localStorage.setItem("boatstead-applications-v3", "complete");
+    await seedOwnerSession(page, {
+      name: "Alex Morgan",
+      email: "alex.morgan@boatstead.mock",
+      image: "https://i.pravatar.cc/160?img=11",
+      phoneNumber: "7700900123",
     });
 
+    // Mark Solstice accepted (hides from "open" filter) and save it for Alex.
+    const maya = await page.context().browser()!.newContext();
+    const mayaPage = await maya.newPage();
+    await seedOwnerSession(mayaPage, {
+      name: "Maya & Finn",
+      email: "maya.finn@boatstead.mock",
+      image: "https://i.pravatar.cc/160?img=5",
+      phoneNumber: "6912345678",
+    });
+    await seedDevFixture(mayaPage, "accept-solstice");
+    await maya.close();
+
+    await page.request.put("/api/prefs/saved/solstice");
     await page.goto("/saved");
     await expect(page.getByRole("heading", { name: /Saved boat sits/i })).toBeVisible();
 

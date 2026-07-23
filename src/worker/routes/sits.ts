@@ -14,6 +14,14 @@ import { requireUser } from "../middleware/auth";
  */
 export const sitsRouter = new Hono<AppEnv>();
 
+function hasAcceptedApplicationSql() {
+  return sql`exists (
+    select 1 from applications
+    where applications.sit_id = ${sits.id}
+      and applications.status = 'accepted'
+    limit 1
+  )`;
+}
 const sitSchema = z.object({
   id: z.string().min(1).max(120),
   boatId: z.string().min(1), // frontend name for vesselId
@@ -46,8 +54,26 @@ function toRow(body: z.infer<typeof sitSchema>) {
 
 sitsRouter.get("/", async (c) => {
   const db = getDb(c.env);
-  const rows = await db.select().from(sits);
-  return c.json({ data: rows.map(({ vesselId, ...s }) => ({ ...s, boatId: vesselId })) });
+  const rows = await db
+    .select({
+      sit: sits,
+      accepted: sql<number>`case when ${hasAcceptedApplicationSql()} then 1 else 0 end`.mapWith(
+        Number,
+      ),
+    })
+    .from(sits);
+  return c.json({
+    data: rows.map(({ sit, accepted }) => {
+      const { vesselId, ...rest } = sit;
+      const isAccepted = Boolean(accepted);
+      return {
+        ...rest,
+        boatId: vesselId,
+        accepted: isAccepted,
+        applicationsOpen: rest.published !== false && !isAccepted,
+      };
+    }),
+  });
 });
 
 /**
@@ -101,8 +127,22 @@ sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => 
 
   const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, body.boatId) });
   if (!vessel) return c.json({ error: "Referenced vessel does not exist" }, 400);
-  if (vessel.ownerUserId !== user.id) {
+  if (vessel.ownerUserId != null && vessel.ownerUserId !== user.id) {
     return c.json({ error: "You do not own this vessel" }, 403);
+  }
+  if (vessel.ownerUserId == null) {
+    if (vessel.owner !== user.name) {
+      return c.json({ error: "You do not own this vessel" }, 403);
+    }
+    await db
+      .update(vessels)
+      .set({
+        ownerUserId: user.id,
+        owner: user.name,
+        ownerImage: user.image ?? vessel.ownerImage,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(vessels.id, vessel.id));
   }
 
   const row = toRow(body);
@@ -124,7 +164,11 @@ sitsRouter.delete("/:id", requireUser, async (c) => {
   if (!existing) return c.json({ error: "Sit not found" }, 404);
 
   const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, existing.vesselId) });
-  if (vessel?.ownerUserId !== user.id) {
+  if (!vessel) return c.json({ error: "Vessel not found" }, 404);
+  if (vessel.ownerUserId != null && vessel.ownerUserId !== user.id) {
+    return c.json({ error: "You do not own this listing" }, 403);
+  }
+  if (vessel.ownerUserId == null && vessel.owner !== user.name) {
     return c.json({ error: "You do not own this listing" }, 403);
   }
 

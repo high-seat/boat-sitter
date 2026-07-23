@@ -24,6 +24,13 @@ export function formatApplicationSystemMessage(
         })
       : t("applications.systemMessage.declined");
   }
+  if (message.systemKind === "unaccepted") {
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.unacceptedOwner", {
+          name: application.applicant.name,
+        })
+      : t("applications.systemMessage.unaccepted");
+  }
   if (message.systemKind === "applicantsClosed") {
     return t("applications.systemMessage.applicantsClosed");
   }

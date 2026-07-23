@@ -42,8 +42,6 @@ export type AdminAuditEntry = {
 const USERS_KEY = "harbourly-admin-users";
 const AUDIT_KEY = "harbourly-admin-audit";
 const ACCOUNTS_KEY = "harbourly-mock-accounts";
-const VESSELS_KEY = "harbourly-vessels";
-const APPLICATIONS_KEY = "harbourly-applications";
 
 type StoredUserOverride = AdminUserPatch & { id: string; deleted?: boolean };
 
@@ -136,7 +134,9 @@ function seededDirectory(): AdminUser[] {
   ];
 }
 
-function collectDirectoryUsers(): AdminUser[] {
+function collectDirectoryUsers(
+  vessels: Array<{ owner: string; ownerImage?: string; homePort?: string }> = [],
+): AdminUser[] {
   const byId = new Map<string, AdminUser>();
 
   for (const user of seededDirectory()) {
@@ -164,10 +164,6 @@ function collectDirectoryUsers(): AdminUser[] {
     });
   }
 
-  const vessels = readJson<Array<{ owner: string; ownerImage?: string; homePort?: string }>>(
-    VESSELS_KEY,
-    [],
-  );
   for (const vessel of vessels) {
     if (!vessel.owner) continue;
     const email = fallbackEmail(vessel.owner);
@@ -186,58 +182,6 @@ function collectDirectoryUsers(): AdminUser[] {
       status: "active",
       memberSince: 2022,
     });
-  }
-
-  const applications = readJson<
-    Array<{
-      ownerName?: string;
-      applicant?: {
-        name: string;
-        image?: string;
-        location?: string;
-        bio?: string;
-        memberSince?: number;
-      };
-    }>
-  >(APPLICATIONS_KEY, []);
-  for (const application of applications) {
-    if (application.ownerName) {
-      const email = fallbackEmail(application.ownerName);
-      const id = userIdFromEmail(email);
-      if (!byId.has(id)) {
-        byId.set(id, {
-          id,
-          email,
-          name: application.ownerName,
-          image: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(application.ownerName)}`,
-          location: "",
-          bio: "",
-          role: "member",
-          status: "active",
-          memberSince: 2022,
-        });
-      }
-    }
-    const applicant = application.applicant;
-    if (applicant?.name) {
-      const email = fallbackEmail(applicant.name);
-      const id = userIdFromEmail(email);
-      if (!byId.has(id)) {
-        byId.set(id, {
-          id,
-          email,
-          name: applicant.name,
-          image:
-            applicant.image ||
-            `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(applicant.name)}`,
-          location: applicant.location || "",
-          bio: applicant.bio || "",
-          role: "member",
-          status: "active",
-          memberSince: applicant.memberSince ?? 2021,
-        });
-      }
-    }
   }
 
   for (const override of readOverrides()) {
@@ -275,7 +219,14 @@ function collectDirectoryUsers(): AdminUser[] {
 
 export async function listAdminUsers(): Promise<AdminUser[]> {
   await wait();
-  return collectDirectoryUsers();
+  let vessels: Array<{ owner: string; ownerImage?: string; homePort?: string }> = [];
+  try {
+    const { getVessels } = await import("@/mockApi");
+    vessels = await getVessels();
+  } catch {
+    vessels = [];
+  }
+  return collectDirectoryUsers(vessels);
 }
 
 export async function updateAdminUser(
@@ -284,7 +235,7 @@ export async function updateAdminUser(
   actor: { email: string; name: string },
 ): Promise<AdminUser> {
   await wait(320);
-  const users = collectDirectoryUsers();
+  const users = await listAdminUsers();
   const current = users.find((user) => user.id === id);
   if (!current) throw new Error("ADMIN_USER_NOT_FOUND");
 
@@ -339,7 +290,7 @@ export async function updateAdminUser(
     summary: "Updated user profile",
   });
 
-  const updated = collectDirectoryUsers().find((user) => user.id === nextId);
+  const updated = (await listAdminUsers()).find((user) => user.id === nextId);
   if (!updated) throw new Error("ADMIN_USER_NOT_FOUND");
   return updated;
 }
@@ -349,7 +300,7 @@ export async function deleteAdminUser(
   actor: { email: string; name: string },
 ): Promise<void> {
   await wait(320);
-  const users = collectDirectoryUsers();
+  const users = await listAdminUsers();
   const current = users.find((user) => user.id === id);
   if (!current) throw new Error("ADMIN_USER_NOT_FOUND");
   if (normalizeEmail(actor.email) === current.email) {

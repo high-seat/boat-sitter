@@ -460,6 +460,7 @@ export function ConversationPanel({
                 <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
                   {message.systemKind === "accepted" ||
                   message.systemKind === "declined" ||
+                  message.systemKind === "unaccepted" ||
                   message.systemKind === "applicantsClosed"
                     ? formatApplicationSystemMessage(t, message, application, currentUser)
                     : message.text}

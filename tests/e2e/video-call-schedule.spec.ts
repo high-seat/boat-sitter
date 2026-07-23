@@ -1,5 +1,5 @@
 import { expect, test, type Browser } from "@playwright/test";
-import { seedVerifiedOwner } from "./helpers/auth";
+import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
 
 function futureDateIso(daysAhead: number) {
   const date = new Date();
@@ -11,55 +11,15 @@ function futureDateIso(daysAhead: number) {
   ].join("-");
 }
 
-async function openAlexMessagesWithSharedData(browser: Browser, storage: Record<string, string>) {
+async function openAlexMessages(browser: Browser) {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.addInitScript((shared) => {
-    localStorage.clear();
-    localStorage.setItem("i18nextLng", "en-US");
-    localStorage.setItem("harbourly-language", "en-US");
-    for (const [key, value] of Object.entries(shared)) {
-      localStorage.setItem(key, value);
-    }
-    localStorage.setItem(
-      "harbourly",
-      JSON.stringify({
-        state: {
-          saved: [],
-          archivedConversations: [],
-          archivedSits: [],
-          blockedUsers: [],
-          userReports: [],
-          user: {
-            name: "Alex Morgan",
-            email: "alex.morgan@boatstead.mock",
-            legalName: "Alex Morgan",
-            image: "https://i.pravatar.cc/160?img=11",
-            bio: "Sitter",
-            location: "Brighton, United Kingdom",
-            languages: ["English"],
-            preferredCountries: [],
-            skills: [],
-            preferredLanguage: "en-US",
-            measurementSystem: "metric",
-            emailNotifications: {
-              newApplications: true,
-              applicationUpdates: true,
-              messages: true,
-              sitReminders: true,
-              productUpdates: false,
-            },
-            sitDefaults: { nonSmokerRequired: false },
-            memberSince: 2020,
-            phoneCountryCode: "+44",
-            phoneNumber: "7700900123",
-            role: "member",
-          },
-        },
-        version: 14,
-      }),
-    );
-  }, storage);
+  await seedOwnerSession(page, {
+    name: "Alex Morgan",
+    email: "alex.morgan@boatstead.mock",
+    image: "https://i.pravatar.cc/160?img=11",
+    phoneNumber: "7700900123",
+  });
   await page.goto("/messages");
   return { context, page };
 }
@@ -70,7 +30,6 @@ test.describe("video call scheduling", () => {
     await page.goto("/owner/sits/solstice/applications");
     await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
 
-    // Ensure Alex's accepted thread is selected.
     await page
       .getByRole("button", { name: /Alex Morgan/i })
       .first()
@@ -111,22 +70,7 @@ test.describe("video call scheduling", () => {
     await dialog.getByRole("button", { name: /Send proposal/i }).click();
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
 
-    const shared = await page.evaluate(() => {
-      const keys = [
-        "harbourly-applications",
-        "harbourly-vessels",
-        "harbourly-sits",
-        "harbourly-boats",
-        "boatstead-applications-v3",
-      ];
-      return Object.fromEntries(
-        keys
-          .map((key) => [key, localStorage.getItem(key)] as const)
-          .filter((entry): entry is [string, string] => entry[1] != null),
-      );
-    });
-
-    const { context, page: sitterPage } = await openAlexMessagesWithSharedData(browser, shared);
+    const { context, page: sitterPage } = await openAlexMessages(browser);
     try {
       await expect(sitterPage.getByRole("heading", { name: /Messages/i })).toBeVisible();
       await sitterPage
@@ -172,22 +116,7 @@ test.describe("video call scheduling", () => {
     await dialog.getByRole("button", { name: /Send proposal/i }).click();
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
 
-    const shared = await page.evaluate(() => {
-      const keys = [
-        "harbourly-applications",
-        "harbourly-vessels",
-        "harbourly-sits",
-        "harbourly-boats",
-        "boatstead-applications-v3",
-      ];
-      return Object.fromEntries(
-        keys
-          .map((key) => [key, localStorage.getItem(key)] as const)
-          .filter((entry): entry is [string, string] => entry[1] != null),
-      );
-    });
-
-    const { context, page: sitterPage } = await openAlexMessagesWithSharedData(browser, shared);
+    const { context, page: sitterPage } = await openAlexMessages(browser);
     try {
       await sitterPage
         .getByRole("button", { name: /Maya|Solstice/i })

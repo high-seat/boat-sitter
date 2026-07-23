@@ -23,7 +23,8 @@
     "db:migrate:local": "wrangler d1 migrations apply boat-sitter-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply boat-sitter-db --remote",
     "db:seed:local": "wrangler d1 execute boat-sitter-db --local --file=./scripts/seed.sql",
-    "db:seed:remote": "wrangler d1 execute boat-sitter-db --remote --file=./scripts/seed.sql"
+    "db:seed:remote": "wrangler d1 execute boat-sitter-db --remote --file=./scripts/seed.sql",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.0",
@@ -69,6 +70,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "^0.31.0",
+    "lefthook": "^2.1.10",
     "oxfmt": "^0.59.0",
     "oxlint": "^1.71.0",
     "tailwindcss": "^4.3.3",

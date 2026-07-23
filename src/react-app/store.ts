@@ -76,13 +76,9 @@ function fallbackEmail(name: string) {
 }
 
 async function withApiSession<T>(fn: () => Promise<T>): Promise<void> {
-  try {
-    const m = await import("@/apiRemote");
-    if (!(await m.hasApiSession())) return;
-    await fn();
-  } catch {
-    // Keep optimistic local state if the Worker is unreachable.
-  }
+  const m = await import("@/apiRemote");
+  if (!(await m.hasApiSession())) return;
+  await fn();
 }
 
 export type SitCreationDefaults = {
@@ -155,6 +151,7 @@ type AppStore = {
       email?: string;
       emailConfirmed?: boolean;
     },
+    options?: { establishApiSession?: boolean },
   ) => void;
   updateProfile: (patch: Partial<Omit<UserProfile, "role">>) => void;
   deleteAccount: () => Promise<void>;
@@ -309,7 +306,7 @@ export const useAppStore = create<AppStore>()(
           }));
         });
       },
-      loginAs: (user) => {
+      loginAs: (user, options) => {
         void import("@/apiRemote").then((m) => m.invalidateApiSessionCache());
         const email = user.email?.trim() || fallbackEmail(user.name);
         const location = "Brighton, United Kingdom";
@@ -334,16 +331,33 @@ export const useAppStore = create<AppStore>()(
             role: roleForEmail(email),
           },
         });
+        if (import.meta.env.DEV && options?.establishApiSession !== false) {
+          void (async () => {
+            try {
+              const res = await fetch("/api/dev/login", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email,
+                  name: user.name,
+                  image: user.image,
+                }),
+              });
+              if (!res.ok) return;
+              const { hydrateSession } = await import("@/session");
+              await hydrateSession();
+            } catch {
+              // Keep optimistic local persona if DEV login is unavailable.
+            }
+          })();
+        }
       },
       updateProfile: (patch) => {
         set((state) => ({ user: state.user ? { ...state.user, ...patch } : null }));
         void import("@/apiRemote").then(async (m) => {
           if (!(await m.hasApiSession())) return;
-          try {
-            await m.apiUpdateProfile(patch);
-          } catch {
-            // Keep local optimistic update if the Worker is unreachable.
-          }
+          await m.apiUpdateProfile(patch);
         });
       },
       deleteAccount: async () => {

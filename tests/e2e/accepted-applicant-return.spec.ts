@@ -1,18 +1,25 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
+import { seedDevFixture } from "./helpers/fixtures";
 
 test.describe("return to accepted applicant", () => {
-  test("shows back control after viewing a declined applicant", async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await seedVerifiedOwner(page);
+    await seedDevFixture(page, "accept-solstice");
+  });
+
+  test("shows back control after viewing another applicant", async ({ page }) => {
     await page.goto("/owner/sits/solstice/applications");
     await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
 
-    // Accepted sitter is highlighted in the banner; detail starts on that applicant.
     await expect(page.getByText("Viewing details")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
 
-    await page.getByRole("button", { name: /Theo Janssen/i }).click();
-    await expect(page.getByRole("heading", { name: "Theo Janssen" })).toBeVisible();
+    await page
+      .getByRole("button", { name: /Samira Costa/i })
+      .first()
+      .click();
+    await expect(page.getByRole("heading", { name: "Samira Costa" })).toBeVisible();
     await expect(page.getByRole("button", { name: /Back to Alex Morgan/i })).toBeVisible();
 
     await page.getByRole("button", { name: /Back to Alex Morgan/i }).click();
@@ -22,11 +29,13 @@ test.describe("return to accepted applicant", () => {
   });
 
   test("banner restores accepted applicant details", async ({ page }) => {
-    await seedVerifiedOwner(page);
     await page.goto("/owner/sits/solstice/applications");
 
-    await page.getByRole("button", { name: /Theo Janssen/i }).click();
-    await expect(page.getByRole("heading", { name: "Theo Janssen" })).toBeVisible();
+    await page
+      .getByRole("button", { name: /Samira Costa/i })
+      .first()
+      .click();
+    await expect(page.getByRole("heading", { name: "Samira Costa" })).toBeVisible();
 
     await page.getByRole("button", { name: /View accepted applicant/i }).click();
     await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
@@ -34,7 +43,6 @@ test.describe("return to accepted applicant", () => {
   });
 
   test("hides boat access details from the application conversation", async ({ page }) => {
-    await seedVerifiedOwner(page);
     await page.goto("/owner/sits/solstice/applications");
     await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Conversation/i })).toBeVisible();

@@ -309,21 +309,11 @@ async function prepareImageUpload(file: File): Promise<string> {
     throw new Error("upload.tooDetailed");
   }
 
-  try {
-    const { apiUploadImage, hasApiSession } = await import("@/apiRemote");
-    if (await hasApiSession()) {
-      return await apiUploadImage(blob, "image.webp");
-    }
-  } catch {
-    // Fall through to a data URL when R2/upload is unavailable (mock login / local).
+  const { apiUploadImage, hasApiSession } = await import("@/apiRemote");
+  if (!(await hasApiSession())) {
+    throw new Error("upload.failed");
   }
-
-  return await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("upload.readFailed"));
-    reader.readAsDataURL(blob);
-  });
+  return await apiUploadImage(blob, "image.webp");
 }
 
 const ENGINE_TYPES: EngineType[] = [
@@ -7328,8 +7318,16 @@ function TermsPage() {
   );
 }
 
-function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
+function ApplicationStatusBadge({
+  status,
+  ownerView = false,
+}: {
+  status: ApplicationStatus;
+  /** When true, show owner-only statuses such as shortlisted. */
+  ownerView?: boolean;
+}) {
   const { t } = useTranslation();
+  const displayStatus = status === "shortlisted" && !ownerView ? "new" : status;
   const colors: Record<ApplicationStatus, string> = {
     new: "bg-aqua/20 text-teal",
     shortlisted: "bg-sun/25 text-navy",
@@ -7338,8 +7336,8 @@ function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
     withdrawn: "bg-slate/15 text-slate",
   };
   return (
-    <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${colors[status]}`}>
-      {t(`applications.status.${status}`)}
+    <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${colors[displayStatus]}`}>
+      {t(`applications.status.${displayStatus}`)}
     </span>
   );
 }
@@ -7473,6 +7471,46 @@ function resolveSitPhase(sit: Sit): SitPhase {
       applicants: sit.applicants,
     })
   );
+}
+
+/** Prefer live accepted-application state when the sits cache is briefly stale. */
+function resolveSitPhaseWithAcceptance(sit: Sit, hasAcceptedApplicant: boolean): SitPhase {
+  if (!hasAcceptedApplicant) return resolveSitPhase(sit);
+  return getSitPhase({
+    dateStart: sit.dateStart,
+    duration: sit.duration,
+    applicationsOpen: false,
+    accepted: true,
+    applicants: sit.applicants,
+  });
+}
+
+function patchSitAcceptanceInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  sitId: string,
+  accepted: boolean,
+) {
+  queryClient.setQueryData<Sit[]>(["sits"], (current) => {
+    if (!current) return current;
+    return current.map((sit) => {
+      if (sit.id !== sitId) return sit;
+      const next = {
+        ...sit,
+        accepted,
+        applicationsOpen: accepted ? false : true,
+      };
+      return {
+        ...next,
+        phase: getSitPhase({
+          dateStart: next.dateStart,
+          duration: next.duration,
+          applicationsOpen: next.applicationsOpen,
+          accepted: next.accepted,
+          applicants: next.applicants,
+        }),
+      };
+    });
+  });
 }
 
 function FlagSitIssueModal({
@@ -7671,6 +7709,7 @@ function ApplicationReviewPage() {
   const vessel = vessels.find((item) => item.id === sit?.boatId);
   const allowed = Boolean(user && vessel && vessel.owner === user.name);
   const pageLoading = (isLoading && !applicationsPage) || sitsLoading || vesselsLoading;
+  const sitPhase = sit ? resolveSitPhaseWithAcceptance(sit, acceptedApplications.length > 0) : null;
 
   const selectableApplications = useMemo(() => {
     if (statusFilter === "accepted") return acceptedApplications;
@@ -7708,7 +7747,12 @@ function ApplicationReviewPage() {
       ownerPhone?: string;
       status: ApplicationStatus;
     }) => updateApplicationStatus(id, status, ownerPhone),
-    onSuccess: async () => {
+    onSuccess: async (_updated, variables) => {
+      const acceptedNow = variables.status === "accepted";
+      const unaccepting = variables.status === "new";
+      if (acceptedNow || unaccepting) {
+        patchSitAcceptanceInCache(queryClient, sitId, acceptedNow);
+      }
       await queryClient.invalidateQueries({ queryKey: ["applications"] });
       await queryClient.invalidateQueries({ queryKey: ["boats"] });
       await queryClient.invalidateQueries({ queryKey: ["sits"] });
@@ -7827,26 +7871,14 @@ function ApplicationReviewPage() {
                 {t("applications.title", { boat: vessel?.name ?? "" })}
               </h1>
               <p className="mt-3 text-slate">{t("applications.subtitle", { count: sitTotal })}</p>
-              {sit && (
+              {sit && sitPhase && (
                 <div className="mt-3">
-                  <SitPhaseBadge
-                    phase={
-                      sit.phase ??
-                      getSitPhase({
-                        dateStart: sit.dateStart,
-                        duration: sit.duration,
-                        applicationsOpen: sit.applicationsOpen,
-                        accepted: sit.accepted,
-                        applicants: sit.applicants,
-                      })
-                    }
-                    size="md"
-                  />
+                  <SitPhaseBadge phase={sitPhase} size="md" />
                 </div>
               )}
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
-              {sit && resolveSitPhase(sit) === "acceptingApplicants" && !sit.accepted && (
+              {sit && sitPhase === "acceptingApplicants" && (
                 <button
                   className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
                     isAcceptingApplications(sit)
@@ -7868,7 +7900,7 @@ function ApplicationReviewPage() {
                     : t("applications.openRequests")}
                 </button>
               )}
-              {sit && resolveSitPhase(sit) === "stayUnderway" && (
+              {sit && sitPhase === "stayUnderway" && (
                 <>
                   <SitEmergencyHelp shape="pill" />
                   <button
@@ -7882,47 +7914,31 @@ function ApplicationReviewPage() {
               )}
             </div>
           </div>
-          {sit && (
+          {sit && sitPhase && (
             <div className="mt-6">
-              <SitPhaseStepper
-                phase={
-                  sit.phase ??
-                  getSitPhase({
-                    dateStart: sit.dateStart,
-                    duration: sit.duration,
-                    applicationsOpen: sit.applicationsOpen,
-                    accepted: sit.accepted,
-                    applicants: sit.applicants,
-                  })
-                }
-              />
+              <SitPhaseStepper phase={sitPhase} />
             </div>
           )}
-          {sit &&
-            !isAcceptingApplications(sit) &&
-            (sit.phase ?? getSitPhase(sit)) === "acceptingApplicants" && (
-              <div
-                className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
-                role="status"
-              >
-                {t("applications.requestsClosedNotice")}
+          {sit && sitPhase === "acceptingApplicants" && !isAcceptingApplications(sit) && (
+            <div
+              className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900"
+              role="status"
+            >
+              {t("applications.requestsClosedNotice")}
+            </div>
+          )}
+          {sit && sitPhase === "acceptingApplicants" && sitTotal > 0 && (
+            <div
+              className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
+              role="status"
+            >
+              <Video className="mt-0.5 shrink-0 text-coral" size={22} />
+              <div>
+                <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
+                <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
               </div>
-            )}
-          {sit &&
-            resolveSitPhase(sit) === "acceptingApplicants" &&
-            !sit.accepted &&
-            sitTotal > 0 && (
-              <div
-                className="mt-5 flex gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:px-5"
-                role="status"
-              >
-                <Video className="mt-0.5 shrink-0 text-coral" size={22} />
-                <div>
-                  <p className="font-bold">{t("applications.videoCallBannerTitle")}</p>
-                  <p className="mt-1 text-slate">{t("applications.videoCallBanner")}</p>
-                </div>
-              </div>
-            )}
+            </div>
+          )}
 
           {sitTotal > 0 ? (
             <div className={`mt-8 space-y-6 ${isFetching ? "opacity-70" : ""}`}>
@@ -7947,7 +7963,7 @@ function ApplicationReviewPage() {
                         <Check size={14} strokeWidth={3} /> {t("applications.status.accepted")}
                       </span>
                     </div>
-                    {sit && resolveSitPhase(sit) === "applicantChosen" && (
+                    {sit && sitPhase === "applicantChosen" && (
                       <div
                         className="mt-5 flex gap-3 rounded-2xl border border-teal/30 bg-seafoam px-4 py-4 text-sm leading-6 text-navy sm:px-5"
                         role="status"
@@ -7959,7 +7975,7 @@ function ApplicationReviewPage() {
                         </div>
                       </div>
                     )}
-                    {sit && resolveSitPhase(sit) === "stayUnderway" && (
+                    {sit && sitPhase === "stayUnderway" && (
                       <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-4 text-sm leading-6 text-navy sm:flex-row sm:items-center sm:justify-between sm:px-5">
                         <div className="flex gap-3">
                           <Flag className="mt-0.5 shrink-0 text-coral" size={22} />
@@ -8019,7 +8035,7 @@ function ApplicationReviewPage() {
                                 <span className="font-display text-xl font-bold text-navy">
                                   {application.applicant.name}
                                 </span>
-                                <ApplicationStatusBadge status={application.status} />
+                                <ApplicationStatusBadge ownerView status={application.status} />
                               </span>
                               <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
                                 <span className="flex items-center gap-1.5">
@@ -8158,7 +8174,7 @@ function ApplicationReviewPage() {
                                   })}
                                 </span>
                                 <span className="mt-1 block">
-                                  <ApplicationStatusBadge status={application.status} />
+                                  <ApplicationStatusBadge ownerView status={application.status} />
                                 </span>
                               </span>
                             </button>
@@ -8215,7 +8231,7 @@ function ApplicationReviewPage() {
                             <h2 className="font-display text-2xl font-bold text-navy">
                               {selected.applicant.name}
                             </h2>
-                            <ApplicationStatusBadge status={selected.status} />
+                            <ApplicationStatusBadge ownerView status={selected.status} />
                           </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
                             <p className="flex items-center gap-1.5">
@@ -8545,6 +8561,13 @@ function ApplicationReviewPage() {
                   <Video className="mt-0.5 shrink-0 text-coral" size={18} />
                   <p>{t("applications.confirm.acceptedVideoCallNote")}</p>
                 </div>
+                <div
+                  className="mt-3 flex gap-3 rounded-xl border border-teal/25 bg-teal/10 px-4 py-3 text-sm leading-6 text-navy"
+                  role="note"
+                >
+                  <Users className="mt-0.5 shrink-0 text-teal" size={18} />
+                  <p>{t("applications.confirm.acceptedCloseNote")}</p>
+                </div>
                 <div className="mt-5 rounded-xl border border-line bg-cream p-4">
                   <label className="flex items-start gap-3">
                     <input
@@ -8827,7 +8850,10 @@ function MessagesPage() {
                     >
                       <span className="flex items-center justify-between gap-2">
                         <span className="truncate font-bold text-navy">{otherName}</span>
-                        <ApplicationStatusBadge status={application.status} />
+                        <ApplicationStatusBadge
+                          ownerView={participationRole === "owner"}
+                          status={application.status}
+                        />
                       </span>
                       <span className="mt-1 flex items-center gap-2 text-xs text-slate">
                         <SitParticipationBadge role={participationRole} />
@@ -8932,7 +8958,10 @@ function MessagesPage() {
                           </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
-                          <ApplicationStatusBadge status={selected.status} />
+                          <ApplicationStatusBadge
+                            ownerView={sitParticipationRole(selected, user.name) === "owner"}
+                            status={selected.status}
+                          />
                           {selected.status === "accepted" &&
                             selectedSit &&
                             resolveSitPhase(selectedSit) === "stayUnderway" && <SitEmergencyHelp />}

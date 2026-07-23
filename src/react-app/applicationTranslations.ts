@@ -64,6 +64,8 @@ const en = {
   "applications.systemMessage.acceptedOwner": "You accepted {{name}} for this sit",
   "applications.systemMessage.declined": "You are no longer being considered for this sit",
   "applications.systemMessage.declinedOwner": "You are no longer considering {{name}} for this sit",
+  "applications.systemMessage.unaccepted": "You are no longer accepted for this sit",
+  "applications.systemMessage.unacceptedOwner": "You unaccepted {{name}} for this sit",
   "applications.systemMessage.applicantsClosed":
     "The owner is no longer considering applicants for this sit",
   "applications.systemMessage.videoCallRequestTitle": "Video call proposed",
@@ -192,6 +194,8 @@ const en = {
   "notifications.items.sitAccepted": "{{actor}} accepted your invitation to sit {{boat}}.",
   "notifications.items.applicationAccepted": "{{actor}} accepted your application for {{boat}}.",
   "notifications.items.applicationDeclined": "{{actor}} declined your application for {{boat}}.",
+  "notifications.items.applicationUnaccepted":
+    "{{actor}} is no longer confirming you for {{boat}}.",
   "notifications.items.newApplication": "{{actor}} applied to sit {{boat}}.",
   "notifications.items.newMessage": "{{actor}} sent you a new message about {{boat}}.",
   "notifications.items.sitReminder": "Your sit on {{boat}} starts soon.",
@@ -316,6 +320,8 @@ const en = {
     "This confirms {{name}} for this boat sit. You can continue coordinating key handover and the walkthrough in messages.",
   "applications.confirm.acceptedVideoCallNote":
     "Only accept after you have completed a video call together.",
+  "applications.confirm.acceptedCloseNote":
+    "This sit will no longer allow others to submit applications. Other applicants will get a message that you are no longer selecting applicants.",
   "applications.confirm.acceptedAction": "Yes, accept",
   "applications.confirm.declinedTitle": "Decline {{name}}?",
   "applications.confirm.declinedText":
@@ -432,6 +438,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined":
       "Vous n’êtes plus pris en considération pour cette garde",
     "applications.systemMessage.declinedOwner": "Vous ne considérez plus {{name}} pour cette garde",
+    "applications.systemMessage.unaccepted": "Vous n’êtes plus accepté pour cette garde",
+    "applications.systemMessage.unacceptedOwner":
+      "Vous avez retiré l’acceptation de {{name}} pour cette garde",
     "applications.systemMessage.applicantsClosed":
       "Le propriétaire n’examine plus les candidatures pour cette garde",
     "applications.systemMessage.videoCallRequestTitle": "Appel vidéo proposé",
@@ -563,6 +572,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitAccepted": "{{actor}} a accepté votre invitation à garder {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} a accepté votre candidature pour {{boat}}.",
+    "notifications.items.applicationUnaccepted": "{{actor}} ne vous confirme plus pour {{boat}}.",
     "notifications.items.newApplication": "{{actor}} a proposé de garder {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} vous a envoyé un nouveau message au sujet de {{boat}}.",
@@ -692,6 +702,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Cela confirme {{name}} pour cette garde. Vous pourrez ensuite organiser la remise des clés et la visite dans les messages.",
     "applications.confirm.acceptedVideoCallNote":
       "N’acceptez qu’après avoir terminé un appel vidéo ensemble.",
+    "applications.confirm.acceptedCloseNote":
+      "Cette garde n’acceptera plus de nouvelles candidatures. Les autres candidats recevront un message indiquant que vous ne sélectionnez plus de candidats.",
     "applications.confirm.acceptedAction": "Oui, accepter",
     "applications.confirm.declinedTitle": "Refuser {{name}} ?",
     "applications.confirm.declinedText":
@@ -803,6 +815,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Ya no se te está considerando para esta estancia",
     "applications.systemMessage.declinedOwner":
       "Ya no estás considerando a {{name}} para esta estancia",
+    "applications.systemMessage.unaccepted": "Ya no estás aceptado para esta estancia",
+    "applications.systemMessage.unacceptedOwner":
+      "Retiraste la aceptación de {{name}} para esta estancia",
     "applications.systemMessage.applicantsClosed":
       "El propietario ya no está considerando solicitantes para esta estancia",
     "applications.systemMessage.videoCallRequestTitle": "Videollamada propuesta",
@@ -933,6 +948,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitAccepted": "{{actor}} aceptó tu invitación para cuidar {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} aceptó tu solicitud para cuidar {{boat}}.",
+    "notifications.items.applicationUnaccepted": "{{actor}} ya no te confirma para {{boat}}.",
     "notifications.items.newApplication": "{{actor}} solicitó cuidar {{boat}}.",
     "notifications.items.newMessage": "{{actor}} te envió un nuevo mensaje sobre {{boat}}.",
     "notifications.items.sitReminder": "Tu estancia en {{boat}} empieza pronto.",
@@ -1062,6 +1078,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Esto confirma a {{name}} para esta estancia. Después podéis coordinar la entrega de llaves y el recorrido en los mensajes.",
     "applications.confirm.acceptedVideoCallNote":
       "Solo acepta después de haber completado una videollamada juntos.",
+    "applications.confirm.acceptedCloseNote":
+      "Esta estancia dejará de aceptar nuevas solicitudes. Los demás solicitantes recibirán un mensaje de que ya no estás seleccionando candidatos.",
     "applications.confirm.acceptedAction": "Sí, aceptar",
     "applications.confirm.declinedTitle": "¿Rechazar a {{name}}?",
     "applications.confirm.declinedText":
@@ -1174,6 +1192,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Non stai più venendo considerato per questo soggiorno",
     "applications.systemMessage.declinedOwner":
       "Non stai più considerando {{name}} per questo soggiorno",
+    "applications.systemMessage.unaccepted": "Non sei più accettato per questa custodia",
+    "applications.systemMessage.unacceptedOwner":
+      "Hai revocato l’accettazione di {{name}} per questa custodia",
     "applications.systemMessage.applicantsClosed":
       "Il proprietario non sta più considerando candidati per questo soggiorno",
     "applications.systemMessage.videoCallRequestTitle": "Videochiamata proposta",
@@ -1307,6 +1328,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} ha accettato il tuo invito a occuparsi di {{boat}}.",
     "notifications.items.applicationAccepted":
       "{{actor}} ha accettato la tua candidatura per {{boat}}.",
+    "notifications.items.applicationUnaccepted": "{{actor}} non ti conferma più per {{boat}}.",
     "notifications.items.newApplication": "{{actor}} si è candidato per occuparsi di {{boat}}.",
     "notifications.items.newMessage": "{{actor}} ti ha inviato un nuovo messaggio su {{boat}}.",
     "notifications.items.sitReminder": "Il tuo soggiorno su {{boat}} inizierà presto.",
@@ -1434,6 +1456,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Questo conferma {{name}} per il soggiorno. Potete poi coordinare consegna chiavi e giro della barca nei messaggi.",
     "applications.confirm.acceptedVideoCallNote":
       "Accetta solo dopo aver completato una videochiamata insieme.",
+    "applications.confirm.acceptedCloseNote":
+      "Questa custodia non accetterà più nuove candidature. Gli altri candidati riceveranno un messaggio che non stai più selezionando candidati.",
     "applications.confirm.acceptedAction": "Sì, accetta",
     "applications.confirm.declinedTitle": "Rifiutare {{name}}?",
     "applications.confirm.declinedText":
@@ -1546,6 +1570,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sie werden für diesen Sit nicht mehr in Betracht gezogen",
     "applications.systemMessage.declinedOwner":
       "Sie ziehen {{name}} für diesen Sit nicht mehr in Betracht",
+    "applications.systemMessage.unaccepted": "Sie sind für diese Betreuung nicht mehr angenommen",
+    "applications.systemMessage.unacceptedOwner":
+      "Sie haben die Annahme von {{name}} für diese Betreuung zurückgenommen",
     "applications.systemMessage.applicantsClosed":
       "Der Eigentümer prüft für diesen Sit keine Bewerber mehr",
     "applications.systemMessage.videoCallRequestTitle": "Videoanruf vorgeschlagen",
@@ -1676,6 +1703,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} hat Ihre Einladung zur Betreuung von {{boat}} angenommen.",
     "notifications.items.applicationAccepted":
       "{{actor}} hat Ihre Bewerbung für {{boat}} angenommen.",
+    "notifications.items.applicationUnaccepted": "{{actor}} bestätigt Sie nicht mehr für {{boat}}.",
     "notifications.items.newApplication": "{{actor}} hat sich für {{boat}} beworben.",
     "notifications.items.newMessage":
       "{{actor}} hat Ihnen eine neue Nachricht zu {{boat}} gesendet.",
@@ -1807,6 +1835,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Damit bestätigen Sie {{name}} für diesen Sit. Schlüsselübergabe und Rundgang können Sie danach in den Nachrichten abstimmen.",
     "applications.confirm.acceptedVideoCallNote":
       "Nehmen Sie erst an, nachdem Sie gemeinsam einen Videoanruf abgeschlossen haben.",
+    "applications.confirm.acceptedCloseNote":
+      "Für diese Betreuung können andere keine Bewerbungen mehr einreichen. Andere Bewerber erhalten eine Nachricht, dass Sie keine Bewerber mehr auswählen.",
     "applications.confirm.acceptedAction": "Ja, annehmen",
     "applications.confirm.declinedTitle": "{{name}} ablehnen?",
     "applications.confirm.declinedText":
@@ -1919,6 +1949,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Je wordt niet langer overwogen voor dit verblijf",
     "applications.systemMessage.declinedOwner":
       "Je overweegt {{name}} niet langer voor dit verblijf",
+    "applications.systemMessage.unaccepted": "Je bent niet langer geaccepteerd voor deze oppas",
+    "applications.systemMessage.unacceptedOwner":
+      "Je hebt de acceptatie van {{name}} voor deze oppas ingetrokken",
     "applications.systemMessage.applicantsClosed":
       "De eigenaar overweegt geen sollicitanten meer voor dit verblijf",
     "applications.systemMessage.videoCallRequestTitle": "Videogesprek voorgesteld",
@@ -2051,6 +2084,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} heeft je uitnodiging voor de oppas van {{boat}} geaccepteerd.",
     "notifications.items.applicationAccepted":
       "{{actor}} heeft je aanvraag voor {{boat}} geaccepteerd.",
+    "notifications.items.applicationUnaccepted":
+      "{{actor}} bevestigt je niet langer voor {{boat}}.",
     "notifications.items.newApplication": "{{actor}} heeft zich aangemeld voor {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} heeft je een nieuw bericht over {{boat}} gestuurd.",
@@ -2180,6 +2215,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Hiermee bevestig je {{name}} voor dit verblijf. Sleuteloverdracht en rondleiding kun je daarna via berichten afstemmen.",
     "applications.confirm.acceptedVideoCallNote":
       "Accepteer pas nadat jullie samen een videogesprek hebben afgerond.",
+    "applications.confirm.acceptedCloseNote":
+      "Voor deze oppas kunnen anderen geen aanvragen meer indienen. Andere sollicitanten krijgen een bericht dat je geen sollicitanten meer selecteert.",
     "applications.confirm.acceptedAction": "Ja, accepteren",
     "applications.confirm.declinedTitle": "{{name}} afwijzen?",
     "applications.confirm.declinedText":
@@ -2290,6 +2327,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Já não está a ser considerado para esta estadia",
     "applications.systemMessage.declinedOwner":
       "Já não está a considerar {{name}} para esta estadia",
+    "applications.systemMessage.unaccepted": "Já não está aceite para esta guarda",
+    "applications.systemMessage.unacceptedOwner":
+      "Retirou a aceitação de {{name}} para esta guarda",
     "applications.systemMessage.applicantsClosed":
       "O proprietário já não está a considerar candidatos para esta estadia",
     "applications.systemMessage.videoCallRequestTitle": "Videochamada proposta",
@@ -2417,6 +2457,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Os anúncios devem oferecer uma embarcação segura, legal e razoavelmente habitável para o cuidador viver e dormir a bordo. Cada estadia exige permanência a bordo e não é um serviço apenas de visitas diurnas. Durante as datas acordadas, o cuidador só pode usar a embarcação como alojamento temporário e para prestar os cuidados acordados. Sem autorização escrita explícita do proprietário, não pode navegar, deslocar, alugar, emprestar, subalugar, usar comercialmente nem alojar convidados noturnos não autorizados. As instruções de segurança e emergência têm prioridade.",
     "notifications.items.sitAccepted": "{{actor}} aceitou o seu convite para cuidar de {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} aceitou a sua candidatura para {{boat}}.",
+    "notifications.items.applicationUnaccepted": "{{actor}} já não o confirma para {{boat}}.",
     "notifications.items.newApplication": "{{actor}} candidatou-se para cuidar de {{boat}}.",
     "notifications.items.newMessage": "{{actor}} enviou-lhe uma nova mensagem sobre {{boat}}.",
     "notifications.items.sitReminder": "A sua estadia em {{boat}} começa em breve.",
@@ -2545,6 +2586,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Isto confirma {{name}} para esta estadia. Depois podem coordenar a entrega das chaves e a visita nas mensagens.",
     "applications.confirm.acceptedVideoCallNote":
       "Só aceite depois de terem concluído uma videochamada juntos.",
+    "applications.confirm.acceptedCloseNote":
+      "Esta guarda deixará de aceitar novas candidaturas. Os outros candidatos receberão uma mensagem de que já não está a selecionar candidatos.",
     "applications.confirm.acceptedAction": "Sim, aceitar",
     "applications.confirm.declinedTitle": "Recusar {{name}}?",
     "applications.confirm.declinedText":
@@ -2656,6 +2699,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Δεν εξετάζεστε πλέον για αυτή τη διαμονή",
     "applications.systemMessage.declinedOwner":
       "Δεν εξετάζετε πλέον τον/την {{name}} για αυτή τη διαμονή",
+    "applications.systemMessage.unaccepted": "Δεν είστε πλέον αποδεκτοί για αυτή τη φύλαξη",
+    "applications.systemMessage.unacceptedOwner":
+      "Ανακαλέσατε την αποδοχή του/της {{name}} για αυτή τη φύλαξη",
     "applications.systemMessage.applicantsClosed":
       "Ο ιδιοκτήτης δεν εξετάζει πλέον υποψηφίους για αυτή τη διαμονή",
     "applications.systemMessage.videoCallRequestTitle": "Προτάθηκε βιντεοκλήση",
@@ -2788,6 +2834,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ο χρήστης {{actor}} αποδέχτηκε την πρόσκλησή σας για τη φροντίδα του {{boat}}.",
     "notifications.items.applicationAccepted":
       "Ο χρήστης {{actor}} αποδέχτηκε την αίτησή σας για το {{boat}}.",
+    "notifications.items.applicationUnaccepted":
+      "Ο/Η {{actor}} δεν σας επιβεβαιώνει πλέον για το {{boat}}.",
     "notifications.items.newApplication":
       "Ο χρήστης {{actor}} έκανε αίτηση για τη φροντίδα του {{boat}}.",
     "notifications.items.newMessage":
@@ -2918,6 +2966,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ο χρήστης {{name}} επιβεβαιώνεται για αυτή τη διαμονή. Μετά μπορείτε να συντονίσετε παράδοση κλειδιών και περιήγηση στα μηνύματα.",
     "applications.confirm.acceptedVideoCallNote":
       "Αποδεχτείτε μόνο αφού ολοκληρώσετε μαζί μια βιντεοκλήση.",
+    "applications.confirm.acceptedCloseNote":
+      "Αυτή η φύλαξη δεν θα επιτρέπει πλέον σε άλλους να υποβάλουν αιτήσεις. Οι άλλοι υποψήφιοι θα λάβουν μήνυμα ότι δεν επιλέγετε πλέον υποψηφίους.",
     "applications.confirm.acceptedAction": "Ναι, αποδοχή",
     "applications.confirm.declinedTitle": "Απόρριψη του χρήστη {{name}};",
     "applications.confirm.declinedText":
@@ -3030,6 +3080,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.acceptedOwner": "Prihvatili ste {{name}} za ovaj boravak",
     "applications.systemMessage.declined": "Više se ne razmatrate za ovaj boravak",
     "applications.systemMessage.declinedOwner": "Više ne razmatrate {{name}} za ovaj boravak",
+    "applications.systemMessage.unaccepted": "Više niste prihvaćeni za ovo čuvanje",
+    "applications.systemMessage.unacceptedOwner":
+      "Poništili ste prihvaćanje osobe {{name}} za ovo čuvanje",
     "applications.systemMessage.applicantsClosed":
       "Vlasnik više ne razmatra prijave za ovaj boravak",
     "applications.systemMessage.videoCallRequestTitle": "Predložen video poziv",
@@ -3160,6 +3213,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitAccepted":
       "{{actor}} je prihvatio vaš poziv za čuvanje broda {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} je prihvatio vašu prijavu za {{boat}}.",
+    "notifications.items.applicationUnaccepted": "{{actor}} više vas ne potvrđuje za {{boat}}.",
     "notifications.items.newApplication": "{{actor}} se prijavio za čuvanje broda {{boat}}.",
     "notifications.items.newMessage": "{{actor}} vam je poslao novu poruku o brodu {{boat}}.",
     "notifications.items.sitReminder": "Vaš boravak na brodu {{boat}} uskoro počinje.",
@@ -3284,6 +3338,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Time potvrđujete osobu {{name}} za ovaj boravak. Predaju ključeva i obilazak možete potom dogovoriti u porukama.",
     "applications.confirm.acceptedVideoCallNote":
       "Prihvatite tek nakon što zajedno završite video poziv.",
+    "applications.confirm.acceptedCloseNote":
+      "Ovo čuvanje više neće dopuštati drugima da pošalju prijave. Ostali kandidati dobit će poruku da više ne birate kandidate.",
     "applications.confirm.acceptedAction": "Da, prihvati",
     "applications.confirm.declinedTitle": "Odbiti osobu {{name}}?",
     "applications.confirm.declinedText":
@@ -3398,6 +3454,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Bu konaklama için artık değerlendirilmiyorsunuz",
     "applications.systemMessage.declinedOwner":
       "{{name}} kişisini bu konaklama için artık değerlendirmiyorsunuz",
+    "applications.systemMessage.unaccepted": "Bu bakıcılık için artık kabul edilmiyorsunuz",
+    "applications.systemMessage.unacceptedOwner":
+      "{{name}} için kabulü bu bakıcılıkta geri aldınız",
     "applications.systemMessage.applicantsClosed":
       "Sahip bu konaklama için artık başvuranları değerlendirmiyor",
     "applications.systemMessage.videoCallRequestTitle": "Görüntülü arama önerildi",
@@ -3524,6 +3583,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "İlanlar, bakıcının yaşayıp uyuyabileceği güvenli, yasal ve makul ölçüde yaşanabilir bir tekne sunmalıdır. Her bakıcılık teknede konaklamayı içerir ve yalnızca gündüz kontrolü hizmeti değildir. Kararlaştırılan tarihler boyunca bakıcı tekneyi sadece geçici konaklama ve kararlaştırılan bakım için kullanabilir. Sahibinin açık yazılı izni olmadan tekneyi seyir amacıyla kullanamaz, taşıyamaz, kiralayamaz, ödünç veremez, alt kiraya veremez, ticari amaçla kullanamaz veya yetkisiz gece misafirleri ağırlayamaz. Güvenlik ve acil durum talimatları önceliklidir.",
     "notifications.items.sitAccepted": "{{actor}}, {{boat}} için bakıcılık davetinizi kabul etti.",
     "notifications.items.applicationAccepted": "{{actor}}, {{boat}} için başvurunuzu kabul etti.",
+    "notifications.items.applicationUnaccepted": "{{actor}}, {{boat}} için artık sizi onaylamıyor.",
     "notifications.items.newApplication": "{{actor}}, {{boat}} için bakıcılık başvurusu yaptı.",
     "notifications.items.newMessage": "{{actor}}, {{boat}} hakkında size yeni bir mesaj gönderdi.",
     "notifications.items.sitReminder": "{{boat}} üzerindeki konaklamanız yakında başlıyor.",
@@ -3649,6 +3709,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Bu işlem {{name}} adlı kişiyi bu konaklama için onaylar. Anahtar teslimini ve turu ardından mesajlarda planlayabilirsiniz.",
     "applications.confirm.acceptedVideoCallNote":
       "Yalnızca birlikte bir görüntülü görüşmeyi tamamladıktan sonra kabul edin.",
+    "applications.confirm.acceptedCloseNote":
+      "Bu bakıcılık artık başkalarının başvuru göndermesine izin vermeyecek. Diğer başvuranlar, artık başvuran seçmediğinize dair bir mesaj alacak.",
     "applications.confirm.acceptedAction": "Evet, kabul et",
     "applications.confirm.declinedTitle": "{{name}} reddedilsin mi?",
     "applications.confirm.declinedText":
@@ -3759,6 +3821,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Du övervägs inte längre för denna sittning",
     "applications.systemMessage.declinedOwner":
       "Du överväger inte längre {{name}} för denna sittning",
+    "applications.systemMessage.unaccepted": "Du är inte längre accepterad för denna sits",
+    "applications.systemMessage.unacceptedOwner":
+      "Du tog tillbaka acceptansen av {{name}} för denna sits",
     "applications.systemMessage.applicantsClosed":
       "Ägaren överväger inte längre sökande till denna sitt",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtal föreslagits",
@@ -3885,6 +3950,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Listor måste erbjuda ett fartyg som är säkert, lagligt och rimligt beboeligt för sittaren att bo och sova ombord. Varje sittning är ett liveaboard-arrangemang, inte en dagkontrolltjänst. Under överenskomna datum får barnvakten endast använda fartyget som tillfälligt boende och för att utföra överenskommen vård. Såvida inte ägaren ger uttryckligt skriftligt tillstånd, får barnvakten inte navigera, flytta, chartra, låna ut, hyra ut i andra hand, använda kommersiellt eller ta emot obehöriga övernattande gäster ombord på fartyget. Säkerhets- och nödanvisningar har prioritet.",
     "notifications.items.sitAccepted": "{{actor}} tackade ja till din inbjudan att sitta {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} accepterade din ansökan för {{boat}}.",
+    "notifications.items.applicationUnaccepted":
+      "{{actor}} bekräftar dig inte längre för {{boat}}.",
     "notifications.items.newApplication": "{{actor}} användes för att sitta {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} skickade ett nytt meddelande till dig om {{boat}}.",
@@ -4014,6 +4081,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Detta bekräftar {{name}} för denna båtsitt. Du kan fortsätta att koordinera nyckelöverlämnandet och genomgången i meddelanden.",
     "applications.confirm.acceptedVideoCallNote":
       "Acceptera först efter att ni har slutfört ett videosamtal tillsammans.",
+    "applications.confirm.acceptedCloseNote":
+      "Denna sits kommer inte längre att tillåta andra att skicka ansökningar. Övriga sökande får ett meddelande om att du inte längre väljer sökande.",
     "applications.confirm.acceptedAction": "Ja, acceptera",
     "applications.confirm.declinedTitle": "Avvisa {{name}}?",
     "applications.confirm.declinedText":
@@ -4122,6 +4191,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.acceptedOwner": "Du godtok {{name}} for dette setet",
     "applications.systemMessage.declined": "Du vurderes ikke lenger for dette setet",
     "applications.systemMessage.declinedOwner": "Du vurderer ikke lenger {{name}} for dette setet",
+    "applications.systemMessage.unaccepted": "Du er ikke lenger godtatt for dette setet",
+    "applications.systemMessage.unacceptedOwner":
+      "Du trakk tilbake godtakelsen av {{name}} for dette setet",
     "applications.systemMessage.applicantsClosed":
       "Eieren vurderer ikke lenger søkere til dette setet",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtale foreslått",
@@ -4248,6 +4320,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Oppføringer må tilby et fartøy som er trygt, lovlig og rimelig beboelig for sitteren å bo og sove ombord. Hver sit er et liveaboard-arrangement, ikke en dagsjekk-tjeneste. På de avtalte datoene kan oppsitteren kun bruke fartøyet som midlertidig innkvartering og for å utføre avtalt stell. Med mindre eieren gir uttrykkelig skriftlig tillatelse, må sitteren ikke navigere, flytte, leie ut, låne ut, fremleie, bruke kommersielt eller være vert for uautoriserte overnattingsgjester ombord på fartøyet. Sikkerhets- og nødinstruksjoner har prioritet.",
     "notifications.items.sitAccepted": "{{actor}} godtok invitasjonen din til å sitte {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} godtok søknaden din for {{boat}}.",
+    "notifications.items.applicationUnaccepted":
+      "{{actor}} bekrefter deg ikke lenger for {{boat}}.",
     "notifications.items.newApplication": "{{actor}} brukt for å sitte {{boat}}.",
     "notifications.items.newMessage": "{{actor}} sendte deg en ny melding om {{boat}}.",
     "notifications.items.sitReminder": "Sitt på {{boat}} starter snart.",
@@ -4374,6 +4448,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Dette bekrefter {{name}} for denne båtsitten. Du kan fortsette å koordinere nøkkeloverlevering og gjennomgang i meldinger.",
     "applications.confirm.acceptedVideoCallNote":
       "Godta først etter at dere har fullført en videosamtale sammen.",
+    "applications.confirm.acceptedCloseNote":
+      "Dette setet vil ikke lenger la andre sende inn søknader. Andre søkere får en melding om at du ikke lenger velger søkere.",
     "applications.confirm.acceptedAction": "Ja, godta",
     "applications.confirm.declinedTitle": "Avslå {{name}}?",
     "applications.confirm.declinedText":
@@ -4482,6 +4558,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.acceptedOwner": "Du accepterede {{name}} til dette møde",
     "applications.systemMessage.declined": "Du kommer ikke længere i betragtning til dette møde",
     "applications.systemMessage.declinedOwner": "Du overvejer ikke længere {{name}} til dette møde",
+    "applications.systemMessage.unaccepted": "Du er ikke længere accepteret til denne sit",
+    "applications.systemMessage.unacceptedOwner":
+      "Du trak accepten af {{name}} tilbage for denne sit",
     "applications.systemMessage.applicantsClosed":
       "Ejeren overvejer ikke længere ansøgere til denne sit",
     "applications.systemMessage.videoCallRequestTitle": "Videoopkald foreslået",
@@ -4607,6 +4686,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitAccepted":
       "{{actor}} accepterede din invitation til at sidde {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} accepterede din ansøgning om {{boat}}.",
+    "notifications.items.applicationUnaccepted":
+      "{{actor}} bekræfter dig ikke længere til {{boat}}.",
     "notifications.items.newApplication": "{{actor}} anvendt til at sidde {{boat}}.",
     "notifications.items.newMessage": "{{actor}} har sendt dig en ny besked om {{boat}}.",
     "notifications.items.sitReminder": "Din sit på {{boat}} starter snart.",
@@ -4734,6 +4815,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Dette bekræfter {{name}} for denne båd. Du kan fortsætte med at koordinere nøgleoverdragelsen og gennemgangen i beskeder.",
     "applications.confirm.acceptedVideoCallNote":
       "Accepter først, når I har gennemført et videoopkald sammen.",
+    "applications.confirm.acceptedCloseNote":
+      "Denne sit vil ikke længere tillade andre at indsende ansøgninger. Andre ansøgere får en besked om, at du ikke længere vælger ansøgere.",
     "applications.confirm.acceptedAction": "Ja, accepter",
     "applications.confirm.declinedTitle": "Afvise {{name}}?",
     "applications.confirm.declinedText":
@@ -4843,6 +4926,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.declined": "Sinua ei enää oteta huomioon tässä istunnossa",
     "applications.systemMessage.declinedOwner":
       "Et enää harkitse henkilöä {{name}} tähän istuntoon",
+    "applications.systemMessage.unaccepted": "Sinua ei enää ole hyväksytty tälle istunnolle",
+    "applications.systemMessage.unacceptedOwner":
+      "Peruit henkilön {{name}} hyväksynnän tälle istunnolle",
     "applications.systemMessage.applicantsClosed":
       "Omistaja ei enää harkitse hakijoita tälle paikalle",
     "applications.systemMessage.videoCallRequestTitle": "Videopuhelu ehdotettu",
@@ -4971,6 +5057,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Listausten on tarjottava alus, joka on turvallinen, laillinen ja kohtuullisen asumiskelpoinen, jotta hoitaja voi asua ja nukkua siinä. Jokainen istunto on liveaboard-järjestely, ei päivätarkastuspalvelu. Sitteri saa käyttää alusta sovittuna aikana vain tilapäisenä majoituksena ja sovitun hoidon suorittamiseen. Ellei omistaja anna nimenomaista kirjallista lupaa, vahtimestari ei saa navigoida, siirtää, vuokrata, lainata, edelleenvuokrata, käyttää kaupallisesti tai vastaanottaa luvattomia yöpyjiä aluksella. Turvallisuus- ja hätäohjeet ovat etusijalla.",
     "notifications.items.sitAccepted": "{{actor}} hyväksyi kutsusi istua {{boat}}.",
     "notifications.items.applicationAccepted": "{{actor}} hyväksyi hakemuksesi {{boat}}.",
+    "notifications.items.applicationUnaccepted":
+      "{{actor}} ei enää vahvista sinua kohteelle {{boat}}.",
     "notifications.items.newApplication": "{{actor}} sovellettu istumaan {{boat}}.",
     "notifications.items.newMessage": "{{actor}} lähetti sinulle uuden viestin aiheesta {{boat}}.",
     "notifications.items.sitReminder": "Istuksesi {{boat}} alkaa pian.",
@@ -5096,6 +5184,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Tämä vahvistaa {{name}} tälle veneelle. Voit jatkaa avainten luovutuksen ja läpikäynnin koordinointia viesteissä.",
     "applications.confirm.acceptedVideoCallNote":
       "Hyväksy vasta, kun olette suorittaneet videopuhelun yhdessä.",
+    "applications.confirm.acceptedCloseNote":
+      "Tämä istunto ei enää salli muiden lähettää hakemuksia. Muut hakijat saavat viestin, ettet enää valitse hakijoita.",
     "applications.confirm.acceptedAction": "Kyllä, hyväksy",
     "applications.confirm.declinedTitle": "Hylätäänkö {{name}}?",
     "applications.confirm.declinedText":
@@ -5204,6 +5294,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.acceptedOwner": "この座席の {{name}} を受け入れました",
     "applications.systemMessage.declined": "あなたはもうこの座席には考慮されていません",
     "applications.systemMessage.declinedOwner": "この座席では {{name}} をもう検討していません",
+    "applications.systemMessage.unaccepted": "この座席への承諾は取り消されました",
+    "applications.systemMessage.unacceptedOwner": "{{name}} の承諾を取り消しました",
     "applications.systemMessage.applicantsClosed": "オーナーはこの座席への応募者を検討していません",
     "applications.systemMessage.videoCallRequestTitle": "ビデオ通話の提案",
     "applications.systemMessage.videoCallRequest": "{{name}} がビデオ通話を提案しました。",
@@ -5331,6 +5423,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitAccepted":
       "{{actor}} は、{{boat}} に座るというあなたの招待を受け入れました。",
     "notifications.items.applicationAccepted": "{{actor}} が {{boat}} の申請を受理しました。",
+    "notifications.items.applicationUnaccepted": "{{actor}} は {{boat}} の承諾を取り消しました。",
     "notifications.items.newApplication": "{{actor}} は {{boat}} に座るのに適用されます。",
     "notifications.items.newMessage":
       "{{actor}} さんが {{boat}} に関する新しいメッセージを送信しました。",
@@ -5458,6 +5551,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "これにより、このボートの着座は {{name}} であることが確認されます。キーの引き継ぎとメッセージ内のウォークスルーの調整を続けることができます。",
     "applications.confirm.acceptedVideoCallNote":
       "一緒にビデオ通話を完了した後にのみ承諾してください。",
+    "applications.confirm.acceptedCloseNote":
+      "この座席は他の人が新たに申請できなくなります。他の応募者には、応募者の選定を終了した旨のメッセージが届きます。",
     "applications.confirm.acceptedAction": "はい、受け入れます",
     "applications.confirm.declinedTitle": "{{name}} を拒否しますか?",
     "applications.confirm.declinedText":

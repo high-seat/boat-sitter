@@ -3,10 +3,10 @@
 Hono on Cloudflare Workers, backed by D1 via Drizzle. The React app reaches the
 API through `src/react-app/mockApi.ts` (filename kept for import stability).
 
-That module routes to the Worker when a Better Auth session exists (e.g. Google
-sign-in), via `apiClient.ts` / `apiRemote.ts`. Mock login and e2e still use the
-browser localStorage fallback. Remaining local-only gaps: identity verification
-and non-Google auth (`mockAuth`).
+That module always talks to the Worker via `apiClient.ts` / `apiRemote.ts`.
+Writes require a Better Auth session. Local and Playwright flows can create one
+with `POST /api/dev/login` (non-production). Remaining local-only gaps: identity
+verification mock state and Apple/Facebook stubs in `mockAuth`.
 
 ## Data model
 

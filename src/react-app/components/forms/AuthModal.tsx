@@ -69,11 +69,38 @@ export function AuthModal() {
     image: string;
     name: string;
   }) {
-    loginAs(account);
-    setOpen(false);
-    setForm({ email: "", name: "", password: "" });
-    setAcceptedTerms(false);
-    setError("");
+    void (async () => {
+      if (import.meta.env.DEV) {
+        try {
+          const email =
+            account.email?.trim() ||
+            `${account.name.toLowerCase().replaceAll(/[^a-z0-9]+/g, ".")}@boatstead.mock`;
+          await fetch("/api/dev/login", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              name: account.name,
+              image: account.image,
+            }),
+          });
+          await hydrateSession();
+          setOpen(false);
+          setForm({ email: "", name: "", password: "" });
+          setAcceptedTerms(false);
+          setError("");
+          return;
+        } catch {
+          // Fall through to local-only mock social login.
+        }
+      }
+      loginAs(account);
+      setOpen(false);
+      setForm({ email: "", name: "", password: "" });
+      setAcceptedTerms(false);
+      setError("");
+    })();
   }
 
   async function submit(event: React.FormEvent) {

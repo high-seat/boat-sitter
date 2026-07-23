@@ -21,7 +21,10 @@ type SeedOwnerOptions = Partial<OwnerSeed> & {
   featureFlags?: Record<string, boolean>;
 };
 
-/** Seeds a logged-in owner session before the app boots. */
+/**
+ * Establish a real Better Auth session (via /api/dev/login) and local UI flags
+ * before the app boots. Domain data comes from D1 — not localStorage.
+ */
 export async function seedOwnerSession(page: Page, options?: SeedOwnerOptions) {
   const { featureFlags, ...ownerOptions } = options ?? {};
   const owner: OwnerSeed = {
@@ -39,49 +42,32 @@ export async function seedOwnerSession(page: Page, options?: SeedOwnerOptions) {
     ...featureFlags,
   };
 
+  const login = await page.request.post("/api/dev/login", {
+    data: {
+      email: owner.email,
+      name: owner.name,
+      image: owner.image,
+    },
+  });
+  if (!login.ok()) {
+    const body = await login.text();
+    throw new Error(`Dev login failed (${login.status()}): ${body}`);
+  }
+
+  await page.request.put("/api/me/profile", {
+    data: {
+      phoneNumber: owner.phoneNumber,
+      phoneCountryCode: "+30",
+      location: "Lefkada, Greece",
+      bio: "Owner of Solstice",
+      image: owner.image,
+    },
+  });
+
   await page.addInitScript(
     ({ ownerState, verificationKey, flagOverrides }) => {
-      localStorage.clear();
       localStorage.setItem("i18nextLng", "en-US");
-      localStorage.setItem(
-        "harbourly",
-        JSON.stringify({
-          state: {
-            saved: [],
-            archivedConversations: [],
-            archivedSits: [],
-            blockedUsers: [],
-            userReports: [],
-            user: {
-              name: ownerState.name,
-              email: ownerState.email,
-              emailConfirmed: ownerState.emailConfirmed,
-              legalName: ownerState.name,
-              image: ownerState.image,
-              bio: "Owner of Solstice",
-              location: "Lefkada, Greece",
-              languages: ["English"],
-              preferredCountries: ["Greece"],
-              skills: [],
-              preferredLanguage: "en-US",
-              measurementSystem: "metric",
-              emailNotifications: {
-                newApplications: true,
-                applicationUpdates: true,
-                messages: true,
-                sitReminders: true,
-                productUpdates: false,
-              },
-              sitDefaults: { nonSmokerRequired: false },
-              memberSince: 2021,
-              phoneCountryCode: "+30",
-              phoneNumber: ownerState.phoneNumber,
-              role: ownerState.role,
-            },
-          },
-          version: 16,
-        }),
-      );
+      localStorage.setItem("harbourly-language", "en-US");
       if (ownerState.verified) {
         localStorage.setItem(
           verificationKey,
@@ -92,6 +78,8 @@ export async function seedOwnerSession(page: Page, options?: SeedOwnerOptions) {
             reference: "mock_e2e_verified",
           }),
         );
+      } else {
+        localStorage.removeItem(verificationKey);
       }
       localStorage.setItem(
         "boatstead-feature-flags",
@@ -100,6 +88,13 @@ export async function seedOwnerSession(page: Page, options?: SeedOwnerOptions) {
           version: 1,
         }),
       );
+      // emailConfirmed is still client-only in the SPA store for settings tests.
+      (
+        window as unknown as { __boatsteadE2e?: { emailConfirmed: boolean; role: string } }
+      ).__boatsteadE2e = {
+        emailConfirmed: ownerState.emailConfirmed,
+        role: ownerState.role,
+      };
     },
     { ownerState: owner, verificationKey, flagOverrides },
   );

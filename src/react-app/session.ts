@@ -40,13 +40,16 @@ export async function hydrateSession(): Promise<void> {
     if (!body.user) return;
 
     const store = useAppStore.getState();
-    store.loginAs({
-      name: body.user.name,
-      image:
-        body.user.image ??
-        `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(body.user.name)}`,
-      email: body.user.email,
-    });
+    store.loginAs(
+      {
+        name: body.user.name,
+        image:
+          body.user.image ??
+          `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(body.user.name)}`,
+        email: body.user.email,
+      },
+      { establishApiSession: false },
+    );
 
     if (body.profile) {
       const profile = body.profile;
@@ -84,6 +87,24 @@ export async function hydrateSession(): Promise<void> {
       }));
     }
 
+    // Playwright can set window.__boatsteadE2e before boot for client-only fields.
+    const e2e = (
+      window as unknown as {
+        __boatsteadE2e?: { emailConfirmed?: boolean; role?: "member" | "admin" };
+      }
+    ).__boatsteadE2e;
+    if (e2e && useAppStore.getState().user) {
+      useAppStore.setState((state) => ({
+        user: state.user
+          ? {
+              ...state.user,
+              ...(e2e.emailConfirmed != null ? { emailConfirmed: e2e.emailConfirmed } : {}),
+              ...(e2e.role ? { role: e2e.role } : {}),
+            }
+          : null,
+      }));
+    }
+
     try {
       const { apiGetPrefs } = await import("@/apiRemote");
       const prefs = await apiGetPrefs();
@@ -98,7 +119,14 @@ export async function hydrateSession(): Promise<void> {
         })),
       });
     } catch {
-      // Prefs table may not be migrated yet — keep local persist.
+      // Prefer empty server prefs over stale localStorage when the API is unavailable.
+      useAppStore.getState().hydratePrefs({
+        saved: [],
+        archivedConversations: [],
+        archivedSits: [],
+        blockedUsers: [],
+        userReports: [],
+      });
     }
   } catch {
     // Offline or auth not migrated — stay logged out.

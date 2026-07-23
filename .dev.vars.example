@@ -1,5 +1,10 @@
 # Copy to .dev.vars for local development (gitignored).
-# .dev.vars overrides wrangler.json `vars` during `wrangler dev`, so local runs
-# stay in development mode (dev console open) while deploys are production.
+# .dev.vars overrides wrangler.json `vars` during `wrangler dev` / Vite, so local
+# runs stay in development mode (dev console + /api/dev open) while deploys are
+# production.
 ENVIRONMENT=development
 ADMIN_TOKEN=dev-token
+BETTER_AUTH_URL=http://127.0.0.1:5173
+BETTER_AUTH_SECRET=dev-local-better-auth-secret-32chars
+GOOGLE_CLIENT_ID=unused-local
+GOOGLE_CLIENT_SECRET=unused-local

@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, ne, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import {
@@ -94,7 +94,14 @@ function shape(
   app: ApplicationRow,
   messages: MessageRow[],
   ownerImages: Map<string, string> = new Map(),
+  options?: { viewerName?: string | null; revealShortlist?: boolean },
 ) {
+  const viewerName = options?.viewerName ?? null;
+  const revealShortlist =
+    options?.revealShortlist === true || Boolean(viewerName && viewerName === app.ownerName);
+  // Shortlist is an owner-only tracking flag; never reveal it to applicants.
+  const status = app.status === "shortlisted" && !revealShortlist ? "new" : app.status;
+
   return {
     id: app.id,
     sitId: app.sitId,
@@ -108,7 +115,7 @@ function shape(
       completedSits: app.applicant.completedSits ?? 0,
     },
     initialMessage: app.initialMessage,
-    status: app.status,
+    status,
     createdAt: app.createdAt,
     ownerPhone: app.ownerPhone ?? undefined,
     messages: messages
@@ -134,13 +141,23 @@ async function loadOwnerImages(env: Env, apps: ApplicationRow[]): Promise<Map<st
   return images;
 }
 
-async function shapeMany(env: Env, apps: ApplicationRow[], messages: MessageRow[]) {
+async function shapeMany(
+  env: Env,
+  apps: ApplicationRow[],
+  messages: MessageRow[],
+  options?: { viewerName?: string | null; revealShortlist?: boolean },
+) {
   const ownerImages = await loadOwnerImages(env, apps);
-  return apps.map((app) => shape(app, messages, ownerImages));
+  return apps.map((app) => shape(app, messages, ownerImages, options));
 }
 
-async function shapeOne(env: Env, app: ApplicationRow, messages: MessageRow[]) {
-  const [shaped] = await shapeMany(env, [app], messages);
+async function shapeOne(
+  env: Env,
+  app: ApplicationRow,
+  messages: MessageRow[],
+  options?: { viewerName?: string | null; revealShortlist?: boolean },
+) {
+  const [shaped] = await shapeMany(env, [app], messages, options);
   return shaped;
 }
 
@@ -226,8 +243,8 @@ applicationsRouter.get("/", async (c) => {
     ];
     const messages = await loadMessages(c.env, messageIds);
     const [shapedList, shapedAccepted] = await Promise.all([
-      shapeMany(c.env, paged.items, messages),
-      shapeMany(c.env, accepted, messages),
+      shapeMany(c.env, paged.items, messages, { revealShortlist: true }),
+      shapeMany(c.env, accepted, messages, { revealShortlist: true }),
     ]);
 
     return c.json({
@@ -251,7 +268,7 @@ applicationsRouter.get("/", async (c) => {
       c.env,
       rows.map((r) => r.id),
     );
-    return c.json({ data: await shapeMany(c.env, rows, messages) });
+    return c.json({ data: await shapeMany(c.env, rows, messages, { viewerName: user }) });
   }
 
   return c.json({ error: "Provide sitId or user" }, 400);
@@ -276,7 +293,7 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
     .limit(1);
   if (existing.length) {
     const msgs = await loadMessages(c.env, [existing[0].id]);
-    return c.json({ data: await shapeOne(c.env, existing[0], msgs) });
+    return c.json({ data: await shapeOne(c.env, existing[0], msgs, { viewerName: user.name }) });
   }
 
   const listing = await db
@@ -338,7 +355,7 @@ applicationsRouter.post("/", requireUser, zValidator("json", createSchema), asyn
 
   const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   const msgs = await loadMessages(c.env, [id]);
-  return c.json({ data: await shapeOne(c.env, row!, msgs) }, 201);
+  return c.json({ data: await shapeOne(c.env, row!, msgs, { viewerName: user.name }) }, 201);
 });
 
 /** Look up a logged-in user's real email by their auth user id. */
@@ -457,8 +474,47 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
     });
   }
 
+  // Unaccept / move away from accepted: notify applicant, then reopen when nobody else is accepted.
+  if (appRow.status === "accepted" && status !== "accepted") {
+    // Decline already posts its own system message + notification above.
+    if (status !== "declined") {
+      await insertSystemMessage(c.env, {
+        applicationId: id,
+        senderName: user.name,
+        text: `${user.name} unaccepted this application`,
+        systemKind: "unaccepted",
+      });
+      await insertNotification(db, {
+        userId: appRow.applicantUserId,
+        userName: appRow.applicantName,
+        type: "applicationUnaccepted",
+        actor: user.name,
+        boatName: appRow.boatName,
+        href: `/messages?application=${id}`,
+      });
+    }
+
+    const stillAccepted = await db
+      .select({ id: applications.id })
+      .from(applications)
+      .where(
+        and(
+          eq(applications.sitId, appRow.sitId),
+          eq(applications.status, "accepted"),
+          ne(applications.id, id),
+        ),
+      )
+      .limit(1);
+    if (!stillAccepted.length) {
+      await db
+        .update(sits)
+        .set({ published: true, updatedAt: sql`CURRENT_TIMESTAMP` })
+        .where(eq(sits.id, appRow.sitId));
+    }
+  }
+
   const msgs = await loadMessages(c.env, [id]);
-  return c.json({ data: await shapeOne(c.env, row, msgs) });
+  return c.json({ data: await shapeOne(c.env, row, msgs, { viewerName: user.name }) });
 });
 
 applicationsRouter.post(
@@ -517,7 +573,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: await shapeOne(c.env, row, msgs) });
+    return c.json({ data: await shapeOne(c.env, row, msgs, { viewerName: user.name }) });
   },
 );
 
@@ -569,7 +625,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: await shapeOne(c.env, app, msgs) });
+    return c.json({ data: await shapeOne(c.env, app, msgs, { viewerName: user.name }) });
   },
 );
 
@@ -615,7 +671,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: await shapeOne(c.env, app, msgs) });
+    return c.json({ data: await shapeOne(c.env, app, msgs, { viewerName: user.name }) });
   },
 );
 
@@ -679,7 +735,7 @@ applicationsRouter.post(
     });
 
     const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: await shapeOne(c.env, app, msgs) });
+    return c.json({ data: await shapeOne(c.env, app, msgs, { viewerName: user.name }) });
   },
 );
 
@@ -721,7 +777,7 @@ applicationsRouter.post("/:id/video-call/:messageId/accept", requireUser, async 
   });
 
   const next = await loadMessages(c.env, [id]);
-  return c.json({ data: await shapeOne(c.env, app, next) });
+  return c.json({ data: await shapeOne(c.env, app, next, { viewerName: user.name }) });
 });
 
 applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async (c) => {
@@ -762,5 +818,5 @@ applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async
   });
 
   const next = await loadMessages(c.env, [id]);
-  return c.json({ data: await shapeOne(c.env, app, next) });
+  return c.json({ data: await shapeOne(c.env, app, next, { viewerName: user.name }) });
 });

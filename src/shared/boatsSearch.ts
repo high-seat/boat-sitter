@@ -1,6 +1,6 @@
 /**
  * Shared boat catalogue filter / sort / pagination.
- * Used by the Worker `/api/boats` route and the SPA localStorage fallback.
+ * Used by the Worker `/api/boats` route.
  */
 
 import { vesselTypeFromParam, vesselTypeToSlug } from "./vesselTypes";

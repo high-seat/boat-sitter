@@ -1,118 +1,26 @@
 import { expect, test } from "@playwright/test";
+import { seedOwnerSession } from "./helpers/auth";
+import { seedDevFixture } from "./helpers/fixtures";
 
 test.describe("withdrawn requested sits", () => {
   test("moves withdrawn applications into a separate section", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.clear();
-      localStorage.setItem("i18nextLng", "en-US");
-      localStorage.setItem("harbourly-language", "en-US");
-      localStorage.setItem(
-        "harbourly",
-        JSON.stringify({
-          state: {
-            saved: [],
-            archivedConversations: [],
-            archivedSits: [],
-            blockedUsers: [],
-            userReports: [],
-            user: {
-              name: "Alex Morgan",
-              email: "alex.morgan@boatstead.mock",
-              legalName: "Alex Morgan",
-              image: "https://i.pravatar.cc/160?img=11",
-              bio: "Sitter",
-              location: "Brighton, United Kingdom",
-              languages: ["English"],
-              preferredCountries: [],
-              skills: [],
-              preferredLanguage: "en-US",
-              measurementSystem: "metric",
-              emailNotifications: {
-                newApplications: true,
-                applicationUpdates: true,
-                messages: true,
-                sitReminders: true,
-                productUpdates: false,
-              },
-              sitDefaults: { nonSmokerRequired: false },
-              memberSince: 2020,
-              phoneCountryCode: "+44",
-              phoneNumber: "7700900123",
-              role: "member",
-            },
-          },
-          version: 14,
-        }),
-      );
-      localStorage.setItem("boatstead-applications-v3", "complete");
-      localStorage.setItem(
-        "harbourly-applications",
-        JSON.stringify([
-          {
-            id: "application-alex-solstice",
-            sitId: "solstice",
-            boatName: "Solstice",
-            ownerName: "Maya & Finn",
-            status: "withdrawn",
-            createdAt: "2026-07-18T10:00:00.000Z",
-            partySize: 1,
-            initialMessage: "Interested in Solstice.",
-            applicant: {
-              name: "Alex Morgan",
-              image: "https://i.pravatar.cc/160?img=11",
-              location: "Brighton, United Kingdom",
-              bio: "Sitter",
-              languages: ["English"],
-              preferredCountries: [],
-              skills: [],
-              yearsExperience: 7,
-              certifications: [],
-              memberSince: 2020,
-              completedSits: 8,
-            },
-            messages: [
-              {
-                id: "message-withdrawn",
-                senderName: "Alex Morgan",
-                text: "Interested in Solstice.",
-                createdAt: "2026-07-18T10:00:00.000Z",
-              },
-            ],
-          },
-          {
-            id: "application-alex-blue-hour",
-            sitId: "blue-hour",
-            boatName: "Blue Hour",
-            ownerName: "Jonas",
-            status: "accepted",
-            createdAt: "2026-07-19T10:00:00.000Z",
-            partySize: 1,
-            initialMessage: "Interested in Blue Hour.",
-            applicant: {
-              name: "Alex Morgan",
-              image: "https://i.pravatar.cc/160?img=11",
-              location: "Brighton, United Kingdom",
-              bio: "Sitter",
-              languages: ["English"],
-              preferredCountries: [],
-              skills: [],
-              yearsExperience: 7,
-              certifications: [],
-              memberSince: 2020,
-              completedSits: 8,
-            },
-            messages: [
-              {
-                id: "message-active",
-                senderName: "Alex Morgan",
-                text: "Interested in Blue Hour.",
-                createdAt: "2026-07-19T10:00:00.000Z",
-              },
-            ],
-          },
-        ]),
-      );
+    await seedOwnerSession(page, {
+      name: "Alex Morgan",
+      email: "alex.morgan@boatstead.mock",
+      image: "https://i.pravatar.cc/160?img=11",
+      phoneNumber: "7700900123",
     });
+
+    const withdraw = await page.request.post(
+      "/api/applications/application-alex-solstice/withdraw",
+      {
+        data: { explanation: "E2E withdraw" },
+      },
+    );
+    if (!withdraw.ok()) {
+      throw new Error(`Withdraw failed (${withdraw.status()}): ${await withdraw.text()}`);
+    }
+    await seedDevFixture(page, "alex-blue-hour-accepted");
 
     await page.goto("/my-sits");
     await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Command } from "cmdk";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Anchor,
   CalendarPlus,
@@ -35,7 +35,7 @@ import {
   type FeatureFlagKey,
 } from "@/featureFlags";
 import { useFeatureFlagStore } from "@/featureFlagStore";
-import { createDevRandomSit, createDevRandomVessel } from "@/mockApi";
+import { createDevRandomSit, createDevRandomVessel, getSits, getVessels } from "@/mockApi";
 import { isAdminUser } from "@/adminAccess";
 import { useAppStore } from "@/store";
 import { getVerificationStatusSync, setMockVerificationStatus } from "@/verificationService";
@@ -45,29 +45,6 @@ const DEMO_PHONE_COUNTRY = "+1";
 
 function openAuth(mode: "login" | "signup") {
   window.dispatchEvent(new CustomEvent("open-auth", { detail: mode }));
-}
-
-function readSitBoatId(sitId: string) {
-  try {
-    const sits = JSON.parse(localStorage.getItem("harbourly-sits") ?? "[]") as Array<{
-      id: string;
-      boatId: string;
-    }>;
-    return sits.find((sit) => sit.id === sitId)?.boatId;
-  } catch {
-    return undefined;
-  }
-}
-
-function readOwnedBoatCount(ownerName: string) {
-  try {
-    const vessels = JSON.parse(localStorage.getItem("harbourly-vessels") ?? "[]") as Array<{
-      owner: string;
-    }>;
-    return vessels.filter((vessel) => vessel.owner === ownerName).length;
-  } catch {
-    return 0;
-  }
 }
 
 function StatusBadge({
@@ -152,7 +129,21 @@ export function CommandPalette() {
   const onMessages = Boolean(matchPath("/messages", location.pathname));
   const boatId = boatMatch?.params.id;
   const applicationSitId = applicationsMatch?.params.sitId;
-  const applicationBoatId = applicationSitId ? readSitBoatId(applicationSitId) : undefined;
+
+  const { data: sits = [] } = useQuery({
+    queryKey: ["sits"],
+    queryFn: getSits,
+    enabled: open && Boolean(applicationSitId || user),
+  });
+  const { data: vessels = [] } = useQuery({
+    queryKey: ["vessels"],
+    queryFn: getVessels,
+    enabled: open && Boolean(user),
+  });
+
+  const applicationBoatId = applicationSitId
+    ? sits.find((sit) => sit.id === applicationSitId)?.boatId
+    : undefined;
   const editBoatId = vesselEditMatch?.params.boatId;
   const memberParam = memberMatch?.params.id
     ? decodeURIComponent(memberMatch.params.id)
@@ -276,7 +267,8 @@ export function CommandPalette() {
             onSelect={() =>
               run(() => {
                 void (async () => {
-                  if (readOwnedBoatCount(user.name) === 0) {
+                  const ownedCount = vessels.filter((vessel) => vessel.owner === user.name).length;
+                  if (ownedCount === 0) {
                     await createDevRandomVessel({
                       name: user.name,
                       image: user.image,

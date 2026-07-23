@@ -1,12 +1,12 @@
 # Boatstead
 
-Boatstead connects boat owners with experienced sitters. The React SPA talks to a Hono API on Cloudflare Workers (D1). Google sign-in uses Better Auth; when a real session cookie is present, boats/vessels/sits/applications/support go through the Worker. Mock email login and Playwright e2e still use the browser localStorage layer.
+Boatstead connects boat owners with experienced sitters. The React SPA talks to a Hono API on Cloudflare Workers (D1). Auth uses Better Auth (Google OAuth and email/password). Domain data (boats, sits, applications, prefs, etc.) is API-only — there is no localStorage fallback for listings.
 
 ## Stack
 
 - React, TypeScript, Vite, and Tailwind CSS
 - Hono API running on Cloudflare Workers + D1 (Drizzle)
-- Better Auth (Google OAuth)
+- Better Auth (Google OAuth + email/password)
 - TanStack Query and Zustand
 - i18next for localization
 - pnpm for package management
@@ -21,7 +21,7 @@ pnpm db:seed:local
 pnpm dev
 ```
 
-The frontend lives in `src/react-app`, and the Worker API entrypoint lives in `src/worker`. See `API.md` for endpoints.
+The frontend lives in `src/react-app`, and the Worker API entrypoint lives in `src/worker`. See `API.md` for endpoints. Local/Playwright sessions can use `POST /api/dev/login`.
 
 ## Verification
 

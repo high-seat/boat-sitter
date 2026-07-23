@@ -97,8 +97,15 @@ vesselsRouter.put("/:id", requireUser, zValidator("json", vesselSchema), async (
   const user = c.get("user")!;
 
   const existing = await db.query.vessels.findFirst({ where: eq(vessels.id, id) });
-  if (existing && existing.ownerUserId !== user.id) {
-    return c.json({ error: "You do not own this vessel" }, 403);
+  if (existing) {
+    if (existing.ownerUserId != null && existing.ownerUserId !== user.id) {
+      return c.json({ error: "You do not own this vessel" }, 403);
+    }
+    // Seed/legacy rows have a null ownerUserId — allow the matching display-name
+    // owner to claim them on first write.
+    if (existing.ownerUserId == null && existing.owner !== user.name) {
+      return c.json({ error: "You do not own this vessel" }, 403);
+    }
   }
 
   const privateAccess = body.privateAccess
@@ -161,7 +168,10 @@ vesselsRouter.delete("/:id", requireUser, async (c) => {
 
   const existing = await db.query.vessels.findFirst({ where: eq(vessels.id, id) });
   if (!existing) return c.json({ error: "Vessel not found" }, 404);
-  if (existing.ownerUserId !== user.id) {
+  if (existing.ownerUserId != null && existing.ownerUserId !== user.id) {
+    return c.json({ error: "You do not own this vessel" }, 403);
+  }
+  if (existing.ownerUserId == null && existing.owner !== user.name) {
     return c.json({ error: "You do not own this vessel" }, 403);
   }
 

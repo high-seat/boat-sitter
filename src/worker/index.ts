@@ -24,7 +24,13 @@ app.use("*", logger());
 // but this keeps localhost cross-port dev working too.
 app.use("/api/*", (c, next) =>
   cors({
-    origin: [c.env.BETTER_AUTH_URL ?? "http://localhost:5173", "http://localhost:5173"],
+    origin: [
+      c.env.BETTER_AUTH_URL ?? "http://localhost:5173",
+      "http://localhost:5173",
+      "http://localhost:4174",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:4174",
+    ],
     credentials: true,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
@@ -34,7 +40,7 @@ app.use("/api/*", (c, next) =>
 // Populate user/session on the context for every request.
 app.use("*", async (c, next) => {
   try {
-    const auth = buildAuth(c.env);
+    const auth = buildAuth(c.env, c.req.raw);
     const session = await auth.api.getSession({ headers: c.req.raw.headers });
     c.set("user", (session?.user as SessionUser) ?? null);
     c.set("session", session?.session ?? null);
@@ -47,7 +53,7 @@ app.use("*", async (c, next) => {
 });
 
 // Better Auth handles all its own routes (sign-in, callback, session, sign-out).
-app.on(["GET", "POST"], "/api/auth/*", (c) => buildAuth(c.env).handler(c.req.raw));
+app.on(["GET", "POST"], "/api/auth/*", (c) => buildAuth(c.env, c.req.raw).handler(c.req.raw));
 
 app.route("/api/me", meRouter);
 app.route("/api/profiles", profilesRouter);

@@ -154,6 +154,7 @@ type SitApplication = {
     systemKind?:
       | "accepted"
       | "declined"
+      | "unaccepted"
       | "applicantsClosed"
       | "videoCallRequest"
       | "videoCallCounter"
@@ -280,6 +281,8 @@ type ApiSit = {
   featured: boolean;
   published: boolean;
   sitType?: "liveaboard" | "daytimeChecks";
+  accepted?: boolean;
+  applicationsOpen?: boolean;
 };
 
 type ApiApplication = {
@@ -502,6 +505,7 @@ export function normalizeApiVessel(row: ApiVessel): Vessel {
 
 export function normalizeApiSit(row: ApiSit): Sit {
   const coords = coordsFor(row.location, row.country, row.latitude, row.longitude);
+  const accepted = Boolean(row.accepted);
   return {
     id: row.id,
     boatId: row.boatId,
@@ -525,7 +529,11 @@ export function normalizeApiSit(row: ApiSit): Sit {
     applicants: row.applicants,
     pet: row.pet ?? undefined,
     featured: row.featured,
-    applicationsOpen: row.published,
+    accepted,
+    applicationsOpen:
+      row.applicationsOpen != null
+        ? Boolean(row.applicationsOpen)
+        : row.published !== false && !accepted,
   };
 }
 
