@@ -29,10 +29,40 @@ const MEASUREMENT_ID =
   (import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined) ?? "G-QX5XWC25XK";
 const ENABLED = import.meta.env.PROD && Boolean(MEASUREMENT_ID);
 
+const CONSENT_KEY = "boatstead-analytics-consent";
+
 let initialised = false;
 
 function gtag(...args: unknown[]) {
   window.dataLayer.push(args);
+}
+
+/** The stored consent choice, if the visitor has made one. */
+function readConsent(): "granted" | "denied" | null {
+  try {
+    const v = localStorage.getItem(CONSENT_KEY);
+    return v === "granted" || v === "denied" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveConsent(choice: "granted" | "denied") {
+  try {
+    localStorage.setItem(CONSENT_KEY, choice);
+  } catch {
+    // Private mode / storage disabled — consent just won't persist.
+  }
+}
+
+/** True when GA is actually running (prod build + id) — gates the banner. */
+export function isAnalyticsActive() {
+  return ENABLED;
+}
+
+/** Whether the visitor has already accepted or declined. */
+export function hasConsentChoice() {
+  return readConsent() !== null;
 }
 
 /** Load gtag.js once and set Consent Mode defaults (all denied). */
@@ -59,6 +89,12 @@ export function initAnalytics() {
   gtag("js", new Date());
   // We send page_view ourselves on each route change.
   gtag("config", MEASUREMENT_ID, { send_page_view: false });
+
+  // Returning visitor who already accepted — restore their consent so we don't
+  // re-prompt and analytics resumes immediately.
+  if (readConsent() === "granted") {
+    gtag("consent", "update", { analytics_storage: "granted" });
+  }
 }
 
 /** Record a page view. No-op unless analytics is enabled + initialised. */
@@ -73,12 +109,16 @@ export function trackPageView(path: string) {
 
 /** Call from a consent banner once the user accepts analytics cookies. */
 export function grantConsent() {
+  saveConsent("granted");
   if (!ENABLED || !initialised) return;
   gtag("consent", "update", { analytics_storage: "granted" });
+  // Capture the current page now, since collection was suppressed until now.
+  trackPageView(window.location.pathname + window.location.search);
 }
 
 /** Call if the user declines / withdraws consent. */
 export function denyConsent() {
+  saveConsent("denied");
   if (!ENABLED || !initialised) return;
   gtag("consent", "update", { analytics_storage: "denied" });
 }
