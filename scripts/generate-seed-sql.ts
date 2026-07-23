@@ -58,6 +58,7 @@ const vesselCols = [
   ["type", "type"],
   ["length", "length"],
   ["homePort", "home_port"],
+  ["fullAddress", "full_address"],
   ["image", "image"],
   ["gallery", "gallery"],
   ["owner", "owner"],

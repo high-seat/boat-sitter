@@ -96,9 +96,13 @@ export async function fillMinimalCreateSitForm(
 
   await pickFutureSitDates(modal, page);
 
-  await modal
-    .getByTestId("sit-full-address-input")
-    .fill(options?.fullAddress ?? "Berth A4, Demo Marina, Harbor Road 12");
+  // Default is "use normal port"; only fill a custom address when requested.
+  if (options?.fullAddress) {
+    await modal.getByTestId("sit-use-normal-port-input").uncheck();
+    await modal.getByTestId("sit-full-address-input").fill(options.fullAddress);
+  } else {
+    await expect(modal.getByTestId("sit-use-normal-port-input")).toBeChecked();
+  }
 
   if (sitType !== "daytimeChecks") {
     const maxGuests = modal.getByTestId("sit-editor-max-guests").locator('input[type="number"]');

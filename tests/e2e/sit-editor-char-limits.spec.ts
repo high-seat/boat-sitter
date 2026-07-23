@@ -7,6 +7,7 @@ test.describe("sit editor character limits", () => {
     await seedVerifiedOwner(page);
     const editor = await openCreateSitModal(page);
 
+    await editor.getByTestId("sit-use-normal-port-input").uncheck();
     const address = editor.getByTestId("sit-full-address-input");
     await address.fill("A".repeat(320));
     await expect(address).toHaveValue("A".repeat(300));

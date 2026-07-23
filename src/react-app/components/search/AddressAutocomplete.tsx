@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { MapPin, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import type { AddressSuggestion } from "../../../shared/addressSearch";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
+import { homePortFromAddress, type AddressSuggestion } from "../../../shared/addressSearch";
 import { queries } from "@/queries";
 import { CharacterCount } from "@/components/ui/CharacterCount";
 import { ShimmerBlock } from "@/components/ui/Shimmer";
@@ -34,24 +34,47 @@ function photonLangFromI18n(language: string) {
   return "default";
 }
 
+function firstResolvable(suggestions: AddressSuggestion[]) {
+  return suggestions.find((suggestion) => Boolean(homePortFromAddress(suggestion)));
+}
+
+export type AddressSelectMeta = {
+  /** `pick` replaces the input with the suggestion label; `resolve` keeps typed free text. */
+  source: "pick" | "resolve";
+};
+
 export function AddressAutocomplete({
   value,
   onChange,
+  onSelect,
+  onClear,
+  onLocalityClear,
+  resolveLocalityOnBlur = false,
   placeholder,
   testId,
   maxLength,
 }: {
   value: string;
   onChange: (value: string) => void;
+  /** Fired when the user picks a suggestion, or when free text is resolved on blur. */
+  onSelect?: (suggestion: AddressSuggestion, meta: AddressSelectMeta) => void;
+  onClear?: () => void;
+  /** Fired when typed text no longer has a resolved city/country. */
+  onLocalityClear?: () => void;
+  /** On blur, match city/country from Photon while keeping the typed address. */
+  resolveLocalityOnBlur?: boolean;
   placeholder?: string;
   testId?: string;
   maxLength?: number;
 }) {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  /** Exact query string that currently has a resolved locality. */
+  const resolvedForQueryRef = useRef<string | null>(null);
   const liveQuery = value.trim();
   const searchEnabled = liveQuery.length >= 3;
 
@@ -77,9 +100,48 @@ export function AddressAutocomplete({
 
   function choose(suggestion: AddressSuggestion) {
     const label = maxLength != null ? suggestion.label.slice(0, maxLength) : suggestion.label;
+    resolvedForQueryRef.current = label.trim();
     onChange(label);
+    onSelect?.(suggestion, { source: "pick" });
     setOpen(false);
     setActiveIndex(0);
+  }
+
+  function clear() {
+    resolvedForQueryRef.current = null;
+    onChange("");
+    onClear?.();
+    onLocalityClear?.();
+    setActiveIndex(0);
+    setOpen(true);
+    inputRef.current?.focus();
+  }
+
+  async function resolveTypedLocality(query: string) {
+    if (!resolveLocalityOnBlur) return;
+    const trimmed = query.trim();
+    if (trimmed.length < 3) {
+      resolvedForQueryRef.current = null;
+      onLocalityClear?.();
+      return;
+    }
+    if (resolvedForQueryRef.current === trimmed) return;
+
+    try {
+      const results = await queryClient.fetchQuery({
+        ...queries.addresses.search(trimmed, lang),
+      });
+      const match = firstResolvable(results);
+      if (match) {
+        resolvedForQueryRef.current = trimmed;
+        onSelect?.(match, { source: "resolve" });
+        return;
+      }
+    } catch {
+      // Network / upstream failures leave the address unresolved.
+    }
+    resolvedForQueryRef.current = null;
+    onLocalityClear?.();
   }
 
   return (
@@ -93,10 +155,21 @@ export function AddressAutocomplete({
           className="form-input mt-1 min-h-24 resize-y"
           data-testid={testId ? `${testId}-input` : undefined}
           onBlur={() => {
-            window.setTimeout(() => setOpen(false), 120);
+            window.setTimeout(() => {
+              setOpen(false);
+              void resolveTypedLocality(value);
+            }, 120);
           }}
           onChange={(event) => {
-            onChange(event.target.value);
+            const next = event.target.value;
+            if (
+              resolvedForQueryRef.current != null &&
+              next.trim() !== resolvedForQueryRef.current
+            ) {
+              resolvedForQueryRef.current = null;
+              onLocalityClear?.();
+            }
+            onChange(next);
             setOpen(true);
             setActiveIndex(0);
           }}
@@ -136,12 +209,7 @@ export function AddressAutocomplete({
             aria-label={t("address.clear")}
             className="absolute top-2.5 right-2 z-10 grid size-8 place-items-center rounded-full border border-line bg-white text-slate shadow-sm transition hover:border-teal hover:text-navy"
             data-testid={testId ? `${testId}-clear` : undefined}
-            onClick={() => {
-              onChange("");
-              setActiveIndex(0);
-              setOpen(true);
-              inputRef.current?.focus();
-            }}
+            onClick={clear}
             onMouseDown={(event) => event.preventDefault()}
             title={t("address.clear")}
             type="button"

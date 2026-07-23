@@ -79,6 +79,7 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
   sydney: [-33.8688, 151.2093],
   tallinn: [59.437, 24.7536],
   tampa: [27.9506, -82.4572],
+  tewantin: [-26.3916, 153.0395],
   trogir: [43.515, 16.2517],
   valencia: [39.4699, -0.3763],
   valletta: [35.8989, 14.5146],
@@ -138,4 +139,31 @@ export function lookupCoordinates(location: string, country: string): LatLng | n
   if (byCountry) return { latitude: byCountry[0], longitude: byCountry[1] };
 
   return null;
+}
+
+/**
+ * Legacy Atlantic dump used when unknown places had no match. Treat as missing
+ * so we can re-resolve from city/country instead of pinning West Africa.
+ */
+export function isPlaceholderCoordinates(latitude: number, longitude: number) {
+  return latitude === 20 && longitude === 0;
+}
+
+/**
+ * Prefer an explicit geocode (e.g. Photon), then curated city/country lookup.
+ * Returns null when nothing trustworthy is available.
+ */
+export function resolveListingCoordinates(
+  location: string,
+  country: string,
+  hint?: { latitude?: number; longitude?: number } | null,
+): LatLng | null {
+  if (
+    hint?.latitude != null &&
+    hint?.longitude != null &&
+    !isPlaceholderCoordinates(hint.latitude, hint.longitude)
+  ) {
+    return { latitude: hint.latitude, longitude: hint.longitude };
+  }
+  return lookupCoordinates(location, country);
 }

@@ -99,6 +99,8 @@ import { ShimmerBlock } from "@/components/ui/Shimmer";
 import { VesselPicker } from "@/components/ui/VesselPicker";
 import { DestinationAutocomplete } from "@/components/search/DestinationAutocomplete";
 import { AddressAutocomplete } from "@/components/search/AddressAutocomplete";
+import { homePortFromAddress } from "../shared/addressSearch";
+import { resolveListingCoordinates } from "@/coordinates";
 import { AuthModal } from "@/components/forms/AuthModal";
 import { ConversationPanel } from "@/components/applications/ConversationPanel";
 import { ConversationRowActions } from "@/components/applications/ConversationRowActions";
@@ -143,7 +145,6 @@ import {
   containsOffPlatformContactDetails,
   deleteSit,
   deleteVessel,
-  coordinatesForLocation,
   findConfirmedSitDateConflict,
   markNotificationRead,
   saveSit,
@@ -4044,6 +4045,7 @@ const VESSEL_MAX_LENGTHS = {
   wifiPassword: 64,
   accessCodes: 500,
   otherPrivateNotes: 1000,
+  fullAddress: 300,
 } as const;
 
 const SIT_MAX_LENGTHS = {
@@ -4105,6 +4107,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     voltageType: boat?.voltageType ?? "Not specified",
     stoveFuelType: boat?.stoveFuelType ?? "Not specified",
     homePort: boat?.homePort ?? "",
+    fullAddress: boat?.fullAddress ?? "",
     image: boat?.image ?? "",
     description: boat?.description ?? "",
     home: boat?.home ?? "",
@@ -4134,6 +4137,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
             voltageType: "Not specified",
             stoveFuelType: "Not specified",
             homePort: "",
+            fullAddress: "",
             image: "",
             description: "",
             home: "",
@@ -4267,6 +4271,7 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
         voltageType: form.voltageType,
         stoveFuelType: form.stoveFuelType,
         homePort: form.homePort,
+        fullAddress: form.fullAddress.trim() || undefined,
         description: form.description,
         home: form.home,
         length:
@@ -4332,12 +4337,13 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     const reasons: string[] = [];
     if (!form.image.trim()) reasons.push(t("vesselEditor.coverImage"));
     if (!form.name.trim()) reasons.push(t("vesselEditor.name"));
-    if (!form.homePort.trim()) reasons.push(t("vesselEditor.homePort"));
+    if (!form.fullAddress.trim()) reasons.push(t("vesselEditor.fullAddress"));
+    if (!form.homePort.trim()) reasons.push(t("vesselEditor.publicLocation"));
     if (!form.type.trim() || form.type === "Not specified") {
       reasons.push(t("vesselEditor.type"));
     }
     return reasons;
-  }, [form.homePort, form.image, form.name, form.type, t]);
+  }, [form.fullAddress, form.homePort, form.image, form.name, form.type, t]);
 
   const publishDisabled = mutation.isPending || publishBlockedReasons.length > 0;
   const publishBlockedTooltip =
@@ -4535,19 +4541,55 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
               </div>
             </label>
             <div className="sm:col-span-2">
-              <FormLabel required>{t("vesselEditor.homePort")}</FormLabel>
-              <DestinationAutocomplete
-                includeCountry
-                onChange={(homePort) => setForm({ ...form, homePort })}
-                placeholder={t("search.destination")}
-                requireSelection
-                testId="vessel-home-port"
-                value={form.homePort}
-                variant="profile"
-              />
-              <p className="mt-2 text-xs leading-5 text-slate" data-testid="vessel-home-port-hint">
-                {t("vesselEditor.homePortHint")}
-              </p>
+              <FormLabel required>{t("vesselEditor.fullAddress")}</FormLabel>
+              <div className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
+                <AddressAutocomplete
+                  maxLength={VESSEL_MAX_LENGTHS.fullAddress}
+                  onChange={(fullAddress) => setForm({ ...form, fullAddress })}
+                  onClear={() => setForm({ ...form, fullAddress: "", homePort: "" })}
+                  onLocalityClear={() => setForm((current) => ({ ...current, homePort: "" }))}
+                  onSelect={(suggestion, meta) => {
+                    const derived = homePortFromAddress(suggestion);
+                    if (meta.source === "pick") {
+                      setForm({
+                        ...form,
+                        fullAddress: suggestion.label.slice(0, VESSEL_MAX_LENGTHS.fullAddress),
+                        homePort: derived,
+                      });
+                      return;
+                    }
+                    setForm((current) => ({ ...current, homePort: derived }));
+                  }}
+                  placeholder={t("vesselEditor.fullAddressPlaceholder")}
+                  resolveLocalityOnBlur
+                  testId="vessel-port-address"
+                  value={form.fullAddress}
+                />
+                <p
+                  className="mt-2 text-xs leading-5 text-slate"
+                  data-testid="vessel-port-address-hint"
+                  role="note"
+                >
+                  {t("vesselEditor.fullAddressHint")}
+                </p>
+                {form.homePort ? (
+                  <p
+                    className="mt-2 text-sm font-semibold text-navy"
+                    data-testid="vessel-public-location"
+                  >
+                    {t("vesselEditor.publicLocationPreview", { location: form.homePort })}
+                  </p>
+                ) : null}
+                {!form.homePort && form.fullAddress.trim().length >= 3 ? (
+                  <p
+                    className="mt-2 text-xs font-semibold text-amber-800"
+                    data-testid="vessel-public-location-unresolved"
+                    role="status"
+                  >
+                    {t("address.unresolvedLocality")}
+                  </p>
+                ) : null}
+              </div>
             </div>
             <label>
               <FormLabel required>{t("vesselEditor.type")}</FormLabel>
@@ -5139,14 +5181,22 @@ function SitEditor({
     end.setDate(end.getDate() + Number.parseInt(sit.duration, 10));
     return end.toISOString().slice(0, 10);
   }, [sit]);
+  const vesselFullAddress = initialVessel?.fullAddress?.trim() ?? "";
+  const sitUsesVesselAddress =
+    !sit?.fullAddress?.trim() ||
+    Boolean(vesselFullAddress && sit.fullAddress.trim() === vesselFullAddress);
   const [sameAsHomePort, setSameAsHomePort] = useState(
-    !sit || matchesHomePort(sit.location, sit.country, initialVessel?.homePort ?? ""),
+    !sit ||
+      (matchesHomePort(sit.location, sit.country, initialVessel?.homePort ?? "") &&
+        sitUsesVesselAddress),
   );
   const [form, setForm] = useState({
     boatId: initialBoatId,
     location: sit?.location ?? initialHomePort.location,
     country: sit?.country ?? initialHomePort.country,
-    fullAddress: sit?.fullAddress ?? "",
+    fullAddress: sitUsesVesselAddress ? "" : (sit?.fullAddress ?? ""),
+    latitude: sit?.latitude,
+    longitude: sit?.longitude,
     startDate: sit?.dateStart ?? "",
     endDate: existingEnd,
     sitType: sit?.sitType ?? "liveaboard",
@@ -5253,7 +5303,16 @@ function SitEditor({
       });
       const location = sameAsHomePort ? homePort.location : form.location.trim();
       const country = sameAsHomePort ? homePort.country : form.country.trim();
-      const coordinates = coordinatesForLocation(location, country);
+      const coordinates = resolveListingCoordinates(location, country, {
+        latitude: sameAsHomePort ? undefined : form.latitude,
+        longitude: sameAsHomePort ? undefined : form.longitude,
+      }) ?? { latitude: 0, longitude: 0 };
+      let fullAddress: string | undefined;
+      if (sameAsHomePort) {
+        fullAddress = selectedVessel?.fullAddress?.trim() || undefined;
+      } else {
+        fullAddress = form.fullAddress.trim() || undefined;
+      }
       return saveSit(
         {
           id: sit?.id ?? `sit-${form.boatId}-${Date.now().toString().slice(-6)}`,
@@ -5263,7 +5322,7 @@ function SitEditor({
           duration: t("duration.nights", { count: nights }),
           location,
           country,
-          fullAddress: form.fullAddress.trim() || undefined,
+          fullAddress,
           latitude: coordinates.latitude,
           longitude: coordinates.longitude,
           approximateLocation: true,
@@ -5320,6 +5379,10 @@ function SitEditor({
     const home = splitHomePort(selectedVessel.homePort);
     const location = (sameAsHomePort ? home.location : form.location.trim()) || home.location;
     const country = (sameAsHomePort ? home.country : form.country.trim()) || home.country;
+    const coordinates = resolveListingCoordinates(location, country, {
+      latitude: sameAsHomePort ? undefined : form.latitude,
+      longitude: sameAsHomePort ? undefined : form.longitude,
+    }) ?? { latitude: 0, longitude: 0 };
     let nights = 0;
     if (form.startDate && form.endDate) {
       const start = new Date(`${form.startDate}T00:00:00`);
@@ -5334,8 +5397,8 @@ function SitEditor({
       length: selectedVessel.length,
       location,
       country,
-      latitude: coordinatesForLocation(location, country).latitude,
-      longitude: coordinatesForLocation(location, country).longitude,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
       approximateLocation: true,
       homePort: selectedVessel.homePort,
       dates: "",
@@ -5374,6 +5437,8 @@ function SitEditor({
     form.boatId,
     form.country,
     form.endDate,
+    form.latitude,
+    form.longitude,
     form.location,
     form.maxGuests,
     form.minYearsExperience,
@@ -5396,9 +5461,15 @@ function SitEditor({
     const reasons: string[] = [];
     if (!form.boatId) reasons.push(t("sitEditor.boat"));
     if (!form.startDate || !form.endDate) reasons.push(t("sitEditor.dates"));
-    if (!sameAsHomePort && !form.location.trim()) reasons.push(t("sitEditor.location"));
-    if (!sameAsHomePort && !form.country.trim()) reasons.push(t("sitEditor.country"));
-    if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
+    const vessel = vessels.find((item) => item.id === form.boatId);
+    if (sameAsHomePort) {
+      if (!vessel?.homePort.trim()) reasons.push(t("sitEditor.location"));
+      if (!vessel?.fullAddress?.trim()) reasons.push(t("sitEditor.fullAddress"));
+    } else {
+      if (!form.location.trim()) reasons.push(t("sitEditor.location"));
+      if (!form.country.trim()) reasons.push(t("sitEditor.country"));
+      if (!form.fullAddress.trim()) reasons.push(t("sitEditor.fullAddress"));
+    }
     if (form.sitType !== "daytimeChecks") {
       const guests = Number(form.maxGuests);
       if (!Number.isFinite(guests) || guests < 1 || guests > 12) {
@@ -5417,6 +5488,7 @@ function SitEditor({
     form.startDate,
     sameAsHomePort,
     t,
+    vessels,
   ]);
 
   const publishDisabled = mutation.isPending || publishBlockedReasons.length > 0;
@@ -5550,7 +5622,11 @@ function SitEditor({
                       ...form,
                       boatId,
                       ...(sameAsHomePort
-                        ? { location: homePort.location, country: homePort.country }
+                        ? {
+                            location: homePort.location,
+                            country: homePort.country,
+                            fullAddress: "",
+                          }
                         : {}),
                     });
                   }}
@@ -5559,10 +5635,14 @@ function SitEditor({
                 />
                 <div className="space-y-3">
                   <FormLabel required>{t("sitEditor.location")}</FormLabel>
-                  <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream/60 p-3">
+                  <label
+                    className="flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream/60 p-3"
+                    data-testid="sit-use-normal-port"
+                  >
                     <input
                       checked={sameAsHomePort}
                       className="mt-0.5 size-4 accent-teal"
+                      data-testid="sit-use-normal-port-input"
                       onChange={(event) => {
                         const checked = event.target.checked;
                         setSameAsHomePort(checked);
@@ -5573,6 +5653,18 @@ function SitEditor({
                             ...form,
                             location: homePort.location,
                             country: homePort.country,
+                            fullAddress: "",
+                            latitude: undefined,
+                            longitude: undefined,
+                          });
+                        } else {
+                          setForm({
+                            ...form,
+                            location: "",
+                            country: "",
+                            fullAddress: "",
+                            latitude: undefined,
+                            longitude: undefined,
                           });
                         }
                       }}
@@ -5590,43 +5682,104 @@ function SitEditor({
                       </span>
                     </span>
                   </label>
-                  {!sameAsHomePort && (
-                    <DestinationAutocomplete
-                      includeCountry
-                      onSelect={(destination) =>
-                        setForm({
-                          ...form,
-                          location: destination.name,
-                          country: destination.detail,
-                        })
-                      }
-                      onChange={() => {}}
-                      placeholder={t("search.destination")}
-                      requireSelection
-                      testId="sit-location"
-                      value={
-                        form.location && form.country
-                          ? `${form.location}, ${form.country}`
-                          : form.location
-                      }
-                      variant="profile"
-                    />
-                  )}
-                </div>
-                <div>
-                  <FormLabel required>{t("sitEditor.fullAddress")}</FormLabel>
-                  <div className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
-                    <AddressAutocomplete
-                      maxLength={SIT_MAX_LENGTHS.fullAddress}
-                      onChange={(fullAddress) => setForm({ ...form, fullAddress })}
-                      placeholder={t("sitEditor.fullAddressPlaceholder")}
-                      testId="sit-full-address"
-                      value={form.fullAddress}
-                    />
-                    <p className="mt-2 text-xs leading-5 text-slate" role="note">
-                      {t("sitEditor.fullAddressHint")}
-                    </p>
-                  </div>
+                  {sameAsHomePort && !selectedVessel?.fullAddress?.trim() ? (
+                    <div
+                      className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950"
+                      data-testid="sit-missing-vessel-address"
+                      role="status"
+                    >
+                      <p className="font-semibold">{t("sitEditor.missingVesselAddressTitle")}</p>
+                      <p className="mt-1">{t("sitEditor.missingVesselAddress")}</p>
+                      {form.boatId ? (
+                        <Link
+                          className="mt-2 inline-flex font-bold text-amber-900 underline decoration-amber-400 underline-offset-2 hover:text-navy"
+                          to={`/owner/boats/${form.boatId}/edit`}
+                        >
+                          {t("sitEditor.missingVesselAddressCta")}
+                        </Link>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {!sameAsHomePort ? (
+                    <div className="rounded-2xl border border-teal/30 bg-seafoam/50 p-4">
+                      <FormLabel required>{t("sitEditor.fullAddress")}</FormLabel>
+                      <AddressAutocomplete
+                        maxLength={SIT_MAX_LENGTHS.fullAddress}
+                        onChange={(fullAddress) => setForm({ ...form, fullAddress })}
+                        onClear={() =>
+                          setForm({
+                            ...form,
+                            fullAddress: "",
+                            location: "",
+                            country: "",
+                            latitude: undefined,
+                            longitude: undefined,
+                          })
+                        }
+                        onLocalityClear={() =>
+                          setForm((current) => ({
+                            ...current,
+                            location: "",
+                            country: "",
+                            latitude: undefined,
+                            longitude: undefined,
+                          }))
+                        }
+                        onSelect={(suggestion, meta) => {
+                          const derived = homePortFromAddress(suggestion);
+                          const parts = splitHomePort(derived);
+                          const location = parts.location || suggestion.city?.trim() || "";
+                          const country = parts.country || suggestion.country?.trim() || "";
+                          const latitude = suggestion.latitude;
+                          const longitude = suggestion.longitude;
+                          if (meta.source === "pick") {
+                            setForm({
+                              ...form,
+                              fullAddress: suggestion.label.slice(0, SIT_MAX_LENGTHS.fullAddress),
+                              location,
+                              country,
+                              latitude,
+                              longitude,
+                            });
+                            return;
+                          }
+                          setForm((current) => ({
+                            ...current,
+                            location,
+                            country,
+                            latitude,
+                            longitude,
+                          }));
+                        }}
+                        placeholder={t("sitEditor.fullAddressPlaceholder")}
+                        resolveLocalityOnBlur
+                        testId="sit-full-address"
+                        value={form.fullAddress}
+                      />
+                      <p className="mt-2 text-xs leading-5 text-slate" role="note">
+                        {t("sitEditor.fullAddressHint")}
+                      </p>
+                      {form.location && form.country ? (
+                        <p
+                          className="mt-2 text-sm font-semibold text-navy"
+                          data-testid="sit-public-location"
+                        >
+                          {t("sitEditor.publicLocationPreview", {
+                            location: formatSitLocation(form.location, form.country),
+                          })}
+                        </p>
+                      ) : null}
+                      {!(form.location && form.country) && form.fullAddress.trim().length >= 3 ? (
+                        <p
+                          className="mt-2 text-xs font-semibold text-amber-800"
+                          data-testid="sit-public-location-unresolved"
+                          role="status"
+                        >
+                          {t("address.unresolvedLocality")}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
                 <div>
                   <FormLabel required>{t("sitEditor.dates")}</FormLabel>

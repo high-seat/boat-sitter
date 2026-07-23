@@ -54,19 +54,20 @@ npm run build && npm run deploy
 | GET    | `/api/boats`        | Filters applied in D1 SQL: `q`, `type` (slug e.g. `motor-yacht`; legacy labels still accepted), `sitType`, `from`, `to`, `pet`, `availability` (`open`/`accepted`), `sort`, `page`, `limit`. Response: `data`, `total`, `page`, `limit`, `totalPages`. Omit `limit` for the full match set. |
 | GET    | `/api/boats/:id`    | One listing by sit id; 404 if missing/unpublished                                                                                                                                                                                                                                           |
 | GET    | `/api/destinations` | City/country autocomplete gazetteer. Query: `q`, `kind` (`city`/`country`/`all`), `limit` (1–20, default 8). Empty `q` returns popular places. Response: `{ data: [{ name, detail, kind, latitude?, longitude?, countryCode? }] }`                                                          |
+| GET    | `/api/addresses`    | Global street/marina autocomplete (Photon proxy). Query: `q` (min 3 chars), `limit` (1–12), `lang`. Response: `{ data: [{ id, label, primary, secondary, city?, country?, latitude?, longitude?, countryCode? }] }`                                                                         |
 
 ### Owner — vessels & sits _(writes require Better Auth session)_
 
-| Method | Path                       | Notes                                                        |
-| ------ | -------------------------- | ------------------------------------------------------------ |
-| GET    | `/api/vessels` · `?owner=` | List (optionally by owner); `privateAccess` only for owner   |
-| GET    | `/api/vessels/:id`         | One vessel; `privateAccess` only for owner                   |
-| PUT    | `/api/vessels/:id`         | Upsert (create or update); stores `privateAccess`            |
-| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it                   |
-| GET    | `/api/sits`                | List (sits expose `boatId` = vessel id)                      |
-| GET    | `/api/sits/:id/access`     | Private Wi-Fi/codes + full address; owner or accepted sitter |
-| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist                 |
-| DELETE | `/api/sits/:id`            |                                                              |
+| Method | Path                       | Notes                                                                      |
+| ------ | -------------------------- | -------------------------------------------------------------------------- |
+| GET    | `/api/vessels` · `?owner=` | List (optionally by owner); `privateAccess` + `fullAddress` only for owner |
+| GET    | `/api/vessels/:id`         | One vessel; `privateAccess` + `fullAddress` only for owner                 |
+| PUT    | `/api/vessels/:id`         | Upsert; stores `homePort` (public city/country) + private `fullAddress`    |
+| DELETE | `/api/vessels/:id`         | 409 `VESSEL_HAS_SITS` if sits reference it                                 |
+| GET    | `/api/sits`                | List (`boatId` = vessel id); `fullAddress` only for vessel owner           |
+| GET    | `/api/sits/:id/access`     | Private Wi-Fi/codes + sit or vessel full address; owner or accepted sitter |
+| PUT    | `/api/sits/:id`            | Upsert; 400 if `boatId` vessel doesn't exist                               |
+| DELETE | `/api/sits/:id`            |                                                                            |
 
 ### Applications _(writes require Better Auth session)_
 

@@ -362,6 +362,7 @@ export const extraVessels: NewVessel[] = Array.from({ length: VESSEL_COUNT }, (_
     length: LENGTHS[i % LENGTHS.length],
     yearBuilt: 1998 + (i % 25),
     homePort: `${loc.location}, ${loc.country}`,
+    fullAddress: `Marina berth, ${loc.location}, ${loc.country}`,
     image: img(i),
     gallery: [img(i + 1, 900), img(i + 2, 900)],
     owner: owner.name,

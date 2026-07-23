@@ -110,6 +110,7 @@ devRouter.get("/sample", (c) => {
       type: "Sailing yacht",
       length: "34 ft",
       homePort: "Palma, Spain",
+      fullAddress: "Real Club Náutico de Palma, Palma, Spain",
       image:
         "https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&w=1400&q=85",
       gallery: [],

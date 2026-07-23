@@ -18,7 +18,7 @@ test.describe("vessel editor field order", () => {
         labels.findIndex((label) => label.includes(needle));
       return {
         name: indexIncluding("Boat name"),
-        homePort: indexIncluding("Home port"),
+        homePort: indexIncluding("Normal port address"),
         cover: indexIncluding("Cover image"),
         type: indexIncluding("Vessel type"),
       };

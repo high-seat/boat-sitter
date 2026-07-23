@@ -3,10 +3,27 @@ export type AddressSuggestion = {
   label: string;
   primary: string;
   secondary: string;
+  /** Locality derived from Photon (city / town / village / municipality). */
+  city?: string;
+  /** Country name derived from Photon. */
+  country?: string;
   latitude?: number;
   longitude?: number;
   countryCode?: string;
 };
+
+/** Public listing label: city + country, or whichever parts we have. */
+export function formatPublicLocation(city?: string, country?: string) {
+  const place = city?.trim() || "";
+  const nation = country?.trim() || "";
+  if (place && nation) return `${place}, ${nation}`;
+  return place || nation;
+}
+
+/** Home-port string stored on the vessel for public display. */
+export function homePortFromAddress(suggestion: AddressSuggestion) {
+  return formatPublicLocation(suggestion.city, suggestion.country);
+}
 
 export type AddressSearchParams = {
   q?: string;

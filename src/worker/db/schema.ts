@@ -31,6 +31,8 @@ export const vessels = sqliteTable(
     /** Calendar year the vessel was built; null when the owner does not know. */
     yearBuilt: integer("year_built"),
     homePort: text("home_port").notNull(),
+    /** Full street/marina address; only returned to the owner (and via sit /access). */
+    fullAddress: text("full_address"),
     image: text("image").notNull(),
     gallery: jsonArray("gallery"),
     owner: text("owner").notNull(),

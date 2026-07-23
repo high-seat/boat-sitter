@@ -42,14 +42,15 @@ test.describe("create editor discard confirmation", () => {
     await expect(page).toHaveURL(/\/my-sits/);
 
     await openCreateSitModal(page);
-    await page.getByTestId("sit-full-address").fill("Pier 4, berth 12");
+    await page.getByTestId("sit-use-normal-port-input").uncheck();
+    await page.getByTestId("sit-full-address-input").fill("Pier 4, berth 12");
 
     await page.getByTestId("sit-editor-cancel").click();
     const dialog = page.getByTestId("editor-discard-dialog");
     await expect(dialog).toBeVisible();
     await dialog.getByRole("button", { name: /Keep editing/i }).click();
     await expect(page).toHaveURL(/\/owner\/sits\/new/);
-    await expect(page.getByTestId("sit-full-address")).toHaveValue("Pier 4, berth 12");
+    await expect(page.getByTestId("sit-full-address-input")).toHaveValue("Pier 4, berth 12");
 
     await page.getByTestId("sit-editor-back").click();
     await expect(page.getByTestId("editor-discard-dialog")).toBeVisible();

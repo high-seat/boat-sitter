@@ -1,5 +1,6 @@
 import { feetToMetresString, normalizeLengthToMetres } from "@/lengthUtils";
 import { getSitPhase, sitDateRangesOverlap, type SitPhase } from "@/dateUtils";
+import { lookupCoordinates } from "@/coordinates";
 import {
   apiCreateReview,
   apiDeleteSit,
@@ -189,6 +190,8 @@ export type Vessel = Pick<
   | "stoveFuelType"
   | "amenities"
 > & {
+  /** Full street/marina address; owner-only on vessel GET, shared via sit /access. */
+  fullAddress?: string;
   privateAccess?: VesselPrivateAccess;
 };
 
@@ -266,21 +269,9 @@ export type Sit = {
   phase?: SitPhase;
 };
 
-const LOCATION_COORDINATES: Record<string, [number, number]> = {
-  bath: [51.3811, -2.359],
-  grenada: [12.0561, -61.7488],
-  greece: [38.7066, 20.7019],
-  lefkada: [38.7066, 20.7019],
-  palma: [39.5696, 2.6502],
-  sausalito: [37.8591, -122.4853],
-  vancouver: [49.2827, -123.1207],
-};
-
+/** @deprecated Prefer resolveListingCoordinates — kept for seed helpers. */
 export function coordinatesForLocation(location: string, country: string) {
-  const searchable = `${location} ${country}`.toLowerCase();
-  const match = Object.entries(LOCATION_COORDINATES).find(([name]) => searchable.includes(name));
-  const [latitude, longitude] = match?.[1] ?? [20, 0];
-  return { latitude, longitude };
+  return lookupCoordinates(location, country) ?? { latitude: 0, longitude: 0 };
 }
 
 function unsplashBoatCover(photoId: string, focus?: { x?: number; y?: number }) {
@@ -574,13 +565,18 @@ export async function getSits(): Promise<Sit[]> {
 
 export async function saveVessel(vessel: Vessel): Promise<Vessel> {
   const privateAccess = normalizeVesselPrivateAccess(vessel.privateAccess);
+  const fullAddress = vessel.fullAddress?.trim() || undefined;
   const normalized: Vessel = {
     ...vessel,
     length: vessel.length ? normalizeLengthToMetres(vessel.length) : "",
     yearBuilt: vessel.yearBuilt ?? null,
     gallery: normalizeGallery(vessel.gallery),
+    ...(fullAddress ? { fullAddress } : { fullAddress: undefined }),
     ...(privateAccess ? { privateAccess } : { privateAccess: undefined }),
   };
+  if (!fullAddress) {
+    delete normalized.fullAddress;
+  }
   if (!privateAccess) {
     delete normalized.privateAccess;
   }

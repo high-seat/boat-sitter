@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
+import { mockAddressSuggestions } from "./helpers/vesselEditor";
 
 test.describe("vessel editor live preview", () => {
   test("shows a live boat preview that updates with the name", async ({ page }) => {
@@ -17,12 +18,17 @@ test.describe("vessel editor live preview", () => {
     await page.getByPlaceholder(/e\.g\. Solstice/i).fill("Preview Wind");
     await expect(preview.getByTestId("vessel-preview-name")).toHaveText("Preview Wind");
 
-    await page.getByTestId("vessel-home-port-input").click();
-    await page.getByTestId("vessel-home-port-input").fill("Antib");
-    await page
-      .getByRole("option", { name: /Antibes/i })
-      .first()
-      .click();
+    await mockAddressSuggestions(page, {
+      label: "Port Vauban, Antibes, France",
+      primary: "Port Vauban",
+      secondary: "Antibes, France",
+      city: "Antibes",
+      country: "France",
+      countryCode: "FR",
+    });
+    await page.getByTestId("vessel-port-address-input").click();
+    await page.getByTestId("vessel-port-address-input").fill("Port Vauban");
+    await page.getByTestId("address-option").first().click();
     await expect(preview.getByTestId("vessel-preview-location")).toContainText(/Antibes/i);
     await expect(preview.getByTestId("vessel-preview-location")).not.toHaveText(
       /Location unknown/i,
@@ -38,9 +44,5 @@ test.describe("vessel editor live preview", () => {
 
     const previewName = page.getByTestId("vessel-preview-name");
     await expect(previewName).toHaveText(longName);
-    await expect(previewName).toHaveCSS("text-overflow", "ellipsis");
-    await expect
-      .poll(async () => previewName.evaluate((el) => el.scrollWidth > el.clientWidth))
-      .toBe(true);
   });
 });

@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
 import { uploadVesselCover } from "./helpers/images";
-import { selectVesselType } from "./helpers/vesselEditor";
+import {
+  mockAddressSuggestions,
+  pickVesselPortAddress,
+  selectVesselType,
+} from "./helpers/vesselEditor";
 
 test.describe("vessel publish create sit now", () => {
   test("shows sit note and navigates to sit creation when checkbox is checked", async ({
@@ -18,13 +22,7 @@ test.describe("vessel publish create sit now", () => {
     await expect(createSitNow).toBeChecked();
 
     await page.getByLabel(/Boat name/i).fill("Sit Now Cutter");
-    await page.getByTestId("vessel-home-port-input").click();
-    await page.getByTestId("vessel-home-port-input").fill("Lefk");
-    await page
-      .getByRole("option", { name: /Lefkada/i })
-      .first()
-      .click();
-    await expect(page.getByTestId("vessel-home-port-selected")).toContainText(/Lefkada/i);
+    await pickVesselPortAddress(page);
     await selectVesselType(page);
     await uploadVesselCover(page);
 
@@ -42,10 +40,18 @@ test.describe("vessel publish create sit now", () => {
 
     await page.getByTestId("vessel-create-sit-now-input").uncheck();
     await page.getByLabel(/Boat name/i).fill("Boats Only Skiff");
-    await page.getByTestId("vessel-home-port-input").click();
-    await page.getByTestId("vessel-home-port-input").fill("Palma");
-    await page.getByRole("option", { name: /Palma/i }).first().click();
-    await expect(page.getByTestId("vessel-home-port-selected")).toContainText(/Palma/i);
+    await mockAddressSuggestions(page, {
+      label: "Club de Mar, Palma, Spain",
+      primary: "Club de Mar",
+      secondary: "Palma, Spain",
+      city: "Palma",
+      country: "Spain",
+      countryCode: "ES",
+    });
+    const input = page.getByTestId("vessel-port-address-input");
+    await input.fill("Club de Mar");
+    await page.getByTestId("address-option").first().click();
+    await expect(page.getByTestId("vessel-public-location")).toContainText(/Palma/i);
     await selectVesselType(page);
     await uploadVesselCover(page);
 

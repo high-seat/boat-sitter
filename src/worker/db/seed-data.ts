@@ -21,6 +21,7 @@ export const seedVessels: NewVessel[] = [
     length: "42 ft",
     yearBuilt: 2008,
     homePort: "Lefkada, Greece",
+    fullAddress: "Lefkas Marina, Lefkada 311 00, Greece",
     image:
       "https://images.unsplash.com/photo-1540946485063-a40da27545f8?auto=format&fit=crop&w=1400&q=85",
     gallery: [
@@ -63,6 +64,7 @@ export const seedVessels: NewVessel[] = [
     length: "46 ft",
     yearBuilt: 2015,
     homePort: "St. George's, Grenada",
+    fullAddress: "Port Louis Marina, St. George's, Grenada",
     image:
       "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=1400&q=85",
     gallery: [],
@@ -94,6 +96,7 @@ export const seedVessels: NewVessel[] = [
     length: "38 ft",
     yearBuilt: 1998,
     homePort: "Bergen, Norway",
+    fullAddress: "Bergen Marina, Bergen, Norway",
     image:
       "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85",
     gallery: [
@@ -119,6 +122,7 @@ export const seedVessels: NewVessel[] = [
     length: "36 ft",
     yearBuilt: 2012,
     homePort: "Whangarei, New Zealand",
+    fullAddress: "Town Basin Marina, Whangarei, New Zealand",
     image:
       "https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=1400&q=85",
     gallery: [],
@@ -142,6 +146,7 @@ export const seedVessels: NewVessel[] = [
     length: "31 ft",
     yearBuilt: 2004,
     homePort: "Falmouth, United Kingdom",
+    fullAddress: "Falmouth Marina, Falmouth, United Kingdom",
     image:
       "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1400&q=85",
     gallery: [],
@@ -165,6 +170,7 @@ export const seedVessels: NewVessel[] = [
     length: "34 ft",
     yearBuilt: 2019,
     homePort: "Sausalito, United States",
+    fullAddress: "Schoonmaker Point Marina, Sausalito, CA, United States",
     image:
       "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1400&q=85",
     gallery: [],

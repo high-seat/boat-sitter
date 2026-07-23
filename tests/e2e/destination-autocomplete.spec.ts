@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { seedVerifiedOwner } from "./helpers/auth";
 import { TOP_BOAT_SITTING_PORT_CITIES } from "../../src/shared/popularPortCities";
 
 test.describe("destination autocomplete gazetteer", () => {
@@ -9,20 +8,13 @@ test.describe("destination autocomplete gazetteer", () => {
     const body = await api.json();
     expect(body.data?.some((row: { name: string }) => row.name === "Lefkada")).toBeTruthy();
 
-    await seedVerifiedOwner(page);
-    await page.goto("/owner/boats/solstice-boat/edit");
-    await expect(page.getByRole("heading", { name: /Edit Solstice/i })).toBeVisible();
-
-    const homePort = page.getByTestId("vessel-home-port");
-    await expect(page.getByTestId("vessel-home-port-selected")).toBeVisible();
-    await page.getByTestId("vessel-home-port-edit").click();
-    const input = page.getByTestId("vessel-home-port-input");
+    await page.goto("/boats");
+    const input = page.getByPlaceholder(/City or country/i).first();
     await expect(input).toBeVisible();
     await input.fill("Lefk");
-    const option = homePort.getByRole("option", { name: /Lefkada/i }).first();
-    await expect(option).toBeVisible({ timeout: 10_000 });
-    await option.click();
-    await expect(page.getByTestId("vessel-home-port-selected")).toContainText(/Lefkada/i);
+    await expect(page.getByRole("option", { name: /Lefkada/i }).first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test("lists countries from the destinations API", async ({ page }) => {

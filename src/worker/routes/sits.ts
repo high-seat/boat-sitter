@@ -64,20 +64,25 @@ function toRow(body: z.infer<typeof sitSchema>) {
 
 sitsRouter.get("/", async (c) => {
   const db = getDb(c.env);
+  const sessionUser = c.get("user");
   const rows = await db
     .select({
       sit: sits,
+      ownerUserId: vessels.ownerUserId,
       accepted: sql<number>`case when ${hasAcceptedApplicationSql()} then 1 else 0 end`.mapWith(
         Number,
       ),
     })
-    .from(sits);
+    .from(sits)
+    .innerJoin(vessels, eq(sits.vesselId, vessels.id));
   return c.json({
-    data: rows.map(({ sit, accepted }) => {
-      const { vesselId, ...rest } = sit;
+    data: rows.map(({ sit, ownerUserId, accepted }) => {
+      const { vesselId, fullAddress, ...rest } = sit;
       const isAccepted = Boolean(accepted);
+      const isOwner = Boolean(sessionUser && ownerUserId === sessionUser.id);
       return {
         ...rest,
+        ...(isOwner && fullAddress?.trim() ? { fullAddress: fullAddress.trim() } : {}),
         boatId: vesselId,
         accepted: isAccepted,
         applicationsOpen: rest.published !== false && !isAccepted,
@@ -116,7 +121,7 @@ sitsRouter.get("/:id/access", requireUser, async (c) => {
   }
 
   const privateAccess = vessel.privateAccess ?? undefined;
-  const fullAddress = sit.fullAddress?.trim() || undefined;
+  const fullAddress = sit.fullAddress?.trim() || vessel.fullAddress?.trim() || undefined;
   if (!privateAccess && !fullAddress) {
     return c.json({ data: null });
   }

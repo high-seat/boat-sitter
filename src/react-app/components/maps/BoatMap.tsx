@@ -85,7 +85,7 @@ export function BoatMap({
 }) {
   const { t } = useTranslation();
   const center = useMemo<[number, number]>(
-    () => (boats[0] ? [boats[0].latitude, boats[0].longitude] : [20, 0]),
+    () => (boats[0] ? [boats[0].latitude, boats[0].longitude] : [0, 0]),
     [boats],
   );
 

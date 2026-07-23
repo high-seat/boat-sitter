@@ -15,8 +15,8 @@ import { requireUser } from "../middleware/auth";
  * (`ownerUserId`); only that user may update or delete it. Seed/legacy rows have
  * a null owner and are therefore read-only through the API.
  *
- * `privateAccess` is stored on the vessel but only returned to the owner on
- * GET; accepted sitters use GET /api/sits/:id/access instead.
+ * `privateAccess` and `fullAddress` are stored on the vessel but only returned
+ * to the owner on GET; accepted sitters use GET /api/sits/:id/access instead.
  */
 export const vesselsRouter = new Hono<AppEnv>();
 
@@ -43,6 +43,7 @@ const vesselSchema = z.object({
       message: `yearBuilt must be null or between ${MIN_YEAR_BUILT} and ${maxYearBuilt()}`,
     }),
   homePort: z.string().min(1),
+  fullAddress: z.string().optional(),
   image: z.string().min(1),
   gallery: z.array(z.string()).default([]),
   owner: z.string().min(1),
@@ -59,9 +60,11 @@ const vesselSchema = z.object({
   privateAccess: privateAccessSchema,
 });
 
-function stripPrivateAccess<T extends { privateAccess?: unknown }>(row: T, include: boolean) {
+function stripPrivateVesselFields<
+  T extends { privateAccess?: unknown; fullAddress?: string | null },
+>(row: T, include: boolean) {
   if (include) return row;
-  const { privateAccess: _ignored, ...rest } = row;
+  const { privateAccess: _ignoredAccess, fullAddress: _ignoredAddress, ...rest } = row;
   return rest;
 }
 
@@ -73,7 +76,9 @@ vesselsRouter.get("/", async (c) => {
     ? await db.select().from(vessels).where(eq(vessels.owner, owner))
     : await db.select().from(vessels);
   return c.json({
-    data: rows.map((row) => stripPrivateAccess(row, Boolean(user && row.ownerUserId === user.id))),
+    data: rows.map((row) =>
+      stripPrivateVesselFields(row, Boolean(user && row.ownerUserId === user.id)),
+    ),
   });
 });
 
@@ -83,7 +88,7 @@ vesselsRouter.get("/:id", async (c) => {
   const row = await db.query.vessels.findFirst({ where: eq(vessels.id, c.req.param("id")) });
   if (!row) return c.json({ error: "Vessel not found" }, 404);
   return c.json({
-    data: stripPrivateAccess(row, Boolean(user && row.ownerUserId === user.id)),
+    data: stripPrivateVesselFields(row, Boolean(user && row.ownerUserId === user.id)),
   });
 });
 
@@ -132,6 +137,7 @@ vesselsRouter.put("/:id", requireUser, zValidator("json", vesselSchema), async (
     length: body.length,
     yearBuilt: body.yearBuilt ?? null,
     homePort: body.homePort,
+    fullAddress: body.fullAddress?.trim() || null,
     image: body.image,
     gallery: body.gallery,
     owner: user.name,

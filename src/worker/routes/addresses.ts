@@ -102,6 +102,13 @@ function locality(props: PhotonProperties) {
   );
 }
 
+/** City/town for public listings — skip broad districts/regions. */
+function publicLocality(props: PhotonProperties) {
+  const raw = props.city || props.town || props.village || props.municipality || undefined;
+  if (!raw) return undefined;
+  return raw.replace(/^Municipal Unit of\s+/i, "").trim() || undefined;
+}
+
 function cleanPostcode(postcode: string | undefined) {
   if (!postcode) return undefined;
   // Photon sometimes returns multiple codes joined with `;`.
@@ -121,6 +128,7 @@ function shapeSuggestion(feature: PhotonFeature, index: number): AddressSuggesti
   if (!primary) return null;
 
   const place = locality(props);
+  const city = publicLocality(props);
   const secondaryParts = [cleanPostcode(props.postcode), place, props.state, props.country].filter(
     (part, partIndex, all) => Boolean(part) && all.indexOf(part) === partIndex,
   );
@@ -142,6 +150,8 @@ function shapeSuggestion(feature: PhotonFeature, index: number): AddressSuggesti
     label,
     primary,
     secondary,
+    city,
+    country: props.country?.trim() || undefined,
     latitude: typeof latitude === "number" ? latitude : undefined,
     longitude: typeof longitude === "number" ? longitude : undefined,
     countryCode: props.countrycode?.toUpperCase() || undefined,

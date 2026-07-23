@@ -1,5 +1,5 @@
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut, ApiError } from "@/apiClient";
-import { lookupCoordinates } from "@/coordinates";
+import { resolveListingCoordinates } from "@/coordinates";
 import {
   applicationsListQueryString,
   type ApplicationsListParams,
@@ -101,6 +101,7 @@ type Vessel = Pick<
   | "stoveFuelType"
   | "amenities"
 > & {
+  fullAddress?: string;
   privateAccess?: {
     wifiNetwork?: string;
     wifiPassword?: string;
@@ -205,8 +206,12 @@ function coordsFor(
   latitude: number | null,
   longitude: number | null,
 ) {
-  if (latitude != null && longitude != null) return { latitude, longitude };
-  return lookupCoordinates(location, country) ?? { latitude: 20, longitude: 0 };
+  return (
+    resolveListingCoordinates(location, country, {
+      latitude: latitude ?? undefined,
+      longitude: longitude ?? undefined,
+    }) ?? { latitude: 0, longitude: 0 }
+  );
 }
 
 type ApiBoat = {
@@ -266,6 +271,7 @@ type ApiVessel = {
   length: string;
   yearBuilt?: number | null;
   homePort: string;
+  fullAddress?: string | null;
   image: string;
   gallery: string[];
   owner: string;
@@ -516,6 +522,7 @@ export function normalizeApiVessel(row: ApiVessel): Vessel {
     length: row.length,
     yearBuilt: row.yearBuilt ?? null,
     homePort: row.homePort,
+    ...(row.fullAddress?.trim() ? { fullAddress: row.fullAddress.trim() } : {}),
     image: row.image,
     gallery: normalizeGallery(row.gallery),
     owner: row.owner,
@@ -577,6 +584,7 @@ export function vesselToApiBody(vessel: Vessel) {
     length: vessel.length,
     yearBuilt: vessel.yearBuilt ?? null,
     homePort: vessel.homePort,
+    fullAddress: vessel.fullAddress?.trim() || null,
     image: vessel.image,
     gallery: galleryUrls(vessel.gallery),
     owner: vessel.owner,

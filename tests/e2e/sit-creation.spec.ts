@@ -42,16 +42,23 @@ test.describe("sit creation flow", () => {
     await expect(modal.getByTestId("sit-editor-max-guests")).toBeVisible();
     await expect(modal.getByText(/^Region$/i)).toHaveCount(0);
     await expect(modal.getByText(/e\.g\. Mediterranean/i)).toHaveCount(0);
+    await expect(modal.getByTestId("sit-use-normal-port-input")).toBeChecked();
+    await expect(modal.getByText(/Use normal port:/i)).toBeVisible();
     await expect(
       modal.getByTestId("form-label-required").filter({ hasText: /Full address/i }),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await expect(
       modal.getByTestId("form-label-required").filter({ hasText: /Sit type/i }),
     ).toBeVisible();
     await expect(
       modal.getByTestId("form-label-required").filter({ hasText: /Sit location/i }),
     ).toBeVisible();
+    await modal.getByTestId("sit-use-normal-port-input").uncheck();
+    await expect(
+      modal.getByTestId("form-label-required").filter({ hasText: /Full address/i }),
+    ).toBeVisible();
     await expect(modal.getByText(/Not shared until you accept an applicant/i)).toBeVisible();
+    await modal.getByTestId("sit-use-normal-port-input").check();
     const publish = modal.getByTestId("sit-publish");
     await expect(publish).toBeDisabled();
     await expect(publish).not.toHaveAttribute("title");
@@ -59,8 +66,7 @@ test.describe("sit creation flow", () => {
     const blocked = page.getByRole("tooltip", { name: /Still needed:/i });
     await expect(blocked).toBeVisible();
     await expect(blocked).toContainText(/Sit dates/i);
-    await expect(blocked).toContainText(/Full address/i);
-    await expect(blocked).not.toContainText(/Full address.*Full address/i);
+    await expect(blocked).not.toContainText(/Full address/i);
     await expect(modal.getByRole("complementary", { name: /Live preview/i })).toBeVisible();
     await expect(modal.getByText(/How it will look/i)).toBeVisible();
     await expect(modal.getByText(/Solstice/i).first()).toBeVisible();
