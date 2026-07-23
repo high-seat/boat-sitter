@@ -30,6 +30,11 @@ export function signUpWithEmail(input: { email: string; password: string; name: 
   });
 }
 
+/** Resend the email-verification link to an address. */
+export function resendVerificationEmail(email: string) {
+  return authClient.sendVerificationEmail({ email, callbackURL: window.location.origin });
+}
+
 export function signOut() {
   return authClient.signOut();
 }

@@ -19,6 +19,8 @@ declare namespace Cloudflare {
     RESEND_API_KEY?: string;
     NOTIFY_EMAIL?: string;
     EMAIL_FROM?: string;
+    /** "true" to block sign-in until email is verified (enable once Resend domain is live) */
+    REQUIRE_EMAIL_VERIFICATION?: string;
     /** Optional comma-separated sign-up allowlist; empty = open sign-up */
     ALLOWED_EMAILS?: string;
   }

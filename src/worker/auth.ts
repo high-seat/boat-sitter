@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getDb } from "./db";
 import { account, session, user, verification } from "./db/auth-schema";
+import { sendNotificationEmail } from "./email";
 
 /**
  * Build a Better Auth instance for the current request.
@@ -49,7 +50,40 @@ export function buildAuth(env: Env, request?: Request) {
       provider: "sqlite",
       schema: { user, session, account, verification },
     }),
-    emailAndPassword: { enabled: true },
+    emailAndPassword: {
+      enabled: true,
+      // Hard-block unverified sign-in only when explicitly turned on (flip to
+      // "true" once a Resend sending domain is verified, so emails reach real
+      // users). Until then the verification email still sends, but sign-in isn't
+      // blocked — avoids locking out testers pre-domain.
+      requireEmailVerification: env.REQUIRE_EMAIL_VERIFICATION === "true",
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      // Verification links are valid for 1 hour, then show the "expired" banner.
+      expiresIn: 60 * 60,
+      sendVerificationEmail: async ({ user: u, url }) => {
+        // After verifying, redirect to the app with a flag so we can show a
+        // "email verified" confirmation instead of a bare homepage.
+        let actionUrl = url;
+        try {
+          const parsed = new URL(url);
+          parsed.searchParams.set("callbackURL", `${baseURL}/?verified=1`);
+          actionUrl = parsed.toString();
+        } catch {
+          // keep the original url if parsing fails
+        }
+        await sendNotificationEmail(env, {
+          to: u.email,
+          subject: "Verify your Boatstead email",
+          heading: "Confirm your email",
+          body: "Tap the button below to verify your email and finish setting up your Boatstead account. If you didn't create an account, you can ignore this.",
+          actionUrl,
+          actionLabel: "Verify email",
+        });
+      },
+    },
     socialProviders: {
       google: {
         clientId: env.GOOGLE_CLIENT_ID,

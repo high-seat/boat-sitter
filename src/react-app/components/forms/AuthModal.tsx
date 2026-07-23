@@ -8,7 +8,12 @@ import {
 } from "react-social-login-buttons";
 import { TermsAgreementCheckbox } from "@/components/forms/TermsAgreementCheckbox";
 import { continueWithSocialProvider, type SocialProvider } from "@/mockAuth";
-import { signInWithEmail, signInWithGoogle, signUpWithEmail } from "@/authClient";
+import {
+  resendVerificationEmail,
+  signInWithEmail,
+  signInWithGoogle,
+  signUpWithEmail,
+} from "@/authClient";
 import { hydrateSession } from "@/session";
 import { useFeatureFlag } from "@/featureFlags";
 import { useAppStore } from "@/store";
@@ -40,6 +45,8 @@ export function AuthModal() {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [pendingVerifyEmail, setPendingVerifyEmail] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [form, setForm] = useState({ email: "", name: "", password: "" });
   const emailRef = useRef<HTMLInputElement>(null);
@@ -106,6 +113,7 @@ export function AuthModal() {
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
+    setNotice("");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       setError(t("auth.emailInvalid"));
       return;
@@ -133,10 +141,32 @@ export function AuthModal() {
             })
           : await signInWithEmail(form.email, form.password);
       if (result.error) {
-        throw new Error(result.error.message ?? "auth.failed");
+        const msg = result.error.message ?? "auth.failed";
+        // Unverified email → offer to resend the verification link.
+        if (/verif/i.test(msg)) {
+          setPendingVerifyEmail(form.email);
+          setNotice(
+            t("auth.verifyNeeded", "Please verify your email first. We can resend the link."),
+          );
+          return;
+        }
+        throw new Error(msg);
       }
       // Real Better Auth session cookie is now set — populate the store from it.
       await hydrateSession();
+      const loggedIn = Boolean(useAppStore.getState().user);
+      if (!loggedIn) {
+        // Sign-up succeeded but no session — email verification is required.
+        setPendingVerifyEmail(form.email);
+        setNotice(
+          t(
+            "auth.verifyEmailSent",
+            "Check your inbox — we sent a link to verify your email and finish setting up your account.",
+          ),
+        );
+        setForm({ email: "", name: "", password: "" });
+        return;
+      }
       setOpen(false);
       setForm({ email: "", name: "", password: "" });
       setAcceptedTerms(false);
@@ -145,6 +175,17 @@ export function AuthModal() {
       setError(t(caught instanceof Error ? caught.message : "auth.failed"));
     } finally {
       setPending(false);
+    }
+  }
+
+  async function resendVerification() {
+    if (!pendingVerifyEmail) return;
+    setError("");
+    try {
+      await resendVerificationEmail(pendingVerifyEmail);
+      setNotice(t("auth.verifyResent", "Verification email re-sent. Check your inbox."));
+    } catch {
+      setError(t("auth.failed"));
     }
   }
 
@@ -301,6 +342,20 @@ export function AuthModal() {
             <p className="text-sm font-semibold text-coral" role="alert">
               {error}
             </p>
+          )}
+          {notice && (
+            <div className="rounded-xl border border-teal/25 bg-seafoam px-4 py-3 text-sm text-navy">
+              <p>{notice}</p>
+              {pendingVerifyEmail && (
+                <button
+                  className="mt-2 font-bold text-teal underline hover:text-navy"
+                  onClick={resendVerification}
+                  type="button"
+                >
+                  {t("auth.resendVerification", "Resend verification email")}
+                </button>
+              )}
+            </div>
           )}
           <button
             className="w-full rounded-xl bg-coral py-3.5 font-bold text-white disabled:opacity-60"
