@@ -10,6 +10,7 @@ export type DevFixtureKind =
   | "alex-blue-hour-accepted"
   | "lifecycle-sit"
   | "owner-second-boat"
+  | "owner-boat-no-sits"
   | "unclaim-owned-vessels";
 
 export type LifecycleSitPhase = "accepting" | "accepted" | "underway" | "completed";

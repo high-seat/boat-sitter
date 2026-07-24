@@ -5,7 +5,7 @@ description: >-
   whenever adding or editing pages, routes, screen headers, titles, subtitles,
   back links, empty states, or form shells in src/react-app. Prefer the shared
   section-title pattern and existing form/search components over one-off
-  layouts.
+  layouts. Empty-state actions must be buttons, never text links.
 ---
 
 # Consistent Page Layout
@@ -47,6 +47,27 @@ Reference peers: Settings, Saved, Owner boats/sits, Support, Availability.
 Editors keep their card-style `font-display text-3xl` title and explicit back
 button (`data-testid="…-back"`). Do not force `section-title` onto those.
 
+## Empty states
+
+When putting an action for empty set, always use a button.
+
+Do **not** use a text link or underline-only control as the empty-state CTA.
+Match peer empty actions (solid pill button):
+
+```tsx
+<button
+  className="mt-4 inline-flex rounded-full bg-teal px-6 py-3 font-bold text-white hover:bg-teal/90"
+  data-testid="feature-empty-action"
+  onClick={...}
+  type="button"
+>
+  {t("feature.emptyAction")}
+</button>
+```
+
+`Link` is fine when navigation is the action, but style it as the same button
+(not `text-teal hover:underline`).
+
 ## Shared form and search controls
 
 Before building a control, reuse the existing one:
@@ -69,5 +90,6 @@ blocked-tooltip pattern fits.
 - [ ] Header matches a peer page (`section-title` + subtitle, or editor card)
 - [ ] Dates / destinations / selects / tooltips reuse shared components
 - [ ] No parallel one-off implementation of an existing control
+- [ ] Empty-state actions use a solid button, not a text link
 - [ ] Copy goes through i18n; blocked CTA lists missing fields on hover
 - [ ] Loading uses a detailed shimmer, not a single pulse line

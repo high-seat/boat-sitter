@@ -31,15 +31,14 @@ test.describe("owner sit delete and older completed filter", () => {
     await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
 
     const completedId = "sit-completed-archive-e2e";
+    const completedSection = page.getByTestId("owner-sits-phase-stayCompleted");
+    await expect(completedSection).toBeVisible();
     await expect(page.getByTestId(`owner-sit-card-${completedId}`)).toHaveCount(0);
-    await expect(page.getByTestId("owner-sits-phase-stayCompleted")).toHaveCount(0);
 
-    const olderToggle = page.getByTestId("owner-sits-show-older-completed");
+    const olderToggle = completedSection.getByTestId("owner-sits-show-older-completed");
     await expect(olderToggle).toBeVisible();
     await olderToggle.getByRole("checkbox").check();
 
-    const completedSection = page.getByTestId("owner-sits-phase-stayCompleted");
-    await expect(completedSection).toBeVisible();
     await expect(completedSection.getByTestId(`owner-sit-card-${completedId}`)).toBeVisible();
 
     // Completed sits have no overflow menu (listing unpublished; no archive).

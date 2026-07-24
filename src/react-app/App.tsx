@@ -6575,8 +6575,16 @@ function OwnerBoatsPage() {
     {} as Record<SitPhase, Sit[]>,
   );
   let visibleOwnedPhases: SitPhase[];
+  const showOwnedCompletedPhase =
+    ownedSitsByPhase.stayCompleted.length > 0 || olderCompletedOwnedCount > 0;
   if (sitPhaseFilter === "all") {
-    visibleOwnedPhases = SIT_LIST_PHASES.filter((phase) => ownedSitsByPhase[phase].length > 0);
+    visibleOwnedPhases = SIT_LIST_PHASES.filter(
+      (phase) =>
+        ownedSitsByPhase[phase].length > 0 ||
+        (phase === "stayCompleted" && olderCompletedOwnedCount > 0),
+    );
+  } else if (sitPhaseFilter === "stayCompleted" && showOwnedCompletedPhase) {
+    visibleOwnedPhases = ["stayCompleted"];
   } else if (ownedSitsByPhase[sitPhaseFilter].length > 0) {
     visibleOwnedPhases = [sitPhaseFilter];
   } else {
@@ -6630,9 +6638,13 @@ function OwnerBoatsPage() {
     },
     {} as Record<SitPhase, SitApplication[]>,
   );
-  const visibleSitterPhases = SIT_LIST_PHASES.filter(
-    (phase) => sitterApplicationsByPhase[phase].length > 0,
-  );
+  const visibleSitterPhases = SIT_LIST_PHASES.filter((phase) => {
+    if (sitPhaseFilter !== "all" && phase !== sitPhaseFilter) return false;
+    return (
+      sitterApplicationsByPhase[phase].length > 0 ||
+      (phase === "stayCompleted" && olderCompletedSitterCount > 0)
+    );
+  });
   const sitsTabCount = allOwnedSits.length + sitterApplications.length;
   const isLoading = vesselsLoading || sitsLoading;
   const boatsCountLoading = vesselsLoading;
@@ -7179,7 +7191,7 @@ function OwnerBoatsPage() {
       ) : null}
       {!isLoading && activeTab === "sits" && (allOwnedSits.length || sitterApplications.length) ? (
         <div className="mt-10 space-y-8">
-          {(allOwnedSits.length > 0 || showOlderCompletedCheckbox) && (
+          {allOwnedSits.length > 0 && (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               {sitterApplications.length > 0 ? (
                 <h2 className="font-display text-lg font-bold text-navy">
@@ -7219,20 +7231,6 @@ function OwnerBoatsPage() {
                     ))}
                   </Select>
                 </label>
-                {showOlderCompletedCheckbox ? (
-                  <label
-                    className="flex cursor-pointer items-center gap-2 text-sm text-navy"
-                    data-testid="owner-sits-show-older-completed"
-                  >
-                    <input
-                      checked={showOlderCompletedSits}
-                      className="size-4 accent-teal"
-                      onChange={(event) => setShowOlderCompletedSits(event.target.checked)}
-                      type="checkbox"
-                    />
-                    <span>{t("owner.showOlderCompletedSits")}</span>
-                  </label>
-                ) : null}
               </div>
             </div>
           )}
@@ -7245,7 +7243,8 @@ function OwnerBoatsPage() {
                 {t("owner.sitBoatFilterEmpty")}
               </p>
               <button
-                className="mt-4 text-sm font-bold text-teal hover:underline"
+                className="mt-4 inline-flex rounded-full bg-teal px-6 py-3 font-bold text-white hover:bg-teal/90"
+                data-testid="owner-sits-show-all-boats"
                 onClick={() => setSitBoatFilter("")}
                 type="button"
               >
@@ -7307,6 +7306,20 @@ function OwnerBoatsPage() {
                         </Select>
                       </label>
                     ) : null}
+                    {phase === "stayCompleted" && olderCompletedOwnedCount > 0 ? (
+                      <label
+                        className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-navy"
+                        data-testid="owner-sits-show-older-completed"
+                      >
+                        <input
+                          checked={showOlderCompletedSits}
+                          className="size-4 accent-teal"
+                          onChange={(event) => setShowOlderCompletedSits(event.target.checked)}
+                          type="checkbox"
+                        />
+                        <span>{t("owner.showOlderCompletedSits")}</span>
+                      </label>
+                    ) : null}
                   </div>
                   {ownedSitsByPhase[phase].map((sit) => renderOwnedSitCard(sit))}
                 </section>
@@ -7335,6 +7348,22 @@ function OwnerBoatsPage() {
                         count: sitterApplicationsByPhase[phase].length,
                       })}
                     </span>
+                    {phase === "stayCompleted" &&
+                    olderCompletedSitterCount > 0 &&
+                    olderCompletedOwnedCount === 0 ? (
+                      <label
+                        className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-navy"
+                        data-testid="owner-sits-show-older-completed"
+                      >
+                        <input
+                          checked={showOlderCompletedSits}
+                          className="size-4 accent-teal"
+                          onChange={(event) => setShowOlderCompletedSits(event.target.checked)}
+                          type="checkbox"
+                        />
+                        <span>{t("owner.showOlderCompletedSits")}</span>
+                      </label>
+                    ) : null}
                   </div>
                   {sitterApplicationsByPhase[phase].map((application) =>
                     renderSitterApplicationCard(application),

@@ -817,6 +817,47 @@ devRouter.post("/fixture", async (c) => {
     return c.json({ ok: true, vesselId, sitId });
   }
 
+  if (kind === "owner-boat-no-sits") {
+    const vesselId = "quiet-cove-boat";
+    await db
+      .insert(vessels)
+      .values({
+        id: vesselId,
+        name: "Quiet Cove",
+        type: "Sailboat",
+        length: "32 ft",
+        yearBuilt: 2008,
+        homePort: "Athens, Greece",
+        fullAddress: "Flisvos Marina, Paleo Faliro 175 61, Greece",
+        image:
+          "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85",
+        gallery: [],
+        owner: sessionUser.name,
+        ownerImage: sessionUser.image ?? "",
+        ownerUserId: sessionUser.id,
+        rating: 4.5,
+        reviews: 2,
+        description: "Quiet day-sailer with no sits listed yet.",
+        home: "Simple cabin and cockpit.",
+        systems: ["Outboard", "12V electrical"],
+        engineType: "Outboard",
+        voltageType: "12 V DC",
+        stoveFuelType: "Alcohol",
+        amenities: ["Bathroom"],
+      })
+      .onConflictDoUpdate({
+        target: vessels.id,
+        set: {
+          owner: sessionUser.name,
+          ownerImage: sessionUser.image ?? "",
+          ownerUserId: sessionUser.id,
+          updatedAt: sql`CURRENT_TIMESTAMP`,
+        },
+      });
+
+    return c.json({ ok: true, vesselId });
+  }
+
   if (kind === "unclaim-owned-vessels") {
     // Simulate seed/legacy vessels that match by display name but have no ownerUserId
     // (Google login never claimed them). Used to regression-test chat send authz.
