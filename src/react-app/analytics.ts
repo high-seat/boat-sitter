@@ -33,9 +33,16 @@ const CONSENT_KEY = "boatstead-analytics-consent";
 
 let initialised = false;
 
-function gtag(...args: unknown[]) {
-  window.dataLayer.push(args);
-}
+type GtagCommand = (...args: unknown[]) => void;
+
+// GA reads gtag commands from the dataLayer as `arguments`-shaped entries. If we
+// push a plain array instead, GTM treats it as an (ignored) data-layer event and
+// the config/consent/page_view commands silently never send — no /collect. So we
+// must push the real `arguments` object.
+const gtag = function () {
+  // eslint-disable-next-line prefer-rest-params
+  window.dataLayer.push(arguments);
+} as GtagCommand;
 
 /** The stored consent choice, if the visitor has made one. */
 function readConsent(): "granted" | "denied" | null {
