@@ -14,7 +14,7 @@ import {
   vessels,
 } from "../db/schema";
 import { sendNotificationEmail } from "../email";
-import { insertNotification } from "../lib/notifications";
+import { insertNotification, shouldEmail } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -285,17 +285,19 @@ sitsRouter.post(
             href: `/messages?application=${app.id}`,
           });
         }
-        const applicantEmail = app.applicantUserId
-          ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
-          : undefined;
-        await sendNotificationEmail(c.env, {
-          subject: `Update on your sit for ${app.boatName}`,
-          heading: "Sit update",
-          body: `${sessionUser.name} is no longer confirming you for ${app.boatName}. The owner has reopened the sit for other applicants.`,
-          actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
-          actionLabel: "View conversation",
-          to: applicantEmail,
-        });
+        if (await shouldEmail(db, app.applicantUserId, "applicationUnaccepted")) {
+          const applicantEmail = app.applicantUserId
+            ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
+            : undefined;
+          await sendNotificationEmail(c.env, {
+            subject: `Update on your sit for ${app.boatName}`,
+            heading: "Sit update",
+            body: `${sessionUser.name} is no longer confirming you for ${app.boatName}. The owner has reopened the sit for other applicants.`,
+            actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
+            actionLabel: "View conversation",
+            to: applicantEmail,
+          });
+        }
       }
 
       const { vesselId, ...rest } = saved;
@@ -341,17 +343,19 @@ sitsRouter.post(
           href: `/messages?application=${app.id}`,
         });
       }
-      const applicantEmail = app.applicantUserId
-        ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
-        : undefined;
-      await sendNotificationEmail(c.env, {
-        subject: `Sit cancelled: ${app.boatName}`,
-        heading: "Sit cancelled",
-        body: `${sessionUser.name} cancelled the sit for ${app.boatName}. You can still open the conversation for any follow-up.`,
-        actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
-        actionLabel: "View conversation",
-        to: applicantEmail,
-      });
+      if (await shouldEmail(db, app.applicantUserId, "sitCancelled")) {
+        const applicantEmail = app.applicantUserId
+          ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
+          : undefined;
+        await sendNotificationEmail(c.env, {
+          subject: `Sit cancelled: ${app.boatName}`,
+          heading: "Sit cancelled",
+          body: `${sessionUser.name} cancelled the sit for ${app.boatName}. You can still open the conversation for any follow-up.`,
+          actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
+          actionLabel: "View conversation",
+          to: applicantEmail,
+        });
+      }
     }
 
     const { vesselId, ...rest } = saved;
@@ -469,15 +473,17 @@ async function notifyMatchingSitters(
       href: `/boats/${sit.id}`,
     });
 
-    const u = await db.query.user.findFirst({ where: eq(user.id, w.sitterUserId) });
-    await sendNotificationEmail(env, {
-      subject: `A new sit matches your availability: ${vesselName}`,
-      heading: "A boat needs a sitter during your free dates",
-      body: `${vesselName} in ${sit.location}, ${sit.country} (${sit.dates}) matches an availability window you published. Take a look and apply if it suits.`,
-      actionUrl: `${baseUrl}/boats/${sit.id}`,
-      actionLabel: "View the sit",
-      to: u?.email ?? undefined,
-    });
+    if (await shouldEmail(db, w.sitterUserId, "availabilityMatch")) {
+      const u = await db.query.user.findFirst({ where: eq(user.id, w.sitterUserId) });
+      await sendNotificationEmail(env, {
+        subject: `A new sit matches your availability: ${vesselName}`,
+        heading: "A boat needs a sitter during your free dates",
+        body: `${vesselName} in ${sit.location}, ${sit.country} (${sit.dates}) matches an availability window you published. Take a look and apply if it suits.`,
+        actionUrl: `${baseUrl}/boats/${sit.id}`,
+        actionLabel: "View the sit",
+        to: u?.email ?? undefined,
+      });
+    }
   }
 
   // Owner summary: one alert with the count of available sitters.
@@ -491,14 +497,16 @@ async function notifyMatchingSitters(
       href: `/boats/${sit.id}`,
     });
 
-    await sendNotificationEmail(env, {
-      subject: `${matches.length} sitters are available for ${vesselName}`,
-      heading: "Sitters are free for your new sit",
-      body: `${matches.length} sitter(s) have published availability that fits ${vesselName} (${sit.dates}).`,
-      actionUrl: `${baseUrl}/boats/${sit.id}`,
-      actionLabel: "View the sit",
-      to: owner.email ?? undefined,
-    });
+    if (await shouldEmail(db, owner.userId, "sitSittersFound")) {
+      await sendNotificationEmail(env, {
+        subject: `${matches.length} sitters are available for ${vesselName}`,
+        heading: "Sitters are free for your new sit",
+        body: `${matches.length} sitter(s) have published availability that fits ${vesselName} (${sit.dates}).`,
+        actionUrl: `${baseUrl}/boats/${sit.id}`,
+        actionLabel: "View the sit",
+        to: owner.email ?? undefined,
+      });
+    }
   }
 }
 

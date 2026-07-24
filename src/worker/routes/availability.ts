@@ -6,7 +6,7 @@ import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import { sits, sitterAvailability, user, vessels } from "../db/schema";
 import { sendNotificationEmail } from "../email";
-import { insertNotification } from "../lib/notifications";
+import { insertNotification, shouldEmail } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
 import type { Db } from "../db";
 
@@ -192,15 +192,17 @@ async function notifySitterOfMatches(env: Env, win: WindowRow) {
     href: "/availability",
   });
 
-  const u = await db.query.user.findFirst({ where: eq(user.id, win.sitterUserId) });
-  await sendNotificationEmail(env, {
-    subject: `${matches.length} sits match your new availability`,
-    heading: "There are boats needing a sitter in your dates",
-    body: `We found ${matches.length} open sit(s) that fit the window you just published. Open your availability to see them.`,
-    actionUrl: `${env.BETTER_AUTH_URL ?? ""}/availability`,
-    actionLabel: "View matches",
-    to: u?.email ?? undefined,
-  });
+  if (await shouldEmail(db, win.sitterUserId, "availabilitySitsFound")) {
+    const u = await db.query.user.findFirst({ where: eq(user.id, win.sitterUserId) });
+    await sendNotificationEmail(env, {
+      subject: `${matches.length} sits match your new availability`,
+      heading: "There are boats needing a sitter in your dates",
+      body: `We found ${matches.length} open sit(s) that fit the window you just published. Open your availability to see them.`,
+      actionUrl: `${env.BETTER_AUTH_URL ?? ""}/availability`,
+      actionLabel: "View matches",
+      to: u?.email ?? undefined,
+    });
+  }
 }
 
 /** PATCH /api/availability/:id — edit your own window. */
