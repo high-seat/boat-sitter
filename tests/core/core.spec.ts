@@ -45,7 +45,9 @@ test("core: a user can sign in", async ({ page }) => {
   await expect(dialog).toBeVisible();
   await dialog.locator('input[type="email"]').fill(email);
   await dialog.locator('input[type="password"]').fill(password);
-  await dialog.getByRole("button", { name: /^Log in$/i }).click();
+  // The modal has a "Log in" tab toggle AND a "Log in" submit button — target
+  // the submit specifically.
+  await dialog.locator('button[type="submit"]').click();
 
   // A real session must exist: /api/me returns our user (context carries the cookie).
   await expect(async () => {
