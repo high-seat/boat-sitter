@@ -186,3 +186,75 @@ export async function deleteAllTestUsers(requiresSecret: boolean): Promise<DevRe
   const body = (await res.data.json().catch(() => null)) as { data?: { deleted?: number } } | null;
   return { ok: true, data: body?.data?.deleted ?? 0 };
 }
+
+/** True if an email belongs to a tool-created test user. */
+export function isDevTestUserEmail(email?: string | null): boolean {
+  return Boolean(email && /^dev-.*@boatstead\.test$/i.test(email));
+}
+
+const BOAT_NAME_PREFIXES = ["Sea", "Blue", "North", "Wind", "Salt", "Wave", "Coral", "Drift"];
+const BOAT_NAME_SUFFIXES = ["Breeze", "Voyager", "Spirit", "Dancer", "Runner", "Star", "Haven"];
+const BOAT_TYPES = ["Sailboat", "Motor yacht", "Catamaran", "Trawler", "Houseboat"];
+const BOAT_LOCATIONS: Array<[string, string]> = [
+  ["Palma", "Spain"],
+  ["Lefkada", "Greece"],
+  ["Brighton", "United Kingdom"],
+  ["Split", "Croatia"],
+  ["Newport", "United States"],
+  ["Auckland", "New Zealand"],
+];
+const BOAT_IMAGES = [
+  "https://images.pexels.com/photos/273886/pexels-photo-273886.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/540518/pexels-photo-540518.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1001682/pexels-photo-1001682.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/237272/pexels-photo-237272.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/42091/pexels-photo-42091.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1167021/pexels-photo-1167021.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/144634/pexels-photo-144634.jpeg?auto=compress&cs=tinysrgb&w=1400",
+  "https://images.pexels.com/photos/1295036/pexels-photo-1295036.jpeg?auto=compress&cs=tinysrgb&w=1400",
+];
+
+const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+/**
+ * Create a boat with random details for the CURRENTLY logged-in user, via the
+ * real PUT /api/vessels (server sets owner = the session user). Works anywhere
+ * you have a session — no dev secret needed. Returns the new boat's id + name.
+ */
+export async function createRandomBoat(): Promise<DevResult<{ id: string; name: string }>> {
+  const stamp = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const id = `dev-boat-${stamp}`;
+  const name = `${pick(BOAT_NAME_PREFIXES)} ${pick(BOAT_NAME_SUFFIXES)}`;
+  const type = pick(BOAT_TYPES);
+  const [location, country] = pick(BOAT_LOCATIONS);
+  const body = {
+    id,
+    name,
+    type,
+    length: String(28 + Math.floor(Math.random() * 40)),
+    yearBuilt: 1990 + Math.floor(Math.random() * 35),
+    homePort: `${location}, ${country}`,
+    image: pick(BOAT_IMAGES),
+    gallery: [] as string[],
+    owner: "Test", // server overrides with the session user's name
+    ownerImage: "https://placehold.co/80/e11d48/ffffff?text=TEST",
+    rating: 0,
+    reviews: 0,
+    description: `${name} is a randomly generated ${type.toLowerCase()} for testing.`,
+    home: "A practical layout with a usable galley and easy marina access.",
+    systems: ["Shore power", "Battery monitor"],
+    amenities: ["Bathroom", "Full kitchen", "Wi-Fi"],
+  };
+  const res = await fetch(`/api/vessels/${id}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (res.status === 401) return { ok: false, error: "Log in as a test user first." };
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    return { ok: false, error: detail || `Create boat failed (${res.status}).` };
+  }
+  return { ok: true, data: { id, name } };
+}

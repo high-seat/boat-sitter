@@ -41,11 +41,13 @@ import { useFeatureFlagStore } from "@/featureFlagStore";
 import { createDevRandomSit, createDevRandomVessel } from "@/mockApi";
 import {
   clearStoredDevSecret,
+  createRandomBoat,
   deleteAllTestUsers,
   deleteTestUser,
   devLoginAs,
   freshTestUser,
   getStoredDevSecret,
+  isDevTestUserEmail,
   listTestUsers,
   setStoredDevSecret,
   useDevToolsStatus,
@@ -211,6 +213,17 @@ export function CommandPalette() {
     }
     // needSecret already cleared any bad cached secret; surface the reason.
     window.alert(result.error);
+  }
+
+  async function createRandomTestBoat() {
+    const result = await createRandomBoat();
+    if (!result.ok) {
+      window.alert(result.error);
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: queries.vessels.all.queryKey });
+    await queryClient.invalidateQueries({ queryKey: queries.boats.all.queryKey });
+    navigate("/my-boats");
   }
 
   async function switchToTestUser(testEmail: string, testName: string) {
@@ -629,6 +642,15 @@ export function CommandPalette() {
                   <StatusBadge tone="on">Real login</StatusBadge>
                 </span>
               </CommandItem>
+              {isDevTestUserEmail(user?.email) && (
+                <CommandItem onSelect={() => run(() => void createRandomTestBoat())}>
+                  <ShipWheel className="size-4 shrink-0" />
+                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                    Create random boat
+                    <StatusBadge>for {user?.name}</StatusBadge>
+                  </span>
+                </CommandItem>
+              )}
               {testUsers.length > 0 && (
                 <CommandItem onSelect={() => run(() => void removeAllTestUsers())}>
                   <Trash2 className="size-4 shrink-0" />
