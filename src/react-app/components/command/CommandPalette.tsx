@@ -186,8 +186,13 @@ export function CommandPalette() {
   });
 
   async function createFreshTestUser() {
-    const { email, name } = freshTestUser();
-    const result = await devLoginAs({ email, name, requiresSecret: devTools.requiresSecret });
+    const { email, name, image } = freshTestUser();
+    const result = await devLoginAs({
+      email,
+      name,
+      image,
+      requiresSecret: devTools.requiresSecret,
+    });
     if (result.ok) {
       window.location.reload();
       return;

@@ -70,12 +70,27 @@ export function clearStoredDevSecret(): void {
   }
 }
 
+/**
+ * Distinctive avatar for tool-created test users — a red "TEST" badge, so a dev
+ * account is instantly recognizable anywhere it appears (nav, member cards,
+ * applications). Inline SVG data URI: no network dependency, always renders.
+ */
+export const TEST_USER_AVATAR =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160">' +
+      '<rect width="160" height="160" rx="24" fill="#e11d48"/>' +
+      '<text x="80" y="98" font-family="Helvetica,Arial,sans-serif" font-size="40" ' +
+      'font-weight="bold" fill="#ffffff" text-anchor="middle">TEST</text></svg>',
+  );
+
 /** A brand-new unique test identity. Dev-domain email so it's obviously fake. */
-export function freshTestUser(): { email: string; name: string } {
+export function freshTestUser(): { email: string; name: string; image: string } {
   const suffix = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
   return {
     email: `dev-${suffix}@boatstead.test`,
     name: `Dev User ${suffix.slice(-4)}`,
+    image: TEST_USER_AVATAR,
   };
 }
 
@@ -123,6 +138,7 @@ async function devFetch(
 export async function devLoginAs(opts: {
   email: string;
   name: string;
+  image?: string;
   requiresSecret: boolean;
 }): Promise<DevResult> {
   const res = await devFetch(
@@ -130,7 +146,7 @@ export async function devLoginAs(opts: {
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: opts.email, name: opts.name }),
+      body: JSON.stringify({ email: opts.email, name: opts.name, image: opts.image }),
     },
     opts.requiresSecret,
   );
