@@ -8,9 +8,9 @@ import { ConsentBanner } from "@/components/ConsentBanner";
 import { EmailVerifiedBanner } from "@/components/EmailVerifiedBanner";
 import { ResetPasswordPage } from "@/components/ResetPasswordPage";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { ToastHost } from "@/components/ui/Toast";
+import { showToast, ToastHost } from "@/components/ui/Toast";
 import { hydrateSession } from "@/session";
-import "@/i18n";
+import i18n from "@/i18n";
 import "@/index.css";
 
 // Pull the real Better Auth session into the store on load, so a Google login
@@ -23,6 +23,11 @@ initAnalytics();
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { staleTime: 60_000, retry: 1 },
+    mutations: {
+      onError: () => {
+        showToast(i18n.t("error.genericFailed"), "error");
+      },
+    },
   },
 });
 

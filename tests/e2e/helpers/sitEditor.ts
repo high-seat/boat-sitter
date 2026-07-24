@@ -37,7 +37,7 @@ export async function openCreateSitModal(page: Page) {
 
 /** Selects a future date range in the sit editor DateRangePicker. */
 export async function pickFutureSitDates(modal: Locator, page: Page) {
-  await modal.getByRole("button", { name: /Any dates/i }).click();
+  await modal.getByTestId("sit-editor-dates-trigger").click();
   await expect(page.getByText(/When can you boat sit/i)).toBeVisible();
 
   const calendar = page.locator(".boatstead-rdp");
@@ -68,7 +68,7 @@ export async function pickFutureSitDates(modal: Locator, page: Page) {
   await selectDay(toIso(start));
   await selectDay(toIso(end));
 
-  await expect(modal.getByRole("button", { name: /Any dates/i })).toHaveCount(0);
+  await expect(modal.getByTestId("sit-editor-dates")).not.toContainText(/Any dates/i);
 }
 
 export async function acceptSitTerms(modal: Locator) {

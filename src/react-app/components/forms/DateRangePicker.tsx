@@ -11,6 +11,7 @@ import {
   toIsoDate,
   type DayPickerLocaleCode,
 } from "@/components/forms/dateIso";
+import { formatDisplayDate, formatInclusiveDateRange } from "@/dateUtils";
 import "react-day-picker/style.css";
 
 export function DateRangePicker({
@@ -29,11 +30,7 @@ export function DateRangePicker({
   const { i18n, t } = useTranslation();
   const [open, setOpen] = useState(false);
   const language = normalizeLanguageCode(i18n.language) as DayPickerLocaleCode;
-  const displayDate = (value: string) =>
-    new Intl.DateTimeFormat(getIntlLocale(i18n.language), {
-      day: "numeric",
-      month: "short",
-    }).format(fromIsoDate(value));
+  const locale = getIntlLocale(i18n.language);
   const selected = useMemo<DateRange | undefined>(
     () =>
       startDate || endDate
@@ -48,9 +45,9 @@ export function DateRangePicker({
   const hasDates = Boolean(startDate || endDate);
   let label = t("search.anyDates");
   if (startDate && endDate) {
-    label = `${displayDate(startDate)} – ${displayDate(endDate)}`;
+    label = formatInclusiveDateRange(locale, fromIsoDate(startDate), fromIsoDate(endDate));
   } else if (startDate) {
-    label = displayDate(startDate);
+    label = formatDisplayDate(locale, fromIsoDate(startDate));
   }
 
   function clear(event: MouseEvent) {

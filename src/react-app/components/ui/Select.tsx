@@ -3,7 +3,7 @@ import type { SelectHTMLAttributes } from "react";
 const variantClasses = {
   filter:
     "rounded-xl border border-line bg-white px-4 py-3 text-sm font-semibold text-navy outline-none focus:border-teal",
-  sort: "rounded-xl border border-line bg-white px-3 py-2 text-sm font-semibold text-navy outline-none focus:border-teal",
+  sort: "rounded-xl border border-line bg-white px-3 py-3 text-sm font-semibold text-navy outline-none focus:border-teal",
   form: "form-input",
   inline:
     "select-variant-inline w-full border-0 bg-transparent p-0 text-sm font-medium text-navy shadow-none outline-none ring-0",

@@ -1,6 +1,7 @@
 import {
   canLeaveReview,
   daysUntilSitStarts,
+  formatDisplayDate,
   formatInclusiveDateRange,
   formatSitDates,
   getReviewDeadline,
@@ -66,7 +67,17 @@ describe("startOfLocalDay / isHappeningSoon", () => {
   });
 });
 
-describe("formatInclusiveDateRange / formatSitDates", () => {
+describe("formatDisplayDate / formatInclusiveDateRange / formatSitDates", () => {
+  it("omits year for a single date in the current year", () => {
+    const now = new Date(2026, 6, 1);
+    expect(formatDisplayDate("en-US", new Date(2026, 11, 30), now)).toBe("Dec 30");
+  });
+
+  it("includes year for a single date outside the current year", () => {
+    const now = new Date(2026, 6, 1);
+    expect(formatDisplayDate("en-US", new Date(2027, 0, 8), now)).toBe("Jan 8, 2027");
+  });
+
   it("omits year when both ends are in the current year", () => {
     const now = new Date(2026, 6, 1);
     const text = formatInclusiveDateRange("en-US", new Date(2026, 0, 5), new Date(2026, 1, 2), now);

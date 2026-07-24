@@ -33,6 +33,7 @@ import {
   MapPin,
   Menu,
   MessageCircle,
+  Pause,
   Pencil,
   Play,
   Plus,
@@ -1605,6 +1606,7 @@ function BoatsPage() {
               syncBoatSearchUrl({ from: next.startDate, to: next.endDate, page: 0 });
             }}
             startDate={dates.startDate}
+            testId="boats-dates"
             variant="browse"
           />
           <Select
@@ -5886,6 +5888,7 @@ function SitEditor({
                     endDate={form.endDate}
                     onChange={({ startDate, endDate }) => setForm({ ...form, startDate, endDate })}
                     startDate={form.startDate}
+                    testId="sit-editor-dates"
                     variant="browse"
                   />
                 </div>
@@ -6766,6 +6769,7 @@ function OwnerBoatsPage() {
                   ? "border-line text-navy hover:border-teal"
                   : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
               }`}
+              data-testid="owner-sit-toggle-applicants"
               disabled={toggleApplicationsMutation.isPending}
               onClick={() => {
                 if (isAcceptingApplications(sit)) {
@@ -6776,6 +6780,7 @@ function OwnerBoatsPage() {
               }}
               type="button"
             >
+              {isAcceptingApplications(sit) ? <Pause size={16} /> : <Play size={16} />}
               {isAcceptingApplications(sit) ? t("owner.closeRequests") : t("owner.openRequests")}
             </button>
           ) : null}
@@ -9278,11 +9283,12 @@ function ApplicationReviewPage() {
             <div className="flex shrink-0 flex-wrap gap-2">
               {sit && sitPhase === "acceptingApplicants" && (
                 <button
-                  className={`rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
+                  className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-60 ${
                     isAcceptingApplications(sit)
                       ? "border-line bg-white text-navy hover:border-teal"
                       : "border-teal bg-seafoam text-teal hover:bg-seafoam/80"
                   }`}
+                  data-testid="applications-toggle-applicants"
                   disabled={toggleApplicationsMutation.isPending}
                   onClick={() => {
                     if (isAcceptingApplications(sit)) {
@@ -9293,6 +9299,7 @@ function ApplicationReviewPage() {
                   }}
                   type="button"
                 >
+                  {isAcceptingApplications(sit) ? <Pause size={16} /> : <Play size={16} />}
                   {isAcceptingApplications(sit)
                     ? t("applications.closeRequests")
                     : t("applications.openRequests")}

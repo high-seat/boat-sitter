@@ -44,6 +44,21 @@ export function sitEndDate(dateStart: string, duration: string) {
 }
 
 /**
+ * Formats a calendar date for display.
+ * Omits the year when it matches the current calendar year.
+ */
+export function formatDisplayDate(locale: string, date: Date, now = new Date()) {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+  };
+  if (date.getFullYear() !== now.getFullYear()) {
+    options.year = "numeric";
+  }
+  return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
+/**
  * Formats an inclusive sit date range for display.
  * Omits the year when both ends fall in the current calendar year; otherwise
  * includes a numeric year on each side (e.g. "Jan 5, 2027 – Feb 2, 2027").
