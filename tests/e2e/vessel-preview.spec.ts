@@ -14,6 +14,9 @@ test.describe("vessel editor live preview", () => {
     await expect(preview.getByText(/^Live preview$/i)).toHaveCount(0);
     await expect(preview.getByTestId("vessel-preview-name")).toHaveText(/Untitled boat/i);
     await expect(preview.getByTestId("vessel-preview-location")).toHaveText(/Location unknown/i);
+    await expect(preview.getByTestId("vessel-preview-length-unit-hint")).toHaveText(
+      /Length is shown in feet or meters based on each member's preference/i,
+    );
 
     await page.getByPlaceholder(/e\.g\. Solstice/i).fill("Preview Wind");
     await expect(preview.getByTestId("vessel-preview-name")).toHaveText("Preview Wind");

@@ -114,9 +114,7 @@ export async function fillMinimalCreateSitForm(
   const responsibilities =
     options?.responsibilities ??
     "Daily bilge check\nBattery and shore power check\nLine and fender inspection";
-  await modal
-    .getByPlaceholder(/One task per line|Jeden Morgen|Eine Aufgabe/i)
-    .fill(responsibilities);
+  await modal.getByTestId("sit-editor-responsibilities").locator("textarea").fill(responsibilities);
 
   await acceptSitTerms(modal);
 }

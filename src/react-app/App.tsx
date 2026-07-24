@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  CigaretteOff,
   CircleCheck,
   Compass,
   Droplets,
@@ -2744,16 +2745,22 @@ function DetailPage() {
 
             <section className="py-8">
               <h2 className="detail-title">{t("detail.experience")}</h2>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {experienceRequirements.map((item) => (
-                  <span
-                    className="rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-navy"
-                    key={item}
-                  >
-                    {displayLabel(t, item)}
-                  </span>
-                ))}
-              </div>
+              {experienceRequirements.length === 0 ? (
+                <p className="mt-5 text-sm text-slate" data-testid="listing-experience-empty">
+                  {t("detail.experienceNone")}
+                </p>
+              ) : (
+                <div className="mt-5 flex flex-wrap gap-2" data-testid="listing-experience-list">
+                  {experienceRequirements.map((item) => (
+                    <span
+                      className="rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-navy"
+                      key={item}
+                    >
+                      {displayLabel(t, item)}
+                    </span>
+                  ))}
+                </div>
+              )}
               <h2 className="detail-title mt-9">{t("detail.lifeAboard")}</h2>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {boat.amenities.map((item) => (
@@ -2804,6 +2811,11 @@ function DetailPage() {
                   <p className="flex items-center gap-3" data-testid="detail-max-guests">
                     <Users className="text-coral" size={18} />{" "}
                     {t("detail.maxGuests", { count: boat.maxGuests ?? 2 })}
+                  </p>
+                ) : null}
+                {resolveNonSmokerRequired(boat) ? (
+                  <p className="flex items-center gap-3" data-testid="detail-non-smoking">
+                    <CigaretteOff className="text-coral" size={18} /> {t("detail.nonSmoking")}
                   </p>
                 ) : null}
               </div>
@@ -4342,8 +4354,19 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
     if (!form.type.trim() || form.type === "Not specified") {
       reasons.push(t("vesselEditor.type"));
     }
+    if (!form.description.trim()) reasons.push(t("vesselEditor.about"));
+    if (!form.home.trim()) reasons.push(t("vesselEditor.lifeAboard"));
     return reasons;
-  }, [form.fullAddress, form.homePort, form.image, form.name, form.type, t]);
+  }, [
+    form.description,
+    form.fullAddress,
+    form.home,
+    form.homePort,
+    form.image,
+    form.name,
+    form.type,
+    t,
+  ]);
 
   const publishDisabled = mutation.isPending || publishBlockedReasons.length > 0;
   const publishBlockedTooltip =
@@ -4770,35 +4793,46 @@ function VesselEditor({ boat, close }: { boat?: Vessel; close: () => void }) {
                   t("vesselEditor.about"),
                   t("vesselEditor.aboutPlaceholder"),
                   VESSEL_MAX_LENGTHS.description,
+                  true,
+                  "vessel-editor-about",
                 ],
                 [
                   "home",
                   t("vesselEditor.lifeAboard"),
                   t("vesselEditor.lifePlaceholder"),
                   VESSEL_MAX_LENGTHS.home,
+                  true,
+                  "vessel-editor-life-aboard",
                 ],
                 [
                   "systems",
                   t("vesselEditor.systems"),
                   t("vesselEditor.systemsPlaceholder"),
                   VESSEL_MAX_LENGTHS.systems,
+                  false,
+                  "vessel-editor-systems",
                 ],
                 [
                   "customAmenities",
                   t("vesselEditor.otherFeatures"),
                   t("vesselEditor.onePerLine"),
                   VESSEL_MAX_LENGTHS.customAmenities,
+                  false,
+                  "vessel-editor-other-features",
                 ],
               ] as const
-            ).map(([key, label, placeholder, maxLength]) => (
-              <label className="sm:col-span-2" key={key}>
-                <FormLabel optional>{label}</FormLabel>
+            ).map(([key, label, placeholder, maxLength, isRequired, testId]) => (
+              <label className="sm:col-span-2" data-testid={testId} key={key}>
+                <FormLabel optional={!isRequired} required={isRequired}>
+                  {label}
+                </FormLabel>
                 <div className="relative">
                   <textarea
                     className="form-input min-h-24 resize-y"
                     maxLength={maxLength}
                     onChange={(event) => setForm({ ...form, [key]: event.target.value })}
                     placeholder={placeholder}
+                    required={isRequired}
                     value={form[key as keyof typeof form] as string}
                   />
                   <CharacterCount
@@ -5327,7 +5361,10 @@ function SitEditor({
           longitude: coordinates.longitude,
           approximateLocation: true,
           sitType: form.sitType as "liveaboard" | "daytimeChecks",
-          responsibilities: form.responsibilities.split("\n").filter(Boolean),
+          responsibilities: form.responsibilities
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean),
           requirements: withoutNonSmokerRequirementLabels(
             form.requirements.split("\n").filter(Boolean),
           ),
@@ -5415,7 +5452,10 @@ function SitEditor({
       applicants: sit?.applicants ?? 0,
       description: selectedVessel.description,
       home: selectedVessel.home,
-      responsibilities: form.responsibilities.split("\n").filter(Boolean),
+      responsibilities: form.responsibilities
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
       sitType: form.sitType as "liveaboard" | "daytimeChecks",
       systems: selectedVessel.systems,
       engineType: selectedVessel.engineType,
@@ -5476,6 +5516,13 @@ function SitEditor({
         reasons.push(t("sitEditor.maxGuests"));
       }
     }
+    const responsibilityLines = form.responsibilities
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (responsibilityLines.length === 0) {
+      reasons.push(t("sitEditor.responsibilities"));
+    }
     return reasons;
   }, [
     form.boatId,
@@ -5484,6 +5531,7 @@ function SitEditor({
     form.fullAddress,
     form.location,
     form.maxGuests,
+    form.responsibilities,
     form.sitType,
     form.startDate,
     sameAsHomePort,
@@ -5882,7 +5930,7 @@ function SitEditor({
                   </div>
                 </label>
                 <label data-testid="sit-editor-responsibilities">
-                  <FormLabel optional>{t("sitEditor.responsibilities")}</FormLabel>
+                  <FormLabel required>{t("sitEditor.responsibilities")}</FormLabel>
                   <div className="relative">
                     <textarea
                       className="form-input min-h-28 resize-y"
@@ -5891,6 +5939,7 @@ function SitEditor({
                         setForm({ ...form, responsibilities: event.target.value })
                       }
                       placeholder={t("sitEditor.responsibilitiesPlaceholder")}
+                      required
                       value={form.responsibilities}
                     />
                     <CharacterCount

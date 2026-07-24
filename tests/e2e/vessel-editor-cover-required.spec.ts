@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
 import { uploadVesselCover } from "./helpers/images";
-import { pickVesselPortAddress, selectVesselType } from "./helpers/vesselEditor";
+import {
+  fillVesselAboutFields,
+  pickVesselPortAddress,
+  selectVesselType,
+} from "./helpers/vesselEditor";
 
 test.describe("vessel editor cover required", () => {
   test("requires a cover photo and hides more photos until one is chosen", async ({ page }) => {
@@ -18,6 +22,7 @@ test.describe("vessel editor cover required", () => {
     await page.getByLabel(/Boat name/i).fill("Cover Required");
     await pickVesselPortAddress(page);
     await selectVesselType(page);
+    await fillVesselAboutFields(page);
 
     await expect(publish).toBeDisabled();
     await publish.hover({ force: true });

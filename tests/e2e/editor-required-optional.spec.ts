@@ -20,10 +20,18 @@ test.describe("editor required vs optional fields", () => {
 
     const requiredLabels = page.getByTestId("form-label-required");
     await expect(requiredLabels.filter({ hasText: /Boat name/i })).toContainText("*");
-    await expect(requiredLabels.filter({ hasText: /Home port/i })).toContainText("*");
+    await expect(requiredLabels.filter({ hasText: /Normal port address/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Cover image/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Vessel type/i })).toContainText("*");
+    await expect(requiredLabels.filter({ hasText: /About the boat/i })).toContainText("*");
+    await expect(requiredLabels.filter({ hasText: /Life aboard/i })).toContainText("*");
     await expect(page.getByTestId("vessel-type")).toHaveValue("Not specified");
+
+    await expect(page.getByTestId("vessel-editor-about")).not.toContainText(/optional/i);
+    await expect(page.getByTestId("vessel-editor-life-aboard")).not.toContainText(/optional/i);
+    await expect(
+      page.getByTestId("form-label-optional").filter({ hasText: /Onboard systems/i }),
+    ).toContainText(/optional/i);
 
     await expect(page.getByRole("heading", { name: /What’s available/i })).toContainText(
       /optional/i,
@@ -43,12 +51,18 @@ test.describe("editor required vs optional fields", () => {
     const requiredLabels = editor.getByTestId("form-label-required");
     await expect(requiredLabels.filter({ hasText: /^Boat/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Sit location/i })).toContainText("*");
-    await expect(requiredLabels.filter({ hasText: /Full address/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Sit dates/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Sit type/i })).toContainText("*");
     await expect(requiredLabels.filter({ hasText: /Maximum number of people/i })).toContainText(
       "*",
     );
+    await expect(requiredLabels.filter({ hasText: /Care responsibilities/i })).toContainText("*");
+    await expect(editor.getByTestId("sit-editor-responsibilities")).not.toContainText(/optional/i);
+
+    await expect(editor.getByTestId("sit-use-normal-port-input")).toBeChecked();
+    await editor.getByTestId("sit-use-normal-port-input").uncheck();
+    await expect(requiredLabels.filter({ hasText: /Full address/i })).toContainText("*");
+    await editor.getByTestId("sit-use-normal-port-input").check();
 
     await editor.getByRole("radio", { name: /Daytime checks/i }).check();
     await expect(editor.getByTestId("sit-editor-max-guests")).toHaveCount(0);

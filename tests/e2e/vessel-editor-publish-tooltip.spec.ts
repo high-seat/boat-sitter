@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
 import { uploadVesselCover } from "./helpers/images";
-import { pickVesselPortAddress, selectVesselType } from "./helpers/vesselEditor";
+import {
+  fillVesselAboutFields,
+  pickVesselPortAddress,
+  selectVesselType,
+} from "./helpers/vesselEditor";
 
 test.describe("vessel editor publish blocked tooltip", () => {
   test("shows which required fields are missing when publish is disabled", async ({ page }) => {
@@ -17,7 +21,7 @@ test.describe("vessel editor publish blocked tooltip", () => {
     await publish.hover({ force: true });
     await expect(
       page.getByRole("tooltip", {
-        name: /Still needed:.*Cover image.*Boat name.*Normal port address.*Public city and country.*Vessel type/i,
+        name: /Still needed:.*Cover image.*Boat name.*Normal port address.*Public city and country.*Vessel type.*About the boat.*Life aboard/i,
       }),
     ).toBeVisible();
 
@@ -25,7 +29,7 @@ test.describe("vessel editor publish blocked tooltip", () => {
     await publish.hover({ force: true });
     await expect(
       page.getByRole("tooltip", {
-        name: /Still needed:.*Boat name.*Normal port address.*Public city and country.*Vessel type/i,
+        name: /Still needed:.*Boat name.*Normal port address.*Public city and country.*Vessel type.*About the boat.*Life aboard/i,
       }),
     ).toBeVisible();
     await expect(page.getByRole("tooltip", { name: /Cover image/i })).toHaveCount(0);
@@ -35,18 +39,30 @@ test.describe("vessel editor publish blocked tooltip", () => {
     await publish.hover({ force: true });
     await expect(
       page.getByRole("tooltip", {
-        name: /Still needed:.*Normal port address.*Public city and country.*Vessel type/i,
+        name: /Still needed:.*Normal port address.*Public city and country.*Vessel type.*About the boat.*Life aboard/i,
       }),
     ).toBeVisible();
     await expect(page.getByRole("tooltip", { name: /Boat name/i })).toHaveCount(0);
 
     await pickVesselPortAddress(page);
     await publish.hover({ force: true });
-    await expect(page.getByRole("tooltip", { name: /Still needed:.*Vessel type/i })).toBeVisible();
+    await expect(
+      page.getByRole("tooltip", {
+        name: /Still needed:.*Vessel type.*About the boat.*Life aboard/i,
+      }),
+    ).toBeVisible();
     await expect(page.getByRole("tooltip", { name: /Normal port address/i })).toHaveCount(0);
     await expect(publish).toBeDisabled();
 
     await selectVesselType(page);
+    await publish.hover({ force: true });
+    await expect(
+      page.getByRole("tooltip", { name: /Still needed:.*About the boat.*Life aboard/i }),
+    ).toBeVisible();
+    await expect(page.getByRole("tooltip", { name: /Vessel type/i })).toHaveCount(0);
+    await expect(publish).toBeDisabled();
+
+    await fillVesselAboutFields(page);
     await expect(publish).toBeEnabled();
     await expect(publish).not.toHaveAttribute("title");
     await publish.hover();

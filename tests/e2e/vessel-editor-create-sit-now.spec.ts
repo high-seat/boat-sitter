@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
 import { uploadVesselCover } from "./helpers/images";
 import {
+  fillVesselAboutFields,
   mockAddressSuggestions,
   pickVesselPortAddress,
   selectVesselType,
@@ -24,6 +25,7 @@ test.describe("vessel publish create sit now", () => {
     await page.getByLabel(/Boat name/i).fill("Sit Now Cutter");
     await pickVesselPortAddress(page);
     await selectVesselType(page);
+    await fillVesselAboutFields(page);
     await uploadVesselCover(page);
 
     await page.getByTestId("vessel-publish").click();
@@ -53,6 +55,7 @@ test.describe("vessel publish create sit now", () => {
     await page.getByTestId("address-option").first().click();
     await expect(page.getByTestId("vessel-public-location")).toContainText(/Palma/i);
     await selectVesselType(page);
+    await fillVesselAboutFields(page);
     await uploadVesselCover(page);
 
     await page.getByTestId("vessel-publish").click();

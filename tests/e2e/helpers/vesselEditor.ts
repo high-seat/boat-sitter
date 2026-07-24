@@ -5,6 +5,21 @@ export async function selectVesselType(page: Page, type: string = "Sailing yacht
   await page.getByTestId("vessel-type").selectOption(type);
 }
 
+/** Fill About the boat and Life aboard (required on create). */
+export async function fillVesselAboutFields(
+  page: Page,
+  options?: { about?: string; lifeAboard?: string },
+) {
+  await page
+    .getByTestId("vessel-editor-about")
+    .locator("textarea")
+    .fill(options?.about ?? "A well-kept vessel ready for careful sitters.");
+  await page
+    .getByTestId("vessel-editor-life-aboard")
+    .locator("textarea")
+    .fill(options?.lifeAboard ?? "Comfortable cabin with a proper berth and galley.");
+}
+
 /** Deterministic Photon-style address suggestions for vessel/sit editors. */
 export async function mockAddressSuggestions(
   page: Page,

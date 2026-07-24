@@ -43,7 +43,9 @@ const sitSchema = z.object({
   fullAddress: z.string().optional(),
   latitude: z.number().nullish(),
   longitude: z.number().nullish(),
-  responsibilities: z.array(z.string()).default([]),
+  responsibilities: z
+    .array(z.string().trim().min(1))
+    .min(1, "At least one care responsibility is required"),
   requirements: z.array(z.string()).default([]),
   minYearsExperience: z.number().int().min(0).nullish(),
   requiredExperience: z.array(z.string()).default([]),
