@@ -23,6 +23,13 @@ declare namespace Cloudflare {
     REQUIRE_EMAIL_VERIFICATION?: string;
     /** Optional comma-separated sign-up allowlist; empty = open sign-up */
     ALLOWED_EMAILS?: string;
+    /**
+     * Shared secret that gates POST /api/dev/login on reachable-but-non-prod
+     * environments (e.g. staging). When set, the request must send a matching
+     * `x-dev-secret` header. Unset locally = no secret needed (e2e stays open).
+     * The whole /api/dev router already 404s when ENVIRONMENT === "production".
+     */
+    DEV_LOGIN_SECRET?: string;
   }
 }
 interface Env extends Cloudflare.Env {}

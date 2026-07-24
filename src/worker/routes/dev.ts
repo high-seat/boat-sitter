@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, isNull, like, ne, or, sql } from "drizzle-orm";
 import type { AppEnv } from "../context";
 import { buildAuth } from "../auth";
 import { getDb } from "../db";
@@ -7,9 +7,16 @@ import { user } from "../db/auth-schema";
 import {
   applicationMessages,
   applications,
+  notifications,
+  profiles,
   reviews,
   sits,
+  sitterAvailability,
   supportRequests,
+  userArchivedConversations,
+  userBlocks,
+  userReports,
+  userSaved,
   vessels,
 } from "../db/schema";
 import { seedApplications, seedSits, seedVessels } from "../db/seed-data";
@@ -32,6 +39,19 @@ devRouter.use("*", async (c, next) => {
   await next();
 });
 
+/**
+ * Tool-created test users all use this email shape (see freshTestUser() on the
+ * client). Listing and deletion are hard-restricted to it so this tooling can
+ * never touch a real account, a seed user, or the qatest core-test user.
+ */
+const TEST_USER_EMAIL_LIKE = "dev-%@boatstead.test";
+const isToolTestUserEmail = (email: string) => /^dev-.*@boatstead\.test$/i.test(email);
+
+/** On staging a shared secret gates the account-creating/-deleting endpoints. */
+function devSecretOk(c: { env: Env; req: { header: (name: string) => string | undefined } }) {
+  return !c.env.DEV_LOGIN_SECRET || c.req.header("x-dev-secret") === c.env.DEV_LOGIN_SECRET;
+}
+
 devRouter.get("/", (c) => c.html(devConsoleHtml));
 
 devRouter.get("/status", async (c) => {
@@ -44,6 +64,8 @@ devRouter.get("/status", async (c) => {
   return c.json({
     environment: c.env.ENVIRONMENT,
     adminTokenConfigured: Boolean(c.env.ADMIN_TOKEN),
+    // Client uses this to decide whether to prompt for the dev login secret.
+    requiresDevSecret: Boolean(c.env.DEV_LOGIN_SECRET),
     vessels: v.length,
     sits: s.length,
     applications: a.length,
@@ -157,6 +179,13 @@ const DEV_PASSWORD = "dev-password-boatstead";
  * Also claims seed vessels whose display `owner` matches the user's name.
  */
 devRouter.post("/login", async (c) => {
+  // On reachable non-prod envs (staging) a secret is configured to keep this
+  // from being an open "create a logged-in account" backdoor. Locally the
+  // secret is unset, so e2e/dev keep working with no header.
+  if (!devSecretOk(c)) {
+    return c.json({ error: "Dev login secret required or incorrect" }, 401);
+  }
+
   const body = (await c.req.json().catch(() => null)) as {
     email?: string;
     name?: string;
@@ -278,6 +307,92 @@ devRouter.post("/login", async (c) => {
     }),
     { status: 200, headers },
   );
+});
+
+/**
+ * Cascade-delete a user and everything they own. Mirrors the account-deletion
+ * cleanup in routes/me.ts — keep the two in sync if per-user tables change.
+ */
+async function deleteUserAndData(db: ReturnType<typeof getDb>, userId: string) {
+  const ownedVessels = await db.select().from(vessels).where(eq(vessels.ownerUserId, userId));
+  for (const vessel of ownedVessels) {
+    const vesselSits = await db.select().from(sits).where(eq(sits.vesselId, vessel.id));
+    for (const sit of vesselSits) {
+      await db.delete(applications).where(eq(applications.sitId, sit.id));
+      await db.delete(reviews).where(eq(reviews.sitId, sit.id));
+    }
+    await db.delete(sits).where(eq(sits.vesselId, vessel.id));
+    await db.delete(vessels).where(eq(vessels.id, vessel.id));
+  }
+  await db.delete(applications).where(eq(applications.applicantUserId, userId));
+  await db.delete(reviews).where(eq(reviews.sitterUserId, userId));
+  await db.delete(reviews).where(eq(reviews.ownerUserId, userId));
+  await db.delete(notifications).where(eq(notifications.userId, userId));
+  await db.delete(sitterAvailability).where(eq(sitterAvailability.sitterUserId, userId));
+  await db.delete(userSaved).where(eq(userSaved.userId, userId));
+  await db.delete(userArchivedConversations).where(eq(userArchivedConversations.userId, userId));
+  await db.delete(userBlocks).where(eq(userBlocks.userId, userId));
+  await db.delete(userReports).where(eq(userReports.reporterUserId, userId));
+  await db.delete(profiles).where(eq(profiles.userId, userId));
+  await db.delete(user).where(eq(user.id, userId)); // cascades session + account
+}
+
+/**
+ * GET /api/dev/test-users — list tool-created test users (dev-%@boatstead.test),
+ * newest first. Secret-gated on staging.
+ */
+devRouter.get("/test-users", async (c) => {
+  if (!devSecretOk(c)) return c.json({ error: "Dev secret required or incorrect" }, 401);
+  const db = getDb(c.env);
+  const rows = await db
+    .select({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt,
+    })
+    .from(user)
+    .where(like(user.email, TEST_USER_EMAIL_LIKE));
+  rows.sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0));
+  return c.json({ data: rows });
+});
+
+/**
+ * DELETE /api/dev/test-users/:id — delete ONE tool-created test user + all their
+ * data. Refuses any id whose email isn't a dev-%@boatstead.test address, so it
+ * can never remove a real/seed/qatest account. Secret-gated on staging.
+ */
+devRouter.delete("/test-users/:id", async (c) => {
+  if (!devSecretOk(c)) return c.json({ error: "Dev secret required or incorrect" }, 401);
+  const db = getDb(c.env);
+  const id = c.req.param("id");
+  const target = await db.query.user.findFirst({ where: eq(user.id, id) });
+  if (!target) return c.json({ error: "User not found" }, 404);
+  if (!isToolTestUserEmail(target.email)) {
+    return c.json({ error: "Refusing to delete a non-test user" }, 400);
+  }
+  await deleteUserAndData(db, id);
+  return c.json({ data: { id, deleted: true } });
+});
+
+/**
+ * DELETE /api/dev/test-users — delete ALL tool-created test users at once.
+ * Same hard restriction to dev-%@boatstead.test. Secret-gated on staging.
+ */
+devRouter.delete("/test-users", async (c) => {
+  if (!devSecretOk(c)) return c.json({ error: "Dev secret required or incorrect" }, 401);
+  const db = getDb(c.env);
+  const rows = await db
+    .select({ id: user.id, email: user.email })
+    .from(user)
+    .where(like(user.email, TEST_USER_EMAIL_LIKE));
+  let deleted = 0;
+  for (const row of rows) {
+    if (!isToolTestUserEmail(row.email)) continue; // belt-and-braces
+    await deleteUserAndData(db, row.id);
+    deleted += 1;
+  }
+  return c.json({ data: { deleted } });
 });
 
 /**

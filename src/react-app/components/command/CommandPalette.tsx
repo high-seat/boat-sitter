@@ -10,9 +10,11 @@ import {
   Flag,
   Heart,
   Home,
+  KeyRound,
   LifeBuoy,
   LogIn,
   LogOut,
+  UserPlus,
   MapPin,
   MessageCircle,
   Phone,
@@ -23,6 +25,7 @@ import {
   ShieldCheck,
   ShieldOff,
   ShipWheel,
+  Trash2,
   UserRound,
   Users,
 } from "lucide-react";
@@ -36,6 +39,17 @@ import {
 } from "@/featureFlags";
 import { useFeatureFlagStore } from "@/featureFlagStore";
 import { createDevRandomSit, createDevRandomVessel } from "@/mockApi";
+import {
+  clearStoredDevSecret,
+  deleteAllTestUsers,
+  deleteTestUser,
+  devLoginAs,
+  freshTestUser,
+  getStoredDevSecret,
+  listTestUsers,
+  setStoredDevSecret,
+  useDevToolsStatus,
+} from "@/devLogin";
 import { isAdminUser } from "@/adminAccess";
 import { useAppStore } from "@/store";
 import { queries } from "@/queries";
@@ -139,6 +153,56 @@ export function CommandPalette() {
     ...queries.vessels.all,
     enabled: open && Boolean(user),
   });
+
+  // Whether the real (session-backed) dev test-user tools are available here.
+  // Enabled on any non-prod env that answers /api/dev/status (local + staging);
+  // false on prod. Only queried while the palette is open.
+  const devTools = useDevToolsStatus(open);
+
+  // Load the test-user list, but don't trigger a secret prompt just by opening
+  // the palette: only fetch when no secret is required or one is already cached.
+  const canListTestUsers =
+    open && devTools.enabled && (!devTools.requiresSecret || Boolean(getStoredDevSecret()));
+  const { data: testUsers = [] } = useQuery({
+    queryKey: ["dev-test-users"],
+    enabled: canListTestUsers,
+    retry: false,
+    queryFn: async () => {
+      const result = await listTestUsers(devTools.requiresSecret);
+      return result.ok ? result.data : [];
+    },
+  });
+
+  async function createFreshTestUser() {
+    const { email, name } = freshTestUser();
+    const result = await devLoginAs({ email, name, requiresSecret: devTools.requiresSecret });
+    if (result.ok) {
+      window.location.reload();
+      return;
+    }
+    // needSecret already cleared any bad cached secret; surface the reason.
+    window.alert(result.error);
+  }
+
+  async function removeTestUser(id: string, label: string) {
+    if (!window.confirm(`Delete test user "${label}" and all their data?`)) return;
+    const result = await deleteTestUser(id, devTools.requiresSecret);
+    if (!result.ok) {
+      window.alert(result.error);
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["dev-test-users"] });
+  }
+
+  async function removeAllTestUsers() {
+    if (!window.confirm(`Delete ALL ${testUsers.length} test user(s) and their data?`)) return;
+    const result = await deleteAllTestUsers(devTools.requiresSecret);
+    if (!result.ok) {
+      window.alert(result.error);
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["dev-test-users"] });
+  }
 
   const applicationBoatId = applicationSitId
     ? sits.find((sit) => sit.id === applicationSitId)?.boatId
@@ -497,6 +561,63 @@ export function CommandPalette() {
               </>
             )}
           </CommandGroup>
+          {devTools.enabled && (
+            <CommandGroup heading="Test users (real session)">
+              <CommandItem onSelect={() => run(() => void createFreshTestUser())}>
+                <UserPlus className="size-4 shrink-0" />
+                <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                  Create fresh test user
+                  <StatusBadge tone="on">Real login</StatusBadge>
+                </span>
+              </CommandItem>
+              {testUsers.length > 0 && (
+                <CommandItem onSelect={() => run(() => void removeAllTestUsers())}>
+                  <Trash2 className="size-4 shrink-0" />
+                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                    Delete all test users
+                    <StatusBadge tone="off">{testUsers.length}</StatusBadge>
+                  </span>
+                </CommandItem>
+              )}
+              {devTools.requiresSecret && (
+                <CommandItem
+                  onSelect={() =>
+                    run(() => {
+                      const next = window.prompt("Set the dev login secret (blank = clear):");
+                      if (next == null) return;
+                      if (next.trim()) setStoredDevSecret(next.trim());
+                      else clearStoredDevSecret();
+                    })
+                  }
+                >
+                  <KeyRound className="size-4 shrink-0" />
+                  Set / clear dev login secret
+                </CommandItem>
+              )}
+            </CommandGroup>
+          )}
+          {devTools.enabled && testUsers.length > 0 && (
+            <CommandGroup heading="Delete a test user">
+              {testUsers.map((testUser) => (
+                <CommandItem
+                  key={testUser.id}
+                  onSelect={() =>
+                    run(() => void removeTestUser(testUser.id, testUser.name || testUser.email))
+                  }
+                >
+                  <Trash2 className="size-4 shrink-0" />
+                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                    <span className="min-w-0">
+                      <span className="block truncate">{testUser.name || testUser.email}</span>
+                      <span className="block truncate text-xs font-normal text-slate">
+                        {testUser.email}
+                      </span>
+                    </span>
+                  </span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
           {import.meta.env.DEV && (
             <>
               <CommandGroup heading="Feature flags">
