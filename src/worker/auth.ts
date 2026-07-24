@@ -36,10 +36,28 @@ export function buildAuth(env: Env, request?: Request) {
   const baseURL =
     isLocal && requestOrigin ? requestOrigin : (env.BETTER_AUTH_URL ?? requestOrigin ?? "");
 
+  const isProd = env.ENVIRONMENT === "production";
+
   return betterAuth({
     baseURL,
     secret: env.BETTER_AUTH_SECRET,
-    logger: { level: "debug" },
+    // Verbose locally; quiet in prod so auth internals don't leak into logs.
+    logger: { level: isProd ? "error" : "debug" },
+    // Blunt brute-force on the auth endpoints. Better Auth applies tighter
+    // limits to sensitive paths (sign-in, reset) automatically.
+    rateLimit: {
+      enabled: isProd,
+      window: 60, // seconds
+      max: 100, // requests per window per IP
+    },
+    account: {
+      accountLinking: {
+        enabled: true,
+        // Google verifies its emails, so linking a Google login to an existing
+        // (verified) same-email account is safe and avoids duplicate accounts.
+        trustedProviders: ["google"],
+      },
+    },
     advanced: {
       useSecureCookies: !isLocal,
       defaultCookieAttributes: {
