@@ -195,13 +195,15 @@ export function isDevTestUserEmail(email?: string | null): boolean {
 const BOAT_NAME_PREFIXES = ["Sea", "Blue", "North", "Wind", "Salt", "Wave", "Coral", "Drift"];
 const BOAT_NAME_SUFFIXES = ["Breeze", "Voyager", "Spirit", "Dancer", "Runner", "Star", "Haven"];
 const BOAT_TYPES = ["Sailboat", "Motor yacht", "Catamaran", "Trawler", "Houseboat"];
-const BOAT_LOCATIONS: Array<[string, string]> = [
-  ["Palma", "Spain"],
-  ["Lefkada", "Greece"],
-  ["Brighton", "United Kingdom"],
-  ["Split", "Croatia"],
-  ["Newport", "United States"],
-  ["Auckland", "New Zealand"],
+// [city, country, full port address] — the port address matters because the
+// sit editor requires the boat to have one.
+const BOAT_LOCATIONS: Array<[string, string, string]> = [
+  ["Palma", "Spain", "Real Club Náutico de Palma, 07012 Palma, Spain"],
+  ["Lefkada", "Greece", "Lefkas Marina, Lefkada 311 00, Greece"],
+  ["Brighton", "United Kingdom", "Brighton Marina, Brighton BN2 5UF, United Kingdom"],
+  ["Split", "Croatia", "ACI Marina Split, 21000 Split, Croatia"],
+  ["Newport", "United States", "Newport Yachting Center, Newport, RI 02840, United States"],
+  ["Auckland", "New Zealand", "Westhaven Marina, Auckland 1011, New Zealand"],
 ];
 const BOAT_IMAGES = [
   "https://images.pexels.com/photos/273886/pexels-photo-273886.jpeg?auto=compress&cs=tinysrgb&w=1400",
@@ -226,7 +228,7 @@ export async function createRandomBoat(): Promise<DevResult<{ id: string; name: 
   const id = `dev-boat-${stamp}`;
   const name = `${pick(BOAT_NAME_PREFIXES)} ${pick(BOAT_NAME_SUFFIXES)}`;
   const type = pick(BOAT_TYPES);
-  const [location, country] = pick(BOAT_LOCATIONS);
+  const [location, country, fullAddress] = pick(BOAT_LOCATIONS);
   const body = {
     id,
     name,
@@ -234,6 +236,8 @@ export async function createRandomBoat(): Promise<DevResult<{ id: string; name: 
     length: String(28 + Math.floor(Math.random() * 40)),
     yearBuilt: 1990 + Math.floor(Math.random() * 35),
     homePort: `${location}, ${country}`,
+    // A real port address so the sit editor doesn't block on "no full address".
+    fullAddress,
     image: pick(BOAT_IMAGES),
     gallery: [] as string[],
     owner: "Test", // server overrides with the session user's name
