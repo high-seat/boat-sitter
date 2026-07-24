@@ -28,14 +28,40 @@ import { devConsoleHtml } from "./dev-console-html";
 /**
  * Developer-only routes. Mounted at /api/dev.
  *
- * The whole router 404s when ENVIRONMENT === "production", so it cannot be
- * reached on a real deploy even if someone guesses the path.
+ * Non-prod (local + staging): the whole router is reachable. On staging the
+ * account-touching endpoints are additionally secret-gated (see devSecretOk).
+ *
+ * PROD: only the test-user tooling is reachable — GET /status, POST /login, and
+ * /test-users[/:id] — and everything except /status requires a matching
+ * `x-dev-secret`. It FAILS CLOSED: if DEV_LOGIN_SECRET isn't configured on prod,
+ * even those endpoints 404. The dangerous routes (/reset, /fixture, /sample, the
+ * console) stay 404 on prod no matter what.
  */
 export const devRouter = new Hono<AppEnv>();
 
+// Paths (relative to /api/dev) that are allowed to run on production.
+function isProdAllowedDevPath(suffix: string) {
+  return (
+    suffix === "/status" ||
+    suffix === "/login" ||
+    suffix === "/test-users" ||
+    suffix.startsWith("/test-users/")
+  );
+}
+
 devRouter.use("*", async (c, next) => {
   if (c.env.ENVIRONMENT === "production") {
-    return c.json({ error: "Not found" }, 404);
+    const suffix = c.req.path.replace(/^\/api\/dev/, "") || "/";
+    if (!isProdAllowedDevPath(suffix)) {
+      return c.json({ error: "Not found" }, 404);
+    }
+    // Everything except the availability probe requires the secret on prod, and
+    // the secret MUST be configured — otherwise the tool is off (404), never open.
+    if (suffix !== "/status") {
+      if (!c.env.DEV_LOGIN_SECRET || c.req.header("x-dev-secret") !== c.env.DEV_LOGIN_SECRET) {
+        return c.json({ error: "Not found" }, 404);
+      }
+    }
   }
   await next();
 });
@@ -56,6 +82,12 @@ function devSecretOk(c: { env: Env; req: { header: (name: string) => string | un
 devRouter.get("/", (c) => c.html(devConsoleHtml));
 
 devRouter.get("/status", async (c) => {
+  const requiresDevSecret = Boolean(c.env.DEV_LOGIN_SECRET);
+  // On prod, keep this minimal — it's publicly reachable, so never expose row
+  // counts or sit ids. Enough for the client to know the tool exists + is gated.
+  if (c.env.ENVIRONMENT === "production") {
+    return c.json({ environment: "production", requiresDevSecret });
+  }
   const db = getDb(c.env);
   const [v, s, a] = await Promise.all([
     db.select().from(vessels),
@@ -66,7 +98,7 @@ devRouter.get("/status", async (c) => {
     environment: c.env.ENVIRONMENT,
     adminTokenConfigured: Boolean(c.env.ADMIN_TOKEN),
     // Client uses this to decide whether to prompt for the dev login secret.
-    requiresDevSecret: Boolean(c.env.DEV_LOGIN_SECRET),
+    requiresDevSecret,
     vessels: v.length,
     sits: s.length,
     applications: a.length,

@@ -159,10 +159,22 @@ export function CommandPalette() {
   // false on prod. Only queried while the palette is open.
   const devTools = useDevToolsStatus(open);
 
+  // Reactive read of the cached dev secret (bumped when it's set/cleared).
+  const [secretBump, setSecretBump] = useState(0);
+  const hasStoredSecret = useMemo(() => Boolean(getStoredDevSecret()), [secretBump, open]);
+
+  // On prod the tool exists for everyone (secret-gated server-side), but we only
+  // SHOW it once a secret has been entered — so ordinary visitors never see the
+  // dev group. On local/staging it shows whenever the endpoint is reachable.
+  const showTestUserTools =
+    devTools.enabled && (devTools.environment !== "production" || hasStoredSecret);
+  const showProdUnlock =
+    devTools.enabled && devTools.environment === "production" && !hasStoredSecret;
+
   // Load the test-user list, but don't trigger a secret prompt just by opening
   // the palette: only fetch when no secret is required or one is already cached.
   const canListTestUsers =
-    open && devTools.enabled && (!devTools.requiresSecret || Boolean(getStoredDevSecret()));
+    open && showTestUserTools && (!devTools.requiresSecret || hasStoredSecret);
   const { data: testUsers = [] } = useQuery({
     queryKey: ["dev-test-users"],
     enabled: canListTestUsers,
@@ -574,7 +586,24 @@ export function CommandPalette() {
               </>
             )}
           </CommandGroup>
-          {devTools.enabled && (
+          {showProdUnlock && (
+            <CommandGroup heading="Test users (real session)">
+              <CommandItem
+                onSelect={() => {
+                  const next = window.prompt("Enter the dev login secret to unlock:");
+                  if (next == null) return;
+                  if (next.trim()) {
+                    setStoredDevSecret(next.trim());
+                    setSecretBump((n) => n + 1);
+                  }
+                }}
+              >
+                <KeyRound className="size-4 shrink-0" />
+                Unlock test users (enter secret)
+              </CommandItem>
+            </CommandGroup>
+          )}
+          {showTestUserTools && (
             <CommandGroup heading="Test users (real session)">
               <CommandItem onSelect={() => run(() => void createFreshTestUser())}>
                 <UserPlus className="size-4 shrink-0" />
@@ -600,6 +629,7 @@ export function CommandPalette() {
                       if (next == null) return;
                       if (next.trim()) setStoredDevSecret(next.trim());
                       else clearStoredDevSecret();
+                      setSecretBump((n) => n + 1);
                     })
                   }
                 >
@@ -609,7 +639,7 @@ export function CommandPalette() {
               )}
             </CommandGroup>
           )}
-          {devTools.enabled && testUsers.length > 0 && (
+          {showTestUserTools && testUsers.length > 0 && (
             <CommandGroup heading="Switch to test user">
               {testUsers.map((testUser) => (
                 <CommandItem
@@ -636,7 +666,7 @@ export function CommandPalette() {
               ))}
             </CommandGroup>
           )}
-          {devTools.enabled && testUsers.length > 0 && (
+          {showTestUserTools && testUsers.length > 0 && (
             <CommandGroup heading="Delete a test user">
               {testUsers.map((testUser) => (
                 <CommandItem

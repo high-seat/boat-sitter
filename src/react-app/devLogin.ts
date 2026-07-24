@@ -16,9 +16,16 @@ import { useQuery } from "@tanstack/react-query";
 
 const SECRET_KEY = "boatstead-dev-login-secret";
 
-export type DevToolsStatus = { enabled: boolean; requiresSecret: boolean };
+export type DevToolsStatus = {
+  enabled: boolean;
+  requiresSecret: boolean;
+  /** "production" | "staging" | "" — from the server, used to gate UI on prod. */
+  environment: string;
+};
 
-/** Query /api/dev/status. 404 (prod) → disabled. Only runs when `active`. */
+const DISABLED: DevToolsStatus = { enabled: false, requiresSecret: false, environment: "" };
+
+/** Query /api/dev/status. 404 (prod, misconfigured) → disabled. Runs when `active`. */
 export function useDevToolsStatus(active: boolean): DevToolsStatus {
   const { data } = useQuery({
     queryKey: ["dev-tools-status"],
@@ -27,12 +34,16 @@ export function useDevToolsStatus(active: boolean): DevToolsStatus {
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<DevToolsStatus> => {
       const res = await fetch("/api/dev/status", { credentials: "include" });
-      if (!res.ok) return { enabled: false, requiresSecret: false };
-      const body = (await res.json()) as { requiresDevSecret?: boolean };
-      return { enabled: true, requiresSecret: Boolean(body.requiresDevSecret) };
+      if (!res.ok) return DISABLED;
+      const body = (await res.json()) as { requiresDevSecret?: boolean; environment?: string };
+      return {
+        enabled: true,
+        requiresSecret: Boolean(body.requiresDevSecret),
+        environment: body.environment ?? "",
+      };
     },
   });
-  return data ?? { enabled: false, requiresSecret: false };
+  return data ?? DISABLED;
 }
 
 export function getStoredDevSecret(): string {
