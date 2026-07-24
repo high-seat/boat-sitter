@@ -190,14 +190,20 @@ const sql = `-- GENERATED FILE — do not edit by hand.
 -- Source: src/worker/db/seed-data.ts
 -- Regenerate: npm run db:seed:generate
 
--- Domain listings are fully reset (test data).
-DELETE FROM application_messages;
-DELETE FROM applications;
-DELETE FROM sits;
-DELETE FROM vessels;
-DELETE FROM support_requests;
--- Seed-owned rows only: scoped so real accounts/profiles/windows are untouched.
--- (Safe to run against production.)
+-- Scoped resets: only rows this seed owns are cleared, so boats/sits/accounts
+-- you create yourself (owner_user_id not 'seed-%') survive a re-seed. Every seed
+-- vessel is owned by a seed-user-*, so we key the listing wipe off that. Child →
+-- parent order. Safe to run against production.
+DELETE FROM application_messages WHERE application_id IN (
+  SELECT id FROM applications WHERE sit_id IN (
+    SELECT id FROM sits WHERE vessel_id IN (
+      SELECT id FROM vessels WHERE owner_user_id LIKE 'seed-%')));
+DELETE FROM applications WHERE sit_id IN (
+  SELECT id FROM sits WHERE vessel_id IN (
+    SELECT id FROM vessels WHERE owner_user_id LIKE 'seed-%'));
+DELETE FROM sits WHERE vessel_id IN (
+  SELECT id FROM vessels WHERE owner_user_id LIKE 'seed-%');
+DELETE FROM vessels WHERE owner_user_id LIKE 'seed-%';
 DELETE FROM reviews WHERE id LIKE 'seed-%';
 DELETE FROM sitter_availability WHERE id LIKE 'seed-%';
 DELETE FROM profiles WHERE user_id LIKE 'seed-%';
