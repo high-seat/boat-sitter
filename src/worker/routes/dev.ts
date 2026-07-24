@@ -220,17 +220,15 @@ devRouter.post("/login", async (c) => {
   } else {
     userId = crypto.randomUUID();
     const now = new Date();
-    await db
-      .insert(user)
-      .values({
-        id: userId,
-        name,
-        email,
-        emailVerified: true,
-        image,
-        createdAt: now,
-        updatedAt: now,
-      });
+    await db.insert(user).values({
+      id: userId,
+      name,
+      email,
+      emailVerified: true,
+      image,
+      createdAt: now,
+      updatedAt: now,
+    });
   }
 
   // A credential (email+password) account is what sign-in checks against.
