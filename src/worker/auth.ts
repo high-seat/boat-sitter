@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { eq } from "drizzle-orm";
 import { getDb } from "./db";
 import { account, session, user, verification } from "./db/auth-schema";
+import { profiles } from "./db/schema";
 import { sendNotificationEmail } from "./email";
 
 /**
@@ -96,6 +98,33 @@ export function buildAuth(env: Env, request?: Request) {
         });
       },
     },
+    user: {
+      changeEmail: {
+        enabled: true,
+        // Better Auth sends this approval link to the user's CURRENT email when
+        // that email is verified — so a hijacked session can't silently move the
+        // account to an attacker's inbox. The user's id never changes; only the
+        // email attribute does once they confirm.
+        sendChangeEmailVerification: async ({
+          user: u,
+          newEmail,
+          url,
+        }: {
+          user: { email: string };
+          newEmail: string;
+          url: string;
+        }) => {
+          await sendNotificationEmail(env, {
+            to: u.email,
+            subject: "Confirm your Boatstead email change",
+            heading: "Approve your email change",
+            body: `We received a request to change your Boatstead email to ${newEmail}. Tap below to confirm. If this wasn't you, ignore this message and your email stays the same.`,
+            actionUrl: url,
+            actionLabel: "Confirm email change",
+          });
+        },
+      },
+    },
     socialProviders: {
       google: {
         clientId: env.GOOGLE_CLIENT_ID,
@@ -126,6 +155,20 @@ export function buildAuth(env: Env, request?: Request) {
               throw new Error("This email is not permitted to sign up.");
             }
             return { data: u };
+          },
+        },
+        update: {
+          // Keep the denormalized profile copy in sync after an email/name
+          // change so profile pages don't drift from the auth record.
+          after: async (u) => {
+            try {
+              await db
+                .update(profiles)
+                .set({ email: u.email, name: u.name })
+                .where(eq(profiles.userId, u.id));
+            } catch {
+              // Profile row may not exist yet; ignore.
+            }
           },
         },
       },

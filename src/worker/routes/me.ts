@@ -4,7 +4,21 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { applications, notifications, profiles, reviews, sits, user, vessels } from "../db/schema";
+import {
+  applications,
+  notifications,
+  profiles,
+  reviews,
+  sits,
+  sitterAvailability,
+  user,
+  userArchivedConversations,
+  userArchivedSits,
+  userBlocks,
+  userReports,
+  userSaved,
+  vessels,
+} from "../db/schema";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -194,6 +208,14 @@ meRouter.delete("/", requireUser, async (c) => {
   await db.delete(reviews).where(eq(reviews.sitterUserId, userId));
   await db.delete(reviews).where(eq(reviews.ownerUserId, userId));
   await db.delete(notifications).where(eq(notifications.userId, userId));
+  // Supply-side + per-user data keyed by userId. Availability especially must go,
+  // or withdrawn-owner windows would keep surfacing in the matching engine.
+  await db.delete(sitterAvailability).where(eq(sitterAvailability.sitterUserId, userId));
+  await db.delete(userSaved).where(eq(userSaved.userId, userId));
+  await db.delete(userArchivedConversations).where(eq(userArchivedConversations.userId, userId));
+  await db.delete(userArchivedSits).where(eq(userArchivedSits.userId, userId));
+  await db.delete(userBlocks).where(eq(userBlocks.userId, userId));
+  await db.delete(userReports).where(eq(userReports.reporterUserId, userId));
   await db.delete(profiles).where(eq(profiles.userId, userId));
   // Cascades session + account rows.
   await db.delete(user).where(eq(user.id, userId));
