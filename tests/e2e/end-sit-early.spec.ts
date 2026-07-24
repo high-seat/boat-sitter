@@ -32,10 +32,31 @@ test.describe("end sit early", () => {
     ).toBeVisible();
 
     const reviewForm = page.getByTestId("leave-review-form-owner");
-    await reviewForm
-      .locator("textarea")
-      .fill("Alex took excellent care of the boat and kept us updated throughout the sit.");
-    await reviewForm.getByTestId("leave-review-submit-owner").click();
+    const submit = reviewForm.getByTestId("leave-review-submit-owner");
+    const textarea = reviewForm.getByTestId("leave-review-text-owner");
+    const charCount = reviewForm.getByTestId("character-count");
+
+    await expect(submit).toBeDisabled();
+    await expect(charCount).toContainText(/20 more characters needed/i);
+    await submit.hover({ force: true });
+    await expect(
+      page.getByRole("tooltip", { name: /Please write at least 20 characters/i }),
+    ).toBeVisible();
+
+    await textarea.fill("Too short");
+    await expect(submit).toBeDisabled();
+    await expect(charCount).toContainText(/more characters needed/i);
+    await submit.hover({ force: true });
+    await expect(
+      page.getByRole("tooltip", { name: /Please write at least 20 characters/i }),
+    ).toBeVisible();
+
+    await textarea.fill(
+      "Alex took excellent care of the boat and kept us updated throughout the sit.",
+    );
+    await expect(charCount).toContainText(/characters left/i);
+    await expect(submit).toBeEnabled();
+    await submit.click();
     await expect(page.getByTestId("leave-review-form-owner")).toHaveCount(0);
     const reviewPreview = page.getByTestId("review-preview-owner");
     await expect(reviewPreview).toBeVisible();

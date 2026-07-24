@@ -12,7 +12,14 @@ import {
   type SitReview,
 } from "@/mockApi";
 import { queries } from "@/queries";
+import { CharacterCount } from "@/components/ui/CharacterCount";
+import { IconTooltip } from "@/components/ui/IconTooltip";
 import { SitterReviewsSkeleton } from "@/components/ui/MemberProfileSkeleton";
+
+const REVIEW_TEXT_MIN = 20;
+const REVIEW_TEXT_MAX = 800;
+const REVIEW_RESPONSE_MIN = 8;
+const REVIEW_RESPONSE_MAX = 600;
 
 function formatReviewDate(language: string, iso: string) {
   const date = new Date(iso);
@@ -96,6 +103,7 @@ function ReviewCard({
   const reviewerName = authorRole === "sitter" ? review.sitterName : review.ownerName;
   const reviewerImage = review.authorImage || review.ownerImage;
   const responseFromName = authorRole === "sitter" ? review.ownerName : review.sitterName;
+  const responseTooShort = responseText.trim().length < REVIEW_RESPONSE_MIN;
   const respondMutation = useMutation({
     mutationFn: () =>
       respondToReview({
@@ -157,26 +165,42 @@ function ReviewCard({
             >
               <label className="block">
                 <span className="form-label">{t("reviews.respondLabel")}</span>
-                <textarea
-                  className="form-input min-h-24 resize-y"
-                  maxLength={600}
-                  onChange={(event) => setResponseText(event.target.value)}
-                  placeholder={t("reviews.respondPlaceholder")}
-                  value={responseText}
-                />
+                <div className="relative">
+                  <textarea
+                    className="form-input min-h-24 resize-y"
+                    maxLength={REVIEW_RESPONSE_MAX}
+                    onChange={(event) => setResponseText(event.target.value)}
+                    placeholder={t("reviews.respondPlaceholder")}
+                    value={responseText}
+                  />
+                  <CharacterCount
+                    className="absolute right-3 bottom-2"
+                    countTowardMin={responseText.trim().length}
+                    current={responseText.length}
+                    max={REVIEW_RESPONSE_MAX}
+                    min={REVIEW_RESPONSE_MIN}
+                  />
+                </div>
               </label>
               {error && (
                 <p className="text-sm font-semibold text-coral" role="alert">
                   {error}
                 </p>
               )}
-              <button
-                className="rounded-xl bg-navy px-4 py-2.5 text-sm font-bold text-white disabled:opacity-60"
-                disabled={respondMutation.isPending || responseText.trim().length < 8}
-                type="submit"
+              <IconTooltip
+                hidden={!responseTooShort || respondMutation.isPending}
+                label={t("reviews.responseTooShort")}
+                side="top"
+                wrap
               >
-                {respondMutation.isPending ? t("reviews.responding") : t("reviews.respondOnce")}
-              </button>
+                <button
+                  className="rounded-xl bg-navy px-4 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+                  disabled={respondMutation.isPending || responseTooShort}
+                  type="submit"
+                >
+                  {respondMutation.isPending ? t("reviews.responding") : t("reviews.respondOnce")}
+                </button>
+              </IconTooltip>
             </form>
           ) : null}
         </div>
@@ -303,6 +327,8 @@ export function LeaveReviewForm({
   if (!canLeaveReview(sitForReview)) return null;
 
   const daysRemaining = reviewDaysRemaining(sitForReview);
+  const textTooShort = text.trim().length < REVIEW_TEXT_MIN;
+  const submitDisabled = mutation.isPending || textTooShort;
 
   return (
     <section
@@ -342,27 +368,44 @@ export function LeaveReviewForm({
         </div>
         <label className="block">
           <span className="form-label">{t("reviews.yourReview")}</span>
-          <textarea
-            className="form-input min-h-28 resize-y"
-            maxLength={800}
-            onChange={(event) => setText(event.target.value)}
-            placeholder={t("reviews.yourReviewPlaceholder")}
-            value={text}
-          />
+          <div className="relative">
+            <textarea
+              className="form-input min-h-28 resize-y"
+              data-testid={`leave-review-text-${authorRole}`}
+              maxLength={REVIEW_TEXT_MAX}
+              onChange={(event) => setText(event.target.value)}
+              placeholder={t("reviews.yourReviewPlaceholder")}
+              value={text}
+            />
+            <CharacterCount
+              className="absolute right-3 bottom-2"
+              countTowardMin={text.trim().length}
+              current={text.length}
+              max={REVIEW_TEXT_MAX}
+              min={REVIEW_TEXT_MIN}
+            />
+          </div>
         </label>
         {error && (
           <p className="text-sm font-semibold text-coral" role="alert">
             {error}
           </p>
         )}
-        <button
-          className="rounded-xl bg-navy px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
-          data-testid={`leave-review-submit-${authorRole}`}
-          disabled={mutation.isPending || text.trim().length < 20}
-          type="submit"
+        <IconTooltip
+          hidden={!textTooShort || mutation.isPending}
+          label={t("reviews.textTooShort")}
+          side="top"
+          wrap
         >
-          {mutation.isPending ? t("reviews.submitting") : t("reviews.submit")}
-        </button>
+          <button
+            className="rounded-xl bg-navy px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+            data-testid={`leave-review-submit-${authorRole}`}
+            disabled={submitDisabled}
+            type="submit"
+          >
+            {mutation.isPending ? t("reviews.submitting") : t("reviews.submit")}
+          </button>
+        </IconTooltip>
       </form>
     </section>
   );

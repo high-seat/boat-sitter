@@ -569,6 +569,7 @@ function Header() {
               <>
                 <Link
                   className="rounded-full px-3 py-2 text-sm font-semibold text-navy hover:bg-white"
+                  data-testid="nav-manage"
                   to="/my-sits"
                 >
                   {t("nav.manage")}
@@ -696,6 +697,7 @@ function Header() {
             aria-expanded={open}
             aria-label={open ? t("common.close") : t("nav.menu")}
             className="rounded-full p-2 md:hidden"
+            data-testid="nav-menu-toggle"
             onClick={() => setOpen(!open)}
             type="button"
           >
@@ -703,34 +705,53 @@ function Header() {
           </button>
         </div>
         {open && (
-          <nav className="border-t border-line bg-cream px-5 py-5 md:hidden">
+          <nav
+            className="border-t border-line bg-cream px-5 py-5 md:hidden"
+            data-testid="nav-mobile-menu"
+          >
             <div className="flex flex-col gap-4 font-semibold">
-              <Link onClick={() => setOpen(false)} to="/boats">
+              <Link data-testid="nav-mobile-find" onClick={() => setOpen(false)} to="/boats">
                 {t("nav.find")}
               </Link>
-              <Link onClick={() => setOpen(false)} to="/how-it-works">
+              <Link data-testid="nav-mobile-how" onClick={() => setOpen(false)} to="/how-it-works">
                 {t("nav.how")}
               </Link>
               {user ? (
-                <Link onClick={() => setOpen(false)} to="/saved">
+                <Link data-testid="nav-mobile-saved" onClick={() => setOpen(false)} to="/saved">
                   {t("nav.saved")}
                 </Link>
               ) : null}
               {user && (
                 <>
-                  <Link onClick={() => setOpen(false)} to="/messages">
+                  <Link
+                    data-testid="nav-mobile-manage"
+                    onClick={() => setOpen(false)}
+                    to="/my-sits"
+                  >
+                    {t("nav.manage")}
+                  </Link>
+                  <Link
+                    data-testid="nav-mobile-messages"
+                    onClick={() => setOpen(false)}
+                    to="/messages"
+                  >
                     {t("nav.messages")}
                   </Link>
                   {showAdmin ? (
-                    <Link onClick={() => setOpen(false)} to="/admin">
+                    <Link data-testid="nav-mobile-admin" onClick={() => setOpen(false)} to="/admin">
                       {t("nav.admin")}
                     </Link>
                   ) : null}
-                  <Link onClick={() => setOpen(false)} to="/settings">
+                  <Link
+                    data-testid="nav-mobile-account"
+                    onClick={() => setOpen(false)}
+                    to="/settings"
+                  >
                     {t("settings.title")}
                   </Link>
                   <button
                     className="text-left text-coral"
+                    data-testid="nav-mobile-logout"
                     onClick={() => setConfirmingLogout(true)}
                     type="button"
                   >

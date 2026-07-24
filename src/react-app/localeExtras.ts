@@ -14,6 +14,8 @@ const localeExtrasSource = {
     "common.optional": "optional",
     "common.charsRemaining_one": "{{count}} character left",
     "common.charsRemaining_other": "{{count}} characters left",
+    "common.charsNeeded_one": "{{count}} more character needed",
+    "common.charsNeeded_other": "{{count}} more characters needed",
     "nav.logout": "Log out",
     "nav.logoutConfirmTitle": "Are you sure you want to log out?",
     "nav.logoutConfirmText":
@@ -1086,6 +1088,8 @@ const localeExtrasSource = {
     "common.optional": "facultatif",
     "common.charsRemaining_one": "{{count}} caractère restant",
     "common.charsRemaining_other": "{{count}} caractères restants",
+    "common.charsNeeded_one": "{{count}} caractère manquant",
+    "common.charsNeeded_other": "{{count}} caractères manquants",
     "nav.logout": "Se déconnecter",
     "nav.logoutConfirmTitle": "Voulez-vous vraiment vous déconnecter ?",
     "nav.logoutConfirmText":
@@ -2186,6 +2190,8 @@ const localeExtrasSource = {
     "common.optional": "opcional",
     "common.charsRemaining_one": "{{count}} carácter restante",
     "common.charsRemaining_other": "{{count}} caracteres restantes",
+    "common.charsNeeded_one": "Falta {{count}} carácter",
+    "common.charsNeeded_other": "Faltan {{count}} caracteres",
     "nav.logout": "Finalizar la sesión",
     "nav.logoutConfirmTitle": "¿Seguro que quieres cerrar sesión?",
     "nav.logoutConfirmText":
@@ -3283,6 +3289,8 @@ const localeExtrasSource = {
     "common.optional": "facoltativo",
     "common.charsRemaining_one": "{{count}} carattere rimasto",
     "common.charsRemaining_other": "{{count}} caratteri rimasti",
+    "common.charsNeeded_one": "Serve ancora {{count}} carattere",
+    "common.charsNeeded_other": "Servono ancora {{count}} caratteri",
     "nav.logout": "Esci",
     "nav.logoutConfirmTitle": "Vuoi davvero uscire?",
     "nav.logoutConfirmText":
@@ -4378,6 +4386,8 @@ const localeExtrasSource = {
     "common.optional": "optional",
     "common.charsRemaining_one": "{{count}} Zeichen übrig",
     "common.charsRemaining_other": "{{count}} Zeichen übrig",
+    "common.charsNeeded_one": "Noch {{count}} Zeichen nötig",
+    "common.charsNeeded_other": "Noch {{count}} Zeichen nötig",
     "nav.logout": "Abmelden",
     "nav.logoutConfirmTitle": "Möchten Sie sich wirklich abmelden?",
     "nav.logoutConfirmText":
@@ -5486,6 +5496,8 @@ const localeExtrasSource = {
     "common.optional": "optioneel",
     "common.charsRemaining_one": "{{count}} teken over",
     "common.charsRemaining_other": "{{count}} tekens over",
+    "common.charsNeeded_one": "Nog {{count}} teken nodig",
+    "common.charsNeeded_other": "Nog {{count}} tekens nodig",
     "nav.logout": "Uitloggen",
     "nav.logoutConfirmTitle": "Weet je zeker dat je wilt uitloggen?",
     "nav.logoutConfirmText":
@@ -6576,6 +6588,8 @@ const localeExtrasSource = {
     "common.optional": "opcional",
     "common.charsRemaining_one": "{{count}} carácter restante",
     "common.charsRemaining_other": "{{count}} caracteres restantes",
+    "common.charsNeeded_one": "Falta {{count}} carácter",
+    "common.charsNeeded_other": "Faltam {{count}} caracteres",
     "nav.logout": "Sair",
     "nav.logoutConfirmTitle": "Tem a certeza de que pretende terminar sessão?",
     "nav.logoutConfirmText":
@@ -7665,6 +7679,8 @@ const localeExtrasSource = {
     "common.optional": "προαιρετικό",
     "common.charsRemaining_one": "{{count}} χαρακτήρας απομένει",
     "common.charsRemaining_other": "{{count}} χαρακτήρες απομένουν",
+    "common.charsNeeded_one": "Χρειάζεται ακόμη {{count}} χαρακτήρας",
+    "common.charsNeeded_other": "Χρειάζονται ακόμη {{count}} χαρακτήρες",
     "nav.logout": "Αποσυνδεθείτε",
     "nav.logoutConfirmTitle": "Θέλετε σίγουρα να αποσυνδεθείτε;",
     "nav.logoutConfirmText":
@@ -8775,6 +8791,9 @@ const localeExtrasSource = {
     "common.optional": "opcionalno",
     "common.charsRemaining_one": "{{count}} znak preostao",
     "common.charsRemaining_other": "{{count}} znakova preostalo",
+    "common.charsNeeded_one": "Potreban je još {{count}} znak",
+    "common.charsNeeded_few": "Potrebna su još {{count}} znaka",
+    "common.charsNeeded_other": "Potrebno je još {{count}} znakova",
     "nav.logout": "Odjavi se",
     "nav.logoutConfirmTitle": "Jeste li sigurni da se želite odjaviti?",
     "nav.logoutConfirmText":
@@ -9875,6 +9894,8 @@ const localeExtrasSource = {
     "common.optional": "isteğe bağlı",
     "common.charsRemaining_one": "{{count}} karakter kaldı",
     "common.charsRemaining_other": "{{count}} karakter kaldı",
+    "common.charsNeeded_one": "{{count}} karakter daha gerekli",
+    "common.charsNeeded_other": "{{count}} karakter daha gerekli",
     "nav.logout": "Oturumu kapat",
     "nav.logoutConfirmTitle": "Oturumu kapatmak istediğinizden emin misiniz?",
     "nav.logoutConfirmText":
@@ -10952,6 +10973,8 @@ const localeExtrasSource = {
     "common.optional": "valfritt",
     "common.charsRemaining_one": "{{count}} tecken kvar",
     "common.charsRemaining_other": "{{count}} tecken kvar",
+    "common.charsNeeded_one": "{{count}} tecken till behövs",
+    "common.charsNeeded_other": "{{count}} tecken till behövs",
     "nav.logout": "Logga ut",
     "nav.logoutConfirmTitle": "Är du säker på att du vill logga ut?",
     "nav.logoutConfirmText":
@@ -12033,6 +12056,8 @@ const localeExtrasSource = {
     "common.optional": "valgfritt",
     "common.charsRemaining_one": "{{count}} tegn igjen",
     "common.charsRemaining_other": "{{count}} tegn igjen",
+    "common.charsNeeded_one": "{{count}} tegn til trengs",
+    "common.charsNeeded_other": "{{count}} tegn til trengs",
     "nav.logout": "Logg ut",
     "nav.logoutConfirmTitle": "Er du sikker på at du vil logge ut?",
     "nav.logoutConfirmText":
@@ -13112,6 +13137,8 @@ const localeExtrasSource = {
     "common.optional": "valgfrit",
     "common.charsRemaining_one": "{{count}} tegn tilbage",
     "common.charsRemaining_other": "{{count}} tegn tilbage",
+    "common.charsNeeded_one": "{{count}} tegn mere mangler",
+    "common.charsNeeded_other": "{{count}} tegn mere mangler",
     "nav.logout": "Log ud",
     "nav.logoutConfirmTitle": "Er du sikker på, at du vil logge ud?",
     "nav.logoutConfirmText":
@@ -14189,6 +14216,8 @@ const localeExtrasSource = {
     "common.optional": "valinnainen",
     "common.charsRemaining_one": "{{count}} merkki jäljellä",
     "common.charsRemaining_other": "{{count}} merkkiä jäljellä",
+    "common.charsNeeded_one": "Tarvitaan vielä {{count}} merkki",
+    "common.charsNeeded_other": "Tarvitaan vielä {{count}} merkkiä",
     "nav.logout": "Kirjaudu ulos",
     "nav.logoutConfirmTitle": "Haluatko varmasti kirjautua ulos?",
     "nav.logoutConfirmText":
@@ -15271,6 +15300,8 @@ const localeExtrasSource = {
     "common.optional": "任意",
     "common.charsRemaining_one": "残り{{count}}文字",
     "common.charsRemaining_other": "残り{{count}}文字",
+    "common.charsNeeded_one": "あと{{count}}文字必要です",
+    "common.charsNeeded_other": "あと{{count}}文字必要です",
     "nav.logout": "ログアウト",
     "nav.logoutConfirmTitle": "ログアウトしてもよろしいですか?",
     "nav.logoutConfirmText":
@@ -16352,6 +16383,8 @@ const localeExtrasSource = {
     "common.optional": "optional",
     "common.charsRemaining_one": "{{count}} character left",
     "common.charsRemaining_other": "{{count}} characters left",
+    "common.charsNeeded_one": "{{count}} more character needed",
+    "common.charsNeeded_other": "{{count}} more characters needed",
     "nav.logout": "Log out",
     "nav.logoutConfirmTitle": "Are you sure you want to log out?",
     "nav.logoutConfirmText":
