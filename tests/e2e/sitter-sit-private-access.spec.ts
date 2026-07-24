@@ -2,20 +2,24 @@ import { expect, test } from "@playwright/test";
 import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
 import { seedDevFixture } from "./helpers/fixtures";
 
+async function seedAsAlex(page: import("@playwright/test").Page) {
+  await seedOwnerSession(page, {
+    name: "Alex Morgan",
+    email: "alex.morgan@boatstead.mock",
+    image: "https://i.pravatar.cc/160?img=11",
+    phoneNumber: "7700900123",
+  });
+}
+
 test.describe("accepted sitter private access on My sits", () => {
-  test("shows Wi-Fi and full address on the accepted sit card", async ({ page, browser }) => {
+  test("shows Wi-Fi and full address only while the sit is underway", async ({ page, browser }) => {
     const ownerContext = await browser.newContext();
     const ownerPage = await ownerContext.newPage();
     await seedVerifiedOwner(ownerPage);
     await seedDevFixture(ownerPage, "underway-sit");
     await ownerContext.close();
 
-    await seedOwnerSession(page, {
-      name: "Alex Morgan",
-      email: "alex.morgan@boatstead.mock",
-      image: "https://i.pravatar.cc/160?img=11",
-      phoneNumber: "7700900123",
-    });
+    await seedAsAlex(page);
 
     await page.goto("/my-sits");
     const card = page.getByTestId("sitter-sit-card-sit-underway-emergency-e2e");
@@ -28,6 +32,26 @@ test.describe("accepted sitter private access on My sits", () => {
     await expect(access.getByText("aegean-sun-42")).toBeVisible();
   });
 
+  test("hides private access after acceptance but before the sit starts", async ({
+    page,
+    browser,
+  }) => {
+    const ownerContext = await browser.newContext();
+    const ownerPage = await ownerContext.newPage();
+    await seedVerifiedOwner(ownerPage);
+    await seedDevFixture(ownerPage, "lifecycle-sit", { phase: "accepted" });
+    await ownerContext.close();
+
+    await seedAsAlex(page);
+
+    await page.goto("/my-sits");
+    const card = page.getByTestId("sitter-sit-card-sit-lifecycle-e2e");
+    await expect(card).toBeVisible();
+    await expect(card.getByText(/^Accepted$/i)).toBeVisible();
+    await expect(card.getByTestId("sitter-sit-private-access")).toHaveCount(0);
+    await expect(card.getByTestId("boat-access-details")).toHaveCount(0);
+  });
+
   test("hides private access before the application is accepted", async ({ page, browser }) => {
     const ownerContext = await browser.newContext();
     const ownerPage = await ownerContext.newPage();
@@ -35,14 +59,26 @@ test.describe("accepted sitter private access on My sits", () => {
     await seedDevFixture(ownerPage, "lifecycle-sit", { phase: "accepting" });
     await ownerContext.close();
 
-    await seedOwnerSession(page, {
-      name: "Alex Morgan",
-      email: "alex.morgan@boatstead.mock",
-      image: "https://i.pravatar.cc/160?img=11",
-      phoneNumber: "7700900123",
-    });
+    await seedAsAlex(page);
 
     await page.goto("/my-sits");
+    const card = page.getByTestId("sitter-sit-card-sit-lifecycle-e2e");
+    await expect(card).toBeVisible();
+    await expect(card.getByTestId("sitter-sit-private-access")).toHaveCount(0);
+    await expect(card.getByTestId("boat-access-details")).toHaveCount(0);
+  });
+
+  test("hides private access after the sit is completed", async ({ page, browser }) => {
+    const ownerContext = await browser.newContext();
+    const ownerPage = await ownerContext.newPage();
+    await seedVerifiedOwner(ownerPage);
+    await seedDevFixture(ownerPage, "lifecycle-sit", { phase: "completed" });
+    await ownerContext.close();
+
+    await seedAsAlex(page);
+
+    await page.goto("/my-sits");
+    await page.getByTestId("owner-sits-show-older-completed").getByRole("checkbox").check();
     const card = page.getByTestId("sitter-sit-card-sit-lifecycle-e2e");
     await expect(card).toBeVisible();
     await expect(card.getByTestId("sitter-sit-private-access")).toHaveCount(0);

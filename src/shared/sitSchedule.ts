@@ -25,6 +25,20 @@ function startOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+function formatScheduleDates(start: Date, end: Date, now = new Date()) {
+  const currentYear = now.getFullYear();
+  const includeYear = start.getFullYear() !== currentYear || end.getFullYear() !== currentYear;
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+  };
+  if (includeYear) {
+    options.year = "numeric";
+  }
+  const formatter = new Intl.DateTimeFormat("en-US", options);
+  return `${formatter.format(start)} – ${formatter.format(end)}`;
+}
+
 /** Inclusive end date from dateStart + nights parsed from duration. */
 export function sitInclusiveEndDate(dateStart: string, duration: string): Date | null {
   const start = parseYmd(dateStart);
@@ -65,6 +79,28 @@ export function isSitUnderway(
 }
 
 /**
+ * True when sit listing details must not change because the sit is underway,
+ * completed, or cancelled (completed). Applicant-based locks are separate.
+ */
+export function isSitListingEditBlockedByPhase(
+  input: {
+    dateStart: string;
+    duration: string;
+    accepted?: boolean;
+    cancelledAt?: string | null;
+  },
+  now = new Date(),
+): boolean {
+  if (input.cancelledAt) return true;
+  if (!input.accepted) return false;
+  const start = parseYmd(input.dateStart);
+  const end = sitInclusiveEndDate(input.dateStart, input.duration);
+  if (!start || !end) return false;
+  const today = startOfDay(now);
+  return today.getTime() >= start.getTime();
+}
+
+/**
  * Move an accepted future sit to start today while keeping the same end date.
  * Returns null when the sit cannot be started early (already started/completed/invalid).
  */
@@ -84,10 +120,47 @@ export function computeStartEarlySchedule(
   const msPerDay = 24 * 60 * 60 * 1000;
   const nights = Math.max(1, Math.round((end.getTime() - today.getTime()) / msPerDay));
   const newStart = isoLocalDate(today);
-  const formatter = new Intl.DateTimeFormat("en-US", { day: "numeric", month: "short" });
   return {
     dateStart: newStart,
     duration: `${nights} nights`,
-    dates: `${formatter.format(today)} – ${formatter.format(end)}`,
+    dates: formatScheduleDates(today, end, now),
+  };
+}
+
+export type EndEarlySchedule = {
+  dateStart: string;
+  duration: string;
+  dates: string;
+};
+
+/**
+ * End an underway sit immediately by moving its inclusive end date to yesterday
+ * (so phase becomes sit completed). Keeps the original start when possible; if the
+ * sit started today, shifts start back one day so the schedule stays valid.
+ * Returns null when the sit is not currently underway.
+ */
+export function computeEndEarlySchedule(
+  dateStart: string,
+  duration: string,
+  now = new Date(),
+): EndEarlySchedule | null {
+  const start = parseYmd(dateStart);
+  const end = sitInclusiveEndDate(dateStart, duration);
+  if (!start || !end) return null;
+
+  const today = startOfDay(now);
+  if (today.getTime() < start.getTime()) return null;
+  if (today.getTime() > end.getTime()) return null;
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const newStart = start.getTime() > yesterday.getTime() ? yesterday : start;
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const nights = Math.max(0, Math.round((yesterday.getTime() - newStart.getTime()) / msPerDay));
+  return {
+    dateStart: isoLocalDate(newStart),
+    duration: `${nights} nights`,
+    dates: formatScheduleDates(newStart, yesterday, now),
   };
 }

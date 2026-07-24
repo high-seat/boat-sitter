@@ -25,20 +25,16 @@ test.describe("withdrawn requested sits", () => {
     await page.goto("/my-sits");
     await expect(page.getByRole("heading", { name: /My sits/i })).toBeVisible();
 
-    const requested = page.locator("section").filter({
-      has: page.getByRole("heading", { name: /^Requested sits$/i }),
-    });
-    const withdrawn = page.locator("section").filter({
-      has: page.getByRole("heading", { name: /^Withdrawn$/i }),
-    });
+    const accepted = page.getByTestId("sitter-sits-phase-applicantChosen");
+    const withdrawn = page.getByTestId("sitter-sits-phase-withdrawn");
 
-    await expect(requested).toBeVisible();
+    await expect(accepted).toBeVisible();
     await expect(withdrawn).toBeVisible();
-    await expect(requested.locator("article").filter({ hasText: /Solstice/i })).toHaveCount(0);
+    await expect(accepted.locator("article").filter({ hasText: /Solstice/i })).toHaveCount(0);
     await expect(withdrawn.locator("article").filter({ hasText: /Solstice/i })).toHaveCount(1);
     await expect(withdrawn.getByText(/^Withdrawn$/i).first()).toBeVisible();
-    await expect(requested.getByText(/^Accepted$/i).first()).toBeVisible();
-    await expect(requested.locator("article").filter({ hasText: /Withdrawn/i })).toHaveCount(0);
+    await expect(accepted.getByText(/^Accepted$/i).first()).toBeVisible();
+    await expect(accepted.locator("article").filter({ hasText: /Withdrawn/i })).toHaveCount(0);
     await expect(
       withdrawn
         .locator("article")
@@ -46,6 +42,6 @@ test.describe("withdrawn requested sits", () => {
         .getByRole("img")
         .first(),
     ).toBeVisible();
-    await expect(requested.locator("article").getByRole("img").first()).toBeVisible();
+    await expect(accepted.locator("article").getByRole("img").first()).toBeVisible();
   });
 });

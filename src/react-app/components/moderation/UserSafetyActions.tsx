@@ -24,6 +24,7 @@ export function UserSafetyActions({
   const [blocking, setBlocking] = useState(false);
   const [reportReason, setReportReason] = useState<ReportReason>("spam");
   const [reportDetails, setReportDetails] = useState("");
+  const [reportAlsoBlock, setReportAlsoBlock] = useState(false);
   const [reportError, setReportError] = useState("");
   const [reportSubmitted, setReportSubmitted] = useState(false);
 
@@ -32,6 +33,7 @@ export function UserSafetyActions({
   function openReport() {
     setReportReason("spam");
     setReportDetails("");
+    setReportAlsoBlock(false);
     setReportError("");
     setReportSubmitted(false);
     setReporting(true);
@@ -44,6 +46,9 @@ export function UserSafetyActions({
       return;
     }
     reportUser({ targetName: name, reason: reportReason, details: reportDetails });
+    if (reportAlsoBlock && !isBlocked) {
+      blockUser({ name, image });
+    }
     setReportSubmitted(true);
   }
 
@@ -60,7 +65,12 @@ export function UserSafetyActions({
   return (
     <>
       <div className={variant === "menu" ? "space-y-1" : "flex flex-wrap gap-2"}>
-        <button className={buttonClass} onClick={openReport} type="button">
+        <button
+          className={buttonClass}
+          data-testid="user-safety-report"
+          onClick={openReport}
+          type="button"
+        >
           <span className="flex items-center gap-2">
             <Flag size={16} /> {t("safetyActions.report")}
           </span>
@@ -82,7 +92,7 @@ export function UserSafetyActions({
 
       {reporting && (
         <div
-          className="fixed inset-0 z-70 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-90 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
             if (event.currentTarget === event.target) setReporting(false);
           }}
@@ -91,6 +101,7 @@ export function UserSafetyActions({
             aria-labelledby="report-user-title"
             aria-modal="true"
             className="w-full max-w-md rounded-3xl bg-white p-6 shadow-float md:p-8"
+            data-testid="report-user-dialog"
             role="dialog"
           >
             {reportSubmitted ? (
@@ -158,6 +169,25 @@ export function UserSafetyActions({
                     {reportError}
                   </p>
                 ) : null}
+                {!isBlocked ? (
+                  <label
+                    className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream p-4 text-sm leading-6 text-navy"
+                    data-testid="report-also-block"
+                  >
+                    <input
+                      checked={reportAlsoBlock}
+                      className="mt-1 size-4 accent-teal"
+                      onChange={(event) => setReportAlsoBlock(event.target.checked)}
+                      type="checkbox"
+                    />
+                    <span>
+                      <span className="block font-bold">
+                        {t("safetyActions.reportAlsoBlock", { name })}
+                      </span>
+                      <span className="mt-1 block text-slate">{t("safetyActions.blockText")}</span>
+                    </span>
+                  </label>
+                ) : null}
                 <div className="mt-7 grid gap-3 sm:grid-cols-2">
                   <button
                     className="rounded-xl border border-line px-5 py-3 font-bold text-navy"
@@ -168,6 +198,7 @@ export function UserSafetyActions({
                   </button>
                   <button
                     className="rounded-xl bg-coral px-5 py-3 font-bold text-white"
+                    data-testid="report-submit"
                     type="submit"
                   >
                     {t("safetyActions.reportSubmit")}
@@ -181,7 +212,7 @@ export function UserSafetyActions({
 
       {blocking && (
         <div
-          className="fixed inset-0 z-70 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-90 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
           onMouseDown={(event) => {
             if (event.currentTarget === event.target) setBlocking(false);
           }}

@@ -15,7 +15,7 @@ import { IconTooltip } from "@/components/ui/IconTooltip";
 import { NavCountBadge } from "@/components/ui/NavCountBadge";
 import { NotificationsMenuSkeleton } from "@/components/ui/NotificationsMenuSkeleton";
 import { getIntlLocale } from "@/i18n";
-import { markNotificationRead, type MockNotification } from "@/mockApi";
+import { markAllNotificationsRead, markNotificationRead, type MockNotification } from "@/mockApi";
 import { queries } from "@/queries";
 import { useAppStore } from "@/store";
 import { isChatMessageNotification, notificationsForBell } from "@/unreadMessages";
@@ -30,6 +30,7 @@ function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   }
   if (type === "sitSittersFound") return <UserPlus className={className} />;
   if (type === "welcome") return <ShipWheel className={className} />;
+  if (type === "sitEndedEarly") return <CheckCircle2 className={className} />;
   if (
     type === "applicationDeclined" ||
     type === "applicationUnaccepted" ||
@@ -75,11 +76,7 @@ export function NotificationsMenu() {
   });
 
   const markAll = useMutation({
-    mutationFn: async () => {
-      const current = queryClient.getQueryData<MockNotification[]>(queryKey) ?? [];
-      const unreadBell = notificationsForBell(current).filter((item) => !item.read);
-      await Promise.all(unreadBell.map((item) => markNotificationRead(item.id, user.name)));
-    },
+    mutationFn: () => markAllNotificationsRead(user.name),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<MockNotification[]>(queryKey);

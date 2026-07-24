@@ -13,12 +13,12 @@ import {
   sitterAvailability,
   user,
   userArchivedConversations,
-  userArchivedSits,
   userBlocks,
   userReports,
   userSaved,
   vessels,
 } from "../db/schema";
+import { detectTimeFormat, type TimeFormat } from "../../shared/timeFormat";
 import { requireUser } from "../middleware/auth";
 
 /**
@@ -49,6 +49,7 @@ const profilePatchSchema = z.object({
   skills: z.array(z.string()).optional(),
   preferredLanguage: z.string().optional(),
   measurementSystem: z.enum(["metric", "imperial"]).optional(),
+  timeFormat: z.enum(["12h", "24h"]).optional(),
   emailNotifications: z.record(z.string(), z.boolean()).optional(),
   sitDefaults: z.record(z.string(), z.unknown()).optional(),
   applicationDefaults: z.record(z.string(), z.unknown()).optional(),
@@ -59,7 +60,20 @@ const profilePatchSchema = z.object({
   completedSits: z.number().int().min(0).optional(),
 });
 
-function shapeProfile(row: typeof profiles.$inferSelect) {
+function normalizeTimeFormat(
+  value: string | null | undefined,
+  acceptLanguage?: string,
+): TimeFormat {
+  if (value === "12h" || value === "24h") return value;
+  return timeFormatFromAcceptLanguage(acceptLanguage);
+}
+
+function timeFormatFromAcceptLanguage(header: string | undefined): TimeFormat {
+  const first = header?.split(",")[0]?.trim().split(";")[0];
+  return detectTimeFormat(first);
+}
+
+function shapeProfile(row: typeof profiles.$inferSelect, acceptLanguage?: string) {
   return {
     userId: row.userId,
     email: row.email,
@@ -75,6 +89,7 @@ function shapeProfile(row: typeof profiles.$inferSelect) {
     skills: row.skills,
     preferredLanguage: row.preferredLanguage,
     measurementSystem: row.measurementSystem === "imperial" ? "imperial" : "metric",
+    timeFormat: normalizeTimeFormat(row.timeFormat, acceptLanguage),
     emailNotifications: {
       ...DEFAULT_EMAIL_NOTIFICATIONS,
       ...(row.emailNotifications ?? {}),
@@ -99,6 +114,7 @@ function shapeProfile(row: typeof profiles.$inferSelect) {
 async function ensureProfile(
   env: Env,
   sessionUser: { id: string; name: string; email: string; image?: string | null },
+  acceptLanguage?: string,
 ) {
   const db = getDb(env);
   const existing = await db.query.profiles.findFirst({
@@ -124,6 +140,7 @@ async function ensureProfile(
       skills: ["Detailed handovers", "Fast responder"],
       preferredLanguage: "en-US",
       measurementSystem: "metric",
+      timeFormat: timeFormatFromAcceptLanguage(acceptLanguage),
       emailNotifications: DEFAULT_EMAIL_NOTIFICATIONS,
       sitDefaults: DEFAULT_SIT_DEFAULTS,
       applicationDefaults: DEFAULT_APPLICATION_DEFAULTS,
@@ -141,24 +158,27 @@ async function ensureProfile(
 meRouter.get("/", async (c) => {
   const sessionUser = c.get("user");
   if (!sessionUser) return c.json({ user: null, profile: null });
-  const profile = await ensureProfile(c.env, sessionUser);
+  const acceptLanguage = c.req.header("Accept-Language");
+  const profile = await ensureProfile(c.env, sessionUser, acceptLanguage);
   return c.json({
     user: sessionUser,
-    profile: shapeProfile(profile),
+    profile: shapeProfile(profile, acceptLanguage),
   });
 });
 
 meRouter.get("/profile", requireUser, async (c) => {
   const sessionUser = c.get("user")!;
-  const profile = await ensureProfile(c.env, sessionUser);
-  return c.json({ data: shapeProfile(profile) });
+  const acceptLanguage = c.req.header("Accept-Language");
+  const profile = await ensureProfile(c.env, sessionUser, acceptLanguage);
+  return c.json({ data: shapeProfile(profile, acceptLanguage) });
 });
 
 meRouter.put("/profile", requireUser, zValidator("json", profilePatchSchema), async (c) => {
   const sessionUser = c.get("user")!;
   const patch = c.req.valid("json");
   const db = getDb(c.env);
-  await ensureProfile(c.env, sessionUser);
+  const acceptLanguage = c.req.header("Accept-Language");
+  await ensureProfile(c.env, sessionUser, acceptLanguage);
 
   const [row] = await db
     .update(profiles)
@@ -182,7 +202,7 @@ meRouter.put("/profile", requireUser, zValidator("json", profilePatchSchema), as
       .where(eq(user.id, sessionUser.id));
   }
 
-  return c.json({ data: shapeProfile(row) });
+  return c.json({ data: shapeProfile(row, acceptLanguage) });
 });
 
 /** Hard-delete the authenticated account and owned data. */
@@ -213,7 +233,6 @@ meRouter.delete("/", requireUser, async (c) => {
   await db.delete(sitterAvailability).where(eq(sitterAvailability.sitterUserId, userId));
   await db.delete(userSaved).where(eq(userSaved.userId, userId));
   await db.delete(userArchivedConversations).where(eq(userArchivedConversations.userId, userId));
-  await db.delete(userArchivedSits).where(eq(userArchivedSits.userId, userId));
   await db.delete(userBlocks).where(eq(userBlocks.userId, userId));
   await db.delete(userReports).where(eq(userReports.reporterUserId, userId));
   await db.delete(profiles).where(eq(profiles.userId, userId));

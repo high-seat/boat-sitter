@@ -14,6 +14,10 @@ test.describe("return to accepted applicant", () => {
 
     await expect(page.getByText("Viewing details")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Alex Morgan" })).toBeVisible();
+    await expect(page.getByTestId("application-list-not-considered")).toBeVisible();
+    await expect(page.getByTestId("application-list-not-considered")).toContainText(
+      /no longer being considered/i,
+    );
 
     await page
       .getByRole("button", { name: /Samira Costa/i })

@@ -1,10 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
+import { seedDevFixture } from "./helpers/fixtures";
 
 test.describe("boat access details", () => {
   test("copies row values and links the address to Google Maps", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await seedVerifiedOwner(page);
+    await seedDevFixture(page, "reset-solstice-open");
     await page.goto("/boats/solstice");
 
     const access = page.getByTestId("boat-access-details");

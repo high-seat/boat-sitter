@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { seedVerifiedOwner } from "./helpers/auth";
-import { mockAddressSuggestions } from "./helpers/vesselEditor";
+import { mockAddressSuggestions, selectVesselType } from "./helpers/vesselEditor";
 
 test.describe("vessel editor live preview", () => {
   test("shows a live boat preview that updates with the name", async ({ page }) => {
@@ -14,12 +14,23 @@ test.describe("vessel editor live preview", () => {
     await expect(preview.getByText(/^Live preview$/i)).toHaveCount(0);
     await expect(preview.getByTestId("vessel-preview-name")).toHaveText(/Untitled boat/i);
     await expect(preview.getByTestId("vessel-preview-location")).toHaveText(/Location unknown/i);
+    await expect(preview.getByTestId("vessel-preview-type-length")).toHaveText("");
     await expect(preview.getByTestId("vessel-preview-length-unit-hint")).toHaveText(
       /Length is shown in feet or meters based on each member's preference/i,
     );
 
     await page.getByPlaceholder(/e\.g\. Solstice/i).fill("Preview Wind");
     await expect(preview.getByTestId("vessel-preview-name")).toHaveText("Preview Wind");
+
+    await selectVesselType(page, "Sailing yacht");
+    await expect(preview.getByTestId("vessel-preview-type-length")).toHaveText(/^Sailing yacht$/i);
+    await expect(preview.getByTestId("vessel-preview-type-length")).not.toHaveText(/·/);
+
+    await page.getByTestId("vessel-length-unknown").uncheck();
+    await page.getByTestId("vessel-length-value").fill("12");
+    await expect(preview.getByTestId("vessel-preview-type-length")).toHaveText(
+      /Sailing yacht · 12 m/i,
+    );
 
     await mockAddressSuggestions(page, {
       label: "Port Vauban, Antibes, France",

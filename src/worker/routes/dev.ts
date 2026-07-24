@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, eq, isNull, or, sql } from "drizzle-orm";
+import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
 import type { AppEnv } from "../context";
 import { buildAuth } from "../auth";
 import { getDb } from "../db";
@@ -7,9 +7,9 @@ import { user } from "../db/auth-schema";
 import {
   applicationMessages,
   applications,
+  reviews,
   sits,
   supportRequests,
-  userArchivedSits,
   vessels,
 } from "../db/schema";
 import { seedApplications, seedSits, seedVessels } from "../db/seed-data";
@@ -450,10 +450,6 @@ devRouter.post("/fixture", async (c) => {
       })
       .where(eq(sits.id, sitId));
 
-    await db
-      .delete(userArchivedSits)
-      .where(and(eq(userArchivedSits.userId, sessionUser.id), eq(userArchivedSits.sitId, sitId)));
-
     return c.json({
       ok: true,
       sitId,
@@ -551,9 +547,11 @@ devRouter.post("/fixture", async (c) => {
       .where(
         and(
           eq(applicationMessages.applicationId, applicationId),
-          sql`${applicationMessages.systemKind} in ('sitCancelled', 'unaccepted')`,
+          sql`${applicationMessages.systemKind} in ('sitCancelled', 'sitEndedEarly', 'unaccepted')`,
         ),
       );
+
+    await db.delete(reviews).where(eq(reviews.applicationId, applicationId));
 
     await db
       .insert(applicationMessages)
@@ -578,11 +576,6 @@ devRouter.post("/fixture", async (c) => {
               : "On board and settling in.",
         },
       });
-
-    // Ensure the sit is not left archived from a previous e2e run.
-    await db
-      .delete(userArchivedSits)
-      .where(and(eq(userArchivedSits.userId, sessionUser.id), eq(userArchivedSits.sitId, sitId)));
 
     return c.json({ ok: true, sitId, applicationId });
   }
@@ -656,8 +649,21 @@ devRouter.post("/fixture", async (c) => {
       .set({ status: "accepted" })
       .where(eq(applications.id, "application-alex-solstice"));
     await db
+      .update(applications)
+      .set({ status: "new", ownerPhone: null })
+      .where(
+        and(eq(applications.sitId, "solstice"), ne(applications.id, "application-alex-solstice")),
+      );
+    await db
       .update(sits)
-      .set({ published: false, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .set({
+        dateStart: "2026-09-12",
+        dates: "12 Sep – 4 Oct",
+        duration: "22 nights",
+        published: false,
+        cancelledAt: null,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
       .where(eq(sits.id, "solstice"));
     return c.json({ ok: true });
   }
@@ -681,7 +687,14 @@ devRouter.post("/fixture", async (c) => {
       );
     await db
       .update(sits)
-      .set({ published: true, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .set({
+        dateStart: "2026-09-12",
+        dates: "12 Sep – 4 Oct",
+        duration: "22 nights",
+        published: true,
+        cancelledAt: null,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
       .where(eq(sits.id, "solstice"));
     return c.json({ ok: true });
   }
@@ -720,6 +733,100 @@ devRouter.post("/fixture", async (c) => {
           applicantUserId: sessionUser.id,
         },
       });
+    return c.json({ ok: true });
+  }
+
+  if (kind === "owner-second-boat") {
+    const vesselId = "harbor-light-boat";
+    const sitId = "harbor-light";
+    await db
+      .insert(vessels)
+      .values({
+        id: vesselId,
+        name: "Harbor Light",
+        type: "Motor yacht",
+        length: "38 ft",
+        yearBuilt: 2015,
+        homePort: "Corfu, Greece",
+        fullAddress: "Gouvia Marina, Corfu 491 00, Greece",
+        image:
+          "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1400&q=85",
+        gallery: [],
+        owner: sessionUser.name,
+        ownerImage: sessionUser.image ?? "",
+        ownerUserId: sessionUser.id,
+        rating: 4.7,
+        reviews: 4,
+        description: "Compact motor yacht for Ionian hops.",
+        home: "Two cabins and a bright saloon.",
+        systems: ["Inboard diesel", "12V electrical"],
+        engineType: "Inboard diesel",
+        voltageType: "12 V DC",
+        stoveFuelType: "LPG / propane",
+        amenities: ["Bathroom", "Full kitchen", "Shore power"],
+      })
+      .onConflictDoUpdate({
+        target: vessels.id,
+        set: {
+          owner: sessionUser.name,
+          ownerImage: sessionUser.image ?? "",
+          ownerUserId: sessionUser.id,
+          updatedAt: sql`CURRENT_TIMESTAMP`,
+        },
+      });
+
+    await db
+      .insert(sits)
+      .values({
+        id: sitId,
+        vesselId,
+        dates: "Oct 1 – Oct 15",
+        dateStart: "2026-10-01",
+        duration: "14 nights",
+        location: "Corfu",
+        country: "Greece",
+        fullAddress: "Gouvia Marina, Corfu 491 00, Greece",
+        latitude: 39.6489,
+        longitude: 19.9106,
+        responsibilities: ["Check lines daily", "Run engines weekly"],
+        requirements: [],
+        minYearsExperience: 0,
+        requiredExperience: [],
+        requiredCertifications: [],
+        requiredSkills: [],
+        applicants: 0,
+        pet: null,
+        featured: false,
+        published: true,
+        sitType: "liveaboard",
+      })
+      .onConflictDoUpdate({
+        target: sits.id,
+        set: {
+          vesselId,
+          dateStart: "2026-10-01",
+          duration: "14 nights",
+          dates: "Oct 1 – Oct 15",
+          applicants: 0,
+          published: true,
+          cancelledAt: null,
+          updatedAt: sql`CURRENT_TIMESTAMP`,
+        },
+      });
+
+    return c.json({ ok: true, vesselId, sitId });
+  }
+
+  if (kind === "unclaim-owned-vessels") {
+    // Simulate seed/legacy vessels that match by display name but have no ownerUserId
+    // (Google login never claimed them). Used to regression-test chat send authz.
+    await db
+      .update(vessels)
+      .set({
+        ownerUserId: null,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(vessels.owner, sessionUser.name));
     return c.json({ ok: true });
   }
 

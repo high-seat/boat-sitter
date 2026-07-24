@@ -6,8 +6,11 @@ import {
   phoneCountryCodeFromLocation,
   resolvePhoneCountryCode,
 } from "@/phoneCountryCode";
+import { detectTimeFormat, type TimeFormat } from "../shared/timeFormat";
 
 export type MeasurementSystem = "metric" | "imperial";
+export type { TimeFormat };
+export { detectTimeFormat };
 
 export type EmailNotificationPrefs = {
   newApplications: boolean;
@@ -111,6 +114,7 @@ export type UserProfile = {
   skills: string[];
   preferredLanguage: string;
   measurementSystem: MeasurementSystem;
+  timeFormat: TimeFormat;
   emailNotifications: EmailNotificationPrefs;
   sitDefaults: SitCreationDefaults;
   applicationDefaults: ApplicationDefaults;
@@ -124,7 +128,6 @@ type AppStore = {
   saved: string[];
   archivedConversations: string[];
   deletedConversations: string[];
-  archivedSits: string[];
   blockedUsers: BlockedUser[];
   userReports: UserReport[];
   user: UserProfile | null;
@@ -132,7 +135,6 @@ type AppStore = {
     saved: string[];
     archivedConversations: string[];
     deletedConversations: string[];
-    archivedSits: string[];
     blockedUsers: BlockedUser[];
     userReports: UserReport[];
   }) => void;
@@ -141,9 +143,6 @@ type AppStore = {
   unarchiveConversation: (id: string) => void;
   isConversationArchived: (id: string) => boolean;
   deleteConversation: (id: string) => void;
-  archiveSit: (id: string) => void;
-  unarchiveSit: (id: string) => void;
-  isSitArchived: (id: string) => boolean;
   blockUser: (user: Pick<BlockedUser, "name" | "image">) => void;
   unblockUser: (name: string) => void;
   isUserBlocked: (name: string) => boolean;
@@ -176,7 +175,6 @@ export const useAppStore = create<AppStore>()(
       saved: [],
       archivedConversations: [],
       deletedConversations: [],
-      archivedSits: [],
       blockedUsers: [],
       userReports: [],
       user: null,
@@ -185,7 +183,6 @@ export const useAppStore = create<AppStore>()(
           saved: prefs.saved,
           archivedConversations: prefs.archivedConversations,
           deletedConversations: prefs.deletedConversations,
-          archivedSits: prefs.archivedSits,
           blockedUsers: prefs.blockedUsers,
           userReports: prefs.userReports.map((report) => ({
             ...report,
@@ -240,24 +237,6 @@ export const useAppStore = create<AppStore>()(
           await m.apiDeleteConversation(id);
         });
       },
-      archiveSit: (id) => {
-        if (get().archivedSits.includes(id)) return;
-        set((state) => ({ archivedSits: [...state.archivedSits, id] }));
-        void withApiSession(async () => {
-          const m = await import("@/apiRemote");
-          await m.apiSetArchivedSit(id, true);
-        });
-      },
-      unarchiveSit: (id) => {
-        set((state) => ({
-          archivedSits: state.archivedSits.filter((sitId) => sitId !== id),
-        }));
-        void withApiSession(async () => {
-          const m = await import("@/apiRemote");
-          await m.apiSetArchivedSit(id, false);
-        });
-      },
-      isSitArchived: (id) => get().archivedSits.includes(id),
       blockUser: (user) => {
         if (get().blockedUsers.some((blocked) => blocked.name === user.name)) return;
         set((state) => ({
@@ -351,6 +330,7 @@ export const useAppStore = create<AppStore>()(
             skills: ["Detailed handovers", "Fast responder"],
             preferredLanguage: "en-US",
             measurementSystem: detectMeasurementSystem(),
+            timeFormat: detectTimeFormat(),
             emailNotifications: { ...DEFAULT_EMAIL_NOTIFICATIONS },
             sitDefaults: { ...DEFAULT_SIT_CREATION_DEFAULTS },
             applicationDefaults: { ...DEFAULT_APPLICATION_DEFAULTS },
@@ -404,7 +384,6 @@ export const useAppStore = create<AppStore>()(
           saved: [],
           archivedConversations: [],
           deletedConversations: [],
-          archivedSits: [],
           blockedUsers: [],
           userReports: [],
           user: null,
@@ -420,14 +399,14 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: "harbourly",
-      version: 18,
+      version: 19,
       migrate: (persistedState) => {
-        const state = persistedState as AppStore;
+        const state = persistedState as AppStore & { archivedSits?: string[] };
+        const { archivedSits: _archivedSits, ...rest } = state;
         const next = {
-          ...state,
+          ...rest,
           archivedConversations: state.archivedConversations ?? [],
           deletedConversations: state.deletedConversations ?? [],
-          archivedSits: state.archivedSits ?? [],
           blockedUsers: state.blockedUsers ?? [],
           userReports: state.userReports ?? [],
         };
@@ -451,6 +430,7 @@ export const useAppStore = create<AppStore>()(
               return language;
             })(),
             measurementSystem: next.user.measurementSystem ?? detectMeasurementSystem(),
+            timeFormat: next.user.timeFormat ?? detectTimeFormat(),
             emailNotifications: {
               ...DEFAULT_EMAIL_NOTIFICATIONS,
               ...next.user.emailNotifications,

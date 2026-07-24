@@ -3,6 +3,7 @@ import { createQueryKeys, defineQueryOptions } from "@ocodio/query-key-manager";
 import { listAdminAuditLog, listAdminUsers } from "@/adminApi";
 import { apiGet } from "@/apiClient";
 import {
+  getApplicationMessages,
   getApplicationsForSit,
   getApplicationsForUser,
   getBoat,
@@ -12,6 +13,7 @@ import {
   getPublicMemberProfile,
   getReviewForApplication,
   getReviewsForSitter,
+  getReviewsForOwner,
   getSavedListings,
   getSitPrivateAccessForViewer,
   getSits,
@@ -22,6 +24,7 @@ import {
 import { getMemberVerificationChecks, getVerificationStatus } from "@/verificationService";
 import type { ApplicationsListParams } from "../shared/applicationsSearch";
 import type { BoatSearchParams } from "../shared/boatsSearch";
+import type { SitListSort } from "../shared/sitsSort";
 
 export type AvailabilityWindow = {
   id: string;
@@ -72,7 +75,7 @@ const managed = createQueryKeys({
   sits: {
     all: defineQueryOptions({
       queryKey: ["sits"],
-      queryFn: getSits,
+      queryFn: () => getSits(),
     }),
   },
   applications: {
@@ -192,6 +195,11 @@ export const queries = {
   sits: {
     all: managed.sits.all,
     getQueryKey: managed.sits.getQueryKey,
+    list: (sort: SitListSort) =>
+      queryOptions({
+        queryKey: ["sits", "list", sort] as const,
+        queryFn: () => getSits(sort),
+      }),
   },
 
   applications: {
@@ -206,19 +214,29 @@ export const queries = {
         queryKey: ["applications", "sit", sitId, listParams] as const,
         queryFn: () => getApplicationsForSit(sitId, listParams),
       }),
+    messages: (applicationId: string, params?: { limit?: number; before?: string }) =>
+      queryOptions({
+        queryKey: ["applications", "messages", applicationId, params] as const,
+        queryFn: () => getApplicationMessages(applicationId, params),
+      }),
   },
 
   reviews: {
     getQueryKey: managed.reviews.getQueryKey,
-    application: (applicationId: string) =>
+    application: (applicationId: string, authorRole: "owner" | "sitter" = "owner") =>
       queryOptions({
-        queryKey: ["reviews", "application", applicationId] as const,
-        queryFn: () => getReviewForApplication(applicationId),
+        queryKey: ["reviews", "application", applicationId, authorRole] as const,
+        queryFn: () => getReviewForApplication(applicationId, authorRole),
       }),
     sitter: (sitterName: string) =>
       queryOptions({
         queryKey: ["reviews", "sitter", sitterName] as const,
         queryFn: () => getReviewsForSitter(sitterName),
+      }),
+    owner: (ownerName: string) =>
+      queryOptions({
+        queryKey: ["reviews", "owner", ownerName] as const,
+        queryFn: () => getReviewsForOwner(ownerName),
       }),
   },
 

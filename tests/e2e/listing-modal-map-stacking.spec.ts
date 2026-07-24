@@ -19,6 +19,7 @@ test.beforeEach(async ({ page }) => {
             skills: ["Line handling"],
             preferredLanguage: "en-US",
             measurementSystem: "metric",
+            timeFormat: "24h",
           },
         },
         version: 3,

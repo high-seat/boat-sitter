@@ -26,14 +26,17 @@ test.describe("accept applicant phase transition", () => {
 
     await expect(page.getByText(/^Applicant accepted$/i).first()).toBeVisible();
     await expect(page.getByRole("heading", { name: /Accepted applicant/i })).toBeVisible();
+    await expect(page.getByTestId("application-list-not-considered")).toBeVisible();
+    await expect(page.getByTestId("application-list-not-considered")).toContainText(
+      /Samira Costa/i,
+    );
 
     await page.goto("/my-sits");
-    await expect(page.getByRole("heading", { name: /Applicant accepted/i })).toBeVisible();
-    const solsticeCard = page
-      .locator("article")
-      .filter({ hasText: /Solstice/i })
-      .filter({ hasText: /Applicant accepted/i })
-      .first();
+    await expect(page.getByTestId("owner-sits-phase-applicantChosen")).toBeVisible();
+    const solsticeCard = page.getByTestId("owner-sit-card-solstice");
     await expect(solsticeCard).toBeVisible();
+    await expect(
+      page.getByTestId("owner-sits-phase-applicantChosen").getByTestId("owner-sit-card-solstice"),
+    ).toBeVisible();
   });
 });

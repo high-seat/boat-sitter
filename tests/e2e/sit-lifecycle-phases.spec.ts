@@ -9,6 +9,13 @@ const PHASE_LABEL = {
   completed: /Sit completed/i,
 } as const;
 
+const PHASE_SECTION = {
+  accepting: "acceptingApplicants",
+  accepted: "applicantChosen",
+  underway: "stayUnderway",
+  completed: "stayCompleted",
+} as const;
+
 const PHASE_BADGE = {
   accepting: /^Accepting applicants$/i,
   accepted: /^Applicant accepted$/i,
@@ -17,20 +24,26 @@ const PHASE_BADGE = {
 } as const;
 
 function lifecycleOwnerCard(page: Page) {
-  return page
-    .locator("article")
-    .filter({ has: page.locator(`a[href*="/boats/${LIFECYCLE_SIT_ID}"]`) })
-    .first();
+  return page.getByTestId(`owner-sit-card-${LIFECYCLE_SIT_ID}`);
 }
 
 function lifecycleSitterCard(page: Page) {
-  return page
-    .locator("article")
-    .filter({ has: page.locator(`a[href*="/boats/${LIFECYCLE_SIT_ID}"]`) })
-    .first();
+  return page.getByTestId(`sitter-sit-card-${LIFECYCLE_SIT_ID}`);
 }
 
-async function expectPhaseOn(locator: Locator, phase: keyof typeof PHASE_BADGE) {
+async function expectOwnerPhaseSection(page: Page, phase: keyof typeof PHASE_SECTION) {
+  const section = page.getByTestId(`owner-sits-phase-${PHASE_SECTION[phase]}`);
+  await expect(section).toBeVisible();
+  await expect(section.getByTestId(`owner-sit-card-${LIFECYCLE_SIT_ID}`)).toBeVisible();
+  for (const [other, id] of Object.entries(PHASE_SECTION)) {
+    if (other === phase) continue;
+    await expect(
+      page.getByTestId(`owner-sits-phase-${id}`).getByTestId(`owner-sit-card-${LIFECYCLE_SIT_ID}`),
+    ).toHaveCount(0);
+  }
+}
+
+async function expectSitterPhaseOn(locator: Locator, phase: keyof typeof PHASE_BADGE) {
   await expect(locator.getByText(PHASE_BADGE[phase])).toBeVisible();
   for (const [other, label] of Object.entries(PHASE_BADGE)) {
     if (other === phase) continue;
@@ -71,12 +84,18 @@ test.describe("sit lifecycle phase transitions", () => {
 
     // 1) Accepting applicants
     await ownerPage.goto("/my-sits");
-    await expectPhaseOn(lifecycleOwnerCard(ownerPage), "accepting");
+    await expectOwnerPhaseSection(ownerPage, "accepting");
     await expectOwnerApplicationsPhase(ownerPage, "accepting");
 
     await sitterPage.goto("/my-sits");
     const sitterAccepting = lifecycleSitterCard(sitterPage);
-    await expectPhaseOn(sitterAccepting, "accepting");
+    await expect(sitterPage.getByTestId("sitter-sits-phase-acceptingApplicants")).toBeVisible();
+    await expect(
+      sitterPage
+        .getByTestId("sitter-sits-phase-acceptingApplicants")
+        .getByTestId(`sitter-sit-card-${LIFECYCLE_SIT_ID}`),
+    ).toBeVisible();
+    await expectSitterPhaseOn(sitterAccepting, "accepting");
     await expect(sitterAccepting.getByText(/^New$/i)).toBeVisible();
 
     // 2) Owner accepts → Applicant accepted
@@ -93,11 +112,16 @@ test.describe("sit lifecycle phase transitions", () => {
     await expect(ownerPage.getByText(PHASE_LABEL.accepted).first()).toBeVisible();
 
     await ownerPage.goto("/my-sits");
-    await expectPhaseOn(lifecycleOwnerCard(ownerPage), "accepted");
+    await expectOwnerPhaseSection(ownerPage, "accepted");
 
     await sitterPage.goto("/my-sits");
     const sitterAccepted = lifecycleSitterCard(sitterPage);
-    await expectPhaseOn(sitterAccepted, "accepted");
+    await expect(
+      sitterPage
+        .getByTestId("sitter-sits-phase-applicantChosen")
+        .getByTestId(`sitter-sit-card-${LIFECYCLE_SIT_ID}`),
+    ).toBeVisible();
+    await expectSitterPhaseOn(sitterAccepted, "accepted");
     await expect(sitterAccepted.getByText(/^Accepted$/i)).toBeVisible();
 
     await expectOwnerApplicationsPhase(ownerPage, "accepted");
@@ -105,13 +129,21 @@ test.describe("sit lifecycle phase transitions", () => {
     // 3) Dates advance → Sit underway
     await seedLifecycleSit(ownerPage, "underway");
     await ownerPage.goto("/my-sits");
-    await expectPhaseOn(lifecycleOwnerCard(ownerPage), "underway");
+    await expectOwnerPhaseSection(ownerPage, "underway");
     await expect(lifecycleOwnerCard(ownerPage).getByTestId("sit-emergency-help")).toBeVisible();
 
     await sitterPage.goto("/my-sits");
     const sitterUnderway = lifecycleSitterCard(sitterPage);
-    await expectPhaseOn(sitterUnderway, "underway");
+    await expect(
+      sitterPage
+        .getByTestId("sitter-sits-phase-stayUnderway")
+        .getByTestId(`sitter-sit-card-${LIFECYCLE_SIT_ID}`),
+    ).toBeVisible();
+    await expectSitterPhaseOn(sitterUnderway, "underway");
     await expect(sitterUnderway.getByTestId("sit-emergency-help")).toBeVisible();
+    await expect(sitterUnderway.getByTestId(`sitter-sit-withdraw-${LIFECYCLE_SIT_ID}`)).toHaveCount(
+      0,
+    );
 
     await expectOwnerApplicationsPhase(ownerPage, "underway");
     await sitterPage.goto(`/messages?application=${LIFECYCLE_APPLICATION_ID}`);
@@ -121,11 +153,16 @@ test.describe("sit lifecycle phase transitions", () => {
     // 4) Dates advance → Sit completed
     await seedLifecycleSit(ownerPage, "completed");
     await ownerPage.goto("/my-sits");
-    await expectPhaseOn(lifecycleOwnerCard(ownerPage), "completed");
+    await expectOwnerPhaseSection(ownerPage, "completed");
 
     await sitterPage.goto("/my-sits");
     const sitterCompleted = lifecycleSitterCard(sitterPage);
-    await expectPhaseOn(sitterCompleted, "completed");
+    await expect(
+      sitterPage
+        .getByTestId("sitter-sits-phase-stayCompleted")
+        .getByTestId(`sitter-sit-card-${LIFECYCLE_SIT_ID}`),
+    ).toBeVisible();
+    await expectSitterPhaseOn(sitterCompleted, "completed");
     await expect(sitterCompleted.getByTestId("sit-emergency-help")).toHaveCount(0);
 
     await expectOwnerApplicationsPhase(ownerPage, "completed");

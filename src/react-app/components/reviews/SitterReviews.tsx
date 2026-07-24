@@ -92,6 +92,10 @@ function ReviewCard({
   const queryClient = useQueryClient();
   const [responseText, setResponseText] = useState("");
   const [error, setError] = useState("");
+  const authorRole = review.authorRole === "sitter" ? "sitter" : "owner";
+  const reviewerName = authorRole === "sitter" ? review.sitterName : review.ownerName;
+  const reviewerImage = review.authorImage || review.ownerImage;
+  const responseFromName = authorRole === "sitter" ? review.ownerName : review.sitterName;
   const respondMutation = useMutation({
     mutationFn: () =>
       respondToReview({
@@ -119,11 +123,11 @@ function ReviewCard({
   return (
     <article className="py-6 first:pt-0 last:pb-0">
       <div className="flex items-start gap-3">
-        <img alt="" className="size-10 rounded-full object-cover" src={review.ownerImage} />
+        <img alt="" className="size-10 rounded-full object-cover" src={reviewerImage} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <p className="text-sm font-bold text-navy">{review.ownerName}</p>
+              <p className="text-sm font-bold text-navy">{reviewerName}</p>
               <p className="text-xs text-slate">
                 {review.boatName} · {review.location} ·{" "}
                 {formatReviewDate(language, review.createdAt)}
@@ -135,7 +139,7 @@ function ReviewCard({
           {review.response ? (
             <div className="mt-4 rounded-xl border border-line bg-cream/70 p-4">
               <p className="text-xs font-bold uppercase tracking-wider text-teal">
-                {t("reviews.responseFrom", { name: review.sitterName })}
+                {t("reviews.responseFrom", { name: responseFromName })}
               </p>
               <p className="mt-2 text-sm leading-6 text-navy">{review.response.text}</p>
               <p className="mt-2 text-xs text-slate">
@@ -181,33 +185,80 @@ function ReviewCard({
   );
 }
 
+function ReviewPreview({
+  review,
+  authorRole,
+  revieweeName,
+  language,
+}: {
+  review: SitReview;
+  authorRole: "owner" | "sitter";
+  revieweeName: string;
+  language: string;
+}) {
+  const { t } = useTranslation();
+  const responseFromName = authorRole === "owner" ? review.sitterName : review.ownerName;
+
+  return (
+    <section
+      className="rounded-2xl border border-line bg-white p-5"
+      data-testid={`review-preview-${authorRole}`}
+    >
+      <p className="eyebrow">{t("reviews.previewKicker")}</p>
+      <h3 className="mt-1 font-display text-xl font-bold text-navy">
+        {authorRole === "owner"
+          ? t("reviews.previewTitle", { name: revieweeName })
+          : t("reviews.previewTitleForOwner", { name: revieweeName })}
+      </h3>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <StarRating rating={review.rating} size={16} />
+        <span className="text-xs text-slate">{formatReviewDate(language, review.createdAt)}</span>
+      </div>
+      <p className="mt-3 text-sm leading-6 text-slate">“{review.text}”</p>
+      {review.response ? (
+        <div className="mt-4 rounded-xl border border-line bg-cream/70 p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-teal">
+            {t("reviews.responseFrom", { name: responseFromName })}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-navy">{review.response.text}</p>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export function LeaveReviewForm({
   application,
-  ownerName,
+  authorRole,
   onSubmitted,
 }: {
   application: SitApplication;
-  ownerName: string;
+  /** Who is writing the review. */
+  authorRole: "owner" | "sitter";
   onSubmitted?: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(5);
   const [text, setText] = useState("");
   const [error, setError] = useState("");
-  const { data: existing } = useQuery({
-    ...queries.reviews.application(application.id),
+  const { data: existing, isLoading: existingLoading } = useQuery({
+    ...queries.reviews.application(application.id, authorRole),
   });
-  const { data: sit, isLoading: sitLoading } = useQuery({
+  const { data: sits = [] } = useQuery(queries.sits.all);
+  const sitFromList = sits.find((item) => item.id === application.sitId);
+  const { data: boatSit, isLoading: sitLoading } = useQuery({
     ...queries.boat.detail(application.sitId),
+    enabled: !sitFromList,
   });
+  const sit = sitFromList ?? boatSit;
   const mutation = useMutation({
     mutationFn: () =>
       createReview({
         applicationId: application.id,
         rating,
         text,
-        ownerName,
+        ownerName: application.ownerName,
       }),
     onSuccess: async () => {
       setError("");
@@ -228,22 +279,49 @@ export function LeaveReviewForm({
     },
   });
 
-  if (application.status !== "accepted" || existing) return null;
-  if (sitLoading || !sit || !canLeaveReview(sit)) return null;
+  if (application.status !== "accepted") return null;
+  if (existingLoading || (!sitFromList && sitLoading)) return null;
+  if (!sit) return null;
 
-  const daysRemaining = reviewDaysRemaining(sit);
+  const sitForReview = {
+    ...sit,
+    accepted: Boolean(sit.accepted) || application.status === "accepted",
+  };
+  const revieweeName = authorRole === "owner" ? application.applicant.name : application.ownerName;
+
+  if (existing) {
+    return (
+      <ReviewPreview
+        authorRole={authorRole}
+        language={i18n.language}
+        review={existing}
+        revieweeName={revieweeName}
+      />
+    );
+  }
+
+  if (!canLeaveReview(sitForReview)) return null;
+
+  const daysRemaining = reviewDaysRemaining(sitForReview);
 
   return (
-    <section className="rounded-2xl border border-aqua/40 bg-aqua/10 p-5">
+    <section
+      className="rounded-2xl border border-aqua/40 bg-aqua/10 p-5"
+      data-testid={`leave-review-form-${authorRole}`}
+    >
       <div className="mb-4 rounded-xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
         {t("reviews.windowBanner", { days: daysRemaining })}
       </div>
       <p className="eyebrow">{t("reviews.leaveKicker")}</p>
       <h3 className="mt-1 font-display text-xl font-bold text-navy">
-        {t("reviews.leaveTitle", { name: application.applicant.name })}
+        {authorRole === "owner"
+          ? t("reviews.leaveTitle", { name: revieweeName })
+          : t("reviews.leaveTitleForOwner", { name: revieweeName })}
       </h3>
       <p className="mt-2 text-sm leading-6 text-slate">
-        {t("reviews.leaveHint", { boat: application.boatName })}
+        {authorRole === "owner"
+          ? t("reviews.leaveHint", { boat: application.boatName })
+          : t("reviews.leaveHintForOwner", { boat: application.boatName })}
       </p>
       <form
         className="mt-4 space-y-4"
@@ -279,6 +357,7 @@ export function LeaveReviewForm({
         )}
         <button
           className="rounded-xl bg-navy px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+          data-testid={`leave-review-submit-${authorRole}`}
           disabled={mutation.isPending || text.trim().length < 20}
           type="submit"
         >
@@ -363,6 +442,69 @@ export function SitterReviewsSection({
           {t("reviews.viewAll", { count: reviews.length })}
         </Link>
       )}
+    </section>
+  );
+}
+
+export function OwnerReviewsSection({
+  ownerName,
+  currentUserName,
+  showEmpty = false,
+}: {
+  ownerName: string;
+  currentUserName?: string;
+  showEmpty?: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  const { data: reviews = [], isLoading } = useQuery({
+    ...queries.reviews.owner(ownerName),
+    enabled: Boolean(ownerName),
+  });
+  const summary = summarizeSitterRating(reviews);
+  const canRespond = currentUserName === ownerName;
+
+  if (isLoading) {
+    return <SitterReviewsSkeleton />;
+  }
+  if (!reviews.length) {
+    if (!showEmpty) return null;
+    return (
+      <section className="rounded-2xl border border-line bg-white p-7" data-testid="owner-reviews">
+        <p className="eyebrow">{t("member.fromSitters")}</p>
+        <h2 className="detail-title">{t("reviews.ownerTitle")}</h2>
+        <p className="mt-4 text-sm leading-6 text-slate">{t("reviews.ownerEmpty")}</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-2xl border border-line bg-white p-7" data-testid="owner-reviews">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="eyebrow">{t("member.fromSitters")}</p>
+          <h2 className="detail-title">{t("reviews.ownerTitle")}</h2>
+          <p className="mt-1 text-sm text-slate">
+            {t("reviews.summary", {
+              average: summary.average.toFixed(1),
+              count: summary.count,
+            })}
+          </p>
+        </div>
+        <span className="flex items-center gap-2 text-sm font-bold text-navy">
+          <StarRating rating={summary.average} size={16} />
+          {summary.average.toFixed(1)}
+        </span>
+      </div>
+      <div className="mt-6 divide-y divide-line">
+        {reviews.map((review) => (
+          <ReviewCard
+            canRespond={canRespond}
+            key={review.id}
+            language={i18n.language}
+            review={review}
+          />
+        ))}
+      </div>
     </section>
   );
 }

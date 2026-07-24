@@ -90,6 +90,8 @@ function shapeMessage(m: MessageRow) {
   };
 }
 
+const MESSAGES_PAGE_SIZE = 10;
+
 /** Assemble the nested SitApplication the frontend expects. */
 function shape(
   app: ApplicationRow,
@@ -102,6 +104,12 @@ function shape(
     options?.revealShortlist === true || Boolean(viewerName && viewerName === app.ownerName);
   // Shortlist is an owner-only tracking flag; never reveal it to applicants.
   const status = app.status === "shortlisted" && !revealShortlist ? "new" : app.status;
+
+  const appMessages = messages
+    .filter((m) => m.applicationId === app.id)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const totalMessages = appMessages.length;
+  const paginatedMessages = appMessages.slice(-MESSAGES_PAGE_SIZE);
 
   return {
     id: app.id,
@@ -119,10 +127,8 @@ function shape(
     status,
     createdAt: app.createdAt,
     ownerPhone: app.ownerPhone ?? undefined,
-    messages: messages
-      .filter((m) => m.applicationId === app.id)
-      .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-      .map(shapeMessage),
+    messages: paginatedMessages.map(shapeMessage),
+    totalMessages,
   };
 }
 
@@ -369,12 +375,66 @@ async function emailForUserId(env: Env, userId: string | null | undefined) {
   return u?.email ?? undefined;
 }
 
-async function ownerIdForApplication(env: Env, appRow: ApplicationRow) {
+async function vesselForApplication(env: Env, appRow: ApplicationRow) {
   const db = getDb(env);
   const sit = await db.query.sits.findFirst({ where: eq(sits.id, appRow.sitId) });
   if (!sit) return null;
-  const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+  return db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+}
+
+async function ownerIdForApplication(env: Env, appRow: ApplicationRow) {
+  const vessel = await vesselForApplication(env, appRow);
   return vessel?.ownerUserId ?? null;
+}
+
+/**
+ * Listing ownership matches sits/vessels: prefer ownerUserId, and for seed/legacy
+ * rows with a null ownerUserId allow the matching display name and claim the id.
+ */
+async function resolveListingOwnerAccess(
+  env: Env,
+  appRow: ApplicationRow,
+  user: { id: string; name: string; image?: string | null },
+): Promise<{ ownerId: string | null; isOwner: boolean }> {
+  const db = getDb(env);
+  const vessel = await vesselForApplication(env, appRow);
+  if (!vessel) return { ownerId: null, isOwner: false };
+
+  if (vessel.ownerUserId != null && vessel.ownerUserId === user.id) {
+    return { ownerId: vessel.ownerUserId, isOwner: true };
+  }
+
+  const nameMatchesOwner =
+    vessel.ownerUserId == null && (vessel.owner === user.name || appRow.ownerName === user.name);
+  if (!nameMatchesOwner) {
+    return { ownerId: vessel.ownerUserId ?? null, isOwner: false };
+  }
+
+  await db
+    .update(vessels)
+    .set({
+      ownerUserId: user.id,
+      owner: user.name,
+      ownerImage: user.image ?? vessel.ownerImage,
+      updatedAt: sql`CURRENT_TIMESTAMP`,
+    })
+    .where(eq(vessels.id, vessel.id));
+
+  return { ownerId: user.id, isOwner: true };
+}
+
+async function resolveConversationAccess(
+  env: Env,
+  appRow: ApplicationRow,
+  user: { id: string; name: string; image?: string | null },
+): Promise<{ ownerId: string | null; isParticipant: boolean; isOwner: boolean }> {
+  const ownerAccess = await resolveListingOwnerAccess(env, appRow, user);
+  const isApplicant = user.id === appRow.applicantUserId;
+  return {
+    ownerId: ownerAccess.ownerId,
+    isOwner: ownerAccess.isOwner,
+    isParticipant: isApplicant || ownerAccess.isOwner,
+  };
 }
 
 applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), async (c) => {
@@ -385,7 +445,7 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
 
   const appRow = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   if (!appRow) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
-  if ((await ownerIdForApplication(c.env, appRow)) !== user.id) {
+  if (!(await resolveListingOwnerAccess(c.env, appRow, user)).isOwner) {
     return c.json({ error: "Only the listing owner can change this" }, 403);
   }
 
@@ -428,10 +488,14 @@ applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), 
     const openSiblings = await db
       .select()
       .from(applications)
-      .where(eq(applications.sitId, appRow.sitId));
+      .where(
+        and(
+          eq(applications.sitId, appRow.sitId),
+          ne(applications.id, id),
+          or(eq(applications.status, "new"), eq(applications.status, "shortlisted")),
+        ),
+      );
     for (const sibling of openSiblings) {
-      if (sibling.id === id) continue;
-      if (sibling.status !== "new" && sibling.status !== "shortlisted") continue;
       await insertSystemMessage(c.env, {
         applicationId: sibling.id,
         senderName: user.name,
@@ -617,44 +681,158 @@ applicationsRouter.post(
     const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
     if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
 
-    const ownerId = await ownerIdForApplication(c.env, app);
-    const isParticipant = user.id === app.applicantUserId || user.id === ownerId;
+    const access = await resolveConversationAccess(c.env, app, user);
+    const { ownerId, isParticipant } = access;
+    // #region agent log
+    {
+      const vessel = await vesselForApplication(c.env, app);
+      const payload = {
+        sessionId: "c8feae",
+        runId: "post-fix",
+        hypothesisId: "A",
+        location: "applications.ts:POST/:id/messages",
+        message: "participant check",
+        data: {
+          applicationId: id,
+          userId: user.id,
+          userName: user.name,
+          ownerId,
+          applicantUserId: app.applicantUserId,
+          ownerName: app.ownerName,
+          vesselOwner: vessel?.owner ?? null,
+          vesselOwnerUserId: vessel?.ownerUserId ?? null,
+          nameMatchesOwner: user.name === app.ownerName,
+          isApplicant: user.id === app.applicantUserId,
+          isOwnerById: access.isOwner,
+          isParticipant,
+        },
+        timestamp: Date.now(),
+      };
+      console.log("DEBUG_C8FEAE", JSON.stringify(payload));
+      fetch("http://127.0.0.1:7593/ingest/0c297f7c-4545-4b43-808d-4c39e61a6eaf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "c8feae" },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    }
+    // #endregion
     if (!isParticipant) {
+      // #region agent log
+      console.log(
+        "DEBUG_C8FEAE",
+        JSON.stringify({
+          sessionId: "c8feae",
+          hypothesisId: "A",
+          location: "applications.ts:POST/:id/messages:403",
+          message: "rejected non-participant",
+          data: {
+            applicationId: id,
+            userId: user.id,
+            ownerId,
+            applicantUserId: app.applicantUserId,
+          },
+          timestamp: Date.now(),
+        }),
+      );
+      // #endregion
       return c.json({ error: "You are not part of this conversation" }, 403);
     }
 
-    await db.insert(applicationMessages).values({
-      id: `message-${Date.now()}`,
-      applicationId: id,
-      senderName: user.name,
-      text: text.trim(),
-      kind: "user",
-      createdAt: new Date().toISOString(),
-    });
-
-    const recipientName = user.id === app.applicantUserId ? app.ownerName : app.applicantName;
-    const recipientId = user.id === app.applicantUserId ? ownerId : app.applicantUserId;
-    await insertNotification(db, {
-      userId: recipientId,
-      userName: recipientName,
-      type: "newMessage",
-      actor: user.name,
-      boatName: app.boatName,
-      href: `/messages?application=${id}`,
-    });
-    if (await shouldEmail(db, recipientId, "newMessage")) {
-      await sendNotificationEmail(c.env, {
-        subject: `New message about ${app.boatName}`,
-        heading: `New message from ${user.name}`,
-        body: `${user.name} sent you a message about ${app.boatName}.`,
-        actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
-        actionLabel: "Reply",
-        to: await emailForUserId(c.env, recipientId),
+    try {
+      await db.insert(applicationMessages).values({
+        id: `message-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        applicationId: id,
+        senderName: user.name,
+        text: text.trim(),
+        kind: "user",
+        createdAt: new Date().toISOString(),
       });
-    }
 
-    const msgs = await loadMessages(c.env, [id]);
-    return c.json({ data: await shapeOne(c.env, app, msgs, { viewerName: user.name }) });
+      const recipientName = user.id === app.applicantUserId ? app.ownerName : app.applicantName;
+      const recipientId = user.id === app.applicantUserId ? ownerId : app.applicantUserId;
+      // #region agent log
+      fetch("http://127.0.0.1:7593/ingest/0c297f7c-4545-4b43-808d-4c39e61a6eaf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "c8feae" },
+        body: JSON.stringify({
+          sessionId: "c8feae",
+          runId: "pre-fix",
+          hypothesisId: "B",
+          location: "applications.ts:POST/:id/messages:notify",
+          message: "notify recipient",
+          data: {
+            applicationId: id,
+            recipientName,
+            recipientId,
+            senderIsApplicant: user.id === app.applicantUserId,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+      await insertNotification(db, {
+        userId: recipientId,
+        userName: recipientName,
+        type: "newMessage",
+        actor: user.name,
+        boatName: app.boatName,
+        href: `/messages?application=${id}`,
+      });
+      if (await shouldEmail(db, recipientId, "newMessage")) {
+        await sendNotificationEmail(c.env, {
+          subject: `New message about ${app.boatName}`,
+          heading: `New message from ${user.name}`,
+          body: `${user.name} sent you a message about ${app.boatName}.`,
+          actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
+          actionLabel: "Reply",
+          to: await emailForUserId(c.env, recipientId),
+        });
+      }
+
+      const msgs = await loadMessages(c.env, [id]);
+      const shaped = await shapeOne(c.env, app, msgs, { viewerName: user.name });
+      // #region agent log
+      fetch("http://127.0.0.1:7593/ingest/0c297f7c-4545-4b43-808d-4c39e61a6eaf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "c8feae" },
+        body: JSON.stringify({
+          sessionId: "c8feae",
+          runId: "pre-fix",
+          hypothesisId: "C",
+          location: "applications.ts:POST/:id/messages:success",
+          message: "send success",
+          data: {
+            applicationId: id,
+            messageCount: shaped.messages?.length ?? null,
+            totalMessages: shaped.totalMessages ?? null,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+      return c.json({ data: shaped });
+    } catch (error) {
+      // #region agent log
+      fetch("http://127.0.0.1:7593/ingest/0c297f7c-4545-4b43-808d-4c39e61a6eaf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "c8feae" },
+        body: JSON.stringify({
+          sessionId: "c8feae",
+          runId: "pre-fix",
+          hypothesisId: "D",
+          location: "applications.ts:POST/:id/messages:catch",
+          message: "send threw",
+          data: {
+            applicationId: id,
+            errorName: error instanceof Error ? error.name : "unknown",
+            errorMessage: error instanceof Error ? error.message : String(error),
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+      throw error;
+    }
   },
 );
 
@@ -671,8 +849,7 @@ applicationsRouter.post(
     const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
     if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
 
-    const ownerId = await ownerIdForApplication(c.env, app);
-    const isParticipant = user.id === app.applicantUserId || user.id === ownerId;
+    const { ownerId, isParticipant } = await resolveConversationAccess(c.env, app, user);
     if (!isParticipant) {
       return c.json({ error: "You are not part of this conversation" }, 403);
     }
@@ -705,7 +882,11 @@ applicationsRouter.post(
 );
 
 const videoCallSchema = z.object({
-  startsAt: z.string().min(1),
+  /** ISO-8601 timestamp; normalized to UTC before persist. */
+  startsAt: z
+    .string()
+    .min(1)
+    .refine((value) => !Number.isNaN(new Date(value).getTime()), "Invalid timestamp"),
   durationMinutes: z.number().min(5).max(180),
   counter: z.boolean().optional(),
 });
@@ -722,8 +903,8 @@ applicationsRouter.post(
 
     const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
     if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
-    const ownerId = await ownerIdForApplication(c.env, app);
-    if (user.id !== app.applicantUserId && user.id !== ownerId) {
+    const { ownerId, isParticipant } = await resolveConversationAccess(c.env, app, user);
+    if (!isParticipant) {
       return c.json({ error: "You are not part of this conversation" }, 403);
     }
 
@@ -731,6 +912,8 @@ applicationsRouter.post(
     if (Number.isNaN(startsAt.getTime()) || startsAt.getTime() <= Date.now()) {
       return c.json({ error: "VIDEO_CALL_TIME_PAST" }, 400);
     }
+    // Always persist UTC ISO (24h), independent of any member display preference.
+    const startsAtIso = startsAt.toISOString();
     const durationMinutes = Math.max(5, Math.round(body.durationMinutes));
     const isCounter = Boolean(body.counter);
     const systemKind = isCounter ? "videoCallCounter" : "videoCallRequest";
@@ -742,7 +925,7 @@ applicationsRouter.post(
     const attendeeEmail = await emailForUserId(c.env, otherId);
     const meetUrl = await createMeetLink(c.env, user.id, {
       summary: `Boatstead video call — ${app.boatName}`,
-      startsAt: startsAt.toISOString(),
+      startsAt: startsAtIso,
       durationMinutes,
       attendeeEmail,
     });
@@ -756,7 +939,7 @@ applicationsRouter.post(
       systemKind,
       payload: {
         videoCall: {
-          startsAt: startsAt.toISOString(),
+          startsAt: startsAtIso,
           durationMinutes,
           ...(meetUrl ? { meetUrl } : {}),
         },
@@ -776,8 +959,8 @@ applicationsRouter.post("/:id/video-call/:messageId/accept", requireUser, async 
 
   const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
-  const ownerId = await ownerIdForApplication(c.env, app);
-  if (user.id !== app.applicantUserId && user.id !== ownerId) {
+  const { isParticipant } = await resolveConversationAccess(c.env, app, user);
+  if (!isParticipant) {
     return c.json({ error: "You are not part of this conversation" }, 403);
   }
 
@@ -817,8 +1000,8 @@ applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async
   const db = getDb(c.env);
   const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
   if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
-  const ownerId = await ownerIdForApplication(c.env, app);
-  if (user.id !== app.applicantUserId && user.id !== ownerId) {
+  const { isParticipant } = await resolveConversationAccess(c.env, app, user);
+  if (!isParticipant) {
     return c.json({ error: "You are not part of this conversation" }, 403);
   }
 
@@ -848,4 +1031,80 @@ applicationsRouter.post("/:id/video-call/:messageId/decline", requireUser, async
 
   const next = await loadMessages(c.env, [id]);
   return c.json({ data: await shapeOne(c.env, app, next, { viewerName: user.name }) });
+});
+
+/**
+ * GET /api/applications/:id/messages?limit=10&before=<cursor>
+ * Returns paginated messages for a conversation, newest first.
+ * The `before` cursor is the id of the oldest message the client has.
+ */
+applicationsRouter.get("/:id/messages", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const id = c.req.param("id");
+  const user = c.get("user")!;
+
+  const limitRaw = c.req.query("limit");
+  const before = c.req.query("before");
+  const limit = limitRaw ? Math.min(Math.max(1, Number(limitRaw)), 50) : MESSAGES_PAGE_SIZE;
+
+  const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+
+  const { isParticipant } = await resolveConversationAccess(c.env, app, user);
+  if (!isParticipant) {
+    return c.json({ error: "You are not part of this conversation" }, 403);
+  }
+
+  const allMessages = await loadMessages(c.env, [id]);
+  const sorted = allMessages.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+  const initialMessageText = app.initialMessage.trim();
+  const hasInitialMessage = Boolean(initialMessageText);
+  const initialAlreadyInDb = sorted.some(
+    (m) =>
+      (m.kind ?? "user") === "user" &&
+      m.senderName === app.applicantName &&
+      m.text === initialMessageText,
+  );
+  const syntheticInitial: MessageRow | null =
+    hasInitialMessage && !initialAlreadyInDb
+      ? {
+          id: `${id}-initial-message`,
+          applicationId: id,
+          senderName: app.applicantName,
+          text: initialMessageText,
+          createdAt: app.createdAt,
+          kind: "user",
+          systemKind: null,
+          payload: null,
+        }
+      : null;
+
+  const allWithInitial = syntheticInitial ? [syntheticInitial, ...sorted] : sorted;
+  const total = allWithInitial.length;
+
+  let startIndex = 0;
+  if (before) {
+    const cursorIndex = allWithInitial.findIndex((m) => m.id === before);
+    if (cursorIndex > 0) {
+      const endIndex = cursorIndex;
+      startIndex = Math.max(0, endIndex - limit);
+      const pageMessages = allWithInitial.slice(startIndex, endIndex);
+      return c.json({
+        data: pageMessages.map(shapeMessage),
+        total,
+        hasMore: startIndex > 0,
+      });
+    }
+    return c.json({ data: [], total, hasMore: false });
+  }
+
+  const pageMessages = allWithInitial.slice(-limit);
+  const hasMore = total > limit;
+
+  return c.json({
+    data: pageMessages.map(shapeMessage),
+    total,
+    hasMore,
+  });
 });

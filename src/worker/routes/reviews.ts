@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv } from "../context";
@@ -10,15 +10,19 @@ import { requireUser } from "../middleware/auth";
 
 export const reviewsRouter = new Hono<AppEnv>();
 
+const authorRoleSchema = z.enum(["owner", "sitter"]);
+
 function shapeReview(row: typeof reviews.$inferSelect) {
   return {
     id: row.id,
     sitId: row.sitId,
     boatName: row.boatName,
     applicationId: row.applicationId,
+    authorRole: (row.authorRole === "sitter" ? "sitter" : "owner") as "owner" | "sitter",
     sitterName: row.sitterName,
     ownerName: row.ownerName,
     ownerImage: row.ownerImage,
+    authorImage: row.authorImage || row.ownerImage,
     rating: row.rating,
     text: row.text,
     createdAt: row.createdAt,
@@ -30,26 +34,52 @@ function shapeReview(row: typeof reviews.$inferSelect) {
   };
 }
 
+function defaultAvatar(name: string) {
+  return `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name)}`;
+}
+
 reviewsRouter.get("/", async (c) => {
   const db = getDb(c.env);
   const sitter = c.req.query("sitter");
+  const owner = c.req.query("owner");
   const applicationId = c.req.query("applicationId");
+  const authorRoleParam = c.req.query("authorRole");
+  const authorRole = authorRoleSchema.safeParse(authorRoleParam);
 
   if (applicationId) {
-    const row = await db.query.reviews.findFirst({
-      where: eq(reviews.applicationId, applicationId),
-    });
-    return c.json({ data: row ? shapeReview(row) : null });
+    if (authorRole.success) {
+      const row = await db.query.reviews.findFirst({
+        where: and(
+          eq(reviews.applicationId, applicationId),
+          eq(reviews.authorRole, authorRole.data),
+        ),
+      });
+      return c.json({ data: row ? shapeReview(row) : null });
+    }
+    const rows = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.applicationId, applicationId))
+      .orderBy(desc(reviews.createdAt));
+    return c.json({ data: rows.map(shapeReview) });
   }
   if (sitter) {
     const rows = await db
       .select()
       .from(reviews)
-      .where(eq(reviews.sitterName, sitter))
+      .where(and(eq(reviews.sitterName, sitter), eq(reviews.authorRole, "owner")))
       .orderBy(desc(reviews.createdAt));
     return c.json({ data: rows.map(shapeReview) });
   }
-  return c.json({ error: "Provide sitter or applicationId" }, 400);
+  if (owner) {
+    const rows = await db
+      .select()
+      .from(reviews)
+      .where(and(eq(reviews.ownerName, owner), eq(reviews.authorRole, "sitter")))
+      .orderBy(desc(reviews.createdAt));
+    return c.json({ data: rows.map(shapeReview) });
+  }
+  return c.json({ error: "Provide sitter, owner, or applicationId" }, 400);
 });
 
 const createSchema = z.object({
@@ -74,30 +104,44 @@ reviewsRouter.post("/", requireUser, zValidator("json", createSchema), async (c)
   const sit = await db.query.sits.findFirst({ where: eq(sits.id, application.sitId) });
   if (!sit) return c.json({ error: "REVIEW_SIT_NOT_COMPLETED" }, 400);
   const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
-  if (!vessel || vessel.ownerUserId !== user.id) {
-    return c.json({ error: "REVIEW_OWNER_ONLY" }, 403);
+  if (!vessel) return c.json({ error: "REVIEW_SIT_NOT_COMPLETED" }, 400);
+
+  const isOwner =
+    (vessel.ownerUserId != null && vessel.ownerUserId === user.id) ||
+    (vessel.ownerUserId == null && vessel.owner === user.name);
+  const isSitter =
+    (application.applicantUserId != null && application.applicantUserId === user.id) ||
+    (application.applicantUserId == null && application.applicantName === user.name);
+
+  if (!isOwner && !isSitter) {
+    return c.json({ error: "REVIEW_FORBIDDEN" }, 403);
   }
 
+  const authorRole = isOwner ? "owner" : "sitter";
+
   const existing = await db.query.reviews.findFirst({
-    where: eq(reviews.applicationId, body.applicationId),
+    where: and(eq(reviews.applicationId, body.applicationId), eq(reviews.authorRole, authorRole)),
   });
   if (existing) return c.json({ error: "REVIEW_ALREADY_EXISTS" }, 409);
 
+  const authorImage = user.image ?? defaultAvatar(user.name);
   const createdAt = new Date().toISOString();
   const [row] = await db
     .insert(reviews)
     .values({
-      id: `review-${Date.now()}`,
+      id: `review-${Date.now()}-${authorRole}`,
       sitId: application.sitId,
       boatName: application.boatName,
       applicationId: application.id,
+      authorRole,
       sitterName: application.applicantName,
       sitterUserId: application.applicantUserId,
       ownerName: application.ownerName,
-      ownerUserId: user.id,
-      ownerImage:
-        user.image ??
-        `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`,
+      ownerUserId: vessel.ownerUserId ?? null,
+      ownerImage: isOwner
+        ? authorImage
+        : (vessel.ownerImage ?? defaultAvatar(application.ownerName)),
+      authorImage,
       rating: body.rating,
       text: body.text.trim(),
       location: `${sit.location}, ${sit.country}`,
@@ -105,7 +149,7 @@ reviewsRouter.post("/", requireUser, zValidator("json", createSchema), async (c)
     })
     .returning();
 
-  if (application.applicantUserId) {
+  if (authorRole === "owner" && application.applicantUserId) {
     await insertNotification(db, {
       userId: application.applicantUserId,
       userName: application.applicantName,
@@ -113,6 +157,16 @@ reviewsRouter.post("/", requireUser, zValidator("json", createSchema), async (c)
       actor: user.name,
       boatName: application.boatName,
       href: `/members/${encodeURIComponent(application.applicantName)}`,
+    });
+  }
+  if (authorRole === "sitter" && (vessel.ownerUserId || application.ownerName)) {
+    await insertNotification(db, {
+      userId: vessel.ownerUserId,
+      userName: application.ownerName,
+      type: "newMessage",
+      actor: user.name,
+      boatName: application.boatName,
+      href: `/members/${encodeURIComponent(application.ownerName)}`,
     });
   }
 
@@ -131,11 +185,17 @@ reviewsRouter.post("/:id/response", requireUser, zValidator("json", responseSche
 
   const existing = await db.query.reviews.findFirst({ where: eq(reviews.id, id) });
   if (!existing) return c.json({ error: "REVIEW_NOT_FOUND" }, 404);
-  if (existing.sitterUserId && existing.sitterUserId !== user.id) {
-    return c.json({ error: "REVIEW_SITTER_ONLY" }, 403);
-  }
-  if (!existing.sitterUserId && existing.sitterName !== user.name) {
-    return c.json({ error: "REVIEW_SITTER_ONLY" }, 403);
+
+  const authorRole = existing.authorRole === "sitter" ? "sitter" : "owner";
+  const isReviewee =
+    authorRole === "owner"
+      ? (existing.sitterUserId && existing.sitterUserId === user.id) ||
+        (!existing.sitterUserId && existing.sitterName === user.name)
+      : (existing.ownerUserId && existing.ownerUserId === user.id) ||
+        (!existing.ownerUserId && existing.ownerName === user.name);
+
+  if (!isReviewee) {
+    return c.json({ error: "REVIEW_RESPONSE_FORBIDDEN" }, 403);
   }
   if (existing.responseText) return c.json({ error: "REVIEW_RESPONSE_EXISTS" }, 409);
 

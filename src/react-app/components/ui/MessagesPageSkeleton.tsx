@@ -3,15 +3,20 @@ import { ShimmerBlock } from "@/components/ui/Shimmer";
 function ConversationRowSkeleton() {
   return (
     <div aria-hidden="true" className="rounded-xl p-3">
-      <div className="flex items-center justify-between gap-2">
-        <ShimmerBlock className="h-4 w-28 max-w-[55%]" />
-        <ShimmerBlock className="h-5 w-16 rounded-full" />
+      <div className="flex items-start gap-3">
+        <ShimmerBlock className="mt-0.5 size-11 shrink-0 rounded-full" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <ShimmerBlock className="h-4 w-28 max-w-[55%]" />
+            <ShimmerBlock className="h-5 w-16 rounded-full" />
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <ShimmerBlock className="h-5 w-14 rounded-full" />
+            <ShimmerBlock className="h-3 w-24 max-w-[40%]" />
+          </div>
+          <ShimmerBlock className="mt-2 h-3 w-[85%]" />
+        </div>
       </div>
-      <div className="mt-2 flex items-center gap-2">
-        <ShimmerBlock className="h-5 w-14 rounded-full" />
-        <ShimmerBlock className="h-3 w-24 max-w-[40%]" />
-      </div>
-      <ShimmerBlock className="mt-2 h-3 w-[85%]" />
     </div>
   );
 }

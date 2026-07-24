@@ -37,6 +37,13 @@ export function unreadNewMessageNotificationsForApplication(
   );
 }
 
+export function unreadNewMessageCountForApplication(
+  notifications: MockNotification[],
+  applicationId: string,
+): number {
+  return unreadNewMessageNotificationsForApplication(notifications, applicationId).length;
+}
+
 export function notificationsForBell(notifications: MockNotification[]): MockNotification[] {
   return notifications.filter((notification) => !isChatMessageNotification(notification));
 }

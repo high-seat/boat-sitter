@@ -12,6 +12,7 @@ export type NotificationType =
   | "newMessage"
   | "sitAccepted"
   | "sitCancelled"
+  | "sitEndedEarly"
   | "sitReminder"
   | "sitSittersFound"
   | "welcome";
@@ -42,6 +43,7 @@ export const NOTIFICATION_EMAIL_PREF: Record<NotificationType, EmailPrefKey | nu
   newMessage: "messages",
   sitAccepted: "applicationUpdates",
   sitCancelled: "applicationUpdates",
+  sitEndedEarly: "applicationUpdates",
   sitReminder: "sitReminders",
   sitSittersFound: "newApplications",
   welcome: null,

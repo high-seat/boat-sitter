@@ -6,8 +6,10 @@ import { TimePicker } from "@/components/forms/TimePicker";
 import { toIsoDate } from "@/components/forms/dateIso";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
+import { formatStoredClockTime, is24HourClockTime } from "../../../shared/timeFormat";
 
 export type VideoCallScheduleValues = {
+  /** ISO-8601 UTC timestamp. Always derived from a 24-hour local `HH:mm`. */
   startsAt: string;
   durationMinutes: number;
 };
@@ -15,10 +17,9 @@ export type VideoCallScheduleValues = {
 const DURATION_OPTIONS = [15, 30, 45, 60] as const;
 
 function toLocalTimeInputValue(date: Date) {
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(Math.round(date.getMinutes() / 5) * 5).padStart(2, "0");
-  const safeMinutes = minutes === "60" ? "55" : minutes;
-  return `${hours}:${safeMinutes}`;
+  let minutes = Math.round(date.getMinutes() / 5) * 5;
+  if (minutes === 60) minutes = 55;
+  return formatStoredClockTime(date.getHours(), minutes);
 }
 
 function defaultSchedule(initial?: Partial<VideoCallScheduleValues>): {
@@ -64,6 +65,7 @@ export function VideoCallScheduleModal({
   const { t } = useTranslation();
   const defaults = useMemo(() => defaultSchedule(initial), [initial]);
   const [date, setDate] = useState(defaults.date);
+  /** Local wall clock in 24-hour `HH:mm`; never a 12-hour display string. */
   const [time, setTime] = useState(defaults.time);
   const [durationMinutes, setDurationMinutes] = useState(defaults.durationMinutes);
   const [error, setError] = useState("");
@@ -71,7 +73,7 @@ export function VideoCallScheduleModal({
   const minDate = toIsoDate(new Date());
 
   function submit() {
-    if (!date || !time) {
+    if (!date || !is24HourClockTime(time)) {
       setError(t("applications.videoCall.incomplete"));
       return;
     }

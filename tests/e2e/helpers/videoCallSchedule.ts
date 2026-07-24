@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from "@playwright/test";
+import { formatClockTime, to12HourClock, type TimeFormat } from "../../../src/shared/timeFormat";
 
 export function futureDate(daysAhead: number) {
   const date = new Date();
@@ -13,6 +14,19 @@ export function futureDateIso(daysAhead: number) {
     String(date.getMonth() + 1).padStart(2, "0"),
     String(date.getDate()).padStart(2, "0"),
   ].join("-");
+}
+
+function parseStoredTime(time: string) {
+  const [hourText, minuteText] = time.split(":");
+  return { hour: Number(hourText), minute: Number(minuteText) };
+}
+
+/** Persist the member's 12h/24h preference (call before navigating so hydrate picks it up). */
+export async function setTimeFormatPreference(page: Page, timeFormat: TimeFormat) {
+  const response = await page.request.put("/api/me/profile", {
+    data: { timeFormat },
+  });
+  expect(response.ok()).toBeTruthy();
 }
 
 /** Fill the branded video-call date/time/duration controls inside a schedule dialog. */
@@ -43,20 +57,42 @@ export async function fillVideoCallSchedule(
       .click();
   }
 
-  const [hour, minute] = options.time.split(":");
-  await dialog.getByRole("button", { name: /^Time$/i }).click();
-  await page
-    .getByRole("listbox", { name: /^Hour$/i })
-    .getByRole("option", { name: hour })
-    .click();
-  await page
-    .getByRole("listbox", { name: /^Minute$/i })
-    .getByRole("option", { name: minute })
-    .click();
+  const { hour, minute } = parseStoredTime(options.time);
+  await dialog.getByTestId("time-picker-trigger").click();
+  const popover = page.getByTestId("time-picker-popover");
+  await expect(popover).toBeVisible();
+  const timeFormat = ((await popover.getAttribute("data-time-format")) ?? "24h") as TimeFormat;
+
+  if (timeFormat === "12h") {
+    const { hour12, period } = to12HourClock(hour);
+    await popover
+      .getByTestId("time-picker-hours")
+      .getByRole("option", { name: String(hour12).padStart(2, "0") })
+      .click();
+    await popover
+      .getByTestId("time-picker-minutes")
+      .getByRole("option", { name: String(minute).padStart(2, "0") })
+      .click();
+    await popover.getByTestId(`time-picker-period-${period}`).click();
+  } else {
+    await popover
+      .getByTestId("time-picker-hours")
+      .getByRole("option", { name: String(hour).padStart(2, "0") })
+      .click();
+    await popover
+      .getByTestId("time-picker-minutes")
+      .getByRole("option", { name: String(minute).padStart(2, "0") })
+      .click();
+  }
 
   if (options.duration) {
     await dialog.locator("select").selectOption(options.duration);
   }
 
-  await expect(dialog.getByRole("button", { name: /^Time$/i })).toContainText(options.time);
+  const expected = formatClockTime(hour, minute, timeFormat, "en-US");
+  // Intl may insert a narrow no-break space before AM/PM.
+  const normalizedExpected = expected.replace(/\s+/g, " ").trim();
+  await expect(dialog.getByTestId("time-picker-value")).toHaveText(
+    new RegExp(normalizedExpected.replaceAll(" ", "\\s+")),
+  );
 }

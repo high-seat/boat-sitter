@@ -7,6 +7,19 @@ import type { AppEnv } from "../context";
  */
 export const requireUser: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (!c.get("user")) {
+    // #region agent log
+    console.log(
+      "DEBUG_C8FEAE",
+      JSON.stringify({
+        sessionId: "c8feae",
+        hypothesisId: "F",
+        location: "auth.ts:requireUser",
+        message: "Sign in required",
+        data: { path: c.req.path, method: c.req.method },
+        timestamp: Date.now(),
+      }),
+    );
+    // #endregion
     return c.json({ error: "Sign in required" }, 401);
   }
   await next();

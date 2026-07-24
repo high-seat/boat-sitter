@@ -8,6 +8,7 @@ import { ConsentBanner } from "@/components/ConsentBanner";
 import { EmailVerifiedBanner } from "@/components/EmailVerifiedBanner";
 import { ResetPasswordPage } from "@/components/ResetPasswordPage";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { ToastHost } from "@/components/ui/Toast";
 import { hydrateSession } from "@/session";
 import "@/i18n";
 import "@/index.css";
@@ -55,6 +56,7 @@ createRoot(document.getElementById("root")!).render(
           <DevCrashProbe />
           <ResetPasswordPage />
           <EmailVerifiedBanner />
+          <ToastHost />
           <App />
         </ErrorBoundary>
       </BrowserRouter>

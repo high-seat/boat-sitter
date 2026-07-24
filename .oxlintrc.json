@@ -1,8 +1,31 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react"],
   "rules": {
     "no-nested-ternary": "error",
     "eslint/no-nested-ternary": "error",
-    "unicorn/no-nested-ternary": "off"
-  }
+    "unicorn/no-nested-ternary": "off",
+    "react/react-compiler": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/react-app/App.tsx",
+        "src/react-app/components/EmailVerifiedBanner.tsx",
+        "src/react-app/components/admin/AdminPage.tsx",
+        "src/react-app/components/applications/ConversationPanel.tsx",
+        "src/react-app/components/command/CommandPalette.tsx",
+        "src/react-app/components/forms/PhoneCountryCodeSelect.tsx",
+        "src/react-app/components/layout/NotificationsMenu.tsx",
+        "src/react-app/components/listing/AutoTranslatedOwnerContent.tsx",
+        "src/react-app/components/search/DestinationAutocomplete.tsx",
+        "src/react-app/components/ui/CollapsiblePills.tsx",
+        "src/react-app/components/ui/PhotoLightbox.tsx",
+        "src/react-app/components/ui/RefetchingResults.tsx"
+      ],
+      "rules": {
+        "react/react-compiler": "off"
+      }
+    }
+  ]
 }

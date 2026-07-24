@@ -227,7 +227,7 @@ export function ChangePasswordModal({
           <p className="text-sm leading-6 text-slate">
             {t(
               "settings.noPasswordYet",
-              "You sign in with Google. To also use a password, we'll email you a link to set one.",
+              "You signed in with Google. To also use a password, we'll email you a link to set one.",
             )}
           </p>
           {error ? (

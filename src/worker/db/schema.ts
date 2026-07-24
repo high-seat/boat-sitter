@@ -211,6 +211,7 @@ export const applications = sqliteTable(
 );
 
 export type MessagePayload = {
+  /** `startsAt` is always an ISO-8601 UTC timestamp (24h), never a locale/AM-PM display string. */
   videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
   sharedPhone?: string;
 };
@@ -262,6 +263,8 @@ export const profiles = sqliteTable(
     skills: jsonArray("skills"),
     preferredLanguage: text("preferred_language").notNull().default("en-US"),
     measurementSystem: text("measurement_system").notNull().default("metric"),
+    /** Display preference only (`12h` | `24h`). Stored event times remain ISO-8601 UTC. */
+    timeFormat: text("time_format").notNull().default(""),
     emailNotifications: text("email_notifications", { mode: "json" })
       .$type<Record<string, boolean>>()
       .notNull()
@@ -296,12 +299,16 @@ export const reviews = sqliteTable(
     id: text("id").primaryKey(),
     sitId: text("sit_id").notNull(),
     boatName: text("boat_name").notNull(),
-    applicationId: text("application_id").notNull().unique(),
+    applicationId: text("application_id").notNull(),
+    /** Who wrote the review: owner (about sitter) or sitter (about owner). */
+    authorRole: text("author_role").notNull().default("owner"),
     sitterName: text("sitter_name").notNull(),
     sitterUserId: text("sitter_user_id"),
     ownerName: text("owner_name").notNull(),
     ownerUserId: text("owner_user_id"),
     ownerImage: text("owner_image").notNull().default(""),
+    /** Avatar of the review author (owner or sitter). */
+    authorImage: text("author_image").notNull().default(""),
     rating: integer("rating").notNull(),
     text: text("text").notNull(),
     location: text("location").notNull().default(""),
@@ -313,7 +320,9 @@ export const reviews = sqliteTable(
   },
   (t) => [
     index("reviews_sitter_idx").on(t.sitterName),
+    index("reviews_owner_idx").on(t.ownerName),
     index("reviews_application_idx").on(t.applicationId),
+    index("reviews_application_author_idx").on(t.applicationId, t.authorRole),
   ],
 );
 
@@ -373,18 +382,6 @@ export const userDeletedConversations = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("user_deleted_conversations_user_idx").on(t.userId)],
-);
-
-export const userArchivedSits = sqliteTable(
-  "user_archived_sits",
-  {
-    userId: text("user_id").notNull(),
-    sitId: text("sit_id").notNull(),
-    createdAt: text("created_at")
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-  },
-  (t) => [index("user_archived_sits_user_idx").on(t.userId)],
 );
 
 export const userBlocks = sqliteTable(

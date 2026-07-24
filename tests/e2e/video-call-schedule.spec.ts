@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
-import { fillVideoCallSchedule } from "./helpers/videoCallSchedule";
+import { fillVideoCallSchedule, setTimeFormatPreference } from "./helpers/videoCallSchedule";
 
 async function openAlexMessages(browser: Browser) {
   const context = await browser.newContext();
@@ -11,6 +11,7 @@ async function openAlexMessages(browser: Browser) {
     image: "https://i.pravatar.cc/160?img=11",
     phoneNumber: "7700900123",
   });
+  await setTimeFormatPreference(page, "24h");
   await page.goto("/messages");
   return { context, page };
 }
@@ -18,6 +19,7 @@ async function openAlexMessages(browser: Browser) {
 test.describe("video call scheduling", () => {
   test("owner proposes a date, time, and duration", async ({ page }) => {
     await seedVerifiedOwner(page);
+    await setTimeFormatPreference(page, "24h");
     await page.goto("/owner/sits/solstice/applications");
     await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
 
@@ -38,18 +40,42 @@ test.describe("video call scheduling", () => {
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
     await expect(page.getByText(/Maya & Finn proposed a video call/i).first()).toBeVisible();
     await expect(page.getByText(/45 minutes/i).first()).toBeVisible();
+    await expect(page.getByTestId("conversation-video-call-when").last()).toContainText(/14:30/);
 
-    const videoCard = page
-      .getByText(/Video call proposed/i)
-      .first()
-      .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
-    const videoRow = videoCard.locator("xpath=..");
+    const videoRow = page.getByTestId("conversation-message-video-call").last();
     await expect(videoRow).toHaveClass(/justify-end/);
     await expect(videoRow).not.toHaveClass(/justify-center/);
+    await expect(videoRow.getByTestId("conversation-message-own")).toBeVisible();
+  });
+
+  test("12-hour preference shows AM/PM in picker and chat", async ({ page }) => {
+    await seedVerifiedOwner(page);
+    await setTimeFormatPreference(page, "12h");
+    await page.goto("/owner/sits/solstice/applications");
+    await page
+      .getByRole("button", { name: /Alex Morgan/i })
+      .first()
+      .click();
+    await page.getByRole("button", { name: /Request video call/i }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("heading", { name: /Propose a video call/i })).toBeVisible();
+
+    await fillVideoCallSchedule(dialog, page, { daysAhead: 3, time: "14:30", duration: "30" });
+    await expect(dialog.getByTestId("time-picker-value")).toHaveText(/2:30\s*PM/i);
+
+    await dialog.getByRole("button", { name: /Send proposal/i }).click();
+    await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
+
+    const when = page.getByTestId("conversation-video-call-when").last();
+    await expect(when).toBeVisible();
+    await expect(when).toContainText(/2:30/i);
+    await expect(when).toContainText(/PM/i);
+    await expect(when).not.toContainText(/14:30/);
   });
 
   test("other party can suggest a different time", async ({ page, browser }) => {
     await seedVerifiedOwner(page);
+    await setTimeFormatPreference(page, "24h");
     await page.goto("/owner/sits/solstice/applications");
     await page
       .getByRole("button", { name: /Alex Morgan/i })
@@ -69,11 +95,9 @@ test.describe("video call scheduling", () => {
         .first()
         .click();
       await expect(sitterPage.getByRole("button", { name: /Accept time/i })).toBeVisible();
-      const incomingCard = sitterPage
-        .getByText(/Video call proposed/i)
-        .first()
-        .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
-      await expect(incomingCard.locator("xpath=..")).toHaveClass(/justify-start/);
+      const incomingRow = sitterPage.getByTestId("conversation-message-video-call").last();
+      await expect(incomingRow).toHaveClass(/justify-start/);
+      await expect(incomingRow.getByTestId("conversation-message-peer")).toBeVisible();
       await sitterPage.getByRole("button", { name: /Suggest different time/i }).click();
       const adjust = sitterPage.getByRole("dialog");
       await expect(
@@ -96,6 +120,7 @@ test.describe("video call scheduling", () => {
 
   test("accepted call shows Google and Apple calendar links", async ({ page, browser }) => {
     await seedVerifiedOwner(page);
+    await setTimeFormatPreference(page, "24h");
     await page.goto("/owner/sits/solstice/applications");
     await page
       .getByRole("button", { name: /Alex Morgan/i })

@@ -10,7 +10,7 @@ import { AdminAuditSkeleton, AdminPageSkeleton } from "@/components/ui/AdminPage
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
 import { SegmentedTab, SegmentedTabs } from "@/components/ui/SegmentedTabs";
-import { getIntlLocale } from "@/i18n";
+import { useDateTimeFormatter } from "@/hooks/useTimeFormat";
 import { useAppStore } from "@/store";
 import type { UserRole } from "@/adminAccess";
 
@@ -21,9 +21,10 @@ function openAuth(mode: "login" | "signup") {
 type AdminTab = "users" | "audit";
 
 export function AdminPage() {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const user = useAppStore((state) => state.user);
+  const { formatDateTime } = useDateTimeFormatter();
   const [tab, setTab] = useState<AdminTab>("users");
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<AdminUser | null>(null);
@@ -118,8 +119,6 @@ export function AdminPage() {
       </main>
     );
   }
-
-  const locale = getIntlLocale(i18n.resolvedLanguage);
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-14 lg:px-8">
@@ -241,7 +240,10 @@ export function AdminPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="font-bold text-navy">{t(`admin.audit.action.${entry.action}`)}</p>
                 <time className="text-sm text-slate" dateTime={entry.at}>
-                  {new Date(entry.at).toLocaleString(locale)}
+                  {formatDateTime(entry.at, {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
                 </time>
               </div>
               <p className="mt-2 text-sm text-slate">

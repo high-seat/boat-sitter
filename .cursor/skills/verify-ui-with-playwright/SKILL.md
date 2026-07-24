@@ -124,6 +124,9 @@ screenshots of it in its different states into the chat so they can be reviewed.
    - Error / validation
    - Open modal, menu, or expanded panel
    - Desktop and mobile
+   - Count copy: when UI shows countable nouns, capture or e2e-assert both
+     singular (`1 …`) and plural (`2 …`) so forms like `1 applicants` cannot
+     ship (see `translate-user-facing-strings`)
 3. Save under `.artifacts/playwright/` with clear names
    (e.g. `cancel-sit-dialog-open-desktop.png`). German layout-check artifacts
    may use a `-de` suffix but stay local only.

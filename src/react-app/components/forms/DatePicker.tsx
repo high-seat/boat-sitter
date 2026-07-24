@@ -56,7 +56,7 @@ export function DatePicker({
       <Popover.Portal>
         <Popover.Content
           align="start"
-          className="z-80 w-[min(calc(100vw-2rem),20rem)] rounded-3xl border border-line bg-white p-3 shadow-float data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+          className="z-100 w-[min(calc(100vw-2rem),20rem)] rounded-3xl border border-line bg-white p-3 shadow-float data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
           collisionPadding={16}
           sideOffset={8}
         >

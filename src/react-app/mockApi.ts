@@ -1,12 +1,14 @@
 import { feetToMetresString, normalizeLengthToMetres } from "@/lengthUtils";
 import { getSitPhase, sitDateRangesOverlap, type SitPhase } from "@/dateUtils";
 import { lookupCoordinates } from "@/coordinates";
+import type { SitListSort } from "../shared/sitsSort";
 import {
   apiCreateReview,
   apiDeleteSit,
   apiDeleteVessel,
   apiGetApplicationsForSit,
   apiGetApplicationsForUser,
+  apiGetApplicationMessages,
   apiGetBoat,
   apiGetBoats,
   apiGetBoatsPage,
@@ -18,6 +20,7 @@ import {
   apiGetPublicProfile,
   apiGetReviewForApplication,
   apiGetReviewsForSitter,
+  apiGetReviewsForOwner,
   apiGetSavedListings,
   apiGetSitPrivateAccess,
   apiGetSits,
@@ -32,10 +35,13 @@ import {
   apiSendApplicationMessage,
   apiShareApplicationPhone,
   apiStartSitEarly,
+  apiEndSitEarly,
   apiCancelSit,
   apiSubmitSupportRequest,
   apiUpdateApplicationStatus,
   apiWithdrawApplication,
+  type ApiApplicationMessage,
+  type ApiMessagesPage,
 } from "@/apiRemote";
 import { ApiError } from "@/apiClient";
 import { type ApplicationsListParams } from "../shared/applicationsSearch";
@@ -558,8 +564,8 @@ export async function getVessels(): Promise<Vessel[]> {
   return (await apiGetVessels()).map(fromApiVessel);
 }
 
-export async function getSits(): Promise<Sit[]> {
-  const remote = await apiGetSits();
+export async function getSits(sort?: SitListSort): Promise<Sit[]> {
+  const remote = await apiGetSits(sort);
   return remote.map(fromApiSit).map((sit) => enrichSit(sit));
 }
 
@@ -583,7 +589,7 @@ export async function saveVessel(vessel: Vessel): Promise<Vessel> {
   return fromApiVessel(await apiSaveVessel(normalized));
 }
 
-/** Private Wi-Fi / access codes / full address for a sit; only owner or the accepted sitter. */
+/** Private Wi-Fi / access codes / full address for a sit; owner, or accepted sitter while underway. */
 export async function getSitPrivateAccessForViewer(
   sitId: string,
   _viewerName: string,
@@ -783,6 +789,10 @@ export async function startSitEarly(id: string): Promise<Sit> {
   return fromApiSit(await apiStartSitEarly(id));
 }
 
+export async function endSitEarly(id: string): Promise<Sit> {
+  return fromApiSit(await apiEndSitEarly(id));
+}
+
 export async function cancelSit(
   id: string,
   options: { reopenApplications?: boolean } = {},
@@ -808,6 +818,7 @@ export type MockNotification = {
     | "newMessage"
     | "sitAccepted"
     | "sitCancelled"
+    | "sitEndedEarly"
     | "sitReminder"
     | "sitSittersFound"
     | "welcome";
@@ -844,7 +855,8 @@ export type ApplicationMessage = {
     | "videoCallDeclined"
     | "phoneShared"
     | "withdrawn"
-    | "sitCancelled";
+    | "sitCancelled"
+    | "sitEndedEarly";
   videoCall?: {
     startsAt: string;
     durationMinutes: number;
@@ -870,6 +882,8 @@ export type SitApplication = {
   createdAt: string;
   messages: ApplicationMessage[];
   ownerPhone?: string;
+  /** Total messages in the conversation (for pagination). */
+  totalMessages?: number;
 };
 
 export function containsOffPlatformContactDetails(message: string) {
@@ -1067,6 +1081,15 @@ export async function markAllNotificationsRead(_userName: string): Promise<MockN
   return remote.map(mapApiNotification);
 }
 
+export { type ApiApplicationMessage, type ApiMessagesPage };
+
+export async function getApplicationMessages(
+  applicationId: string,
+  params?: { limit?: number; before?: string },
+): Promise<ApiMessagesPage> {
+  return apiGetApplicationMessages(applicationId, params);
+}
+
 export async function sendApplicationMessage(
   applicationId: string,
   _senderName: string,
@@ -1187,9 +1210,11 @@ export type SitReview = {
   sitId: string;
   boatName: string;
   applicationId: string;
+  authorRole?: "owner" | "sitter";
   sitterName: string;
   ownerName: string;
   ownerImage: string;
+  authorImage?: string;
   rating: number;
   text: string;
   createdAt: string;
@@ -1230,13 +1255,20 @@ export async function getReviewsForSitter(sitterName: string): Promise<SitReview
   return (await apiGetReviewsForSitter(sitterName)) as SitReview[];
 }
 
+export async function getReviewsForOwner(ownerName: string): Promise<SitReview[]> {
+  return (await apiGetReviewsForOwner(ownerName)) as SitReview[];
+}
+
 export async function getSitterRatingSummary(sitterName: string): Promise<SitterRatingSummary> {
   const reviews = await getReviewsForSitter(sitterName);
   return summarizeSitterRating(reviews);
 }
 
-export async function getReviewForApplication(applicationId: string): Promise<SitReview | null> {
-  return (await apiGetReviewForApplication(applicationId)) as SitReview | null;
+export async function getReviewForApplication(
+  applicationId: string,
+  authorRole: "owner" | "sitter" = "owner",
+): Promise<SitReview | null> {
+  return (await apiGetReviewForApplication(applicationId, authorRole)) as SitReview | null;
 }
 
 export async function getPublicMemberProfile(name: string): Promise<PublicMemberProfile | null> {

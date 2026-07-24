@@ -29,7 +29,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-70 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-90 grid place-items-center bg-navy/60 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.currentTarget === event.target && !pending) onClose();
       }}

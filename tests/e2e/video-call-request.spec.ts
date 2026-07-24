@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { seedOwnerSession, seedVerifiedOwner } from "./helpers/auth";
-import { fillVideoCallSchedule } from "./helpers/videoCallSchedule";
+import { fillVideoCallSchedule, setTimeFormatPreference } from "./helpers/videoCallSchedule";
 
 async function openSitterMessages(browser: Browser) {
   const context = await browser.newContext();
@@ -11,6 +11,7 @@ async function openSitterMessages(browser: Browser) {
     image: "https://i.pravatar.cc/160?img=11",
     phoneNumber: "7700900123",
   });
+  await setTimeFormatPreference(page, "24h");
   await page.goto("/messages");
   return { context, page };
 }
@@ -18,6 +19,7 @@ async function openSitterMessages(browser: Browser) {
 test.describe("video call request", () => {
   test("owner sends video call request and message appears in chat", async ({ page }) => {
     await seedVerifiedOwner(page);
+    await setTimeFormatPreference(page, "24h");
     await page.goto("/owner/sits/solstice/applications");
     await expect(page.getByRole("heading", { name: /Applications for/i })).toBeVisible();
 
@@ -52,12 +54,11 @@ test.describe("video call request", () => {
     await expect(page.getByText(/45 minutes/i).first()).toBeVisible();
 
     // The message should be aligned to the right (it's from "You")
-    const videoCard = page
-      .getByText(/Video call proposed/i)
-      .first()
-      .locator("xpath=ancestor::div[contains(@class,'rounded-2xl')][1]");
-    const videoRow = videoCard.locator("xpath=..");
+    const videoRow = page.getByTestId("conversation-message-video-call").last();
     await expect(videoRow).toHaveClass(/justify-end/);
+    await expect(videoRow.getByTestId("conversation-message-own")).toBeVisible();
+    await expect(videoRow.getByTestId("conversation-message-avatar-own")).toBeVisible();
+    await expect(videoRow.getByTestId("conversation-message-tail-own")).toBeVisible();
   });
 
   test("sitter sends video call request from messages page", async ({ browser }) => {
@@ -65,6 +66,7 @@ test.describe("video call request", () => {
     const ownerContext = await browser.newContext();
     const ownerPage = await ownerContext.newPage();
     await seedVerifiedOwner(ownerPage);
+    await setTimeFormatPreference(ownerPage, "24h");
     await ownerPage.goto("/owner/sits/solstice/applications");
     await ownerPage
       .getByRole("button", { name: /Alex Morgan/i })
@@ -103,6 +105,7 @@ test.describe("video call request", () => {
 
   test("video call request shows correct time details in message", async ({ page }) => {
     await seedVerifiedOwner(page);
+    await setTimeFormatPreference(page, "12h");
     await page.goto("/owner/sits/solstice/applications");
 
     await page
@@ -117,10 +120,9 @@ test.describe("video call request", () => {
     await fillVideoCallSchedule(dialog, page, { daysAhead: 3, time: "09:00", duration: "60" });
     await dialog.getByRole("button", { name: /Send proposal/i }).click();
 
-    // Check that the time and duration are shown
-    // Time may be formatted as "9:00 AM" (en-US) or "09:00" (en-GB) depending on locale
     await expect(page.getByText(/Video call proposed/i).first()).toBeVisible();
-    await expect(page.getByText(/9:00/i).first()).toBeVisible();
+    await expect(page.getByTestId("conversation-video-call-when").last()).toContainText(/9:00/i);
+    await expect(page.getByTestId("conversation-video-call-when").last()).toContainText(/AM/i);
     await expect(page.getByText(/60 minutes/i).first()).toBeVisible();
   });
 });

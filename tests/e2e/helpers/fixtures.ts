@@ -8,7 +8,9 @@ export type DevFixtureKind =
   | "accept-solstice"
   | "reset-solstice-open"
   | "alex-blue-hour-accepted"
-  | "lifecycle-sit";
+  | "lifecycle-sit"
+  | "owner-second-boat"
+  | "unclaim-owned-vessels";
 
 export type LifecycleSitPhase = "accepting" | "accepted" | "underway" | "completed";
 

@@ -64,14 +64,21 @@ export function VesselPreviewCard({ vessel }: { vessel: VesselPreviewFields }) {
     ? t("detail.homePort", { homePort: vessel.homePort.trim() })
     : t("editorPreview.locationUnknown");
   const image = vessel.image.trim() || FALLBACK_IMAGE;
-  const lengthLabel = vessel.length
-    ? formatBoatLength(vessel.length, measurementSystem)
-    : t("editorPreview.lengthPending");
-  const typeLength = `${labelFor(t, vessel.type)} · ${lengthLabel}`;
-  const specsLine =
-    vessel.yearBuilt != null
-      ? `${typeLength} · ${t("boat.yearBuiltShort", { year: vessel.yearBuilt })}`
-      : typeLength;
+  const specsParts: string[] = [];
+  const typeLabel = labelFor(t, vessel.type).trim();
+  if (typeLabel && vessel.type !== "Not specified") {
+    specsParts.push(typeLabel);
+  }
+  const lengthLabel = vessel.length.trim()
+    ? formatBoatLength(vessel.length, measurementSystem).trim()
+    : "";
+  if (lengthLabel) {
+    specsParts.push(lengthLabel);
+  }
+  if (vessel.yearBuilt != null) {
+    specsParts.push(t("boat.yearBuiltShort", { year: vessel.yearBuilt }));
+  }
+  const specsLine = specsParts.join(" · ");
 
   return (
     <div className="min-w-0">

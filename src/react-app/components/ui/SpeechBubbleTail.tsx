@@ -6,9 +6,11 @@ export function SpeechBubbleTail({
 }: {
   side: "left" | "right";
   testId?: string;
-  tone: "cream" | "navy";
+  tone: "cream" | "navy" | "seafoam";
 }) {
-  const fill = tone === "navy" ? "bg-navy" : "bg-cream";
+  let fill = "bg-cream";
+  if (tone === "navy") fill = "bg-navy";
+  else if (tone === "seafoam") fill = "bg-seafoam";
   const isLeft = side === "left";
 
   return (

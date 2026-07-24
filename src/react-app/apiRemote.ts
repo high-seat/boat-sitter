@@ -5,6 +5,7 @@ import {
   type ApplicationsListParams,
 } from "../shared/applicationsSearch";
 import { boatsSearchQueryString, type BoatSearchParams } from "../shared/boatsSearch";
+import type { SitListSort } from "../shared/sitsSort";
 import {
   addressSearchQueryString,
   type AddressSearchParams,
@@ -182,10 +183,12 @@ type SitApplication = {
       | "videoCallDeclined"
       | "phoneShared"
       | "withdrawn"
-      | "sitCancelled";
+      | "sitCancelled"
+      | "sitEndedEarly";
     videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
     sharedPhone?: string;
   }>;
+  totalMessages?: number;
 };
 
 type SupportRequest = {
@@ -354,6 +357,7 @@ type ApiApplication = {
     videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
     sharedPhone?: string;
   }>;
+  totalMessages?: number;
 };
 
 export type ApiProfile = {
@@ -371,6 +375,7 @@ export type ApiProfile = {
   skills: string[];
   preferredLanguage: string;
   measurementSystem: "metric" | "imperial";
+  timeFormat: "12h" | "24h";
   emailNotifications: Record<string, boolean>;
   sitDefaults: Record<string, unknown>;
   applicationDefaults: Record<string, unknown>;
@@ -397,9 +402,11 @@ export type ApiReview = {
   sitId: string;
   boatName: string;
   applicationId: string;
+  authorRole?: "owner" | "sitter";
   sitterName: string;
   ownerName: string;
   ownerImage: string;
+  authorImage?: string;
   rating: number;
   text: string;
   createdAt: string;
@@ -668,6 +675,7 @@ export function normalizeApiApplication(row: ApiApplication): SitApplication {
       videoCall: message.videoCall,
       sharedPhone: message.sharedPhone,
     })),
+    totalMessages: row.totalMessages,
   };
 }
 
@@ -734,8 +742,9 @@ export async function apiGetVessels(owner?: string): Promise<Vessel[]> {
   return rows.map(normalizeApiVessel);
 }
 
-export async function apiGetSits(): Promise<Sit[]> {
-  const rows = await apiGet<ApiSit[]>("/api/sits");
+export async function apiGetSits(sort?: SitListSort): Promise<Sit[]> {
+  const path = sort ? `/api/sits?sort=${encodeURIComponent(sort)}` : "/api/sits";
+  const rows = await apiGet<ApiSit[]>(path);
   return rows.map(normalizeApiSit);
 }
 
@@ -778,6 +787,11 @@ export async function apiDeleteSit(id: string): Promise<void> {
 
 export async function apiStartSitEarly(id: string): Promise<Sit> {
   const row = await apiPost<ApiSit>(`/api/sits/${encodeURIComponent(id)}/start-early`, {});
+  return normalizeApiSit(row);
+}
+
+export async function apiEndSitEarly(id: string): Promise<Sit> {
+  const row = await apiPost<ApiSit>(`/api/sits/${encodeURIComponent(id)}/end-early`, {});
   return normalizeApiSit(row);
 }
 
@@ -961,6 +975,51 @@ export async function apiDeclineApplicationVideoCall(
   return normalizeApiApplication(row);
 }
 
+export type ApiApplicationMessage = {
+  id: string;
+  senderName: string;
+  text: string;
+  createdAt: string;
+  kind: "user" | "system";
+  systemKind?: string;
+  videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
+  sharedPhone?: string;
+};
+
+export type ApiMessagesPage = {
+  data: ApiApplicationMessage[];
+  total: number;
+  hasMore: boolean;
+};
+
+export async function apiGetApplicationMessages(
+  applicationId: string,
+  params?: { limit?: number; before?: string },
+): Promise<ApiMessagesPage> {
+  const searchParams = new URLSearchParams();
+  if (params?.limit) searchParams.set("limit", String(params.limit));
+  if (params?.before) searchParams.set("before", params.before);
+  const qs = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  // Use raw fetch: apiGet unwraps `{ data }` and would drop `total` / `hasMore`.
+  const res = await fetch(`/api/applications/${encodeURIComponent(applicationId)}/messages${qs}`, {
+    credentials: "include",
+  });
+  const body = (await res.json().catch(() => null)) as {
+    data?: ApiApplicationMessage[];
+    total?: number;
+    hasMore?: boolean;
+    error?: string;
+  } | null;
+  if (!res.ok) {
+    throw new ApiError(res.status, body?.error || res.statusText, body);
+  }
+  return {
+    data: body?.data ?? [],
+    total: body?.total ?? 0,
+    hasMore: Boolean(body?.hasMore),
+  };
+}
+
 export async function apiUploadImage(blob: Blob, filename = "image.webp"): Promise<string> {
   const form = new FormData();
   form.append("file", blob, filename);
@@ -985,7 +1044,6 @@ export type ApiUserPrefs = {
   saved: string[];
   archivedConversations: string[];
   deletedConversations: string[];
-  archivedSits: string[];
   blockedUsers: Array<{ name: string; image: string; blockedAt: string }>;
   userReports: Array<{
     id: string;
@@ -1029,12 +1087,6 @@ export async function apiSetArchivedConversation(
 
 export async function apiDeleteConversation(applicationId: string): Promise<void> {
   await apiPut(`/api/prefs/deleted-conversations/${encodeURIComponent(applicationId)}`, {});
-}
-
-export async function apiSetArchivedSit(sitId: string, archived: boolean): Promise<void> {
-  const path = `/api/prefs/archived-sits/${encodeURIComponent(sitId)}`;
-  if (archived) await apiPut(path, {});
-  else await apiDelete(path);
 }
 
 export async function apiBlockUser(input: { name: string; image: string }): Promise<void> {
@@ -1110,9 +1162,16 @@ export async function apiGetReviewsForSitter(sitterName: string): Promise<ApiRev
   return apiGet<ApiReview[]>(`/api/reviews?sitter=${encodeURIComponent(sitterName)}`);
 }
 
-export async function apiGetReviewForApplication(applicationId: string): Promise<ApiReview | null> {
+export async function apiGetReviewsForOwner(ownerName: string): Promise<ApiReview[]> {
+  return apiGet<ApiReview[]>(`/api/reviews?owner=${encodeURIComponent(ownerName)}`);
+}
+
+export async function apiGetReviewForApplication(
+  applicationId: string,
+  authorRole: "owner" | "sitter" = "owner",
+): Promise<ApiReview | null> {
   return apiGet<ApiReview | null>(
-    `/api/reviews?applicationId=${encodeURIComponent(applicationId)}`,
+    `/api/reviews?applicationId=${encodeURIComponent(applicationId)}&authorRole=${authorRole}`,
   );
 }
 

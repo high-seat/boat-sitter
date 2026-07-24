@@ -1,5 +1,5 @@
 import { invalidateApiSessionCache } from "@/apiRemote";
-import { useAppStore } from "@/store";
+import { detectTimeFormat, useAppStore } from "@/store";
 
 /**
  * On app load, ask the Worker who the current session belongs to (/api/me) and,
@@ -30,6 +30,7 @@ export async function hydrateSession(): Promise<void> {
         skills: string[];
         preferredLanguage: string;
         measurementSystem: "metric" | "imperial";
+        timeFormat: "12h" | "24h";
         emailNotifications: Record<string, boolean>;
         sitDefaults: Record<string, unknown>;
         applicationDefaults: Record<string, unknown>;
@@ -72,6 +73,7 @@ export async function hydrateSession(): Promise<void> {
               skills: profile.skills,
               preferredLanguage: profile.preferredLanguage,
               measurementSystem: profile.measurementSystem,
+              timeFormat: profile.timeFormat ?? detectTimeFormat(),
               emailNotifications: {
                 ...state.user.emailNotifications,
                 ...profile.emailNotifications,
@@ -117,7 +119,6 @@ export async function hydrateSession(): Promise<void> {
         saved: prefs.saved,
         archivedConversations: prefs.archivedConversations,
         deletedConversations: prefs.deletedConversations ?? [],
-        archivedSits: prefs.archivedSits,
         blockedUsers: prefs.blockedUsers,
         userReports: prefs.userReports.map((report) => ({
           ...report,
@@ -130,7 +131,6 @@ export async function hydrateSession(): Promise<void> {
         saved: [],
         archivedConversations: [],
         deletedConversations: [],
-        archivedSits: [],
         blockedUsers: [],
         userReports: [],
       });

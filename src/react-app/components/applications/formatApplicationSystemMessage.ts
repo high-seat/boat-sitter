@@ -73,6 +73,13 @@ export function formatApplicationSystemMessage(
         })
       : t("applications.systemMessage.sitCancelled");
   }
+  if (message.systemKind === "sitEndedEarly") {
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.sitEndedEarlyOwner", {
+          name: application.applicant.name,
+        })
+      : t("applications.systemMessage.sitEndedEarly");
+  }
   return message.text;
 }
 

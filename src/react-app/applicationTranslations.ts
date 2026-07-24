@@ -24,6 +24,7 @@ const en = {
   "applications.sortExperience": "Most experience",
   "applications.sortSkillMatch": "Best skill match",
   "applications.sortPriorSits": "Most prior sits",
+  "applications.gettingApplicants": "Getting applicants…",
   "applications.filterStatusLabel": "Filter by status",
   "applications.filterStatusAll": "All statuses",
   "applications.filterExperienceLabel": "Filter by experience",
@@ -63,12 +64,16 @@ const en = {
   "applications.anotherAcceptedBannerTitle": "Another applicant is confirmed",
   "applications.anotherAcceptedBanner":
     "This applicant was not accepted. You can still chat with them here, but you must unaccept {{name}} before you can accept this person.",
+  "applications.listNotConsideredTitle": "Not being considered",
+  "applications.listNotConsidered":
+    "These applicants are no longer being considered while {{name}} is accepted. Conversations stay available.",
   "applications.confirm.unacceptTitle": "Unaccept {{name}}?",
   "applications.confirm.unacceptText":
     "{{name}} will no longer be confirmed for this sit. You can accept another applicant afterward.",
   "applications.confirm.unacceptAction": "Yes, unaccept",
   "applications.conversation": "Conversation",
   "applications.noMessagesYet": "No messages yet",
+  "applications.fetchingOlderMessages": "Fetching older messages",
   "applications.systemMessage.accepted": "You were accepted for this sit",
   "applications.systemMessage.acceptedOwner": "You accepted {{name}} for this sit",
   "applications.systemMessage.declined": "You are no longer being considered for this sit",
@@ -77,6 +82,8 @@ const en = {
   "applications.systemMessage.unacceptedOwner": "You unaccepted {{name}} for this sit",
   "applications.systemMessage.sitCancelled": "This sit was cancelled by the owner",
   "applications.systemMessage.sitCancelledOwner": "You cancelled this sit with {{name}}",
+  "applications.systemMessage.sitEndedEarly": "This sit was completed early",
+  "applications.systemMessage.sitEndedEarlyOwner": "You ended this sit early with {{name}}",
   "applications.systemMessage.applicantsClosed":
     "The owner is no longer considering applicants for this sit",
   "applications.systemMessage.videoCallRequestTitle": "Video call proposed",
@@ -213,6 +220,8 @@ const en = {
   "notifications.items.applicationUnaccepted":
     "{{actor}} is no longer confirming you for {{boat}}.",
   "notifications.items.sitCancelled": "{{actor}} cancelled the sit for {{boat}}.",
+  "notifications.items.sitEndedEarly":
+    "{{actor}} ended the sit for {{boat}} early. You can leave a review.",
   "notifications.items.newApplication": "{{actor}} applied to sit {{boat}}.",
   "notifications.items.availabilityMatch": "A new sit matches your availability: {{boat}}.",
   "notifications.items.availabilitySitsFound":
@@ -296,7 +305,8 @@ const en = {
   "messageReport.escalateSuccessTitle": "Escalated to Boatstead",
   "messageReport.escalateSuccessText": "Our team will review this message and follow up by email.",
   "applications.replyPlaceholder": "Write a reply...",
-  "applications.replyHint": "Enter to send. {{shortcut}} for a new line.",
+  "applications.replyHint":
+    "<sendKey>Enter</sendKey> to send. <modKey/> + <sendKey>Enter</sendKey> for a new line.",
   "applications.sending": "Sending...",
   "applications.sendReply": "Send reply",
   "applications.translateWithGoogle": "Translate with Google",
@@ -354,6 +364,8 @@ const en = {
   "reviews.summary_one": "{{average}} out of 5 from 1 review",
   "reviews.summary_other": "{{average}} out of 5 from {{count}} reviews",
   "reviews.empty": "No reviews yet for this sitter.",
+  "reviews.ownerTitle": "Owner reviews",
+  "reviews.ownerEmpty": "No reviews from sitters yet.",
   "reviews.noRatingYet": "No ratings yet",
   "reviews.viewAll_one": "View 1 review",
   "reviews.viewAll_other": "View all {{count}} reviews",
@@ -364,6 +376,9 @@ const en = {
   "reviews.leaveKicker": "Leave a review",
   "reviews.leaveTitle": "How was {{name}} as a sitter?",
   "reviews.leaveHint": "Share how the sit went on {{boat}}. Your rating helps other owners.",
+  "reviews.leaveTitleForOwner": "How was {{name}} as a boat owner?",
+  "reviews.leaveHintForOwner":
+    "Share how the sit went on {{boat}}. Your rating helps other sitters.",
   "reviews.yourRating": "Your rating",
   "reviews.yourReview": "Your review",
   "reviews.yourReviewPlaceholder": "Describe communication, care of the boat, and handover...",
@@ -384,6 +399,9 @@ const en = {
     "You have {{days}} days left to leave a review. Reviews stay open for 7 days after a sit ends.",
   "reviews.windowClosed": "The review window for this sit has closed.",
   "reviews.sitNotCompleted": "You can leave a review after the sit has finished.",
+  "reviews.previewKicker": "Your review",
+  "reviews.previewTitle": "You reviewed {{name}}",
+  "reviews.previewTitleForOwner": "You reviewed {{name}}",
   "availability.title": "Your availability",
   "availability.subtitle":
     "Share the dates and places you're free to sit. Each open window shows the boats you could apply to right now.",
@@ -451,6 +469,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Plus d’expérience",
     "applications.sortSkillMatch": "Meilleure correspondance de compétences",
     "applications.sortPriorSits": "Plus de gardes précédentes",
+    "applications.gettingApplicants": "Récupération des candidatures…",
     "applications.filterStatusLabel": "Filtrer par statut",
     "applications.filterStatusAll": "Tous les statuts",
     "applications.filterExperienceLabel": "Filtrer par expérience",
@@ -490,6 +509,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Un autre candidat est confirmé",
     "applications.anotherAcceptedBanner":
       "Ce candidat n'a pas été accepté. Vous pouvez toujours discuter avec lui ici, mais vous devez retirer l'acceptation de {{name}} avant de pouvoir accepter cette personne.",
+    "applications.listNotConsideredTitle": "Non pris en considération",
+    "applications.listNotConsidered":
+      "Ces candidats ne sont plus pris en considération tant que {{name}} est accepté. Les conversations restent disponibles.",
     "applications.confirm.unacceptTitle": "Retirer l'acceptation de {{name}} ?",
     "applications.confirm.unacceptText":
       "{{name}} ne sera plus confirmé pour cette garde. Vous pourrez ensuite accepter un autre candidat.",
@@ -506,6 +528,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Vous avez retiré l’acceptation de {{name}} pour cette garde",
     "applications.systemMessage.sitCancelled": "Cette garde a été annulée par le propriétaire",
     "applications.systemMessage.sitCancelledOwner": "Vous avez annulé cette garde avec {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Cette garde a été terminée plus tôt",
+    "applications.systemMessage.sitEndedEarlyOwner":
+      "Vous avez terminé cette garde plus tôt avec {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Le propriétaire n’examine plus les candidatures pour cette garde",
     "applications.systemMessage.videoCallRequestTitle": "Appel vidéo proposé",
@@ -644,6 +669,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} a accepté votre candidature pour {{boat}}.",
     "notifications.items.applicationUnaccepted": "{{actor}} ne vous confirme plus pour {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} a annulé la garde pour {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} a terminé plus tôt la garde pour {{boat}}. Vous pouvez laisser un avis.",
     "notifications.items.newApplication": "{{actor}} a proposé de garder {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} vous a envoyé un nouveau message au sujet de {{boat}}.",
@@ -726,7 +753,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Notre équipe examinera ce message et vous recontactera par e-mail.",
     "applications.replyPlaceholder": "Rédigez une réponse...",
-    "applications.replyHint": "Entrée pour envoyer. {{shortcut}} pour une nouvelle ligne.",
+    "applications.replyHint":
+      "<sendKey>Entrée</sendKey> pour envoyer. <modKey/> + <sendKey>Entrée</sendKey> pour une nouvelle ligne.",
     "applications.sending": "Envoi...",
     "applications.sendReply": "Envoyer la réponse",
     "applications.translateWithGoogle": "Traduire avec Google",
@@ -786,6 +814,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} sur 5 d’après 1 avis",
     "reviews.summary_other": "{{average}} sur 5 d’après {{count}} avis",
     "reviews.empty": "Aucun avis pour ce gardien pour le moment.",
+    "reviews.ownerTitle": "Avis sur le propriétaire",
+    "reviews.ownerEmpty": "Pas encore d’avis de gardiens.",
     "reviews.noRatingYet": "Pas encore de note",
     "reviews.viewAll_one": "Voir 1 avis",
     "reviews.viewAll_other": "Voir les {{count}} avis",
@@ -797,6 +827,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Comment était {{name}} comme gardien ?",
     "reviews.leaveHint":
       "Partagez le déroulement de la garde sur {{boat}}. Votre note aide les autres propriétaires.",
+    "reviews.leaveTitleForOwner": "Comment était {{name}} en tant que propriétaire ?",
+    "reviews.leaveHintForOwner":
+      "Partagez comment s’est passée la garde sur {{boat}}. Votre note aide les autres gardiens.",
     "reviews.yourRating": "Votre note",
     "reviews.yourReview": "Votre avis",
     "reviews.yourReviewPlaceholder":
@@ -818,6 +851,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Il vous reste {{days}} jours pour laisser un avis. Les avis restent ouverts pendant 7 jours après la fin de la garde.",
     "reviews.windowClosed": "La période d’avis pour cette garde est terminée.",
     "reviews.sitNotCompleted": "Vous pourrez laisser un avis une fois la garde terminée.",
+    "reviews.previewKicker": "Votre avis",
+    "reviews.previewTitle": "Vous avez évalué {{name}}",
+    "reviews.previewTitleForOwner": "Vous avez évalué {{name}}",
     "availability.title": "Votre disponibilité",
     "availability.subtitle":
       "Indiquez les dates et les lieux où vous êtes libre pour une garde. Chaque fenêtre ouverte affiche les bateaux auxquels vous pouvez postuler.",
@@ -877,6 +913,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Más experiencia",
     "applications.sortSkillMatch": "Mejor coincidencia de habilidades",
     "applications.sortPriorSits": "Más estancias previas",
+    "applications.gettingApplicants": "Obteniendo solicitantes…",
     "applications.filterStatusLabel": "Filtrar por estado",
     "applications.filterStatusAll": "Todos los estados",
     "applications.filterExperienceLabel": "Filtrar por experiencia",
@@ -916,6 +953,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Otro solicitante está confirmado",
     "applications.anotherAcceptedBanner":
       "Este solicitante no fue aceptado. Aún puede chatear con él aquí, pero debe retirar la aceptación de {{name}} antes de poder aceptar a esta persona.",
+    "applications.listNotConsideredTitle": "No se están considerando",
+    "applications.listNotConsidered":
+      "Estos solicitantes ya no se están considerando mientras {{name}} esté aceptado. Las conversaciones siguen disponibles.",
     "applications.confirm.unacceptTitle": "¿Retirar la aceptación de {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} ya no quedará confirmado para esta estancia. Después podrá aceptar a otro solicitante.",
@@ -932,6 +972,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Retiraste la aceptación de {{name}} para esta estancia",
     "applications.systemMessage.sitCancelled": "El propietario canceló este sit",
     "applications.systemMessage.sitCancelledOwner": "Cancelaste este sit con {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Este sit se completó antes",
+    "applications.systemMessage.sitEndedEarlyOwner": "Terminaste este sit antes con {{name}}",
     "applications.systemMessage.applicantsClosed":
       "El propietario ya no está considerando solicitantes para esta estancia",
     "applications.systemMessage.videoCallRequestTitle": "Videollamada propuesta",
@@ -1069,6 +1111,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} aceptó tu solicitud para cuidar {{boat}}.",
     "notifications.items.applicationUnaccepted": "{{actor}} ya no te confirma para {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} canceló el sit de {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} terminó antes el sit de {{boat}}. Puedes dejar una reseña.",
     "notifications.items.newApplication": "{{actor}} solicitó cuidar {{boat}}.",
     "notifications.items.newMessage": "{{actor}} te envió un nuevo mensaje sobre {{boat}}.",
     "notifications.items.sitReminder": "Tu estancia en {{boat}} empieza pronto.",
@@ -1150,7 +1194,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Nuestro equipo revisará este mensaje y te contactará por correo.",
     "applications.replyPlaceholder": "Escribe una respuesta...",
-    "applications.replyHint": "Intro para enviar. {{shortcut}} para una nueva línea.",
+    "applications.replyHint":
+      "<sendKey>Intro</sendKey> para enviar. <modKey/> + <sendKey>Intro</sendKey> para una nueva línea.",
     "applications.sending": "Enviando...",
     "applications.sendReply": "Enviar respuesta",
     "applications.translateWithGoogle": "Traducir con Google",
@@ -1211,6 +1256,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} de 5 según 1 opinión",
     "reviews.summary_other": "{{average}} de 5 según {{count}} opiniones",
     "reviews.empty": "Todavía no hay opiniones sobre este cuidador.",
+    "reviews.ownerTitle": "Opiniones del propietario",
+    "reviews.ownerEmpty": "Aún no hay opiniones de cuidadores.",
     "reviews.noRatingYet": "Sin valoraciones todavía",
     "reviews.viewAll_one": "Ver 1 opinión",
     "reviews.viewAll_other": "Ver las {{count}} opiniones",
@@ -1222,6 +1269,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "¿Cómo fue {{name}} como cuidador?",
     "reviews.leaveHint":
       "Cuenta cómo fue la estancia en {{boat}}. Tu valoración ayuda a otros propietarios.",
+    "reviews.leaveTitleForOwner": "¿Cómo fue {{name}} como propietario?",
+    "reviews.leaveHintForOwner":
+      "Cuenta cómo fue el sit en {{boat}}. Tu valoración ayuda a otros cuidadores.",
     "reviews.yourRating": "Tu valoración",
     "reviews.yourReview": "Tu opinión",
     "reviews.yourReviewPlaceholder":
@@ -1243,6 +1293,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Te quedan {{days}} días para dejar una opinión. Las opiniones permanecen abiertas durante 7 días después de que termine la estancia.",
     "reviews.windowClosed": "El plazo para opinar sobre este sit ha cerrado.",
     "reviews.sitNotCompleted": "Podrás dejar una opinión cuando termine el sit.",
+    "reviews.previewKicker": "Tu opinión",
+    "reviews.previewTitle": "Has valorado a {{name}}",
+    "reviews.previewTitleForOwner": "Has valorado a {{name}}",
     "availability.title": "Tu disponibilidad",
     "availability.subtitle":
       "Comparte las fechas y lugares en los que estás libre para una estancia. Cada ventana abierta muestra los barcos a los que puedes postularte.",
@@ -1305,6 +1358,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Più esperienza",
     "applications.sortSkillMatch": "Migliore corrispondenza di competenze",
     "applications.sortPriorSits": "Più soggiorni precedenti",
+    "applications.gettingApplicants": "Recupero candidati…",
     "applications.filterStatusLabel": "Filtra per stato",
     "applications.filterStatusAll": "Tutti gli stati",
     "applications.filterExperienceLabel": "Filtra per esperienza",
@@ -1344,6 +1398,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Un altro candidato è confermato",
     "applications.anotherAcceptedBanner":
       "Questo candidato non è stato accettato. Puoi comunque chattare con lui qui, ma devi revocare l'accettazione di {{name}} prima di poter accettare questa persona.",
+    "applications.listNotConsideredTitle": "Non in considerazione",
+    "applications.listNotConsidered":
+      "Questi candidati non sono più in considerazione finché {{name}} è accettato. Le conversazioni restano disponibili.",
     "applications.confirm.unacceptTitle": "Revocare l'accettazione di {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} non sarà più confermato per questa permanenza. Potrai accettare un altro candidato in seguito.",
@@ -1360,6 +1417,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Hai revocato l’accettazione di {{name}} per questa custodia",
     "applications.systemMessage.sitCancelled": "Il proprietario ha annullato questo sit",
     "applications.systemMessage.sitCancelledOwner": "Hai annullato questo sit con {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Questo sit è stato completato in anticipo",
+    "applications.systemMessage.sitEndedEarlyOwner":
+      "Hai terminato questo sit in anticipo con {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Il proprietario non sta più considerando candidati per questo soggiorno",
     "applications.systemMessage.videoCallRequestTitle": "Videochiamata proposta",
@@ -1500,6 +1560,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} ha accettato la tua candidatura per {{boat}}.",
     "notifications.items.applicationUnaccepted": "{{actor}} non ti conferma più per {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} ha annullato il sit per {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} ha terminato in anticipo il sit per {{boat}}. Puoi lasciare una recensione.",
     "notifications.items.newApplication": "{{actor}} si è candidato per occuparsi di {{boat}}.",
     "notifications.items.newMessage": "{{actor}} ti ha inviato un nuovo messaggio su {{boat}}.",
     "notifications.items.sitReminder": "Il tuo soggiorno su {{boat}} inizierà presto.",
@@ -1580,7 +1642,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Il nostro team esaminerà questo messaggio e ti ricontatterà via e-mail.",
     "applications.replyPlaceholder": "Scrivi una risposta...",
-    "applications.replyHint": "Invio per inviare. {{shortcut}} per una nuova riga.",
+    "applications.replyHint":
+      "<sendKey>Invio</sendKey> per inviare. <modKey/> + <sendKey>Invio</sendKey> per una nuova riga.",
     "applications.sending": "Invio...",
     "applications.sendReply": "Invia risposta",
     "applications.translateWithGoogle": "Traduci con Google",
@@ -1640,6 +1703,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} su 5 da 1 recensione",
     "reviews.summary_other": "{{average}} su 5 da {{count}} recensioni",
     "reviews.empty": "Nessuna recensione ancora per questo sitter.",
+    "reviews.ownerTitle": "Recensioni del proprietario",
+    "reviews.ownerEmpty": "Nessuna recensione dai sitter ancora.",
     "reviews.noRatingYet": "Ancora nessuna valutazione",
     "reviews.viewAll_one": "Vedi 1 recensione",
     "reviews.viewAll_other": "Vedi tutte le {{count}} recensioni",
@@ -1651,6 +1716,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Com’è stato {{name}} come sitter?",
     "reviews.leaveHint":
       "Racconta com’è andato il soggiorno su {{boat}}. La tua valutazione aiuta altri proprietari.",
+    "reviews.leaveTitleForOwner": "Com’è stato {{name}} come proprietario?",
+    "reviews.leaveHintForOwner":
+      "Racconta com’è andato il sit su {{boat}}. La tua valutazione aiuta altri sitter.",
     "reviews.yourRating": "La tua valutazione",
     "reviews.yourReview": "La tua recensione",
     "reviews.yourReviewPlaceholder": "Descrivi comunicazione, cura della barca e consegna...",
@@ -1671,6 +1739,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Hai ancora {{days}} giorni per lasciare una recensione. Le recensioni restano aperte per 7 giorni dopo la fine del soggiorno.",
     "reviews.windowClosed": "Il periodo per recensire questo sit è scaduto.",
     "reviews.sitNotCompleted": "Potrai lasciare una recensione quando il sit sarà terminato.",
+    "reviews.previewKicker": "La tua recensione",
+    "reviews.previewTitle": "Hai recensito {{name}}",
+    "reviews.previewTitleForOwner": "Hai recensito {{name}}",
     "availability.title": "La tua disponibilità",
     "availability.subtitle":
       "Condividi le date e i luoghi in cui sei libero per un soggiorno. Ogni finestra aperta mostra le barche a cui puoi candidarti.",
@@ -1734,6 +1805,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Meiste Erfahrung",
     "applications.sortSkillMatch": "Beste Anforderungsübereinstimmung",
     "applications.sortPriorSits": "Meiste frühere Sits",
+    "applications.gettingApplicants": "Bewerber werden geladen…",
     "applications.filterStatusLabel": "Nach Status filtern",
     "applications.filterStatusAll": "Alle Status",
     "applications.filterExperienceLabel": "Nach Erfahrung filtern",
@@ -1773,6 +1845,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Ein anderer Bewerber ist bestätigt",
     "applications.anotherAcceptedBanner":
       "Dieser Bewerber wurde nicht angenommen. Sie können hier weiter mit ihm chatten, müssen aber die Annahme von {{name}} zurücknehmen, bevor Sie diese Person annehmen können.",
+    "applications.listNotConsideredTitle": "Werden nicht berücksichtigt",
+    "applications.listNotConsidered":
+      "Diese Bewerber werden nicht mehr berücksichtigt, solange {{name}} akzeptiert ist. Unterhaltungen bleiben verfügbar.",
     "applications.confirm.unacceptTitle": "Annahme von {{name}} zurücknehmen?",
     "applications.confirm.unacceptText":
       "{{name}} ist danach nicht mehr für diesen Sit bestätigt. Sie können anschließend einen anderen Bewerber annehmen.",
@@ -1790,6 +1865,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sie haben die Annahme von {{name}} für diese Betreuung zurückgenommen",
     "applications.systemMessage.sitCancelled": "Dieser Sit wurde vom Eigentümer abgesagt",
     "applications.systemMessage.sitCancelledOwner": "Du hast diesen Sit mit {{name}} abgesagt",
+    "applications.systemMessage.sitEndedEarly": "Dieser Sit wurde früher abgeschlossen",
+    "applications.systemMessage.sitEndedEarlyOwner":
+      "Du hast diesen Sit mit {{name}} früher beendet",
     "applications.systemMessage.applicantsClosed":
       "Der Eigentümer prüft für diesen Sit keine Bewerber mehr",
     "applications.systemMessage.videoCallRequestTitle": "Videoanruf vorgeschlagen",
@@ -1927,6 +2005,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{actor}} hat Ihre Bewerbung für {{boat}} angenommen.",
     "notifications.items.applicationUnaccepted": "{{actor}} bestätigt Sie nicht mehr für {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} hat den Sit für {{boat}} abgesagt.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} hat den Sit für {{boat}} früher beendet. Du kannst eine Bewertung abgeben.",
     "notifications.items.newApplication": "{{actor}} hat sich für {{boat}} beworben.",
     "notifications.items.newMessage":
       "{{actor}} hat Ihnen eine neue Nachricht zu {{boat}} gesendet.",
@@ -2010,7 +2090,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Unser Team prüft diese Nachricht und meldet sich per E-Mail.",
     "applications.replyPlaceholder": "Antwort schreiben...",
-    "applications.replyHint": "Eingabe zum Senden. {{shortcut}} für eine neue Zeile.",
+    "applications.replyHint":
+      "<sendKey>Eingabe</sendKey> zum Senden. <modKey/> + <sendKey>Eingabe</sendKey> für eine neue Zeile.",
     "applications.sending": "Wird gesendet...",
     "applications.sendReply": "Antwort senden",
     "applications.translateWithGoogle": "Mit Google übersetzen",
@@ -2071,6 +2152,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} von 5 aus 1 Bewertung",
     "reviews.summary_other": "{{average}} von 5 aus {{count}} Bewertungen",
     "reviews.empty": "Noch keine Bewertungen für diesen Sitter.",
+    "reviews.ownerTitle": "Bewertungen als Eigentümer",
+    "reviews.ownerEmpty": "Noch keine Bewertungen von Sittern.",
     "reviews.noRatingYet": "Noch keine Bewertung",
     "reviews.viewAll_one": "1 Bewertung anzeigen",
     "reviews.viewAll_other": "Alle {{count}} Bewertungen anzeigen",
@@ -2082,6 +2165,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Wie war {{name}} als Sitter?",
     "reviews.leaveHint":
       "Berichten Sie, wie der Sit auf {{boat}} verlief. Ihre Bewertung hilft anderen Eigentümern.",
+    "reviews.leaveTitleForOwner": "Wie war {{name}} als Bootsbesitzer?",
+    "reviews.leaveHintForOwner":
+      "Teile, wie der Sit auf {{boat}} gelaufen ist. Deine Bewertung hilft anderen Sittern.",
     "reviews.yourRating": "Ihre Bewertung",
     "reviews.yourReview": "Ihre Rezension",
     "reviews.yourReviewPlaceholder": "Beschreiben Sie Kommunikation, Bootspflege und Übergabe...",
@@ -2103,6 +2189,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sie haben noch {{days}} Tage, um eine Bewertung abzugeben. Bewertungen bleiben 7 Tage nach Ende des Sits offen.",
     "reviews.windowClosed": "Die Bewertungsfrist für diesen Sit ist abgelaufen.",
     "reviews.sitNotCompleted": "Sie können eine Bewertung abgeben, sobald der Sit beendet ist.",
+    "reviews.previewKicker": "Ihre Bewertung",
+    "reviews.previewTitle": "Sie haben {{name}} bewertet",
+    "reviews.previewTitleForOwner": "Sie haben {{name}} bewertet",
     "availability.title": "Deine Verfügbarkeit",
     "availability.subtitle":
       "Teile die Zeiträume und Orte, an denen du frei für eine Betreuung bist. Jedes offene Zeitfenster zeigt Boote, auf die du dich bewerben kannst.",
@@ -2163,6 +2252,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Meeste ervaring",
     "applications.sortSkillMatch": "Beste vaardighedenmatch",
     "applications.sortPriorSits": "Meeste eerdere verblijven",
+    "applications.gettingApplicants": "Sollicitanten ophalen…",
     "applications.filterStatusLabel": "Filteren op status",
     "applications.filterStatusAll": "Alle statussen",
     "applications.filterExperienceLabel": "Filteren op ervaring",
@@ -2202,6 +2292,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Een andere kandidaat is bevestigd",
     "applications.anotherAcceptedBanner":
       "Deze kandidaat is niet geaccepteerd. U kunt hier nog steeds met hen chatten, maar u moet de acceptatie van {{name}} intrekken voordat u deze persoon kunt accepteren.",
+    "applications.listNotConsideredTitle": "Niet in overweging",
+    "applications.listNotConsidered":
+      "Deze kandidaten worden niet meer overwogen zolang {{name}} is geaccepteerd. Gesprekken blijven beschikbaar.",
     "applications.confirm.unacceptTitle": "Acceptatie van {{name}} intrekken?",
     "applications.confirm.unacceptText":
       "{{name}} is daarna niet meer bevestigd voor deze sit. U kunt daarna een andere kandidaat accepteren.",
@@ -2218,6 +2311,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Je hebt de acceptatie van {{name}} voor deze oppas ingetrokken",
     "applications.systemMessage.sitCancelled": "Deze sit is geannuleerd door de eigenaar",
     "applications.systemMessage.sitCancelledOwner": "Je hebt deze sit met {{name}} geannuleerd",
+    "applications.systemMessage.sitEndedEarly": "Deze sit is eerder afgerond",
+    "applications.systemMessage.sitEndedEarlyOwner":
+      "Je hebt deze sit met {{name}} eerder beëindigd",
     "applications.systemMessage.applicantsClosed":
       "De eigenaar overweegt geen sollicitanten meer voor dit verblijf",
     "applications.systemMessage.videoCallRequestTitle": "Videogesprek voorgesteld",
@@ -2358,6 +2454,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationUnaccepted":
       "{{actor}} bevestigt je niet langer voor {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} heeft de sit voor {{boat}} geannuleerd.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} heeft de sit voor {{boat}} eerder beëindigd. Je kunt een beoordeling achterlaten.",
     "notifications.items.newApplication": "{{actor}} heeft zich aangemeld voor {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} heeft je een nieuw bericht over {{boat}} gestuurd.",
@@ -2440,7 +2538,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Ons team bekijkt dit bericht en neemt per e-mail contact op.",
     "applications.replyPlaceholder": "Schrijf een antwoord...",
-    "applications.replyHint": "Enter om te verzenden. {{shortcut}} voor een nieuwe regel.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> om te verzenden. <modKey/> + <sendKey>Enter</sendKey> voor een nieuwe regel.",
     "applications.sending": "Verzenden...",
     "applications.sendReply": "Antwoord verzenden",
     "applications.translateWithGoogle": "Vertalen met Google",
@@ -2500,6 +2599,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} van 5 uit 1 beoordeling",
     "reviews.summary_other": "{{average}} van 5 uit {{count}} beoordelingen",
     "reviews.empty": "Nog geen beoordelingen voor deze oppas.",
+    "reviews.ownerTitle": "Eigenaarbeoordelingen",
+    "reviews.ownerEmpty": "Nog geen beoordelingen van oppassen.",
     "reviews.noRatingYet": "Nog geen beoordeling",
     "reviews.viewAll_one": "Bekijk 1 beoordeling",
     "reviews.viewAll_other": "Bekijk alle {{count}} beoordelingen",
@@ -2511,6 +2612,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Hoe was {{name}} als oppas?",
     "reviews.leaveHint":
       "Vertel hoe het verblijf op {{boat}} ging. Jouw beoordeling helpt andere eigenaren.",
+    "reviews.leaveTitleForOwner": "Hoe was {{name}} als boot-eigenaar?",
+    "reviews.leaveHintForOwner":
+      "Deel hoe de sit op {{boat}} ging. Jouw beoordeling helpt andere oppassen.",
     "reviews.yourRating": "Jouw beoordeling",
     "reviews.yourReview": "Jouw review",
     "reviews.yourReviewPlaceholder": "Beschrijf communicatie, zorg voor de boot en overdracht...",
@@ -2531,6 +2635,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Je hebt nog {{days}} dagen om een beoordeling achter te laten. Beoordelingen blijven 7 dagen open na afloop van het verblijf.",
     "reviews.windowClosed": "De beoordelingsperiode voor deze sit is gesloten.",
     "reviews.sitNotCompleted": "Je kunt een beoordeling achterlaten nadat de sit is afgelopen.",
+    "reviews.previewKicker": "Jouw beoordeling",
+    "reviews.previewTitle": "Je hebt {{name}} beoordeeld",
+    "reviews.previewTitleForOwner": "Je hebt {{name}} beoordeeld",
     "availability.title": "Jouw beschikbaarheid",
     "availability.subtitle":
       "Deel de data en plaatsen waarop je vrij bent om te passen. Elk open venster toont boten waarop je kunt solliciteren.",
@@ -2590,6 +2697,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Mais experiência",
     "applications.sortSkillMatch": "Melhor correspondência de competências",
     "applications.sortPriorSits": "Mais estadias anteriores",
+    "applications.gettingApplicants": "A obter candidatos…",
     "applications.filterStatusLabel": "Filtrar por estado",
     "applications.filterStatusAll": "Todos os estados",
     "applications.filterExperienceLabel": "Filtrar por experiência",
@@ -2629,6 +2737,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Outro candidato está confirmado",
     "applications.anotherAcceptedBanner":
       "Este candidato não foi aceite. Ainda pode conversar com ele aqui, mas tem de retirar a aceitação de {{name}} antes de poder aceitar esta pessoa.",
+    "applications.listNotConsideredTitle": "Não estão a ser considerados",
+    "applications.listNotConsidered":
+      "Estes candidatos já não estão a ser considerados enquanto {{name}} estiver aceite. As conversas continuam disponíveis.",
     "applications.confirm.unacceptTitle": "Retirar a aceitação de {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} deixará de estar confirmado para esta estadia. Depois pode aceitar outro candidato.",
@@ -2645,6 +2756,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Retirou a aceitação de {{name}} para esta guarda",
     "applications.systemMessage.sitCancelled": "Este sit foi cancelado pelo proprietário",
     "applications.systemMessage.sitCancelledOwner": "Cancelou este sit com {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Este sit foi concluído mais cedo",
+    "applications.systemMessage.sitEndedEarlyOwner": "Terminou este sit mais cedo com {{name}}",
     "applications.systemMessage.applicantsClosed":
       "O proprietário já não está a considerar candidatos para esta estadia",
     "applications.systemMessage.videoCallRequestTitle": "Videochamada proposta",
@@ -2779,6 +2892,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationAccepted": "{{actor}} aceitou a sua candidatura para {{boat}}.",
     "notifications.items.applicationUnaccepted": "{{actor}} já não o confirma para {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} cancelou o sit de {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} terminou mais cedo o sit de {{boat}}. Pode deixar uma avaliação.",
     "notifications.items.newApplication": "{{actor}} candidatou-se para cuidar de {{boat}}.",
     "notifications.items.newMessage": "{{actor}} enviou-lhe uma nova mensagem sobre {{boat}}.",
     "notifications.items.sitReminder": "A sua estadia em {{boat}} começa em breve.",
@@ -2859,7 +2974,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "A nossa equipa irá analisar esta mensagem e contactá-lo por e-mail.",
     "applications.replyPlaceholder": "Escreva uma resposta...",
-    "applications.replyHint": "Enter para enviar. {{shortcut}} para uma nova linha.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> para enviar. <modKey/> + <sendKey>Enter</sendKey> para uma nova linha.",
     "applications.sending": "A enviar...",
     "applications.sendReply": "Enviar resposta",
     "applications.translateWithGoogle": "Traduzir com o Google",
@@ -2920,6 +3036,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} de 5 com base em 1 avaliação",
     "reviews.summary_other": "{{average}} de 5 com base em {{count}} avaliações",
     "reviews.empty": "Ainda não há avaliações para este cuidador.",
+    "reviews.ownerTitle": "Avaliações do proprietário",
+    "reviews.ownerEmpty": "Ainda sem avaliações de cuidadores.",
     "reviews.noRatingYet": "Ainda sem classificação",
     "reviews.viewAll_one": "Ver 1 avaliação",
     "reviews.viewAll_other": "Ver as {{count}} avaliações",
@@ -2931,6 +3049,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Como foi {{name}} como cuidador?",
     "reviews.leaveHint":
       "Partilhe como correu a estadia em {{boat}}. A sua classificação ajuda outros proprietários.",
+    "reviews.leaveTitleForOwner": "Como foi {{name}} como proprietário?",
+    "reviews.leaveHintForOwner":
+      "Partilhe como correu o sit em {{boat}}. A sua avaliação ajuda outros cuidadores.",
     "reviews.yourRating": "A sua classificação",
     "reviews.yourReview": "A sua avaliação",
     "reviews.yourReviewPlaceholder": "Descreva a comunicação, o cuidado do barco e a entrega...",
@@ -2951,6 +3072,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Tem {{days}} dias para deixar uma avaliação. As avaliações ficam abertas durante 7 dias após o fim da estadia.",
     "reviews.windowClosed": "O prazo de avaliação para este sit terminou.",
     "reviews.sitNotCompleted": "Pode deixar uma avaliação depois de o sit terminar.",
+    "reviews.previewKicker": "A sua avaliação",
+    "reviews.previewTitle": "Avaliou {{name}}",
+    "reviews.previewTitleForOwner": "Avaliou {{name}}",
     "availability.title": "A sua disponibilidade",
     "availability.subtitle":
       "Partilhe as datas e locais em que está livre para uma estadia. Cada janela aberta mostra os barcos a que pode candidatar-se.",
@@ -3013,6 +3137,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Περισσότερη εμπειρία",
     "applications.sortSkillMatch": "Καλύτερη αντιστοίχιση δεξιοτήτων",
     "applications.sortPriorSits": "Περισσότερες προηγούμενες διαμονές",
+    "applications.gettingApplicants": "Λήψη υποψηφίων…",
     "applications.filterStatusLabel": "Φιλτράρισμα κατά κατάσταση",
     "applications.filterStatusAll": "Όλες οι καταστάσεις",
     "applications.filterExperienceLabel": "Φιλτράρισμα κατά εμπειρία",
@@ -3052,6 +3177,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Ένας άλλος υποψήφιος έχει επιβεβαιωθεί",
     "applications.anotherAcceptedBanner":
       "Αυτός ο υποψήφιος δεν έγινε αποδεκτός. Μπορείτε ακόμα να συνομιλήσετε μαζί του εδώ, αλλά πρέπει να ανακαλέσετε την αποδοχή του {{name}} πριν αποδεχθείτε αυτό το άτομο.",
+    "applications.listNotConsideredTitle": "Δεν εξετάζονται πλέον",
+    "applications.listNotConsidered":
+      "Αυτοί οι υποψήφιοι δεν εξετάζονται πλέον όσο ο/η {{name}} είναι αποδεκτός/ή. Οι συνομιλίες παραμένουν διαθέσιμες.",
     "applications.confirm.unacceptTitle": "Ανάκληση αποδοχής του {{name}};",
     "applications.confirm.unacceptText":
       "Ο/Η {{name}} δεν θα είναι πλέον επιβεβαιωμένος/η για αυτή τη φύλαξη. Μετά μπορείτε να αποδεχθείτε άλλον υποψήφιο.",
@@ -3068,6 +3196,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ανακαλέσατε την αποδοχή του/της {{name}} για αυτή τη φύλαξη",
     "applications.systemMessage.sitCancelled": "Αυτό το sit ακυρώθηκε από τον ιδιοκτήτη",
     "applications.systemMessage.sitCancelledOwner": "Ακυρώσατε αυτό το sit με τον/την {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Αυτό το sit ολοκληρώθηκε νωρίτερα",
+    "applications.systemMessage.sitEndedEarlyOwner":
+      "Ολοκληρώσατε νωρίτερα αυτό το sit με τον/την {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Ο ιδιοκτήτης δεν εξετάζει πλέον υποψηφίους για αυτή τη διαμονή",
     "applications.systemMessage.videoCallRequestTitle": "Προτάθηκε βιντεοκλήση",
@@ -3208,6 +3339,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationUnaccepted":
       "Ο/Η {{actor}} δεν σας επιβεβαιώνει πλέον για το {{boat}}.",
     "notifications.items.sitCancelled": "Ο/Η {{actor}} ακύρωσε το sit για {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "Ο/Η {{actor}} ολοκλήρωσε νωρίτερα το sit για {{boat}}. Μπορείτε να αφήσετε κριτική.",
     "notifications.items.newApplication":
       "Ο χρήστης {{actor}} έκανε αίτηση για τη φροντίδα του {{boat}}.",
     "notifications.items.newMessage":
@@ -3291,7 +3424,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Η ομάδα μας θα εξετάσει αυτό το μήνυμα και θα επικοινωνήσει με e-mail.",
     "applications.replyPlaceholder": "Γράψτε μια απάντηση...",
-    "applications.replyHint": "Enter για αποστολή. {{shortcut}} για νέα γραμμή.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> για αποστολή. <modKey/> + <sendKey>Enter</sendKey> για νέα γραμμή.",
     "applications.sending": "Αποστολή...",
     "applications.sendReply": "Αποστολή απάντησης",
     "applications.translateWithGoogle": "Μετάφραση με Google",
@@ -3351,6 +3485,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} από 5 από 1 κριτική",
     "reviews.summary_other": "{{average}} από 5 από {{count}} κριτικές",
     "reviews.empty": "Δεν υπάρχουν ακόμη κριτικές για αυτόν τον φύλακα.",
+    "reviews.ownerTitle": "Κριτικές ιδιοκτήτη",
+    "reviews.ownerEmpty": "Δεν υπάρχουν ακόμη κριτικές από φύλακες.",
     "reviews.noRatingYet": "Χωρίς βαθμολογία ακόμη",
     "reviews.viewAll_one": "Δείτε 1 κριτική",
     "reviews.viewAll_other": "Δείτε και τις {{count}} κριτικές",
@@ -3362,6 +3498,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Πώς ήταν ο/η {{name}} ως φύλακας;",
     "reviews.leaveHint":
       "Μοιραστείτε πώς πήγε η διαμονή στο {{boat}}. Η βαθμολογία σας βοηθά άλλους ιδιοκτήτες.",
+    "reviews.leaveTitleForOwner": "Πώς ήταν ο/η {{name}} ως ιδιοκτήτης σκάφους;",
+    "reviews.leaveHintForOwner":
+      "Μοιραστείτε πώς πήγε το sit στο {{boat}}. Η βαθμολογία σας βοηθά άλλους φύλακες.",
     "reviews.yourRating": "Η βαθμολογία σας",
     "reviews.yourReview": "Η κριτική σας",
     "reviews.yourReviewPlaceholder": "Περιγράψτε επικοινωνία, φροντίδα σκάφους και παράδοση...",
@@ -3382,6 +3521,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Απομένουν {{days}} ημέρες για να αφήσετε κριτική. Οι κριτικές παραμένουν ανοιχτές για 7 ημέρες μετά το τέλος της διαμονής.",
     "reviews.windowClosed": "Η περίοδος κριτικής για αυτό το sit έχει κλείσει.",
     "reviews.sitNotCompleted": "Μπορείτε να αφήσετε κριτική αφού ολοκληρωθεί το sit.",
+    "reviews.previewKicker": "Η κριτική σας",
+    "reviews.previewTitle": "Αξιολογήσατε τον/την {{name}}",
+    "reviews.previewTitleForOwner": "Αξιολογήσατε τον/την {{name}}",
     "availability.title": "Η διαθεσιμότητά σας",
     "availability.subtitle":
       "Μοιραστείτε τις ημερομηνίες και τα μέρη όπου είστε διαθέσιμοι για φύλαξη. Κάθε ανοιχτό παράθυρο δείχνει τα σκάφη στα οποία μπορείτε να υποβάλετε αίτηση.",
@@ -3442,6 +3584,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Najviše iskustva",
     "applications.sortSkillMatch": "Najbolje podudaranje vještina",
     "applications.sortPriorSits": "Najviše prethodnih boravaka",
+    "applications.gettingApplicants": "Dohvaćanje prijavitelja…",
     "applications.filterStatusLabel": "Filtriraj po statusu",
     "applications.filterStatusAll": "Svi statusi",
     "applications.filterExperienceLabel": "Filtriraj po iskustvu",
@@ -3483,6 +3626,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Drugi je kandidat potvrđen",
     "applications.anotherAcceptedBanner":
       "Ovaj kandidat nije prihvaćen. I dalje možete razgovarati s njim ovdje, ali morate poništiti prihvaćanje osobe {{name}} prije nego što možete prihvatiti ovu osobu.",
+    "applications.listNotConsideredTitle": "Više se ne razmatraju",
+    "applications.listNotConsidered":
+      "Ovi se kandidati više ne razmatraju dok je {{name}} prihvaćen. Razgovori ostaju dostupni.",
     "applications.confirm.unacceptTitle": "Poništiti prihvaćanje osobe {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} više neće biti potvrđen za ovu čuvanje. Nakon toga možete prihvatiti drugog kandidata.",
@@ -3498,6 +3644,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Poništili ste prihvaćanje osobe {{name}} za ovo čuvanje",
     "applications.systemMessage.sitCancelled": "Vlasnik je otkazao ovaj sit",
     "applications.systemMessage.sitCancelledOwner": "Otkazali ste ovaj sit s {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Ovaj sit završen je ranije",
+    "applications.systemMessage.sitEndedEarlyOwner": "Ranije ste završili ovaj sit s {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Vlasnik više ne razmatra prijave za ovaj boravak",
     "applications.systemMessage.videoCallRequestTitle": "Predložen video poziv",
@@ -3635,6 +3783,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationAccepted": "{{actor}} je prihvatio vašu prijavu za {{boat}}.",
     "notifications.items.applicationUnaccepted": "{{actor}} više vas ne potvrđuje za {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} je otkazao sit za {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} je ranije završio sit za {{boat}}. Možete ostaviti recenziju.",
     "notifications.items.newApplication": "{{actor}} se prijavio za čuvanje broda {{boat}}.",
     "notifications.items.newMessage": "{{actor}} vam je poslao novu poruku o brodu {{boat}}.",
     "notifications.items.sitReminder": "Vaš boravak na brodu {{boat}} uskoro počinje.",
@@ -3714,7 +3864,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessTitle": "Eskalirano Boatsteadu",
     "messageReport.escalateSuccessText": "Naš tim će pregledati ovu poruku i javiti se e-poštom.",
     "applications.replyPlaceholder": "Napišite odgovor...",
-    "applications.replyHint": "Enter za slanje. {{shortcut}} za novi red.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> za slanje. <modKey/> + <sendKey>Enter</sendKey> za novi red.",
     "applications.sending": "Slanje...",
     "applications.sendReply": "Pošalji odgovor",
     "applications.translateWithGoogle": "Prevedi s pomoću Googlea",
@@ -3773,6 +3924,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_few": "{{average}} od 5 iz {{count}} recenzije",
     "reviews.summary_other": "{{average}} od 5 iz {{count}} recenzija",
     "reviews.empty": "Još nema recenzija za ovog čuvara.",
+    "reviews.ownerTitle": "Recenzije vlasnika",
+    "reviews.ownerEmpty": "Još nema recenzija od čuvara.",
     "reviews.noRatingYet": "Još nema ocjene",
     "reviews.viewAll_one": "Pogledaj 1 recenziju",
     "reviews.viewAll_few": "Pogledaj sve {{count}} recenzije",
@@ -3786,6 +3939,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "Kakav je bio {{name}} kao čuvar?",
     "reviews.leaveHint":
       "Podijelite kako je prošao boravak na {{boat}}. Vaša ocjena pomaže drugim vlasnicima.",
+    "reviews.leaveTitleForOwner": "Kakav je bio {{name}} kao vlasnik broda?",
+    "reviews.leaveHintForOwner":
+      "Podijelite kako je prošao sit na {{boat}}. Vaša ocjena pomaže drugim čuvarima.",
     "reviews.yourRating": "Vaša ocjena",
     "reviews.yourReview": "Vaša recenzija",
     "reviews.yourReviewPlaceholder": "Opišite komunikaciju, brigu o brodu i predaju...",
@@ -3806,6 +3962,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Preostalo je {{days}} dana za ostavljanje recenzije. Recenzije ostaju otvorene 7 dana nakon završetka boravka.",
     "reviews.windowClosed": "Rok za recenziju ovog sita je istekao.",
     "reviews.sitNotCompleted": "Recenziju možete ostaviti nakon što sit završi.",
+    "reviews.previewKicker": "Vaša recenzija",
+    "reviews.previewTitle": "Ocijenili ste {{name}}",
+    "reviews.previewTitleForOwner": "Ocijenili ste {{name}}",
     "availability.title": "Vaša dostupnost",
     "availability.subtitle":
       "Podijelite datume i mjesta na kojima ste slobodni čuvati brod. Svaki otvoreni prozor prikazuje brodove na koje se možete prijaviti.",
@@ -3865,6 +4024,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "En çok deneyim",
     "applications.sortSkillMatch": "En iyi beceri eşleşmesi",
     "applications.sortPriorSits": "En çok önceki konaklama",
+    "applications.gettingApplicants": "Başvuranlar alınıyor…",
     "applications.filterStatusLabel": "Duruma göre filtrele",
     "applications.filterStatusAll": "Tüm durumlar",
     "applications.filterExperienceLabel": "Deneyime göre filtrele",
@@ -3904,6 +4064,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Başka bir başvuran onaylandı",
     "applications.anotherAcceptedBanner":
       "Bu başvuran kabul edilmedi. Burada onunla sohbet etmeye devam edebilirsiniz, ancak bu kişiyi kabul etmeden önce {{name}} için kabulü geri almalısınız.",
+    "applications.listNotConsideredTitle": "Değerlendirilmiyor",
+    "applications.listNotConsidered":
+      "{{name}} kabul edilmişken bu başvuranlar artık değerlendirilmiyor. Sohbetler kullanılabilir durumda kalır.",
     "applications.confirm.unacceptTitle": "{{name}} için kabul geri alınsın mı?",
     "applications.confirm.unacceptText":
       "{{name}} artık bu konaklama için onaylı olmayacak. Daha sonra başka bir başvuranı kabul edebilirsiniz.",
@@ -3921,6 +4084,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "{{name}} için kabulü bu bakıcılıkta geri aldınız",
     "applications.systemMessage.sitCancelled": "Bu sit sahibi tarafından iptal edildi",
     "applications.systemMessage.sitCancelledOwner": "{{name}} ile bu siti iptal ettiniz",
+    "applications.systemMessage.sitEndedEarly": "Bu sit erken tamamlandı",
+    "applications.systemMessage.sitEndedEarlyOwner": "{{name}} ile bu siti erken bitirdiniz",
     "applications.systemMessage.applicantsClosed":
       "Sahip bu konaklama için artık başvuranları değerlendirmiyor",
     "applications.systemMessage.videoCallRequestTitle": "Görüntülü arama önerildi",
@@ -4054,6 +4219,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationAccepted": "{{actor}}, {{boat}} için başvurunuzu kabul etti.",
     "notifications.items.applicationUnaccepted": "{{actor}}, {{boat}} için artık sizi onaylamıyor.",
     "notifications.items.sitCancelled": "{{actor}}, {{boat}} için siti iptal etti.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}}, {{boat}} için siti erken bitirdi. Değerlendirme yazabilirsiniz.",
     "notifications.items.newApplication": "{{actor}}, {{boat}} için bakıcılık başvurusu yaptı.",
     "notifications.items.newMessage": "{{actor}}, {{boat}} hakkında size yeni bir mesaj gönderdi.",
     "notifications.items.sitReminder": "{{boat}} üzerindeki konaklamanız yakında başlıyor.",
@@ -4133,7 +4300,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessTitle": "Boatstead’e yükseltildi",
     "messageReport.escalateSuccessText": "Ekibimiz bu mesajı inceleyip e-posta ile size dönecek.",
     "applications.replyPlaceholder": "Bir yanıt yazın...",
-    "applications.replyHint": "Göndermek için Enter. Yeni satır için {{shortcut}}.",
+    "applications.replyHint":
+      "Göndermek için <sendKey>Enter</sendKey>. Yeni satır için <modKey/> + <sendKey>Enter</sendKey>.",
     "applications.sending": "Gönderiliyor...",
     "applications.sendReply": "Yanıt gönder",
     "applications.translateWithGoogle": "Google ile çevir",
@@ -4192,6 +4360,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "1 değerlendirmeden {{average}} / 5",
     "reviews.summary_other": "{{count}} değerlendirmeden {{average}} / 5",
     "reviews.empty": "Bu bakıcı için henüz değerlendirme yok.",
+    "reviews.ownerTitle": "Sahip değerlendirmeleri",
+    "reviews.ownerEmpty": "Henüz bakıcılardan değerlendirme yok.",
     "reviews.noRatingYet": "Henüz puan yok",
     "reviews.viewAll_one": "1 değerlendirmeyi gör",
     "reviews.viewAll_other": "Tüm {{count}} değerlendirmeyi gör",
@@ -4203,6 +4373,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "{{name}} bakıcı olarak nasıldı?",
     "reviews.leaveHint":
       "{{boat}} konaklamasının nasıl geçtiğini paylaşın. Puanınız diğer sahiplerine yardımcı olur.",
+    "reviews.leaveTitleForOwner": "{{name}} tekne sahibi olarak nasıldı?",
+    "reviews.leaveHintForOwner":
+      "{{boat}} üzerindeki sitin nasıl geçtiğini paylaşın. Puanınız diğer bakıcılara yardımcı olur.",
     "reviews.yourRating": "Puanınız",
     "reviews.yourReview": "Değerlendirmeniz",
     "reviews.yourReviewPlaceholder": "İletişim, tekne bakımı ve teslimi anlatın...",
@@ -4223,6 +4396,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Değerlendirme bırakmak için {{days}} gününüz kaldı. Değerlendirmeler konaklama bittikten sonra 7 gün boyunca açık kalır.",
     "reviews.windowClosed": "Bu sit için değerlendirme süresi kapandı.",
     "reviews.sitNotCompleted": "Sit bittikten sonra değerlendirme bırakabilirsiniz.",
+    "reviews.previewKicker": "Değerlendirmeniz",
+    "reviews.previewTitle": "{{name}} için değerlendirme bıraktınız",
+    "reviews.previewTitleForOwner": "{{name}} için değerlendirme bıraktınız",
     "availability.title": "Müsaitliğiniz",
     "availability.subtitle":
       "Bakıcılık için müsait olduğunuz tarihleri ve yerleri paylaşın. Her açık pencere başvurabileceğiniz tekneleri gösterir.",
@@ -4283,6 +4459,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Mest erfarenhet",
     "applications.sortSkillMatch": "Bästa skicklighetsmatch",
     "applications.sortPriorSits": "De flesta tidigare sitter",
+    "applications.gettingApplicants": "Hämtar sökande…",
     "applications.filterStatusLabel": "Filtrera efter status",
     "applications.filterStatusAll": "Alla statusar",
     "applications.filterExperienceLabel": "Filtrera efter erfarenhet",
@@ -4322,6 +4499,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Ytterligare en sökande är bekräftad",
     "applications.anotherAcceptedBanner":
       "Denna sökande antogs inte. Du kan fortfarande chatta med dem här, men du måste inte acceptera {{name}} innan du kan acceptera den här personen.",
+    "applications.listNotConsideredTitle": "Övervägs inte",
+    "applications.listNotConsidered":
+      "Dessa sökande övervägs inte längre medan {{name}} är accepterad. Konversationer förblir tillgängliga.",
     "applications.confirm.unacceptTitle": "Vill du inte acceptera {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} kommer inte längre att bekräftas för denna sittning. Du kan acceptera en annan sökande efteråt.",
@@ -4338,6 +4518,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du tog tillbaka acceptansen av {{name}} för denna sits",
     "applications.systemMessage.sitCancelled": "Denna sitt avbokades av ägaren",
     "applications.systemMessage.sitCancelledOwner": "Du avbokade denna sitt med {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Denna sitt slutfördes tidigt",
+    "applications.systemMessage.sitEndedEarlyOwner": "Du avslutade denna sitt tidigt med {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Ägaren överväger inte längre sökande till denna sitt",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtal föreslagits",
@@ -4472,6 +4654,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationUnaccepted":
       "{{actor}} bekräftar dig inte längre för {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} avbokade sitten för {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} avslutade sitten för {{boat}} tidigt. Du kan lämna en recension.",
     "notifications.items.newApplication": "{{actor}} användes för att sitta {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} skickade ett nytt meddelande till dig om {{boat}}.",
@@ -4553,7 +4737,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Vårt team kommer att granska detta meddelande och följa upp via e-post.",
     "applications.replyPlaceholder": "Skriv ett svar...",
-    "applications.replyHint": "Enter för att skicka. {{shortcut}} för ny rad.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> för att skicka. <modKey/> + <sendKey>Enter</sendKey> för ny rad.",
     "applications.sending": "Sändning...",
     "applications.sendReply": "Skicka svar",
     "applications.translateWithGoogle": "Översätt med Google",
@@ -4614,6 +4799,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} av 5 från 1 recension",
     "reviews.summary_other": "{{average}} av 5 från {{count}} recensioner",
     "reviews.empty": "Inga recensioner ännu för denna sitter.",
+    "reviews.ownerTitle": "Ägarrecensioner",
+    "reviews.ownerEmpty": "Inga recensioner från sittare ännu.",
     "reviews.noRatingYet": "Inga betyg än",
     "reviews.viewAll_one": "Visa 1 recension",
     "reviews.viewAll_other": "Visa alla {{count}} recensioner",
@@ -4624,6 +4811,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveKicker": "Lämna en recension",
     "reviews.leaveTitle": "Hur var {{name}} som barnvakt?",
     "reviews.leaveHint": "Dela hur sittningen gick {{boat}}. Ditt betyg hjälper andra ägare.",
+    "reviews.leaveTitleForOwner": "Hur var {{name}} som båtägare?",
+    "reviews.leaveHintForOwner":
+      "Dela hur sittningen gick på {{boat}}. Ditt betyg hjälper andra sittare.",
     "reviews.yourRating": "Ditt betyg",
     "reviews.yourReview": "Din recension",
     "reviews.yourReviewPlaceholder": "Beskriv kommunikation, skötsel av båten och överlämning...",
@@ -4644,6 +4834,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du har {{days}} dagar kvar på dig att lämna en recension. Recensionerna är öppna i 7 dagar efter att en vistelse avslutats.",
     "reviews.windowClosed": "Granskningsfönstret för denna sit har stängt.",
     "reviews.sitNotCompleted": "Du kan lämna en recension efter att siten är avslutad.",
+    "reviews.previewKicker": "Din recension",
+    "reviews.previewTitle": "Du recenserade {{name}}",
+    "reviews.previewTitleForOwner": "Du recenserade {{name}}",
     "availability.title": "Din tillgänglighet",
     "availability.subtitle":
       "Dela datumen och platserna där du är ledig att sitta. Varje öppet fönster visar båtar du kan ansöka till.",
@@ -4705,6 +4898,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Mest erfaring",
     "applications.sortSkillMatch": "Beste ferdighetsmatch",
     "applications.sortPriorSits": "De fleste tidligere sitter",
+    "applications.gettingApplicants": "Henter søkere…",
     "applications.filterStatusLabel": "Filtrer etter status",
     "applications.filterStatusAll": "Alle statuser",
     "applications.filterExperienceLabel": "Filtrer etter erfaring",
@@ -4744,6 +4938,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "En annen søker er bekreftet",
     "applications.anotherAcceptedBanner":
       "Denne søkeren ble ikke akseptert. Du kan fortsatt chatte med dem her, men du må ikke godta {{name}} før du kan godta denne personen.",
+    "applications.listNotConsideredTitle": "Vurderes ikke",
+    "applications.listNotConsidered":
+      "Disse søkerne vurderes ikke lenger mens {{name}} er godtatt. Samtaler forblir tilgjengelige.",
     "applications.confirm.unacceptTitle": "Vil du ikke godta {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} vil ikke lenger bli bekreftet for dette setet. Du kan godta en annen søker etterpå.",
@@ -4759,6 +4956,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du trakk tilbake godtakelsen av {{name}} for dette setet",
     "applications.systemMessage.sitCancelled": "Denne siten ble avbestilt av eieren",
     "applications.systemMessage.sitCancelledOwner": "Du avbestilte denne siten med {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Denne siten ble fullført tidlig",
+    "applications.systemMessage.sitEndedEarlyOwner": "Du avsluttet denne siten tidlig med {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Eieren vurderer ikke lenger søkere til dette setet",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtale foreslått",
@@ -4893,6 +5092,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationUnaccepted":
       "{{actor}} bekrefter deg ikke lenger for {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} avbestilte siten for {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} avsluttet siten for {{boat}} tidlig. Du kan legge igjen en anmeldelse.",
     "notifications.items.newApplication": "{{actor}} brukt for å sitte {{boat}}.",
     "notifications.items.newMessage": "{{actor}} sendte deg en ny melding om {{boat}}.",
     "notifications.items.sitReminder": "Sitt på {{boat}} starter snart.",
@@ -4973,7 +5174,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Teamet vårt vil vurdere denne meldingen og følge opp via e-post.",
     "applications.replyPlaceholder": "Skriv et svar...",
-    "applications.replyHint": "Enter for å sende. {{shortcut}} for ny linje.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> for å sende. <modKey/> + <sendKey>Enter</sendKey> for ny linje.",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
     "applications.translateWithGoogle": "Oversett med Google",
@@ -5032,6 +5234,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} av 5 fra 1 anmeldelse",
     "reviews.summary_other": "{{average}} av 5 fra {{count}} anmeldelser",
     "reviews.empty": "Ingen anmeldelser ennå for denne sitter.",
+    "reviews.ownerTitle": "Eier-anmeldelser",
+    "reviews.ownerEmpty": "Ingen anmeldelser fra sittepassere ennå.",
     "reviews.noRatingYet": "Ingen vurderinger ennå",
     "reviews.viewAll_one": "Se 1 anmeldelse",
     "reviews.viewAll_other": "Se alle {{count}} anmeldelser",
@@ -5042,6 +5246,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveKicker": "Legg igjen en anmeldelse",
     "reviews.leaveTitle": "Hvordan var {{name}} som sitter?",
     "reviews.leaveHint": "Del hvordan oppmøtet gikk {{boat}}. Din vurdering hjelper andre eiere.",
+    "reviews.leaveTitleForOwner": "Hvordan var {{name}} som båteier?",
+    "reviews.leaveHintForOwner":
+      "Del hvordan oppmøtet gikk på {{boat}}. Din vurdering hjelper andre sittepassere.",
     "reviews.yourRating": "Din vurdering",
     "reviews.yourReview": "Din anmeldelse",
     "reviews.yourReviewPlaceholder": "Beskriv kommunikasjon, stell av båten og overlevering...",
@@ -5062,6 +5269,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du har {{days}} dager igjen til å legge igjen en anmeldelse. Anmeldelser holder åpent i 7 dager etter et opphold avsluttes.",
     "reviews.windowClosed": "Gjennomgangsvinduet for dette oppholdet er stengt.",
     "reviews.sitNotCompleted": "Du kan legge igjen en anmeldelse etter at siten er ferdig.",
+    "reviews.previewKicker": "Din anmeldelse",
+    "reviews.previewTitle": "Du anmeldte {{name}}",
+    "reviews.previewTitleForOwner": "Du anmeldte {{name}}",
     "availability.title": "Din tilgjengelighet",
     "availability.subtitle":
       "Del datoene og stedene der du er ledig til å sitte. Hvert åpne vindu viser båter du kan søke på.",
@@ -5123,6 +5333,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Mest erfaring",
     "applications.sortSkillMatch": "Bedste færdighedsmatch",
     "applications.sortPriorSits": "De fleste tidligere sidder",
+    "applications.gettingApplicants": "Henter ansøgere…",
     "applications.filterStatusLabel": "Filtrer efter status",
     "applications.filterStatusAll": "Alle statusser",
     "applications.filterExperienceLabel": "Filtrer efter erfaring",
@@ -5162,6 +5373,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Endnu en ansøger er bekræftet",
     "applications.anotherAcceptedBanner":
       "Denne ansøger blev ikke accepteret. Du kan stadig chatte med dem her, men du skal ikke acceptere {{name}}, før du kan acceptere denne person.",
+    "applications.listNotConsideredTitle": "Overvejes ikke",
+    "applications.listNotConsidered":
+      "Disse ansøgere overvejes ikke længere, mens {{name}} er accepteret. Samtaler forbliver tilgængelige.",
     "applications.confirm.unacceptTitle": "Vil du ikke acceptere {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} vil ikke længere blive bekræftet for dette møde. Du kan efterfølgende acceptere en anden ansøger.",
@@ -5177,6 +5391,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du trak accepten af {{name}} tilbage for denne sit",
     "applications.systemMessage.sitCancelled": "Denne sit blev annulleret af ejeren",
     "applications.systemMessage.sitCancelledOwner": "Du annullerede denne sit med {{name}}",
+    "applications.systemMessage.sitEndedEarly": "Denne sit blev afsluttet tidligt",
+    "applications.systemMessage.sitEndedEarlyOwner": "Du afsluttede denne sit tidligt med {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Ejeren overvejer ikke længere ansøgere til denne sit",
     "applications.systemMessage.videoCallRequestTitle": "Videoopkald foreslået",
@@ -5310,6 +5526,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationUnaccepted":
       "{{actor}} bekræfter dig ikke længere til {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} annullerede siten for {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} afsluttede siten for {{boat}} tidligt. Du kan skrive en anmeldelse.",
     "notifications.items.newApplication": "{{actor}} anvendt til at sidde {{boat}}.",
     "notifications.items.newMessage": "{{actor}} har sendt dig en ny besked om {{boat}}.",
     "notifications.items.sitReminder": "Din sit på {{boat}} starter snart.",
@@ -5390,7 +5608,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Vores team vil gennemgå denne meddelelse og følge op via e-mail.",
     "applications.replyPlaceholder": "Skriv et svar...",
-    "applications.replyHint": "Enter for at sende. {{shortcut}} for ny linje.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> for at sende. <modKey/> + <sendKey>Enter</sendKey> for ny linje.",
     "applications.sending": "Sender...",
     "applications.sendReply": "Send svar",
     "applications.translateWithGoogle": "Oversæt med Google",
@@ -5450,6 +5669,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} ud af 5 fra 1 anmeldelse",
     "reviews.summary_other": "{{average}} ud af 5 fra {{count}} anmeldelser",
     "reviews.empty": "Ingen anmeldelser endnu for denne sitter.",
+    "reviews.ownerTitle": "Ejervurderinger",
+    "reviews.ownerEmpty": "Ingen anmeldelser fra oppassere endnu.",
     "reviews.noRatingYet": "Ingen vurderinger endnu",
     "reviews.viewAll_one": "Se 1 anmeldelse",
     "reviews.viewAll_other": "Se alle {{count}} anmeldelser",
@@ -5460,6 +5681,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveKicker": "Skriv en anmeldelse",
     "reviews.leaveTitle": "Hvordan var {{name}} som oppasser?",
     "reviews.leaveHint": "Del, hvordan mødet forløb {{boat}}. Din vurdering hjælper andre ejere.",
+    "reviews.leaveTitleForOwner": "Hvordan var {{name}} som bådejer?",
+    "reviews.leaveHintForOwner":
+      "Del, hvordan mødet forløb på {{boat}}. Din vurdering hjælper andre oppassere.",
     "reviews.yourRating": "Din vurdering",
     "reviews.yourReview": "Din anmeldelse",
     "reviews.yourReviewPlaceholder": "Beskriv kommunikation, pleje af båden og overdragelse...",
@@ -5480,6 +5704,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du har {{days}} dage tilbage til at skrive en anmeldelse. Anmeldelser forbliver åbne i 7 dage efter et ophold slutter.",
     "reviews.windowClosed": "Gennemgangsvinduet for denne sit er lukket.",
     "reviews.sitNotCompleted": "Du kan skrive en anmeldelse efter siten er afsluttet.",
+    "reviews.previewKicker": "Din anmeldelse",
+    "reviews.previewTitle": "Du anmeldte {{name}}",
+    "reviews.previewTitleForOwner": "Du anmeldte {{name}}",
     "availability.title": "Din tilgængelighed",
     "availability.subtitle":
       "Del de datoer og steder, hvor du er ledig til at sidde. Hvert åbent vindue viser både, du kan søge.",
@@ -5539,6 +5766,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "Eniten kokemusta",
     "applications.sortSkillMatch": "Paras taitopeli",
     "applications.sortPriorSits": "Useimmat aiemmat istuvat",
+    "applications.gettingApplicants": "Haetaan hakijoita…",
     "applications.filterStatusLabel": "Suodata tilan mukaan",
     "applications.filterStatusAll": "Kaikki tilat",
     "applications.filterExperienceLabel": "Suodata kokemuksen mukaan",
@@ -5578,6 +5806,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "Toinen hakija on vahvistettu",
     "applications.anotherAcceptedBanner":
       "Tätä hakijaa ei hyväksytty. Voit silti keskustella heidän kanssaan täällä, mutta sinun on peruutettava {{name}} hyväksyntä ennen kuin voit hyväksyä tämän henkilön.",
+    "applications.listNotConsideredTitle": "Ei enää harkinnassa",
+    "applications.listNotConsidered":
+      "Näitä hakijoita ei enää harkita, kun {{name}} on hyväksytty. Keskustelut pysyvät saatavilla.",
     "applications.confirm.unacceptTitle": "Hylätäänkö {{name}}?",
     "applications.confirm.unacceptText":
       "{{name}} ei enää vahvisteta tälle istunnolle. Voit hyväksyä toisen hakijan myöhemmin.",
@@ -5594,6 +5825,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Peruit henkilön {{name}} hyväksynnän tälle istunnolle",
     "applications.systemMessage.sitCancelled": "Omistaja peruutti tämän sitin",
     "applications.systemMessage.sitCancelledOwner": "Peruit tämän sitin henkilön {{name}} kanssa",
+    "applications.systemMessage.sitEndedEarly": "Tämä sit valmistui aikaisemmin",
+    "applications.systemMessage.sitEndedEarlyOwner":
+      "Lopetit tämän sitin aikaisemmin henkilön {{name}} kanssa",
     "applications.systemMessage.applicantsClosed":
       "Omistaja ei enää harkitse hakijoita tälle paikalle",
     "applications.systemMessage.videoCallRequestTitle": "Videopuhelu ehdotettu",
@@ -5730,6 +5964,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationUnaccepted":
       "{{actor}} ei enää vahvista sinua kohteelle {{boat}}.",
     "notifications.items.sitCancelled": "{{actor}} peruutti sitin kohteelle {{boat}}.",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} lopetti sitin kohteelle {{boat}} aikaisemmin. Voit jättää arvostelun.",
     "notifications.items.newApplication": "{{actor}} sovellettu istumaan {{boat}}.",
     "notifications.items.newMessage": "{{actor}} lähetti sinulle uuden viestin aiheesta {{boat}}.",
     "notifications.items.sitReminder": "Istuksesi {{boat}} alkaa pian.",
@@ -5810,7 +6046,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "Tiimimme tarkistaa tämän viestin ja ottaa yhteyttä sähköpostitse.",
     "applications.replyPlaceholder": "Kirjoita vastaus...",
-    "applications.replyHint": "Enter lähettää. {{shortcut}} uudelle riville.",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey> lähettää. <modKey/> + <sendKey>Enter</sendKey> uudelle riville.",
     "applications.sending": "Lähetetään...",
     "applications.sendReply": "Lähetä vastaus",
     "applications.translateWithGoogle": "Käännä Googlen avulla",
@@ -5868,6 +6105,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} / 5 1 arvostelusta",
     "reviews.summary_other": "{{average}} / 5 {{count}} arvostelusta",
     "reviews.empty": "Ei vielä arvosteluja tälle hoitajalle.",
+    "reviews.ownerTitle": "Omistaja-arvostelut",
+    "reviews.ownerEmpty": "Ei vielä arvosteluja hoitajilta.",
     "reviews.noRatingYet": "Ei vielä arvioita",
     "reviews.viewAll_one": "Näytä 1 arvostelu",
     "reviews.viewAll_other": "Näytä kaikki {{count}} arvostelut",
@@ -5878,6 +6117,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveKicker": "Jätä arvostelu",
     "reviews.leaveTitle": "Millainen oli {{name}} lapsenvahtina?",
     "reviews.leaveHint": "Jaa kuinka istunto sujui {{boat}}. Arvostelusi auttaa muita omistajia.",
+    "reviews.leaveTitleForOwner": "Millainen oli {{name}} veneen omistajana?",
+    "reviews.leaveHintForOwner":
+      "Jaa kuinka istunto sujui kohteessa {{boat}}. Arvostelusi auttaa muita hoitajia.",
     "reviews.yourRating": "Sinun arviosi",
     "reviews.yourReview": "Sinun arvostelusi",
     "reviews.yourReviewPlaceholder": "Kuvaile viestintää, veneen hoitoa ja luovutusta...",
@@ -5898,6 +6140,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Sinulla on {{days}} päivää aikaa jättää arvostelu. Arvostelut pysyvät avoinna 7 päivää oleskelun päättymisen jälkeen.",
     "reviews.windowClosed": "Tämän sitin tarkistusikkuna on suljettu.",
     "reviews.sitNotCompleted": "Voit jättää arvion sitin päätyttyä.",
+    "reviews.previewKicker": "Arvostelusi",
+    "reviews.previewTitle": "Arvioit henkilön {{name}}",
+    "reviews.previewTitleForOwner": "Arvioit henkilön {{name}}",
     "availability.title": "Saatavuutesi",
     "availability.subtitle":
       "Jaa päivämäärät ja paikat, joissa olet vapaa istumaan. Jokainen avoin ikkuna näyttää veneet, joihin voit hakea.",
@@ -5958,6 +6203,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.sortExperience": "ほとんどの経験",
     "applications.sortSkillMatch": "ベストスキルマッチ",
     "applications.sortPriorSits": "前回の座席",
+    "applications.gettingApplicants": "応募者を取得しています…",
     "applications.filterStatusLabel": "ステータスでフィルタリングする",
     "applications.filterStatusAll": "すべてのステータス",
     "applications.filterExperienceLabel": "経験によるフィルタリング",
@@ -5997,6 +6243,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.anotherAcceptedBannerTitle": "別の申請者が確認されました",
     "applications.anotherAcceptedBanner":
       "この申請者は受理されませんでした。ここで彼らとチャットすることはできますが、この人を受け入れる前に {{name}} の受け入れを解除する必要があります。",
+    "applications.listNotConsideredTitle": "検討対象外です",
+    "applications.listNotConsidered":
+      "{{name}} を受け入れている間、これらの申請者は検討対象外です。会話は引き続き利用できます。",
     "applications.confirm.unacceptTitle": "{{name}} を受け入れませんか?",
     "applications.confirm.unacceptText":
       "{{name}} はこの座席では確認されなくなります。その後、別の申請者を受け入れることができます。",
@@ -6011,6 +6260,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.unacceptedOwner": "{{name}} の承諾を取り消しました",
     "applications.systemMessage.sitCancelled": "オーナーがこのシットをキャンセルしました",
     "applications.systemMessage.sitCancelledOwner": "{{name}} とのシットをキャンセルしました",
+    "applications.systemMessage.sitEndedEarly": "このシットは早めに完了しました",
+    "applications.systemMessage.sitEndedEarlyOwner": "{{name}} とのシットを早めに終了しました",
     "applications.systemMessage.applicantsClosed": "オーナーはこの座席への応募者を検討していません",
     "applications.systemMessage.videoCallRequestTitle": "ビデオ通話の提案",
     "applications.systemMessage.videoCallRequest": "{{name}} がビデオ通話を提案しました。",
@@ -6145,6 +6396,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.applicationAccepted": "{{actor}} が {{boat}} の申請を受理しました。",
     "notifications.items.applicationUnaccepted": "{{actor}} は {{boat}} の承諾を取り消しました。",
     "notifications.items.sitCancelled": "{{actor}} が {{boat}} のシットをキャンセルしました。",
+    "notifications.items.sitEndedEarly":
+      "{{actor}} が {{boat}} のシットを早めに終了しました。レビューを残せます。",
     "notifications.items.newApplication": "{{actor}} は {{boat}} に座るのに適用されます。",
     "notifications.items.newMessage":
       "{{actor}} さんが {{boat}} に関する新しいメッセージを送信しました。",
@@ -6227,7 +6480,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "messageReport.escalateSuccessText":
       "私たちのチームがこのメッセージを確認し、電子メールでフォローアップします。",
     "applications.replyPlaceholder": "返信を書いてください...",
-    "applications.replyHint": "Enterで送信。改行は{{shortcut}}。",
+    "applications.replyHint":
+      "<sendKey>Enter</sendKey>で送信。改行は<modKey/> + <sendKey>Enter</sendKey>。",
     "applications.sending": "送信中...",
     "applications.sendReply": "返信を送信",
     "applications.translateWithGoogle": "Google で翻訳する",
@@ -6285,6 +6539,8 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.summary_one": "{{average}} 1 件のレビューで 5 点中",
     "reviews.summary_other": "{{count}} レビューの 5 点中 {{average}}",
     "reviews.empty": "このシッターにはまだレビューがありません。",
+    "reviews.ownerTitle": "オーナーへのレビュー",
+    "reviews.ownerEmpty": "シッターからのレビューはまだありません。",
     "reviews.noRatingYet": "まだ評価がありません",
     "reviews.viewAll_one": "1件のレビューを見る",
     "reviews.viewAll_other": "{{count}} レビューをすべて見る",
@@ -6296,6 +6552,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "reviews.leaveTitle": "シッターとしての{{name}}はどうでしたか？",
     "reviews.leaveHint":
       "座る様子をシェアしてください{{boat}}。あなたの評価は他の所有者の助けになります。",
+    "reviews.leaveTitleForOwner": "オーナーとしての{{name}}はどうでしたか？",
+    "reviews.leaveHintForOwner":
+      "{{boat}} でのシットの様子を共有してください。評価は他のシッターの参考になります。",
     "reviews.yourRating": "あなたの評価",
     "reviews.yourReview": "あなたのレビュー",
     "reviews.yourReviewPlaceholder":
@@ -6317,6 +6576,9 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "レビューを残せる期限は残り {{days}} 日です。レビューは滞在終了後 7 日間公開されます。",
     "reviews.windowClosed": "このシットのレビュー期間は終了しました。",
     "reviews.sitNotCompleted": "シット終了後にレビューを残すことができます。",
+    "reviews.previewKicker": "あなたのレビュー",
+    "reviews.previewTitle": "{{name}}さんをレビューしました",
+    "reviews.previewTitleForOwner": "{{name}}さんをレビューしました",
     "availability.title": "あなたの空き状況",
     "availability.subtitle":
       "シッターとして空いている日付と場所を共有してください。公開中の各期間に、応募できるボートが表示されます。",

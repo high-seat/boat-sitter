@@ -41,7 +41,7 @@ function SitterSitPrivateAccessSkeleton() {
   );
 }
 
-/** Loads and shows marina/Wi-Fi details for an accepted sitter on My sits. */
+/** Loads and shows marina/Wi-Fi details for an underway sit on My sits. */
 export function SitterSitPrivateAccess({
   sitId,
   viewerName,

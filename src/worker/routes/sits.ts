@@ -1,8 +1,14 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import { computeStartEarlySchedule, isSitUnderway } from "../../shared/sitSchedule";
+import {
+  computeEndEarlySchedule,
+  computeStartEarlySchedule,
+  isSitListingEditBlockedByPhase,
+  isSitUnderway,
+} from "../../shared/sitSchedule";
+import { parseSitListSort, type SitListSort } from "../../shared/sitsSort";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
 import {
@@ -16,6 +22,18 @@ import {
 import { sendNotificationEmail } from "../email";
 import { insertNotification, shouldEmail } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
+
+function buildSitOrderBy(sort: SitListSort) {
+  switch (sort) {
+    case "latest":
+      return [desc(sits.dateStart), asc(sits.id)] as const;
+    case "mostApplicants":
+      return [desc(sits.applicants), asc(sits.dateStart), asc(sits.id)] as const;
+    case "soonest":
+    default:
+      return [asc(sits.dateStart), asc(sits.id)] as const;
+  }
+}
 
 /**
  * Owner-managed sits (the listing periods for a vessel).
@@ -67,6 +85,8 @@ function toRow(body: z.infer<typeof sitSchema>) {
 sitsRouter.get("/", async (c) => {
   const db = getDb(c.env);
   const sessionUser = c.get("user");
+  const sort = parseSitListSort(c.req.query("sort"));
+  const orderBy = buildSitOrderBy(sort);
   const rows = await db
     .select({
       sit: sits,
@@ -76,7 +96,8 @@ sitsRouter.get("/", async (c) => {
       ),
     })
     .from(sits)
-    .innerJoin(vessels, eq(sits.vesselId, vessels.id));
+    .innerJoin(vessels, eq(sits.vesselId, vessels.id))
+    .orderBy(...orderBy);
   return c.json({
     data: rows.map(({ sit, ownerUserId, accepted }) => {
       const { vesselId, fullAddress, ...rest } = sit;
@@ -95,7 +116,8 @@ sitsRouter.get("/", async (c) => {
 });
 
 /**
- * Private marina/Wi-Fi details for the sit's vessel — owner or accepted sitter only.
+ * Private marina/Wi-Fi details for the sit's vessel — owner anytime, or the
+ * accepted sitter only while the sit is underway.
  */
 sitsRouter.get("/:id/access", requireUser, async (c) => {
   const db = getDb(c.env);
@@ -120,6 +142,16 @@ sitsRouter.get("/:id/access", requireUser, async (c) => {
       )
       .limit(1);
     if (!mine.length) return c.json({ error: "Forbidden" }, 403);
+    if (
+      !isSitUnderway({
+        dateStart: sit.dateStart,
+        duration: sit.duration,
+        accepted: true,
+        cancelledAt: sit.cancelledAt,
+      })
+    ) {
+      return c.json({ error: "Forbidden" }, 403);
+    }
   }
 
   const privateAccess = vessel.privateAccess ?? undefined;
@@ -180,6 +212,116 @@ sitsRouter.post("/:id/start-early", requireUser, async (c) => {
     })
     .where(eq(sits.id, sit.id))
     .returning();
+
+  const { vesselId, ...rest } = saved;
+  return c.json({
+    data: {
+      ...rest,
+      boatId: vesselId,
+      accepted: true,
+      applicationsOpen: false,
+      cancelledAt: rest.cancelledAt ?? null,
+    },
+  });
+});
+
+/**
+ * Owner-only: end an underway sit early so it becomes "sit completed"
+ * (schedule shortened; not cancelled). Both parties can then leave reviews.
+ */
+sitsRouter.post("/:id/end-early", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const sessionUser = c.get("user")!;
+  const id = c.req.param("id");
+
+  const sit = await db.query.sits.findFirst({ where: eq(sits.id, id) });
+  if (!sit) return c.json({ error: "Sit not found" }, 404);
+
+  const vessel = await db.query.vessels.findFirst({ where: eq(vessels.id, sit.vesselId) });
+  if (!vessel) return c.json({ error: "Vessel not found" }, 404);
+  if (vessel.ownerUserId != null && vessel.ownerUserId !== sessionUser.id) {
+    return c.json({ error: "You do not own this listing" }, 403);
+  }
+  if (vessel.ownerUserId == null && vessel.owner !== sessionUser.name) {
+    return c.json({ error: "You do not own this listing" }, 403);
+  }
+
+  if (sit.cancelledAt) {
+    return c.json({ error: "SIT_END_EARLY_NOT_ALLOWED" }, 400);
+  }
+
+  const acceptedApps = await db
+    .select()
+    .from(applications)
+    .where(and(eq(applications.sitId, sit.id), eq(applications.status, "accepted")));
+  if (!acceptedApps.length) {
+    return c.json({ error: "SIT_END_EARLY_NOT_ALLOWED" }, 400);
+  }
+
+  if (
+    !isSitUnderway({
+      dateStart: sit.dateStart,
+      duration: sit.duration,
+      accepted: true,
+      cancelledAt: sit.cancelledAt,
+    })
+  ) {
+    return c.json({ error: "SIT_END_EARLY_NOT_ALLOWED" }, 400);
+  }
+
+  const schedule = computeEndEarlySchedule(sit.dateStart, sit.duration);
+  if (!schedule) {
+    return c.json({ error: "SIT_END_EARLY_NOT_ALLOWED" }, 400);
+  }
+
+  const nowIso = new Date().toISOString();
+  const [saved] = await db
+    .update(sits)
+    .set({
+      dateStart: schedule.dateStart,
+      duration: schedule.duration,
+      dates: schedule.dates,
+      published: false,
+      updatedAt: sql`CURRENT_TIMESTAMP`,
+    })
+    .where(eq(sits.id, sit.id))
+    .returning();
+
+  for (const app of acceptedApps) {
+    await db.insert(applicationMessages).values({
+      id: `message-sitEndedEarly-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      applicationId: app.id,
+      senderName: sessionUser.name,
+      text: `${sessionUser.name} ended this sit early`,
+      kind: "system",
+      systemKind: "sitEndedEarly",
+      payload: null,
+      createdAt: nowIso,
+    });
+    if (app.applicantUserId || app.applicantName) {
+      await insertNotification(db, {
+        userId: app.applicantUserId,
+        userName: app.applicantName,
+        type: "sitEndedEarly",
+        actor: sessionUser.name,
+        boatName: app.boatName,
+        href: `/messages?application=${app.id}`,
+      });
+    }
+    if (await shouldEmail(db, app.applicantUserId, "sitEndedEarly")) {
+      const applicantEmail = app.applicantUserId
+        ? (await db.query.user.findFirst({ where: eq(user.id, app.applicantUserId) }))?.email
+        : undefined;
+      await sendNotificationEmail(c.env, {
+        subject: `Sit completed early: ${app.boatName}`,
+        heading: "Sit completed",
+        body: `${sessionUser.name} ended the sit for ${app.boatName} early. You can leave a review and keep chatting for any follow-up.`,
+        actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${app.id}`,
+        actionLabel: "View conversation",
+        to: applicantEmail,
+      });
+    }
+  }
 
   const { vesselId, ...rest } = saved;
   return c.json({
@@ -404,6 +546,27 @@ sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => 
   // PUT is an upsert; only a genuinely new row should fan out match alerts.
   const existed = await db.query.sits.findFirst({ where: eq(sits.id, body.id) });
 
+  if (existed) {
+    const acceptedRow = await db
+      .select({ id: applications.id })
+      .from(applications)
+      .where(and(eq(applications.sitId, existed.id), eq(applications.status, "accepted")))
+      .limit(1);
+    if (
+      isSitListingEditBlockedByPhase({
+        dateStart: existed.dateStart,
+        duration: existed.duration,
+        accepted: acceptedRow.length > 0,
+        cancelledAt: existed.cancelledAt,
+      })
+    ) {
+      return c.json(
+        { error: "This sit is underway or completed and can no longer be edited" },
+        403,
+      );
+    }
+  }
+
   const row = toRow(body);
   const [saved] = await db
     .insert(sits)
@@ -422,8 +585,22 @@ sitsRouter.put("/:id", requireUser, zValidator("json", sitSchema), async (c) => 
     });
   }
 
+  const acceptedRow = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .where(and(eq(applications.sitId, saved.id), eq(applications.status, "accepted")))
+    .limit(1);
+  const isAccepted = acceptedRow.length > 0;
   const { vesselId, ...rest } = saved;
-  return c.json({ data: { ...rest, boatId: vesselId } });
+  return c.json({
+    data: {
+      ...rest,
+      boatId: vesselId,
+      accepted: isAccepted,
+      applicationsOpen: rest.published !== false && !isAccepted,
+      cancelledAt: rest.cancelledAt ?? null,
+    },
+  });
 });
 
 /** Add whole days to a YYYY-MM-DD date, returning YYYY-MM-DD (UTC-safe). */

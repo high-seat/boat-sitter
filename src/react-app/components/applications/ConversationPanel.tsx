@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -7,13 +8,19 @@ import {
 } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Ellipsis, Flag, Languages, LoaderCircle, Phone, Send, Video, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { getIntlLocale } from "@/i18n";
-import { type ApplicationMessage, type SitApplication } from "@/mockApi";
+import { Trans, useTranslation } from "react-i18next";
+import {
+  getApplicationMessages,
+  type ApiApplicationMessage,
+  type ApplicationMessage,
+  type SitApplication,
+} from "@/mockApi";
 import { REPORT_REASONS, useAppStore, type ReportReason } from "@/store";
+import { useDateTimeFormatter } from "@/hooks/useTimeFormat";
 import { translateWithGoogle } from "@/translationService";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { IconTooltip } from "@/components/ui/IconTooltip";
+import { KeyboardKey } from "@/components/ui/KeyboardKey";
 import { Select } from "@/components/ui/Select";
 import {
   VideoCallScheduleModal,
@@ -26,35 +33,78 @@ import {
 import { VideoCallCalendarLinks } from "@/components/applications/VideoCallCalendarLinks";
 import { AvatarImage } from "@/components/ui/AvatarImage";
 import { SpeechBubbleTail } from "@/components/ui/SpeechBubbleTail";
+import { showToast } from "@/components/ui/Toast";
+
+function isAppleKeyboardPlatform() {
+  if (typeof navigator === "undefined") return false;
+  return (
+    /Mac|iPhone|iPad|iPod/i.test(navigator.platform) ||
+    /Mac OS|Macintosh/i.test(navigator.userAgent)
+  );
+}
 
 function isOptimisticMessageSynced(optimistic: ApplicationMessage, messages: ApplicationMessage[]) {
+  // Do not require createdAt >= optimistic: worker/browser clocks can skew and
+  // would leave pending optimistic rows forever, blocking further sends.
   return messages.some(
     (message) =>
       !message.pending &&
       message.senderName === optimistic.senderName &&
-      message.text === optimistic.text &&
-      message.createdAt >= optimistic.createdAt,
+      message.text === optimistic.text,
   );
 }
 
-function isUserChatMessage(message: ApplicationMessage) {
-  return message.kind === "user";
+function isVideoCallSystemKind(systemKind: ApplicationMessage["systemKind"]) {
+  return (
+    systemKind === "videoCallRequest" ||
+    systemKind === "videoCallCounter" ||
+    systemKind === "videoCallAccepted" ||
+    systemKind === "videoCallDeclined"
+  );
+}
+
+/** User chat plus phone/video shares that render as sender-aligned bubbles. */
+function isSenderBubbleMessage(message: ApplicationMessage) {
+  if (message.kind === "user") return true;
+  if (message.kind !== "system") return false;
+  return message.systemKind === "phoneShared" || isVideoCallSystemKind(message.systemKind);
 }
 
 /** Avatar only on the last bubble in a consecutive run from the same sender. */
 function isLastInSenderStack(messages: ApplicationMessage[], index: number) {
   const message = messages[index];
-  if (!message || !isUserChatMessage(message)) return false;
+  if (!message || !isSenderBubbleMessage(message)) return false;
   const next = messages[index + 1];
-  if (!next || !isUserChatMessage(next)) return true;
+  if (!next || !isSenderBubbleMessage(next)) return true;
   return next.senderName !== message.senderName;
 }
 
 function isStackContinuation(messages: ApplicationMessage[], index: number) {
   const message = messages[index];
-  if (!message || !isUserChatMessage(message) || index === 0) return false;
+  if (!message || !isSenderBubbleMessage(message) || index === 0) return false;
   const prev = messages[index - 1];
-  return isUserChatMessage(prev) && prev.senderName === message.senderName;
+  return isSenderBubbleMessage(prev) && prev.senderName === message.senderName;
+}
+
+function senderBubbleClass(mine: boolean, showAvatar: boolean, tone: "navy" | "cream" | "seafoam") {
+  let bubbleClass = "relative max-w-[min(85%,calc(100%-2.5rem))] overflow-visible px-5 py-3.5";
+  if (tone === "seafoam") {
+    bubbleClass += " bg-seafoam text-navy";
+  } else if (mine) {
+    bubbleClass += " bg-navy text-white";
+  } else {
+    bubbleClass += " bg-cream text-navy";
+  }
+  if (mine) {
+    bubbleClass += showAvatar
+      ? " rounded-tl-[1.25rem] rounded-tr-[1.25rem] rounded-bl-[1.25rem] rounded-br-none"
+      : " rounded-[1.25rem]";
+  } else {
+    bubbleClass += showAvatar
+      ? " rounded-tl-[1.25rem] rounded-tr-[1.25rem] rounded-br-[1.25rem] rounded-bl-none"
+      : " rounded-[1.25rem]";
+  }
+  return bubbleClass;
 }
 
 function avatarSrcForSender(
@@ -121,6 +171,7 @@ export function ConversationPanel({
 }) {
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
+  const { formatDateTime } = useDateTimeFormatter();
   const [reply, setReply] = useState("");
   const [optimisticMessages, setOptimisticMessages] = useState<ApplicationMessage[]>([]);
   const [typingUser, setTypingUser] = useState("");
@@ -142,11 +193,59 @@ export function ConversationPanel({
   const lastMessageKey =
     optimisticMessages.at(-1)?.id ?? messagesWithInitialApplication(application).at(-1)?.id ?? "";
 
+  const MESSAGES_PAGE_SIZE = 10;
+  const [olderMessages, setOlderMessages] = useState<ApplicationMessage[]>([]);
+  const [isFetchingOlder, setIsFetchingOlder] = useState(false);
+  const [hasMoreOlder, setHasMoreOlder] = useState(true);
+  const prevScrollHeightRef = useRef<number>(0);
+  const prevPageMessagesRef = useRef<ApplicationMessage[]>(application.messages);
+  const stickToBottomRef = useRef(true);
+
   useEffect(() => {
     setReply("");
     setOpenMenuId(null);
     setOptimisticMessages([]);
+    setOlderMessages([]);
+    setIsFetchingOlder(false);
+    prevPageMessagesRef.current = application.messages;
+    stickToBottomRef.current = true;
   }, [application.id]);
+
+  useEffect(() => {
+    // Count only server page + loaded older pages (not the synthetic initial
+    // message), so hasMore stays accurate when the initial falls out of the window.
+    const currentCount = application.messages.length + olderMessages.length;
+    const totalCount = application.totalMessages ?? currentCount;
+    setHasMoreOlder(totalCount > currentCount);
+  }, [application.totalMessages, application.messages.length, olderMessages.length]);
+
+  useEffect(() => {
+    // When the live page window slides forward after a send, keep messages that
+    // fell off the front so they do not vanish until the user scrolls to fetch.
+    const prev = prevPageMessagesRef.current;
+    const next = application.messages;
+    // Do not clobber the previous page when a transient empty payload arrives.
+    if (!next.length) return;
+    prevPageMessagesRef.current = next;
+    if (!prev.length) return;
+
+    const nextIds = new Set(next.map((message) => message.id));
+    const oldestNext = next[0]?.createdAt;
+    const fallen = prev.filter((message) => {
+      if (nextIds.has(message.id)) return false;
+      if (!oldestNext) return true;
+      return message.createdAt < oldestNext;
+    });
+    if (!fallen.length) return;
+
+    setOlderMessages((current) => {
+      const existing = new Set(current.map((message) => message.id));
+      const toAdd = fallen.filter((message) => !existing.has(message.id));
+      if (!toAdd.length) return current;
+      return [...current, ...toAdd].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    });
+  }, [application.messages]);
+
   useEffect(() => {
     // Defer past list-button focus so opening/switching a chat leaves the composer ready.
     const timer = window.setTimeout(() => {
@@ -170,6 +269,11 @@ export function ConversationPanel({
   useLayoutEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
+    // Only pin to bottom for new trailing messages — a permanent ResizeObserver
+    // fights scroll-up pagination and makes the composer thrash/detach.
+    if (!stickToBottomRef.current || isFetchingOlder || prevScrollHeightRef.current > 0) {
+      return;
+    }
 
     const scrollToLatest = () => {
       container.scrollTop = container.scrollHeight;
@@ -178,14 +282,11 @@ export function ConversationPanel({
     scrollToLatest();
     const frame = requestAnimationFrame(scrollToLatest);
     const timeout = window.setTimeout(scrollToLatest, 0);
-    const observer = new ResizeObserver(scrollToLatest);
-    observer.observe(container);
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(timeout);
-      observer.disconnect();
     };
-  }, [application.id, lastMessageKey, typingUser]);
+  }, [application.id, lastMessageKey, typingUser, isFetchingOlder]);
   useEffect(() => {
     if (!("BroadcastChannel" in window)) return;
     const channel = new BroadcastChannel("boatstead-chat-typing");
@@ -213,6 +314,85 @@ export function ConversationPanel({
       setTypingUser("");
     };
   }, [application.id, currentUser]);
+
+  const fetchOlderMessages = useCallback(async () => {
+    if (isFetchingOlder || !hasMoreOlder) return;
+
+    const oldestOlderMessage = olderMessages[0];
+    const oldestApiMessage = application.messages[0];
+    const oldestMessage = oldestOlderMessage ?? oldestApiMessage;
+    if (!oldestMessage) return;
+
+    stickToBottomRef.current = false;
+    setIsFetchingOlder(true);
+    prevScrollHeightRef.current = messagesContainerRef.current?.scrollHeight ?? 0;
+
+    try {
+      const result = await getApplicationMessages(application.id, {
+        limit: MESSAGES_PAGE_SIZE,
+        before: oldestMessage.id,
+      });
+
+      const apiToLocal = (m: ApiApplicationMessage): ApplicationMessage => ({
+        id: m.id,
+        senderName: m.senderName,
+        text: m.text,
+        createdAt: m.createdAt,
+        kind: m.kind,
+        systemKind: m.systemKind as ApplicationMessage["systemKind"],
+        videoCall: m.videoCall,
+        sharedPhone: m.sharedPhone,
+      });
+
+      const page = Array.isArray(result.data) ? result.data : [];
+      const newMessages = page.map(apiToLocal);
+      if (newMessages.length === 0) {
+        setHasMoreOlder(false);
+        return;
+      }
+      setOlderMessages((prev) => {
+        const existing = new Set(prev.map((message) => message.id));
+        const unique = newMessages.filter((message) => !existing.has(message.id));
+        return [...unique, ...prev];
+      });
+      setHasMoreOlder(Boolean(result.hasMore));
+    } catch (error) {
+      console.error("Failed to fetch older messages:", error);
+    } finally {
+      setIsFetchingOlder(false);
+    }
+  }, [application.id, application.messages, olderMessages, isFetchingOlder, hasMoreOlder]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    if (prevScrollHeightRef.current > 0 && !isFetchingOlder) {
+      const newScrollHeight = container.scrollHeight;
+      const scrollDiff = newScrollHeight - prevScrollHeightRef.current;
+      if (scrollDiff > 0) {
+        container.scrollTop += scrollDiff;
+      }
+      prevScrollHeightRef.current = 0;
+    }
+  }, [olderMessages, isFetchingOlder]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const distanceFromBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
+      stickToBottomRef.current = distanceFromBottom < 80;
+      if (container.scrollTop < 100 && hasMoreOlder && !isFetchingOlder) {
+        void fetchOlderMessages();
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [fetchOlderMessages, hasMoreOlder, isFetchingOlder]);
 
   function publishTyping(isTyping: boolean) {
     channelRef.current?.postMessage({
@@ -251,17 +431,6 @@ export function ConversationPanel({
     setReportingMessage(message);
   }
 
-  const formatter = new Intl.DateTimeFormat(getIntlLocale(i18n.language), {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-  const scheduleFormatter = new Intl.DateTimeFormat(getIntlLocale(i18n.language), {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
   const sharedOwnerPhone =
     application.status === "accepted" &&
     currentUser === application.applicant.name &&
@@ -275,7 +444,10 @@ export function ConversationPanel({
   const visibleOptimistic = optimisticMessages.filter(
     (optimistic) => !isOptimisticMessageSynced(optimistic, application.messages),
   );
-  const threadMessages = [...messagesWithInitialApplication(application), ...visibleOptimistic];
+  const currentMessages = messagesWithInitialApplication(application);
+  const existingIds = new Set(currentMessages.map((m) => m.id));
+  const dedupedOlder = olderMessages.filter((m) => !existingIds.has(m.id));
+  const threadMessages = [...dedupedOlder, ...currentMessages, ...visibleOptimistic];
   const hasOptimisticSend = visibleOptimistic.some((message) => message.pending);
 
   async function submitReply() {
@@ -290,14 +462,69 @@ export function ConversationPanel({
       kind: "user",
       pending: true,
     };
+    stickToBottomRef.current = true;
     setOptimisticMessages((current) => [...current, optimistic]);
     setReply("");
     publishTyping(false);
     try {
       await Promise.resolve(onSend(text));
-    } catch {
+      // Clear pending immediately so further sends are not blocked if cache sync is slow.
+      setOptimisticMessages((current) =>
+        current.map((message) =>
+          message.id === optimisticId ? { ...message, pending: false } : message,
+        ),
+      );
+      // #region agent log
+      fetch("http://127.0.0.1:7593/ingest/0c297f7c-4545-4b43-808d-4c39e61a6eaf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "c8feae" },
+        body: JSON.stringify({
+          sessionId: "c8feae",
+          runId: "pre-fix",
+          hypothesisId: "E",
+          location: "ConversationPanel.tsx:submitReply:success",
+          message: "client send ok",
+          data: {
+            applicationId: application.id,
+            currentUser,
+            ownerName: application.ownerName,
+            isOwner: currentUser === application.ownerName,
+            textLength: text.length,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+    } catch (error) {
+      // #region agent log
+      fetch("http://127.0.0.1:7593/ingest/0c297f7c-4545-4b43-808d-4c39e61a6eaf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "c8feae" },
+        body: JSON.stringify({
+          sessionId: "c8feae",
+          runId: "pre-fix",
+          hypothesisId: "E",
+          location: "ConversationPanel.tsx:submitReply:catch",
+          message: "client send failed",
+          data: {
+            applicationId: application.id,
+            currentUser,
+            ownerName: application.ownerName,
+            isOwner: currentUser === application.ownerName,
+            errorName: error instanceof Error ? error.name : "unknown",
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorStatus:
+              error && typeof error === "object" && "status" in error
+                ? (error as { status: unknown }).status
+                : null,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       setOptimisticMessages((current) => current.filter((message) => message.id !== optimisticId));
       setReply(text);
+      showToast(t("messages.sendFailed"), "error");
     }
   }
 
@@ -324,18 +551,27 @@ export function ConversationPanel({
   function formatVideoCallDetails(message: ApplicationMessage) {
     if (!message.videoCall) return null;
     return t("applications.videoCall.proposedDetails", {
-      when: scheduleFormatter.format(new Date(message.videoCall.startsAt)),
+      when: formatDateTime(message.videoCall.startsAt, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }),
       duration: t("applications.videoCall.durationMinutes", {
         count: message.videoCall.durationMinutes,
       }),
     });
   }
 
-  const newlineShortcut =
-    typeof navigator !== "undefined" &&
-    (/Mac|iPhone|iPad|iPod/i.test(navigator.platform) || /Mac OS/i.test(navigator.userAgent))
-      ? "⌘ Enter"
-      : "Ctrl+Enter";
+  function formatMessageTimestamp(createdAt: string) {
+    return formatDateTime(createdAt, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  }
+
+  const modifierKeyLabel = isAppleKeyboardPlatform() ? "⌘" : "Ctrl";
 
   return (
     <section className="min-w-0 overflow-hidden rounded-2xl border border-line bg-white">
@@ -363,6 +599,15 @@ export function ConversationPanel({
         data-testid="conversation-messages"
         ref={messagesContainerRef}
       >
+        {isFetchingOlder && (
+          <div
+            className="flex items-center justify-center gap-2 py-4 text-sm font-semibold text-teal"
+            data-testid="conversation-fetching-older"
+          >
+            <LoaderCircle aria-hidden="true" className="animate-spin" size={16} />
+            {t("applications.fetchingOlderMessages")}
+          </div>
+        )}
         {threadMessages.length === 0 ? (
           <p className="py-10 text-center text-sm text-slate" data-testid="conversation-empty">
             {t("applications.noMessagesYet")}
@@ -371,194 +616,6 @@ export function ConversationPanel({
         {threadMessages.map((message, index) => {
           const stackGap = isStackContinuation(threadMessages, index) ? "mt-1" : "mt-4";
           const rowOffset = index === 0 ? "mt-0" : stackGap;
-          if (message.kind === "system") {
-            if (message.systemKind === "phoneShared" && message.sharedPhone) {
-              const mine = message.senderName === currentUser;
-              return (
-                <div
-                  className={`flex ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
-                  key={message.id}
-                >
-                  <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
-                    <Phone aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-teal">
-                        {mine ? t("messages.you") : message.senderName}
-                      </p>
-                      <p className="mt-1 font-bold text-navy">
-                        {t("applications.systemMessage.phoneSharedTitle")}
-                      </p>
-                      <p className="mt-1 text-slate">
-                        {formatApplicationSystemMessage(t, message, application, currentUser)}
-                      </p>
-                      <a
-                        className="mt-2 inline-flex items-center gap-2 font-bold text-navy hover:text-teal"
-                        href={`tel:${message.sharedPhone.replaceAll(/[^\d+]/g, "")}`}
-                      >
-                        <Phone aria-hidden="true" size={16} />
-                        {message.sharedPhone}
-                      </a>
-                      <p className="mt-2 text-[11px] font-semibold text-teal">
-                        {formatter.format(new Date(message.createdAt))}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-            if (message.systemKind === "withdrawn") {
-              const body = formatApplicationSystemMessage(t, message, application, currentUser);
-              if (message.text.trim()) {
-                return (
-                  <div className={`flex justify-center ${rowOffset}`} key={message.id}>
-                    <div className="max-w-[90%] rounded-2xl border border-slate/20 bg-cream px-4 py-3 text-sm leading-6 text-navy">
-                      <p className="font-bold text-navy">
-                        {t("applications.systemMessage.withdrawnTitle")}
-                      </p>
-                      <p className="mt-1 text-slate">{body}</p>
-                      <p className="mt-2 rounded-xl border border-line bg-white px-3 py-2 text-navy">
-                        {message.text}
-                      </p>
-                      <p className="mt-2 text-[11px] font-semibold text-teal">
-                        {formatter.format(new Date(message.createdAt))}
-                      </p>
-                    </div>
-                  </div>
-                );
-              }
-              return (
-                <div className={`flex justify-center ${rowOffset}`} key={message.id}>
-                  <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
-                    {body}
-                  </p>
-                </div>
-              );
-            }
-            if (
-              message.systemKind === "videoCallRequest" ||
-              message.systemKind === "videoCallCounter" ||
-              message.systemKind === "videoCallAccepted" ||
-              message.systemKind === "videoCallDeclined"
-            ) {
-              let titleKey = "applications.systemMessage.videoCallDeclinedTitle";
-              if (message.systemKind === "videoCallRequest") {
-                titleKey = "applications.systemMessage.videoCallRequestTitle";
-              } else if (message.systemKind === "videoCallCounter") {
-                titleKey = "applications.systemMessage.videoCallCounterTitle";
-              } else if (message.systemKind === "videoCallAccepted") {
-                titleKey = "applications.systemMessage.videoCallAcceptedTitle";
-              }
-              const details = formatVideoCallDetails(message);
-              const mine = message.senderName === currentUser;
-              const canRespond =
-                latestPendingProposal?.id === message.id &&
-                !mine &&
-                (message.systemKind === "videoCallRequest" ||
-                  message.systemKind === "videoCallCounter");
-              return (
-                <div
-                  className={`flex ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
-                  key={message.id}
-                >
-                  <div className="flex max-w-[85%] items-start gap-3 rounded-2xl border border-teal/25 bg-seafoam px-4 py-3 text-sm leading-6 text-navy">
-                    <Video aria-hidden="true" className="mt-0.5 shrink-0 text-teal" size={18} />
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-teal">
-                        {mine ? t("messages.you") : message.senderName}
-                      </p>
-                      <p className="mt-1 font-bold text-navy">{t(titleKey)}</p>
-                      <p className="mt-1 text-slate">
-                        {formatApplicationSystemMessage(t, message, application, currentUser)}
-                      </p>
-                      {details ? <p className="mt-2 font-semibold text-navy">{details}</p> : null}
-                      {message.videoCall?.meetUrl ? (
-                        <a
-                          className="mt-2 inline-flex items-center gap-2 rounded-full bg-navy px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal"
-                          href={message.videoCall.meetUrl}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          <Video aria-hidden="true" size={14} />
-                          {t("applications.videoCall.joinMeet")}
-                        </a>
-                      ) : null}
-                      {message.systemKind === "videoCallAccepted" && message.videoCall ? (
-                        <VideoCallCalendarLinks
-                          event={{
-                            title: t("applications.videoCall.calendarTitle", {
-                              name: otherPartyName,
-                              boat: application.boatName,
-                            }),
-                            description: t("applications.videoCall.calendarDescription", {
-                              name: otherPartyName,
-                              boat: application.boatName,
-                            }),
-                            startsAt: message.videoCall.startsAt,
-                            durationMinutes: message.videoCall.durationMinutes,
-                          }}
-                        />
-                      ) : null}
-                      {canRespond ? (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <button
-                            className="rounded-full bg-navy px-3.5 py-1.5 text-xs font-bold text-white disabled:opacity-50"
-                            disabled={pending}
-                            onClick={() =>
-                              onRespondToVideoCall({
-                                action: "accept",
-                                messageId: message.id,
-                              })
-                            }
-                            type="button"
-                          >
-                            {t("applications.videoCall.accept")}
-                          </button>
-                          <button
-                            className="rounded-full border border-teal/40 bg-white px-3.5 py-1.5 text-xs font-bold text-teal disabled:opacity-50"
-                            disabled={pending}
-                            onClick={() => setScheduleModal({ mode: "adjust", message })}
-                            type="button"
-                          >
-                            {t("applications.videoCall.suggestDifferent")}
-                          </button>
-                          <button
-                            className="rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-bold text-slate disabled:opacity-50"
-                            disabled={pending}
-                            onClick={() =>
-                              onRespondToVideoCall({
-                                action: "decline",
-                                messageId: message.id,
-                              })
-                            }
-                            type="button"
-                          >
-                            {t("applications.videoCall.decline")}
-                          </button>
-                        </div>
-                      ) : null}
-                      <p className="mt-2 text-[11px] font-semibold text-teal">
-                        {formatter.format(new Date(message.createdAt))}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-            return (
-              <div className={`flex justify-center ${rowOffset}`} key={message.id}>
-                <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
-                  {message.systemKind === "accepted" ||
-                  message.systemKind === "declined" ||
-                  message.systemKind === "unaccepted" ||
-                  message.systemKind === "sitCancelled" ||
-                  message.systemKind === "applicantsClosed"
-                    ? formatApplicationSystemMessage(t, message, application, currentUser)
-                    : message.text}
-                </p>
-              </div>
-            );
-          }
-
           const mine = message.senderName === currentUser;
           const showAvatar = isLastInSenderStack(threadMessages, index);
           const avatarSrc = avatarSrcForSender(
@@ -586,18 +643,220 @@ export function ConversationPanel({
             />
           );
 
-          let bubbleClass =
-            "relative max-w-[min(85%,calc(100%-2.5rem))] overflow-visible px-5 py-3.5";
-          if (mine) {
-            bubbleClass += " bg-navy text-white";
-            bubbleClass += showAvatar
-              ? " rounded-tl-[1.25rem] rounded-tr-[1.25rem] rounded-bl-[1.25rem] rounded-br-none"
-              : " rounded-[1.25rem]";
-          } else {
-            bubbleClass += " bg-cream text-navy";
-            bubbleClass += showAvatar
-              ? " rounded-tl-[1.25rem] rounded-tr-[1.25rem] rounded-br-[1.25rem] rounded-bl-none"
-              : " rounded-[1.25rem]";
+          if (message.kind === "system") {
+            if (message.systemKind === "phoneShared" && message.sharedPhone) {
+              return (
+                <div
+                  className={`flex items-end gap-3 ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
+                  data-testid="conversation-message-phone-shared"
+                  key={message.id}
+                >
+                  {mine ? null : avatar}
+                  <div
+                    className={senderBubbleClass(mine, showAvatar, "seafoam")}
+                    data-testid={mine ? "conversation-message-own" : "conversation-message-peer"}
+                  >
+                    {showAvatar ? (
+                      <SpeechBubbleTail
+                        side={mine ? "right" : "left"}
+                        testId={
+                          mine ? "conversation-message-tail-own" : "conversation-message-tail-peer"
+                        }
+                        tone="seafoam"
+                      />
+                    ) : null}
+                    <p className="text-xs font-bold text-teal">
+                      {mine ? t("messages.you") : message.senderName}
+                    </p>
+                    <p className="mt-1 flex items-center gap-2 font-bold text-navy">
+                      <Phone aria-hidden="true" className="shrink-0 text-teal" size={16} />
+                      {t("applications.systemMessage.phoneSharedTitle")}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-slate">
+                      {formatApplicationSystemMessage(t, message, application, currentUser)}
+                    </p>
+                    <a
+                      className="mt-2 inline-block font-bold text-navy hover:text-teal"
+                      href={`tel:${message.sharedPhone.replaceAll(/[^\d+]/g, "")}`}
+                    >
+                      {message.sharedPhone}
+                    </a>
+                    <p className="mt-2 text-[11px] text-slate">
+                      {formatMessageTimestamp(message.createdAt)}
+                    </p>
+                  </div>
+                  {mine ? avatar : null}
+                </div>
+              );
+            }
+            if (message.systemKind === "withdrawn") {
+              const body = formatApplicationSystemMessage(t, message, application, currentUser);
+              if (message.text.trim()) {
+                return (
+                  <div className={`flex justify-center ${rowOffset}`} key={message.id}>
+                    <div className="max-w-[90%] rounded-2xl border border-slate/20 bg-cream px-4 py-3 text-sm leading-6 text-navy">
+                      <p className="font-bold text-navy">
+                        {t("applications.systemMessage.withdrawnTitle")}
+                      </p>
+                      <p className="mt-1 text-slate">{body}</p>
+                      <p className="mt-2 rounded-xl border border-line bg-white px-3 py-2 text-navy">
+                        {message.text}
+                      </p>
+                      <p className="mt-2 text-[11px] font-semibold text-teal">
+                        {formatMessageTimestamp(message.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div className={`flex justify-center ${rowOffset}`} key={message.id}>
+                  <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
+                    {body}
+                  </p>
+                </div>
+              );
+            }
+            if (isVideoCallSystemKind(message.systemKind)) {
+              let titleKey = "applications.systemMessage.videoCallDeclinedTitle";
+              if (message.systemKind === "videoCallRequest") {
+                titleKey = "applications.systemMessage.videoCallRequestTitle";
+              } else if (message.systemKind === "videoCallCounter") {
+                titleKey = "applications.systemMessage.videoCallCounterTitle";
+              } else if (message.systemKind === "videoCallAccepted") {
+                titleKey = "applications.systemMessage.videoCallAcceptedTitle";
+              }
+              const details = formatVideoCallDetails(message);
+              const canRespond =
+                latestPendingProposal?.id === message.id &&
+                !mine &&
+                (message.systemKind === "videoCallRequest" ||
+                  message.systemKind === "videoCallCounter");
+              return (
+                <div
+                  className={`flex items-end gap-3 ${rowOffset} ${mine ? "justify-end" : "justify-start"}`}
+                  data-testid="conversation-message-video-call"
+                  key={message.id}
+                >
+                  {mine ? null : avatar}
+                  <div
+                    className={senderBubbleClass(mine, showAvatar, "seafoam")}
+                    data-testid={mine ? "conversation-message-own" : "conversation-message-peer"}
+                  >
+                    {showAvatar ? (
+                      <SpeechBubbleTail
+                        side={mine ? "right" : "left"}
+                        testId={
+                          mine ? "conversation-message-tail-own" : "conversation-message-tail-peer"
+                        }
+                        tone="seafoam"
+                      />
+                    ) : null}
+                    <p className="text-xs font-bold text-teal">
+                      {mine ? t("messages.you") : message.senderName}
+                    </p>
+                    <p className="mt-1 flex items-center gap-2 font-bold text-navy">
+                      <Video aria-hidden="true" className="shrink-0 text-teal" size={16} />
+                      {t(titleKey)}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-slate">
+                      {formatApplicationSystemMessage(t, message, application, currentUser)}
+                    </p>
+                    {details ? (
+                      <p
+                        className="mt-2 text-sm font-semibold text-navy"
+                        data-testid="conversation-video-call-when"
+                      >
+                        {details}
+                      </p>
+                    ) : null}
+                    {message.videoCall?.meetUrl ? (
+                      <a
+                        className="mt-2 inline-flex items-center gap-2 rounded-full bg-navy px-3.5 py-1.5 text-xs font-bold text-white hover:bg-teal"
+                        href={message.videoCall.meetUrl}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        <Video aria-hidden="true" size={14} />
+                        {t("applications.videoCall.joinMeet")}
+                      </a>
+                    ) : null}
+                    {message.systemKind === "videoCallAccepted" && message.videoCall ? (
+                      <VideoCallCalendarLinks
+                        event={{
+                          title: t("applications.videoCall.calendarTitle", {
+                            name: otherPartyName,
+                            boat: application.boatName,
+                          }),
+                          description: t("applications.videoCall.calendarDescription", {
+                            name: otherPartyName,
+                            boat: application.boatName,
+                          }),
+                          startsAt: message.videoCall.startsAt,
+                          durationMinutes: message.videoCall.durationMinutes,
+                        }}
+                      />
+                    ) : null}
+                    {canRespond ? (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          className="rounded-full bg-navy px-3.5 py-1.5 text-xs font-bold text-white disabled:opacity-50"
+                          disabled={pending}
+                          onClick={() =>
+                            onRespondToVideoCall({
+                              action: "accept",
+                              messageId: message.id,
+                            })
+                          }
+                          type="button"
+                        >
+                          {t("applications.videoCall.accept")}
+                        </button>
+                        <button
+                          className="rounded-full border border-teal/40 bg-white px-3.5 py-1.5 text-xs font-bold text-teal disabled:opacity-50"
+                          disabled={pending}
+                          onClick={() => setScheduleModal({ mode: "adjust", message })}
+                          type="button"
+                        >
+                          {t("applications.videoCall.suggestDifferent")}
+                        </button>
+                        <button
+                          className="rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-bold text-slate disabled:opacity-50"
+                          disabled={pending}
+                          onClick={() =>
+                            onRespondToVideoCall({
+                              action: "decline",
+                              messageId: message.id,
+                            })
+                          }
+                          type="button"
+                        >
+                          {t("applications.videoCall.decline")}
+                        </button>
+                      </div>
+                    ) : null}
+                    <p className="mt-2 text-[11px] text-slate">
+                      {formatMessageTimestamp(message.createdAt)}
+                    </p>
+                  </div>
+                  {mine ? avatar : null}
+                </div>
+              );
+            }
+            return (
+              <div className={`flex justify-center ${rowOffset}`} key={message.id}>
+                <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
+                  {message.systemKind === "accepted" ||
+                  message.systemKind === "declined" ||
+                  message.systemKind === "unaccepted" ||
+                  message.systemKind === "sitCancelled" ||
+                  message.systemKind === "sitEndedEarly" ||
+                  message.systemKind === "applicantsClosed"
+                    ? formatApplicationSystemMessage(t, message, application, currentUser)
+                    : message.text}
+                </p>
+              </div>
+            );
           }
 
           return (
@@ -615,7 +874,7 @@ export function ConversationPanel({
               ) : null}
               <div
                 aria-busy={message.pending || undefined}
-                className={bubbleClass}
+                className={senderBubbleClass(mine, showAvatar, mine ? "navy" : "cream")}
                 data-testid={mine ? "conversation-message-own" : "conversation-message-peer"}
               >
                 {showAvatar ? (
@@ -660,7 +919,7 @@ export function ConversationPanel({
                   {message.text}
                 </p>
                 <p className={`mt-2 text-[11px] ${mine ? "text-white/60" : "text-slate"}`}>
-                  {formatter.format(new Date(message.createdAt))}
+                  {formatMessageTimestamp(message.createdAt)}
                 </p>
                 {!mine && translations[message.id] && (
                   <div className="mt-3 rounded-xl border border-aqua/40 bg-white p-3 text-navy">
@@ -746,8 +1005,14 @@ export function ConversationPanel({
             </span>
           </button>
           <div className={user ? "col-start-2 col-end-4" : "col-span-full"}>
-            <p className="text-xs text-slate">
-              {t("applications.replyHint", { shortcut: newlineShortcut })}
+            <p className="hidden text-xs text-slate sm:block" data-testid="conversation-reply-hint">
+              <Trans
+                components={{
+                  modKey: <KeyboardKey>{modifierKeyLabel}</KeyboardKey>,
+                  sendKey: <KeyboardKey />,
+                }}
+                i18nKey="applications.replyHint"
+              />
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -919,11 +1184,23 @@ function ReportMessageModal({
   message: ApplicationMessage;
 }) {
   const { t } = useTranslation();
+  const user = useAppStore((state) => state.user);
   const reportUser = useAppStore((state) => state.reportUser);
+  const blockUser = useAppStore((state) => state.blockUser);
+  const isBlocked = useAppStore((state) =>
+    state.blockedUsers.some((blocked) => blocked.name === message.senderName),
+  );
   const [reason, setReason] = useState<ReportReason>("inappropriate");
   const [details, setDetails] = useState("");
+  const [alsoBlock, setAlsoBlock] = useState(false);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const senderImage = avatarSrcForSender(
+    message.senderName,
+    application,
+    user?.name ?? "",
+    user?.image,
+  );
 
   function submitReport(event: React.FormEvent) {
     event.preventDefault();
@@ -942,6 +1219,14 @@ function ReportMessageModal({
       messageText: message.text,
       messageCreatedAt: message.createdAt,
     });
+    if (alsoBlock && !isBlocked) {
+      blockUser({
+        name: message.senderName,
+        image:
+          senderImage ||
+          `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(message.senderName)}`,
+      });
+    }
     setSubmitted(true);
   }
 
@@ -1042,8 +1327,31 @@ function ReportMessageModal({
                 {error}
               </p>
             ) : null}
+            {!isBlocked ? (
+              <label
+                className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-cream p-4 text-sm leading-6 text-navy"
+                data-testid="report-also-block"
+              >
+                <input
+                  checked={alsoBlock}
+                  className="mt-1 size-4 accent-teal"
+                  onChange={(event) => setAlsoBlock(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>
+                  <span className="block font-bold">
+                    {t("safetyActions.reportAlsoBlock", { name: message.senderName })}
+                  </span>
+                  <span className="mt-1 block text-slate">{t("safetyActions.blockText")}</span>
+                </span>
+              </label>
+            ) : null}
             <div className="mt-7 grid gap-3">
-              <button className="rounded-xl bg-coral px-5 py-3 font-bold text-white" type="submit">
+              <button
+                className="rounded-xl bg-coral px-5 py-3 font-bold text-white"
+                data-testid="report-submit"
+                type="submit"
+              >
                 {t("messageReport.submit")}
               </button>
               <button

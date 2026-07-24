@@ -7,7 +7,6 @@ import { getDb } from "../db";
 import {
   sits,
   userArchivedConversations,
-  userArchivedSits,
   userBlocks,
   userDeletedConversations,
   userReports,
@@ -18,7 +17,7 @@ import { joinBoat } from "../lib/join";
 import { requireUser } from "../middleware/auth";
 
 /**
- * Per-user saved sits, conversation/sit archives, block list, and reports.
+ * Per-user saved sits, conversation archives, block list, and reports.
  */
 export const prefsRouter = new Hono<AppEnv>();
 
@@ -35,28 +34,22 @@ prefsRouter.get("/", requireUser, async (c) => {
   const db = getDb(c.env);
   const user = c.get("user")!;
 
-  const [savedRows, archivedConvRows, deletedConvRows, archivedSitRows, blockRows, reportRows] =
-    await Promise.all([
-      db.select().from(userSaved).where(eq(userSaved.userId, user.id)),
-      db
-        .select()
-        .from(userArchivedConversations)
-        .where(eq(userArchivedConversations.userId, user.id)),
-      db
-        .select()
-        .from(userDeletedConversations)
-        .where(eq(userDeletedConversations.userId, user.id)),
-      db.select().from(userArchivedSits).where(eq(userArchivedSits.userId, user.id)),
-      db.select().from(userBlocks).where(eq(userBlocks.userId, user.id)),
-      db.select().from(userReports).where(eq(userReports.reporterUserId, user.id)),
-    ]);
+  const [savedRows, archivedConvRows, deletedConvRows, blockRows, reportRows] = await Promise.all([
+    db.select().from(userSaved).where(eq(userSaved.userId, user.id)),
+    db
+      .select()
+      .from(userArchivedConversations)
+      .where(eq(userArchivedConversations.userId, user.id)),
+    db.select().from(userDeletedConversations).where(eq(userDeletedConversations.userId, user.id)),
+    db.select().from(userBlocks).where(eq(userBlocks.userId, user.id)),
+    db.select().from(userReports).where(eq(userReports.reporterUserId, user.id)),
+  ]);
 
   return c.json({
     data: {
       saved: [...new Set(savedRows.map((r) => r.sitId))],
       archivedConversations: [...new Set(archivedConvRows.map((r) => r.applicationId))],
       deletedConversations: [...new Set(deletedConvRows.map((r) => r.applicationId))],
-      archivedSits: [...new Set(archivedSitRows.map((r) => r.sitId))],
       blockedUsers: blockRows.map((r) => ({
         name: r.blockedName,
         image: r.blockedImage,
@@ -216,27 +209,6 @@ prefsRouter.delete("/deleted-conversations/:id", requireUser, async (c) => {
       ),
     );
   return c.json({ data: { deleted: false, applicationId } });
-});
-
-prefsRouter.put("/archived-sits/:sitId", requireUser, async (c) => {
-  const db = getDb(c.env);
-  const user = c.get("user")!;
-  const sitId = c.req.param("sitId");
-  await db
-    .delete(userArchivedSits)
-    .where(and(eq(userArchivedSits.userId, user.id), eq(userArchivedSits.sitId, sitId)));
-  await db.insert(userArchivedSits).values({ userId: user.id, sitId });
-  return c.json({ data: { archived: true, sitId } });
-});
-
-prefsRouter.delete("/archived-sits/:sitId", requireUser, async (c) => {
-  const db = getDb(c.env);
-  const user = c.get("user")!;
-  const sitId = c.req.param("sitId");
-  await db
-    .delete(userArchivedSits)
-    .where(and(eq(userArchivedSits.userId, user.id), eq(userArchivedSits.sitId, sitId)));
-  return c.json({ data: { archived: false, sitId } });
 });
 
 const blockSchema = z.object({

@@ -67,7 +67,28 @@ test.describe("message conversation row actions", () => {
 
     await page.getByTestId(`conversation-row-actions-${applicationId}`).click();
     await page.getByTestId(`conversation-row-report-${applicationId}`).click();
-    await expect(page.getByTestId(`conversation-row-report-dialog-${applicationId}`)).toBeVisible();
+    const dialog = page.getByTestId(`conversation-row-report-dialog-${applicationId}`);
+    await expect(dialog).toBeVisible();
     await expect(page.getByRole("heading", { name: /Report /i })).toBeVisible();
+    await expect(dialog.getByTestId("report-also-block")).toBeVisible();
+  });
+
+  test("reports and blocks a member from the row ellipsis menu", async ({ page }) => {
+    await seedVerifiedOwner(page);
+    const { applicationId, otherName } = await openFirstConversationRow(page);
+
+    await page.getByTestId(`conversation-row-actions-${applicationId}`).click();
+    await page.getByTestId(`conversation-row-report-${applicationId}`).click();
+    const dialog = page.getByTestId(`conversation-row-report-dialog-${applicationId}`);
+    await expect(dialog).toBeVisible();
+    await dialog.getByTestId("report-also-block").click();
+    await dialog.getByTestId("report-submit").click();
+    await expect(dialog.getByRole("heading", { name: /Report submitted/i })).toBeVisible();
+    await dialog.getByRole("button", { name: /Done/i }).click();
+
+    await page.goto("/settings?tab=privacy");
+    const blockedSection = page.getByTestId("settings-blocked-users");
+    await expect(blockedSection).toBeVisible();
+    await expect(blockedSection.getByText(otherName, { exact: true })).toBeVisible();
   });
 });

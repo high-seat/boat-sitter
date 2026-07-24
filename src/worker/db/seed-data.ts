@@ -212,7 +212,7 @@ export const seedSits: NewSit[] = [
     requiredExperience: ["Liveaboard"],
     requiredCertifications: [],
     requiredSkills: ["Diesel troubleshooting", "Mooring & lines"],
-    applicants: 6,
+    applicants: 2,
     pet: "Pip, a sea-loving terrier",
     featured: true,
     published: true,
