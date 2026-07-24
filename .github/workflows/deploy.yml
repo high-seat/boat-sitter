@@ -1,17 +1,18 @@
-name: Deploy
+name: CI + Staging
 
-# Pipeline:
-#   push to main → check → deploy STAGING (auto) → deploy PRODUCTION (manual gate)
+# Pipeline (this file):
+#   push to main → check → deploy STAGING (auto) → core test vs staging
 #
-# The production job uses the GitHub "production" Environment. Add a required
-# reviewer to that environment (repo → Settings → Environments → production →
-# "Required reviewers") and the prod job pauses with a "Review deployments"
-# button — that's your manual promote. Each deploy migrates its own D1 first,
-# so the schema can never drift behind the code.
+# Production is DELIBERATELY not here. Promotion to prod is a separate,
+# manually-triggered workflow: .github/workflows/deploy-production.yml
+# (Actions tab → "Deploy production" → Run workflow). That's your promote
+# button. Each deploy migrates its own D1 first, so schema never drifts
+# behind the code.
 #
 # Repo secrets required (Settings → Secrets and variables → Actions):
 #   CLOUDFLARE_API_TOKEN   (Workers Scripts: Edit + D1: Edit)
 #   CLOUDFLARE_ACCOUNT_ID
+#   TEST_USER_EMAIL / TEST_USER_PASSWORD  (core-test login)
 
 on:
   push:
@@ -69,37 +70,5 @@ jobs:
         run: pnpm test:core
         env:
           CORE_BASE_URL: https://boatstead-staging.sharukrules.workers.dev
-          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-
-  deploy-production:
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    # Manual gate: configure required reviewers on this environment so the job
-    # waits for an approval click before running.
-    environment: production
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Migrate production D1 (before shipping code that expects it)
-        run: pnpm exec wrangler d1 migrations apply boat-sitter-db --remote
-      - name: Build
-        run: pnpm build
-      - name: Deploy production worker
-        run: pnpm exec wrangler deploy
-      - name: Install Playwright (chromium)
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Core test (production)
-        run: pnpm test:core
-        env:
-          CORE_BASE_URL: https://boatstead.sharukrules.workers.dev
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}

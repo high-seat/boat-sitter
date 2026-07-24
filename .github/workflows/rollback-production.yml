@@ -1,0 +1,45 @@
+name: Rollback production
+
+# MANUAL one-click revert of the production WORKER to a previous version.
+#   GitHub → Actions tab → "Rollback production" → Run workflow.
+#
+# Leave "version_id" blank to roll back to the immediately-previous version
+# (the common case). To jump to a specific older version, paste its id — find
+# ids with:  wrangler deployments list   (or the Cloudflare dashboard).
+#
+# SCOPE: this reverts CODE only. It does NOT revert D1 — any migration that
+# already ran stays applied. That's safe as long as migrations are
+# backward-compatible (additive / expand-contract), which is why they're
+# proven on staging first. If a bad *schema* change reached prod, code
+# rollback alone won't fix it; that needs a hand-written reverse migration.
+#
+# Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_id:
+        description: "Version id to roll back to (blank = previous version)"
+        required: false
+        default: ""
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Roll back worker
+        run: pnpm exec wrangler rollback ${{ inputs.version_id }} --message "Manual rollback via GitHub Actions (run ${{ github.run_id }})"

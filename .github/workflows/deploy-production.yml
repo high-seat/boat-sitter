@@ -1,0 +1,68 @@
+name: Deploy production
+
+# MANUAL promote-to-prod. This never runs on push — you trigger it yourself:
+#   GitHub → Actions tab → "Deploy production" → Run workflow (pick main).
+# That "Run workflow" button IS the promote button.
+#
+# Order matters and is deliberate:
+#   1. migrate prod D1   (schema first, so code never lands ahead of its tables)
+#   2. build + deploy    (ship the Worker)
+#   3. core test vs prod (smoke the live site; red = investigate/roll back)
+#
+# NOTE on rollback: a failed step here stops the *remaining* steps, but it does
+# NOT undo steps that already succeeded. Cloudflare has no auto-rollback and D1
+# migrations do not self-revert. See rollback: below.
+#
+# Secrets (same as CI): CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
+# TEST_USER_EMAIL, TEST_USER_PASSWORD.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    # Optional extra gate: if this repo is (or becomes) able to require
+    # reviewers on a "production" Environment, uncomment to add an approval
+    # click on top of the manual trigger. workflow_dispatch alone already
+    # means nothing ships without you pressing Run workflow.
+    # environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Migrate production D1 (before shipping code that expects it)
+        run: pnpm exec wrangler d1 migrations apply boat-sitter-db --remote
+      - name: Build
+        run: pnpm build
+      - name: Deploy production worker
+        id: deploy
+        run: pnpm exec wrangler deploy
+      - name: Install Playwright (chromium)
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Core test (production)
+        id: core
+        run: pnpm test:core
+        env:
+          CORE_BASE_URL: https://boatstead.sharukrules.workers.dev
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      # Auto-rollback the WORKER only when the deploy succeeded but the core
+      # test failed — i.e. we shipped a live-but-broken version. `wrangler
+      # rollback` (no version id) reverts to the immediately-previous version.
+      # It does NOT touch D1: any migration this run applied stays applied
+      # (that's why migrations must be backward-compatible / caught in staging).
+      - name: Roll back worker (core test failed)
+        if: always() && steps.deploy.outcome == 'success' && steps.core.outcome == 'failure'
+        run: pnpm exec wrangler rollback --message "Auto-rollback prod core test failed (run ${{ github.run_id }})"

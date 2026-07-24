@@ -27,12 +27,21 @@ test("core: a user can sign in", async ({ page }) => {
   }
 
   await page.goto("/");
+
+  // The cookie-consent bar is also role="dialog" — dismiss it so it doesn't
+  // clash with the auth modal (and so it can't overlap the form).
+  const consent = page.getByRole("dialog", { name: /cookie consent/i });
+  if (await consent.isVisible().catch(() => false)) {
+    await consent.getByRole("button", { name: /decline/i }).click();
+  }
+
   await page
     .getByRole("button", { name: /Log in/i })
     .first()
     .click();
 
-  const dialog = page.getByRole("dialog");
+  // Scope to the auth modal specifically (labelled "… Boatstead").
+  const dialog = page.getByRole("dialog", { name: /Boatstead/i });
   await expect(dialog).toBeVisible();
   await dialog.locator('input[type="email"]').fill(email);
   await dialog.locator('input[type="password"]').fill(password);
