@@ -32,5 +32,30 @@
     "ENVIRONMENT": "production",
     "BETTER_AUTH_URL": "https://boatstead.sharukrules.workers.dev",
     "REQUIRE_EMAIL_VERIFICATION": "true"
+  },
+  "env": {
+    "staging": {
+      "name": "boatstead-staging",
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "BETTER_AUTH_URL": "https://boatstead-staging.sharukrules.workers.dev",
+        "REQUIRE_EMAIL_VERIFICATION": "false"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "boat-sitter-db-staging",
+          "database_id": "716d8d73-e575-4588-b26b-8f9b77f1c5ad",
+          "migrations_dir": "./drizzle"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "UPLOADS",
+          "bucket_name": "boatstead-uploads-staging",
+          "preview_bucket_name": "boatstead-uploads-staging"
+        }
+      ]
+    }
   }
 }
