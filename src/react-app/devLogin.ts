@@ -153,7 +153,13 @@ export async function devLoginAs(opts: {
   return res.ok ? { ok: true, data: undefined } : res;
 }
 
-export type TestUser = { id: string; email: string; name: string; createdAt?: number | string };
+export type TestUser = {
+  id: string;
+  email: string;
+  name: string;
+  image?: string | null;
+  createdAt?: number | string;
+};
 
 /** List the tool-created test users (dev-%@boatstead.test), newest first. */
 export async function listTestUsers(requiresSecret: boolean): Promise<DevResult<TestUser[]>> {

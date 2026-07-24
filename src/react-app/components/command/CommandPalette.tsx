@@ -62,6 +62,18 @@ function openAuth(mode: "login" | "signup") {
   window.dispatchEvent(new CustomEvent("open-auth", { detail: mode }));
 }
 
+/** Avatar thumbnail for a test-user row; falls back to a person glyph. */
+function TestUserAvatar({ src }: { src?: string | null }) {
+  if (!src) return <UserRound className="size-5 shrink-0" />;
+  return (
+    <img
+      alt=""
+      src={src}
+      className="size-6 shrink-0 rounded-full border border-line object-cover"
+    />
+  );
+}
+
 function StatusBadge({
   children,
   tone = "neutral",
@@ -655,7 +667,7 @@ export function CommandPalette() {
                     )
                   }
                 >
-                  <UserRound className="size-4 shrink-0" />
+                  <TestUserAvatar src={testUser.image} />
                   <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
                     <span className="min-w-0">
                       <span className="block truncate">{testUser.name || testUser.email}</span>
@@ -680,7 +692,7 @@ export function CommandPalette() {
                     run(() => void removeTestUser(testUser.id, testUser.name || testUser.email))
                   }
                 >
-                  <Trash2 className="size-4 shrink-0" />
+                  <TestUserAvatar src={testUser.image} />
                   <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
                     <span className="min-w-0">
                       <span className="block truncate">{testUser.name || testUser.email}</span>
