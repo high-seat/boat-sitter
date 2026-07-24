@@ -184,6 +184,19 @@ export function CommandPalette() {
     window.alert(result.error);
   }
 
+  async function switchToTestUser(testEmail: string, testName: string) {
+    const result = await devLoginAs({
+      email: testEmail,
+      name: testName,
+      requiresSecret: devTools.requiresSecret,
+    });
+    if (result.ok) {
+      window.location.reload();
+      return;
+    }
+    window.alert(result.error);
+  }
+
   async function removeTestUser(id: string, label: string) {
     if (!window.confirm(`Delete test user "${label}" and all their data?`)) return;
     const result = await deleteTestUser(id, devTools.requiresSecret);
@@ -594,6 +607,33 @@ export function CommandPalette() {
                   Set / clear dev login secret
                 </CommandItem>
               )}
+            </CommandGroup>
+          )}
+          {devTools.enabled && testUsers.length > 0 && (
+            <CommandGroup heading="Switch to test user">
+              {testUsers.map((testUser) => (
+                <CommandItem
+                  key={`switch-${testUser.id}`}
+                  onSelect={() =>
+                    run(
+                      () => void switchToTestUser(testUser.email, testUser.name || testUser.email),
+                    )
+                  }
+                >
+                  <UserRound className="size-4 shrink-0" />
+                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                    <span className="min-w-0">
+                      <span className="block truncate">{testUser.name || testUser.email}</span>
+                      <span className="block truncate text-xs font-normal text-slate">
+                        {testUser.email}
+                      </span>
+                    </span>
+                    {user?.email?.toLowerCase() === testUser.email.toLowerCase() && (
+                      <StatusBadge tone="on">Current</StatusBadge>
+                    )}
+                  </span>
+                </CommandItem>
+              ))}
             </CommandGroup>
           )}
           {devTools.enabled && testUsers.length > 0 && (

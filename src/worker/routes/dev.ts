@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { and, eq, isNull, like, ne, or, sql } from "drizzle-orm";
 import type { AppEnv } from "../context";
+import { hashPassword } from "better-auth/crypto";
 import { buildAuth } from "../auth";
 import { getDb } from "../db";
-import { user } from "../db/auth-schema";
+import { account, user } from "../db/auth-schema";
 import {
   applicationMessages,
   applications,
@@ -202,60 +203,67 @@ devRouter.post("/login", async (c) => {
     body?.image?.trim() ||
     `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name)}`;
 
+  const db = getDb(c.env);
   const auth = buildAuth(c.env, c.req.raw);
 
-  let authResponse = await auth.api.signInEmail({
+  // Ensure a credential user exists WITHOUT Better Auth's sign-up flow — that
+  // flow fires a verification email (which on staging lands in NOTIFY_EMAIL).
+  // Instead we upsert the user + a credential account directly, email
+  // pre-verified, then just sign in. Silent, and idempotent for repeat logins.
+  const existing = await db.query.user.findFirst({ where: eq(user.email, email) });
+  let userId: string;
+  if (existing) {
+    userId = existing.id;
+    if (!existing.emailVerified) {
+      await db.update(user).set({ emailVerified: true }).where(eq(user.id, userId));
+    }
+  } else {
+    userId = crypto.randomUUID();
+    const now = new Date();
+    await db
+      .insert(user)
+      .values({
+        id: userId,
+        name,
+        email,
+        emailVerified: true,
+        image,
+        createdAt: now,
+        updatedAt: now,
+      });
+  }
+
+  // A credential (email+password) account is what sign-in checks against.
+  const credential = await db.query.account.findFirst({
+    where: and(eq(account.userId, userId), eq(account.providerId, "credential")),
+  });
+  if (!credential) {
+    const now = new Date();
+    await db.insert(account).values({
+      id: crypto.randomUUID(),
+      accountId: userId,
+      providerId: "credential",
+      userId,
+      password: await hashPassword(password),
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  const authResponse = await auth.api.signInEmail({
     body: { email, password },
     asResponse: true,
   });
-  if (!authResponse.ok) {
-    authResponse = await auth.api.signUpEmail({
-      body: { email, password, name, image },
-      asResponse: true,
-    });
-    // Concurrent e2e workers may create the same user — retry sign-in.
-    if (!authResponse.ok) {
-      authResponse = await auth.api.signInEmail({
-        body: { email, password },
-        asResponse: true,
-      });
-    }
-  }
   if (!authResponse.ok) {
     const detail = await authResponse.text().catch(() => "");
     return c.json({ error: "Dev login failed", detail: detail || authResponse.statusText }, 400);
   }
 
-  // Local/e2e accounts should be usable even when verification is required in prod.
-  const db = getDb(c.env);
-  await db.update(user).set({ emailVerified: true }).where(eq(user.email, email));
-
-  // Re-read session from the Set-Cookie headers Better Auth just issued.
-  let setCookies = authResponse.headers.getSetCookie?.() ?? [];
-  let cookieHeader = setCookies.map((entry) => entry.split(";")[0]).join("; ");
-  let session = await auth.api.getSession({
-    headers: new Headers({
-      cookie: cookieHeader || c.req.header("cookie") || "",
-    }),
+  const setCookies = authResponse.headers.getSetCookie?.() ?? [];
+  const cookieHeader = setCookies.map((entry) => entry.split(";")[0]).join("; ");
+  const session = await auth.api.getSession({
+    headers: new Headers({ cookie: cookieHeader || c.req.header("cookie") || "" }),
   });
-  // Sign-up can succeed without a session when verification emails are enabled.
-  if (!session?.user) {
-    authResponse = await auth.api.signInEmail({
-      body: { email, password },
-      asResponse: true,
-    });
-    if (!authResponse.ok) {
-      const detail = await authResponse.text().catch(() => "");
-      return c.json({ error: "Dev login failed", detail: detail || authResponse.statusText }, 400);
-    }
-    setCookies = authResponse.headers.getSetCookie?.() ?? [];
-    cookieHeader = setCookies.map((entry) => entry.split(";")[0]).join("; ");
-    session = await auth.api.getSession({
-      headers: new Headers({
-        cookie: cookieHeader || c.req.header("cookie") || "",
-      }),
-    });
-  }
   const sessionUser = session?.user;
   if (!sessionUser) {
     return c.json({ error: "Dev login created no session" }, 500);
