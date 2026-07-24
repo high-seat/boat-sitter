@@ -1,14 +1,15 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gte } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import { regionMatchesSit } from "../../shared/availabilityMatch";
 import type { AppEnv } from "../context";
 import { getDb } from "../db";
-import { sits, sitterAvailability, user, vessels } from "../db/schema";
+import type { Db } from "../db";
+import { profiles, sits, sitterAvailability, user, vessels } from "../db/schema";
 import { sendNotificationEmail } from "../email";
 import { insertNotification, shouldEmail } from "../lib/notifications";
 import { requireUser } from "../middleware/auth";
-import type { Db } from "../db";
 
 /**
  * Sitter availability — the supply side of the marketplace.
@@ -54,43 +55,6 @@ const windowPatchSchema = z
 
 type WindowRow = typeof sitterAvailability.$inferSelect;
 
-/**
- * Match a sit's place against a window's regions.
- * Empty regions = open to anywhere. Regions may be countries ("Greece") or
- * cities ("Lefkada" / "Lefkada, Greece"), same shapes DestinationAutocomplete
- * emits in multi-select search.
- */
-function regionMatchesSit(regions: string[], country: string, location: string): boolean {
-  if (regions.length === 0) return true;
-  const countryL = country.toLowerCase().trim();
-  const locationL = location.toLowerCase().trim();
-  return regions.some((raw) => {
-    const region = raw.toLowerCase().trim();
-    if (!region) return false;
-    if (region === countryL) return true;
-    if (region === locationL) return true;
-    const comma = region.lastIndexOf(",");
-    if (comma > 0) {
-      const city = region.slice(0, comma).trim();
-      const regionCountry = region.slice(comma + 1).trim();
-      if (regionCountry === countryL) {
-        return (
-          locationL === city ||
-          locationL.startsWith(`${city},`) ||
-          locationL.includes(city) ||
-          city.includes(locationL)
-        );
-      }
-    }
-    return (
-      locationL === region ||
-      locationL.startsWith(`${region},`) ||
-      locationL.includes(region) ||
-      region.includes(locationL)
-    );
-  });
-}
-
 /** Today as a YYYY-MM-DD string (UTC), for lexical comparison with ISO dates. */
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -121,6 +85,43 @@ availabilityRouter.get("/mine", requireUser, async (c) => {
     .where(eq(sitterAvailability.sitterUserId, user.id))
     .orderBy(desc(sitterAvailability.dateStart));
   return c.json({ data: rows.map(withPhase) });
+});
+
+/**
+ * GET /api/availability/member/:name — public upcoming windows for a profile.
+ *
+ * Returns open, not-yet-ended windows only (the supply signal owners care about
+ * on a sitter profile). Auth not required beyond whatever gates profiles.
+ */
+availabilityRouter.get("/member/:name", async (c) => {
+  const db = getDb(c.env);
+  const name = decodeURIComponent(c.req.param("name"));
+  const profile = await db.query.profiles.findFirst({ where: eq(profiles.name, name) });
+  if (!profile) return c.json({ data: [] });
+
+  const today = todayIso();
+  const rows = await db
+    .select()
+    .from(sitterAvailability)
+    .where(
+      and(
+        eq(sitterAvailability.sitterUserId, profile.userId),
+        eq(sitterAvailability.status, "open"),
+        gte(sitterAvailability.dateEnd, today),
+      ),
+    )
+    .orderBy(asc(sitterAvailability.dateStart));
+
+  return c.json({
+    data: rows.map((row) => ({
+      id: row.id,
+      dateStart: row.dateStart,
+      dateEnd: row.dateEnd,
+      regions: row.regions,
+      notes: row.notes,
+      phase: derivePhase(row),
+    })),
+  });
 });
 
 /** POST /api/availability — publish a new window. */

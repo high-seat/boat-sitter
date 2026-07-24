@@ -16,6 +16,7 @@ import { getDb } from "../db";
 import {
   applicationMessages,
   applications,
+  profiles,
   sits,
   user,
   vessels,
@@ -54,6 +55,13 @@ const createSchema = z.object({
   message: z.string().min(1),
   partySize: z.number().int().min(1).default(1),
   applicant: applicantSchema,
+});
+
+/** Owner invites a sitter to apply / start a thread on one of their open sits. */
+const inviteSchema = z.object({
+  sitId: z.string().min(1),
+  sitterName: z.string().min(1),
+  message: z.string().min(1),
 });
 
 const messageSchema = z.object({
@@ -125,6 +133,7 @@ function shape(
     },
     initialMessage: app.initialMessage,
     status,
+    invited: Boolean(app.invited) || status === "invited",
     createdAt: app.createdAt,
     ownerPhone: app.ownerPhone ?? undefined,
     messages: paginatedMessages.map(shapeMessage),
@@ -281,6 +290,219 @@ applicationsRouter.get("/", async (c) => {
   return c.json({ error: "Provide sitId or user" }, 400);
 });
 
+/**
+ * POST /api/applications/invite — owner reaches out to a sitter for an open sit.
+ * Creates an application with the sitter as applicant and the owner as the
+ * first message sender. If a thread already exists, appends the message.
+ */
+applicationsRouter.post("/invite", requireUser, zValidator("json", inviteSchema), async (c) => {
+  const db = getDb(c.env);
+  const { sitId, sitterName, message } = c.req.valid("json");
+  const owner = c.get("user")!;
+  const trimmed = message.trim();
+  if (!trimmed) return c.json({ error: "MESSAGE_REQUIRED" }, 400);
+
+  if (sitterName === owner.name) {
+    return c.json({ error: "INVITE_SELF_NOT_ALLOWED" }, 400);
+  }
+
+  const listing = await db
+    .select({ vessel: vessels, sit: sits })
+    .from(sits)
+    .innerJoin(vessels, eq(sits.vesselId, vessels.id))
+    .where(eq(sits.id, sitId))
+    .limit(1);
+  if (!listing.length) return c.json({ error: "APPLICATION_SIT_NOT_FOUND" }, 404);
+
+  const { vessel, sit } = listing[0];
+  // Seed/dev sessions often re-login as the same display name with a new user id.
+  // Prefer ownerUserId, but allow a matching owner display name and reclaim the id.
+  const ownsById = vessel.ownerUserId != null && vessel.ownerUserId === owner.id;
+  const ownsByName = vessel.owner === owner.name;
+  if (!ownsById && !ownsByName) return c.json({ error: "FORBIDDEN" }, 403);
+
+  if (ownsByName && vessel.ownerUserId !== owner.id) {
+    await db
+      .update(vessels)
+      .set({
+        ownerUserId: owner.id,
+        owner: owner.name,
+        ownerImage: owner.image ?? vessel.ownerImage,
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(vessels.id, vessel.id));
+  }
+
+  if (sit.published === false) {
+    return c.json({ error: "APPLICATIONS_CLOSED" }, 400);
+  }
+
+  const accepted = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .where(and(eq(applications.sitId, sitId), eq(applications.status, "accepted")))
+    .limit(1);
+  if (accepted.length) return c.json({ error: "APPLICATIONS_CLOSED" }, 400);
+
+  const sitterProfile = await db.query.profiles.findFirst({
+    where: eq(profiles.name, sitterName),
+  });
+  if (!sitterProfile) return c.json({ error: "SITTER_NOT_FOUND" }, 404);
+
+  const existing = await db
+    .select()
+    .from(applications)
+    .where(
+      and(
+        eq(applications.sitId, sitId),
+        or(
+          eq(applications.applicantUserId, sitterProfile.userId),
+          eq(applications.applicantName, sitterName),
+        ),
+      ),
+    )
+    .limit(1);
+
+  const createdAt = new Date().toISOString();
+
+  if (existing.length) {
+    const existingApp = existing[0];
+    if (existingApp.status === "accepted") {
+      return c.json({ error: "APPLICATIONS_CLOSED" }, 400);
+    }
+
+    const alreadyInvited = existingApp.status === "invited";
+    const wasInApplicantPool = existingApp.status === "new" || existingApp.status === "shortlisted";
+
+    // Owner invite always moves the thread into pending-invite until the sitter
+    // accepts (except when already invited — then we just append the message).
+    if (!alreadyInvited) {
+      await db
+        .update(applications)
+        .set({
+          status: "invited",
+          invited: true,
+          initialMessage: trimmed,
+          applicantUserId: sitterProfile.userId ?? existingApp.applicantUserId,
+          applicantName: sitterProfile.name,
+        })
+        .where(eq(applications.id, existingApp.id));
+
+      if (wasInApplicantPool) {
+        const sitRow = await db.query.sits.findFirst({ where: eq(sits.id, sitId) });
+        if (sitRow) {
+          await db
+            .update(sits)
+            .set({
+              applicants: Math.max(0, sitRow.applicants - 1),
+              updatedAt: sql`CURRENT_TIMESTAMP`,
+            })
+            .where(eq(sits.id, sitId));
+        }
+      }
+    }
+
+    await db.insert(applicationMessages).values({
+      id: `message-${Date.now()}`,
+      applicationId: existingApp.id,
+      senderName: owner.name,
+      text: trimmed,
+      kind: "user",
+      createdAt,
+    });
+
+    await insertNotification(db, {
+      userId: sitterProfile.userId,
+      userName: sitterName,
+      type: "sitInvite",
+      actor: owner.name,
+      boatName: vessel.name,
+      href: `/messages?application=${existingApp.id}`,
+    });
+
+    if (await shouldEmail(db, sitterProfile.userId, "sitInvite")) {
+      await sendNotificationEmail(c.env, {
+        subject: `${owner.name} invited you to sit ${vessel.name}`,
+        heading: "A boat owner invited you to sit",
+        body: `${owner.name} invited you to sit ${vessel.name}. Accept or decline from your messages.`,
+        actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${existingApp.id}`,
+        actionLabel: "Open conversation",
+        to: await emailForUserId(c.env, sitterProfile.userId),
+      });
+    }
+
+    const refreshed = await db.query.applications.findFirst({
+      where: eq(applications.id, existingApp.id),
+    });
+    const msgs = await loadMessages(c.env, [existingApp.id]);
+    return c.json({
+      data: await shapeOne(c.env, refreshed!, msgs, { viewerName: owner.name }),
+    });
+  }
+
+  const id = `application-${sitId}-invite-${Date.now()}`;
+  const applicant = {
+    name: sitterProfile.name,
+    image: sitterProfile.image,
+    location: sitterProfile.location,
+    bio: sitterProfile.bio,
+    languages: sitterProfile.languages ?? [],
+    preferredCountries: sitterProfile.preferredCountries ?? [],
+    skills: sitterProfile.skills ?? [],
+    yearsExperience: sitterProfile.yearsExperience ?? 0,
+    certifications: sitterProfile.certifications ?? [],
+    memberSince: sitterProfile.memberSince,
+    completedSits: sitterProfile.completedSits,
+  };
+
+  await db.insert(applications).values({
+    id,
+    sitId,
+    boatName: vessel.name,
+    ownerName: vessel.owner,
+    applicant,
+    applicantName: sitterProfile.name,
+    applicantUserId: sitterProfile.userId,
+    initialMessage: trimmed,
+    status: "invited",
+    invited: true,
+    partySize: 1,
+    createdAt,
+  });
+  await db.insert(applicationMessages).values({
+    id: `message-${Date.now()}`,
+    applicationId: id,
+    senderName: owner.name,
+    text: trimmed,
+    kind: "user",
+    createdAt,
+  });
+
+  await insertNotification(db, {
+    userId: sitterProfile.userId,
+    userName: sitterName,
+    type: "sitInvite",
+    actor: owner.name,
+    boatName: vessel.name,
+    href: `/messages?application=${id}`,
+  });
+
+  if (await shouldEmail(db, sitterProfile.userId, "sitInvite")) {
+    await sendNotificationEmail(c.env, {
+      subject: `${owner.name} invited you to sit ${vessel.name}`,
+      heading: "A boat owner invited you to sit",
+      body: `${owner.name} invited you to sit ${vessel.name}. Accept or decline from your messages.`,
+      actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
+      actionLabel: "Review invite",
+      to: await emailForUserId(c.env, sitterProfile.userId),
+    });
+  }
+
+  const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  const msgs = await loadMessages(c.env, [id]);
+  return c.json({ data: await shapeOne(c.env, row!, msgs, { viewerName: owner.name }) }, 201);
+});
+
 applicationsRouter.post("/", requireUser, zValidator("json", createSchema), async (c) => {
   const db = getDb(c.env);
   const { sitId, message, partySize, applicant } = c.req.valid("json");
@@ -423,19 +645,161 @@ async function resolveListingOwnerAccess(
   return { ownerId: user.id, isOwner: true };
 }
 
+/**
+ * Applicant access: prefer applicantUserId, but for seed/dev re-logins allow a
+ * matching display name and reclaim the id (same pattern as vessel ownership).
+ */
+async function resolveApplicantAccess(
+  env: Env,
+  appRow: ApplicationRow,
+  user: { id: string; name: string },
+): Promise<boolean> {
+  if (user.id === appRow.applicantUserId) return true;
+  if (user.name !== appRow.applicantName) return false;
+
+  if (appRow.applicantUserId !== user.id) {
+    const db = getDb(env);
+    await db
+      .update(applications)
+      .set({ applicantUserId: user.id })
+      .where(eq(applications.id, appRow.id));
+  }
+  return true;
+}
+
 async function resolveConversationAccess(
   env: Env,
   appRow: ApplicationRow,
   user: { id: string; name: string; image?: string | null },
 ): Promise<{ ownerId: string | null; isParticipant: boolean; isOwner: boolean }> {
   const ownerAccess = await resolveListingOwnerAccess(env, appRow, user);
-  const isApplicant = user.id === appRow.applicantUserId;
+  const isApplicant = await resolveApplicantAccess(env, appRow, user);
   return {
     ownerId: ownerAccess.ownerId,
     isOwner: ownerAccess.isOwner,
     isParticipant: isApplicant || ownerAccess.isOwner,
   };
 }
+
+/**
+ * POST /api/applications/:id/accept-invite — sitter accepts an owner invite.
+ * Moves them into the owner's choosing-applicants pool (status new, invited flag kept).
+ */
+applicationsRouter.post("/:id/accept-invite", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const id = c.req.param("id");
+  const user = c.get("user")!;
+
+  const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+  if (app.status !== "invited") return c.json({ error: "INVITE_NOT_PENDING" }, 400);
+
+  if (!(await resolveApplicantAccess(c.env, app, user))) {
+    return c.json({ error: "FORBIDDEN" }, 403);
+  }
+
+  await db
+    .update(applications)
+    .set({ status: "new", invited: true })
+    .where(eq(applications.id, id));
+
+  await db
+    .update(sits)
+    .set({ applicants: sql`${sits.applicants} + 1`, updatedAt: sql`CURRENT_TIMESTAMP` })
+    .where(eq(sits.id, app.sitId));
+
+  const sit = await db.query.sits.findFirst({ where: eq(sits.id, app.sitId) });
+  const sitLabel = sit ? `${app.boatName} (${sit.dateStart}, ${sit.duration})` : app.boatName;
+
+  await insertSystemMessage(c.env, {
+    applicationId: id,
+    senderName: user.name,
+    text: `${user.name} accepted the invite for ${sitLabel}`,
+    systemKind: "inviteAccepted",
+  });
+
+  const vessel = await vesselForApplication(c.env, app);
+  await insertNotification(db, {
+    userId: vessel?.ownerUserId ?? null,
+    userName: app.ownerName,
+    type: "newApplication",
+    actor: user.name,
+    boatName: app.boatName,
+    href: `/owner/sits/${app.sitId}/applications`,
+  });
+
+  if (await shouldEmail(db, vessel?.ownerUserId, "newApplication")) {
+    await sendNotificationEmail(c.env, {
+      subject: `${user.name} accepted your invite for ${app.boatName}`,
+      heading: "Your invite was accepted",
+      body: `${user.name} accepted your invite to sit ${app.boatName} and is now in your applicants list.`,
+      actionUrl: `${c.env.BETTER_AUTH_URL}/owner/sits/${app.sitId}/applications`,
+      actionLabel: "Review applicants",
+      to: await emailForUserId(c.env, vessel?.ownerUserId),
+    });
+  }
+
+  const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  const msgs = await loadMessages(c.env, [id]);
+  return c.json({ data: await shapeOne(c.env, row!, msgs, { viewerName: user.name }) });
+});
+
+/**
+ * POST /api/applications/:id/decline-invite — sitter declines an owner invite.
+ */
+applicationsRouter.post("/:id/decline-invite", requireUser, async (c) => {
+  const db = getDb(c.env);
+  const id = c.req.param("id");
+  const user = c.get("user")!;
+
+  const app = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  if (!app) return c.json({ error: "APPLICATION_NOT_FOUND" }, 404);
+  if (app.status !== "invited") return c.json({ error: "INVITE_NOT_PENDING" }, 400);
+
+  if (!(await resolveApplicantAccess(c.env, app, user))) {
+    return c.json({ error: "FORBIDDEN" }, 403);
+  }
+
+  await db
+    .update(applications)
+    .set({ status: "declined", invited: true })
+    .where(eq(applications.id, id));
+
+  const sit = await db.query.sits.findFirst({ where: eq(sits.id, app.sitId) });
+  const sitLabel = sit ? `${app.boatName} (${sit.dateStart}, ${sit.duration})` : app.boatName;
+
+  await insertSystemMessage(c.env, {
+    applicationId: id,
+    senderName: user.name,
+    text: `${user.name} declined the invite for ${sitLabel}`,
+    systemKind: "inviteDeclined",
+  });
+
+  const vessel = await vesselForApplication(c.env, app);
+  await insertNotification(db, {
+    userId: vessel?.ownerUserId ?? null,
+    userName: app.ownerName,
+    type: "applicationDeclined",
+    actor: user.name,
+    boatName: app.boatName,
+    href: `/messages?application=${id}`,
+  });
+
+  if (await shouldEmail(db, vessel?.ownerUserId, "applicationDeclined")) {
+    await sendNotificationEmail(c.env, {
+      subject: `${user.name} declined your invite for ${app.boatName}`,
+      heading: "Your invite was declined",
+      body: `${user.name} declined your invite to sit ${app.boatName}.`,
+      actionUrl: `${c.env.BETTER_AUTH_URL}/messages?application=${id}`,
+      actionLabel: "Open conversation",
+      to: await emailForUserId(c.env, vessel?.ownerUserId),
+    });
+  }
+
+  const row = await db.query.applications.findFirst({ where: eq(applications.id, id) });
+  const msgs = await loadMessages(c.env, [id]);
+  return c.json({ data: await shapeOne(c.env, row!, msgs, { viewerName: user.name }) });
+});
 
 applicationsRouter.patch("/:id", requireUser, zValidator("json", statusSchema), async (c) => {
   const db = getDb(c.env);
@@ -1060,11 +1424,14 @@ applicationsRouter.get("/:id/messages", requireUser, async (c) => {
 
   const initialMessageText = app.initialMessage.trim();
   const hasInitialMessage = Boolean(initialMessageText);
+  // Owner invites store the first message from the owner; sitter applications
+  // store it from the applicant. Treat either participant as covering the
+  // synthetic initial so we do not duplicate invite threads.
   const initialAlreadyInDb = sorted.some(
     (m) =>
       (m.kind ?? "user") === "user" &&
-      m.senderName === app.applicantName &&
-      m.text === initialMessageText,
+      m.text === initialMessageText &&
+      (m.senderName === app.applicantName || m.senderName === app.ownerName),
   );
   const syntheticInitial: MessageRow | null =
     hasInitialMessage && !initialAlreadyInDb

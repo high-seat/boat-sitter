@@ -9,6 +9,7 @@ import {
 import * as Popover from "@radix-ui/react-popover";
 import { Ellipsis, Flag, Languages, LoaderCircle, Phone, Send, Video, X } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import {
   getApplicationMessages,
   type ApiApplicationMessage,
@@ -34,6 +35,7 @@ import { VideoCallCalendarLinks } from "@/components/applications/VideoCallCalen
 import { AvatarImage } from "@/components/ui/AvatarImage";
 import { SpeechBubbleTail } from "@/components/ui/SpeechBubbleTail";
 import { showToast } from "@/components/ui/Toast";
+import { queries } from "@/queries";
 
 function isAppleKeyboardPlatform() {
   if (typeof navigator === "undefined") return false;
@@ -124,17 +126,21 @@ function avatarSrcForSender(
 function messagesWithInitialApplication(application: SitApplication): ApplicationMessage[] {
   const trimmed = application.initialMessage.trim();
   if (!trimmed) return application.messages;
+  const initialSender =
+    application.status === "invited" || application.invited
+      ? application.ownerName
+      : application.applicant.name;
   const alreadyPresent = application.messages.some(
     (message) =>
       (message.kind ?? "user") === "user" &&
-      message.senderName === application.applicant.name &&
+      message.senderName === initialSender &&
       message.text === trimmed,
   );
   if (alreadyPresent) return application.messages;
   return [
     {
       id: `${application.id}-initial-message`,
-      senderName: application.applicant.name,
+      senderName: initialSender,
       text: trimmed,
       createdAt: application.createdAt,
       kind: "user",
@@ -172,6 +178,14 @@ export function ConversationPanel({
   const { i18n, t } = useTranslation();
   const user = useAppStore((state) => state.user);
   const { formatDateTime } = useDateTimeFormatter();
+  const { data: sits = [] } = useQuery(queries.sits.all);
+  const sitForMessages = sits.find((sit) => sit.id === application.sitId);
+  const systemMessageOptions = {
+    language: i18n.language,
+    sit: sitForMessages
+      ? { dateStart: sitForMessages.dateStart, duration: sitForMessages.duration }
+      : null,
+  };
   const [reply, setReply] = useState("");
   const [optimisticMessages, setOptimisticMessages] = useState<ApplicationMessage[]>([]);
   const [typingUser, setTypingUser] = useState("");
@@ -673,7 +687,13 @@ export function ConversationPanel({
                       {t("applications.systemMessage.phoneSharedTitle")}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-slate">
-                      {formatApplicationSystemMessage(t, message, application, currentUser)}
+                      {formatApplicationSystemMessage(
+                        t,
+                        message,
+                        application,
+                        currentUser,
+                        systemMessageOptions,
+                      )}
                     </p>
                     <a
                       className="mt-2 inline-block font-bold text-navy hover:text-teal"
@@ -690,7 +710,13 @@ export function ConversationPanel({
               );
             }
             if (message.systemKind === "withdrawn") {
-              const body = formatApplicationSystemMessage(t, message, application, currentUser);
+              const body = formatApplicationSystemMessage(
+                t,
+                message,
+                application,
+                currentUser,
+                systemMessageOptions,
+              );
               if (message.text.trim()) {
                 return (
                   <div className={`flex justify-center ${rowOffset}`} key={message.id}>
@@ -760,7 +786,13 @@ export function ConversationPanel({
                       {t(titleKey)}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-slate">
-                      {formatApplicationSystemMessage(t, message, application, currentUser)}
+                      {formatApplicationSystemMessage(
+                        t,
+                        message,
+                        application,
+                        currentUser,
+                        systemMessageOptions,
+                      )}
                     </p>
                     {details ? (
                       <p
@@ -845,14 +877,25 @@ export function ConversationPanel({
             }
             return (
               <div className={`flex justify-center ${rowOffset}`} key={message.id}>
-                <p className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal">
+                <p
+                  className="max-w-[90%] rounded-full bg-seafoam px-4 py-2 text-center text-xs font-semibold leading-5 text-teal"
+                  data-testid="conversation-system-message"
+                >
                   {message.systemKind === "accepted" ||
                   message.systemKind === "declined" ||
                   message.systemKind === "unaccepted" ||
                   message.systemKind === "sitCancelled" ||
                   message.systemKind === "sitEndedEarly" ||
-                  message.systemKind === "applicantsClosed"
-                    ? formatApplicationSystemMessage(t, message, application, currentUser)
+                  message.systemKind === "applicantsClosed" ||
+                  message.systemKind === "inviteAccepted" ||
+                  message.systemKind === "inviteDeclined"
+                    ? formatApplicationSystemMessage(
+                        t,
+                        message,
+                        application,
+                        currentUser,
+                        systemMessageOptions,
+                      )
                     : message.text}
                 </p>
               </div>

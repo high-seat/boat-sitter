@@ -7,6 +7,7 @@ import type { AppEnv, SessionUser } from "./context";
 import { applicationsRouter } from "./routes/applications";
 import { availabilityRouter } from "./routes/availability";
 import { boatsRouter } from "./routes/boats";
+import { sittersRouter } from "./routes/sitters";
 import { addressesRouter } from "./routes/addresses";
 import { destinationsRouter } from "./routes/destinations";
 import { devRouter } from "./routes/dev";
@@ -79,6 +80,7 @@ app.get("/api/health", (context) =>
 );
 
 app.route("/api/boats", boatsRouter);
+app.route("/api/sitters", sittersRouter);
 app.route("/api/destinations", destinationsRouter);
 app.route("/api/addresses", addressesRouter);
 app.route("/api/vessels", vesselsRouter);

@@ -9,6 +9,7 @@ import {
   getBoat,
   getBoats,
   getBoatsPage,
+  getSittersPage,
   getNotificationsForUser,
   getPublicMemberProfile,
   getReviewForApplication,
@@ -24,6 +25,7 @@ import {
 import { getMemberVerificationChecks, getVerificationStatus } from "@/verificationService";
 import type { ApplicationsListParams } from "../shared/applicationsSearch";
 import type { BoatSearchParams } from "../shared/boatsSearch";
+import type { SitterSearchParams } from "../shared/sittersSearch";
 import type { SitListSort } from "../shared/sitsSort";
 
 export type AvailabilityWindow = {
@@ -34,6 +36,15 @@ export type AvailabilityWindow = {
   notes: string;
   status: string;
   phase: "open" | "booked" | "expired" | "completed" | "withdrawn";
+};
+
+export type PublicAvailabilityWindow = {
+  id: string;
+  dateStart: string;
+  dateEnd: string;
+  regions: string[];
+  notes: string;
+  phase: string;
 };
 
 export type AvailabilityMatchingSit = {
@@ -52,6 +63,10 @@ function getAvailabilityMine() {
 
 function getAvailabilitySits(windowId: string) {
   return apiGet<AvailabilityMatchingSit[]>(`/api/availability/${windowId}/sits`);
+}
+
+function getAvailabilityForMember(name: string) {
+  return apiGet<PublicAvailabilityWindow[]>(`/api/availability/member/${encodeURIComponent(name)}`);
 }
 
 /**
@@ -175,6 +190,15 @@ export const queries = {
       queryOptions({
         queryKey: ["boats", "search", params] as const,
         queryFn: () => getBoatsPage(params),
+      }),
+  },
+
+  sitters: {
+    getQueryKey: () => ["sitters"] as const,
+    search: (params: SitterSearchParams) =>
+      queryOptions({
+        queryKey: ["sitters", "search", params] as const,
+        queryFn: () => getSittersPage(params),
       }),
   },
 
@@ -411,6 +435,11 @@ export const queries = {
       queryOptions({
         queryKey: ["availability", "mine"] as const,
         queryFn: getAvailabilityMine,
+      }),
+    member: (name: string) =>
+      queryOptions({
+        queryKey: ["availability", "member", name] as const,
+        queryFn: () => getAvailabilityForMember(name),
       }),
     sits: (windowId: string) =>
       queryOptions({

@@ -285,6 +285,7 @@ export function CommandPalette() {
   const navigation = [
     ["/", t("command.home"), <Home className="size-4" />],
     ["/boats", t("nav.find"), <Search className="size-4" />],
+    ["/sitters", t("nav.findSitter"), <Users className="size-4" />],
     ["/how-it-works", t("nav.how"), <ShipWheel className="size-4" />],
     ...(user ? [["/saved", t("nav.saved"), <Heart className="size-4" />] as const] : []),
     ["/messages", t("command.messages"), <MessageCircle className="size-4" />],

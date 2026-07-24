@@ -5,6 +5,11 @@ import {
   type ApplicationsListParams,
 } from "../shared/applicationsSearch";
 import { boatsSearchQueryString, type BoatSearchParams } from "../shared/boatsSearch";
+import {
+  sittersSearchQueryString,
+  type SitterSearchItem,
+  type SitterSearchParams,
+} from "../shared/sittersSearch";
 import type { SitListSort } from "../shared/sitsSort";
 import {
   addressSearchQueryString,
@@ -23,7 +28,7 @@ export type ApiStoveFuelType = string;
 
 type BoatPhoto = { url: string; caption?: string; focus?: string };
 type SitType = "liveaboard" | "daytimeChecks";
-type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined" | "withdrawn";
+type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined" | "withdrawn" | "invited";
 
 type Boat = {
   id: string;
@@ -165,6 +170,8 @@ type SitApplication = {
   applicant: ApplicationApplicant;
   initialMessage: string;
   status: ApplicationStatus;
+  /** True when the owner invited this sitter (survives accept → new). */
+  invited?: boolean;
   createdAt: string;
   messages: Array<{
     id: string;
@@ -184,7 +191,9 @@ type SitApplication = {
       | "phoneShared"
       | "withdrawn"
       | "sitCancelled"
-      | "sitEndedEarly";
+      | "sitEndedEarly"
+      | "inviteAccepted"
+      | "inviteDeclined";
     videoCall?: { startsAt: string; durationMinutes: number; meetUrl?: string };
     sharedPhone?: string;
   }>;
@@ -346,6 +355,7 @@ type ApiApplication = {
   };
   initialMessage: string;
   status: string;
+  invited?: boolean;
   createdAt: string;
   messages: Array<{
     id: string;
@@ -637,7 +647,7 @@ export function sitToApiBody(sit: Sit) {
 
 export function normalizeApiApplication(row: ApiApplication): SitApplication {
   const status = (
-    ["new", "shortlisted", "accepted", "declined", "withdrawn"].includes(row.status)
+    ["new", "shortlisted", "accepted", "declined", "withdrawn", "invited"].includes(row.status)
       ? row.status
       : "new"
   ) as ApplicationStatus;
@@ -664,6 +674,7 @@ export function normalizeApiApplication(row: ApiApplication): SitApplication {
     },
     initialMessage: row.initialMessage,
     status,
+    invited: Boolean(row.invited) || status === "invited",
     createdAt: row.createdAt,
     messages: row.messages.map((message) => ({
       id: message.id,
@@ -724,6 +735,35 @@ export async function apiGetBoatsPage(params: BoatSearchParams): Promise<{
   const page = body.page ?? 0;
   const totalPages = body.totalPages ?? Math.max(1, Math.ceil(total / limit));
   return { boats, total, page, limit, totalPages };
+}
+
+export async function apiGetSittersPage(params: SitterSearchParams): Promise<{
+  sitters: SitterSearchItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> {
+  const qs = sittersSearchQueryString(params);
+  const res = await fetch(`/api/sitters${qs}`, { credentials: "include" });
+  const body = (await res.json()) as {
+    data?: SitterSearchItem[];
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(res.status, body.error || res.statusText, body);
+  }
+  const sitters = body.data ?? [];
+  const total = body.total ?? sitters.length;
+  const limit =
+    body.limit ?? (params.limit && params.limit > 0 ? params.limit : sitters.length || 1);
+  const page = body.page ?? 0;
+  const totalPages = body.totalPages ?? Math.max(1, Math.ceil(total / limit));
+  return { sitters, total, page, limit, totalPages };
 }
 
 export async function apiGetBoat(id: string): Promise<Boat | undefined> {
@@ -881,6 +921,38 @@ export async function apiSendApplication(input: {
       completedSits: input.applicant.completedSits,
     },
   });
+  return normalizeApiApplication(row);
+}
+
+/** Owner invites a sitter to start (or continue) a conversation on an open sit. */
+export async function apiInviteSitter(input: {
+  sitId: string;
+  sitterName: string;
+  message: string;
+}): Promise<SitApplication> {
+  const row = await apiPost<ApiApplication>("/api/applications/invite", {
+    sitId: input.sitId,
+    sitterName: input.sitterName,
+    message: input.message,
+  });
+  return normalizeApiApplication(row);
+}
+
+/** Sitter accepts an owner invite and joins the choosing-applicants pool. */
+export async function apiAcceptInvite(applicationId: string): Promise<SitApplication> {
+  const row = await apiPost<ApiApplication>(
+    `/api/applications/${encodeURIComponent(applicationId)}/accept-invite`,
+    {},
+  );
+  return normalizeApiApplication(row);
+}
+
+/** Sitter declines an owner invite. */
+export async function apiDeclineInvite(applicationId: string): Promise<SitApplication> {
+  const row = await apiPost<ApiApplication>(
+    `/api/applications/${encodeURIComponent(applicationId)}/decline-invite`,
+    {},
+  );
   return normalizeApiApplication(row);
 }
 

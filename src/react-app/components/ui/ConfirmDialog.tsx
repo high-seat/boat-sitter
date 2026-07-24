@@ -32,6 +32,7 @@ export function ConfirmDialog({
   onConfirm,
   children,
   testId,
+  confirmTestId,
 }: {
   title: string;
   titleId?: string;
@@ -45,6 +46,7 @@ export function ConfirmDialog({
   onConfirm: () => void;
   children?: ReactNode;
   testId?: string;
+  confirmTestId?: string;
 }) {
   const { t } = useTranslation();
   const styles = toneStyles[tone];
@@ -82,6 +84,7 @@ export function ConfirmDialog({
           </button>
           <button
             className={`rounded-xl px-5 py-3 font-bold disabled:opacity-60 ${styles.confirm}`}
+            data-testid={confirmTestId}
             disabled={pending}
             onClick={onConfirm}
             type="button"

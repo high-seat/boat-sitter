@@ -1,5 +1,29 @@
 import type { TFunction } from "i18next";
 import type { ApplicationMessage, SitApplication } from "@/mockApi";
+import { formatSitDates } from "@/dateUtils";
+import { getIntlLocale } from "@/i18n";
+
+export type ApplicationSystemMessageSit = {
+  dateStart: string;
+  duration: string;
+};
+
+function inviteSitLabel(
+  t: TFunction,
+  application: SitApplication,
+  options?: {
+    language?: string;
+    sit?: ApplicationSystemMessageSit | null;
+  },
+) {
+  const boat = application.boatName;
+  const sit = options?.sit;
+  if (!sit) return boat;
+  return t("applications.systemMessage.inviteSitDetail", {
+    boat,
+    dates: formatSitDates(getIntlLocale(options?.language), sit.dateStart, sit.duration),
+  });
+}
 
 /** Localized system message text for the current viewer (owner vs applicant). */
 export function formatApplicationSystemMessage(
@@ -7,6 +31,10 @@ export function formatApplicationSystemMessage(
   message: ApplicationMessage,
   application: SitApplication,
   currentUser: string,
+  options?: {
+    language?: string;
+    sit?: ApplicationSystemMessageSit | null;
+  },
 ): string {
   if (message.kind !== "system" || !message.systemKind) return message.text;
 
@@ -79,6 +107,24 @@ export function formatApplicationSystemMessage(
           name: application.applicant.name,
         })
       : t("applications.systemMessage.sitEndedEarly");
+  }
+  if (message.systemKind === "inviteAccepted") {
+    const sitLabel = inviteSitLabel(t, application, options);
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.inviteAcceptedOwner", {
+          name: application.applicant.name,
+          sit: sitLabel,
+        })
+      : t("applications.systemMessage.inviteAccepted", { sit: sitLabel });
+  }
+  if (message.systemKind === "inviteDeclined") {
+    const sitLabel = inviteSitLabel(t, application, options);
+    return currentUser === application.ownerName
+      ? t("applications.systemMessage.inviteDeclinedOwner", {
+          name: application.applicant.name,
+          sit: sitLabel,
+        })
+      : t("applications.systemMessage.inviteDeclined", { sit: sitLabel });
   }
   return message.text;
 }

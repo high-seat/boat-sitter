@@ -15,7 +15,8 @@ export type ApplicationStatusFilter =
   | "shortlisted"
   | "accepted"
   | "declined"
-  | "withdrawn";
+  | "withdrawn"
+  | "invited";
 
 export type ApplicationsListParams = {
   sitId: string;
@@ -58,6 +59,7 @@ const STATUSES = new Set<ApplicationStatusFilter>([
   "accepted",
   "declined",
   "withdrawn",
+  "invited",
 ]);
 
 export function parseApplicationListSort(value: string | null | undefined): ApplicationListSort {
@@ -165,6 +167,8 @@ export function prepareApplicationReviewLists<T extends ApplicationListItem>(
 
   const list = sortApplications(
     apps.filter((app) => {
+      // Pending owner invites are not in the choosing-applicants pool yet.
+      if (app.status === "invited") return false;
       if (app.status === "accepted") return false;
       if (options.status !== "all" && app.status !== options.status) return false;
       return matchesExperience(app);

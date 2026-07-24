@@ -12,6 +12,7 @@ import {
   apiGetBoat,
   apiGetBoats,
   apiGetBoatsPage,
+  apiGetSittersPage,
   apiSearchAddresses,
   apiSearchDestinations,
   apiGetNotifications,
@@ -31,6 +32,9 @@ import {
   apiRespondToReview,
   apiSaveSit,
   apiSaveVessel,
+  apiInviteSitter,
+  apiAcceptInvite,
+  apiDeclineInvite,
   apiSendApplication,
   apiSendApplicationMessage,
   apiShareApplicationPhone,
@@ -47,6 +51,7 @@ import { ApiError } from "@/apiClient";
 import { type ApplicationsListParams } from "../shared/applicationsSearch";
 import { type AddressSearchParams, type AddressSuggestion } from "../shared/addressSearch";
 import { type BoatSearchParams } from "../shared/boatsSearch";
+import { type SitterSearchItem, type SitterSearchParams } from "../shared/sittersSearch";
 import { type DestinationSearchParams } from "../shared/destinationsSearch";
 import type { Destination } from "@/destinations";
 
@@ -543,6 +548,16 @@ export async function getBoatsPage(params: BoatSearchParams): Promise<{
   };
 }
 
+export async function getSittersPage(params: SitterSearchParams): Promise<{
+  sitters: SitterSearchItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> {
+  return apiGetSittersPage(params);
+}
+
 export async function searchDestinations(
   params: DestinationSearchParams = {},
 ): Promise<Destination[]> {
@@ -800,7 +815,13 @@ export async function cancelSit(
   return fromApiSit(await apiCancelSit(id, options));
 }
 
-export type ApplicationStatus = "new" | "shortlisted" | "accepted" | "declined" | "withdrawn";
+export type ApplicationStatus =
+  | "new"
+  | "shortlisted"
+  | "accepted"
+  | "declined"
+  | "withdrawn"
+  | "invited";
 export type MockNotification = {
   actor?: string;
   boatName?: string;
@@ -816,6 +837,7 @@ export type MockNotification = {
     | "availabilitySitsFound"
     | "newApplication"
     | "newMessage"
+    | "sitInvite"
     | "sitAccepted"
     | "sitCancelled"
     | "sitEndedEarly"
@@ -856,7 +878,9 @@ export type ApplicationMessage = {
     | "phoneShared"
     | "withdrawn"
     | "sitCancelled"
-    | "sitEndedEarly";
+    | "sitEndedEarly"
+    | "inviteAccepted"
+    | "inviteDeclined";
   videoCall?: {
     startsAt: string;
     durationMinutes: number;
@@ -879,6 +903,8 @@ export type SitApplication = {
   partySize: number;
   initialMessage: string;
   status: ApplicationStatus;
+  /** True when the owner invited this sitter (survives accept → new). */
+  invited?: boolean;
   createdAt: string;
   messages: ApplicationMessage[];
   ownerPhone?: string;
@@ -980,6 +1006,57 @@ export async function sendApplication(
       if (error.message === "APPLICATION_SIT_NOT_FOUND")
         throw new Error("APPLICATION_SIT_NOT_FOUND");
       if (error.message === "APPLICATIONS_CLOSED") throw new Error("APPLICATIONS_CLOSED");
+    }
+    throw error;
+  }
+}
+
+/** Owner invites a sitter whose availability overlaps an open sit. */
+export async function inviteSitterToSit(sitId: string, sitterName: string, message: string) {
+  if (containsOffPlatformContactDetails(message)) {
+    throw new Error("APPLICATION_CONTACT_DETAILS_NOT_ALLOWED");
+  }
+  try {
+    return fromApiApplication(
+      await apiInviteSitter({
+        sitId,
+        sitterName,
+        message: message.trim(),
+      }),
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === "APPLICATION_SIT_NOT_FOUND")
+        throw new Error("APPLICATION_SIT_NOT_FOUND");
+      if (error.message === "APPLICATIONS_CLOSED") throw new Error("APPLICATIONS_CLOSED");
+      if (error.message === "SITTER_NOT_FOUND") throw new Error("SITTER_NOT_FOUND");
+      if (error.message === "FORBIDDEN") throw new Error("FORBIDDEN");
+    }
+    throw error;
+  }
+}
+
+export async function acceptSitInvite(applicationId: string): Promise<SitApplication> {
+  try {
+    return fromApiApplication(await apiAcceptInvite(applicationId));
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === "APPLICATION_NOT_FOUND") throw new Error("APPLICATION_NOT_FOUND");
+      if (error.message === "INVITE_NOT_PENDING") throw new Error("INVITE_NOT_PENDING");
+      if (error.message === "FORBIDDEN") throw new Error("FORBIDDEN");
+    }
+    throw error;
+  }
+}
+
+export async function declineSitInvite(applicationId: string): Promise<SitApplication> {
+  try {
+    return fromApiApplication(await apiDeclineInvite(applicationId));
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.message === "APPLICATION_NOT_FOUND") throw new Error("APPLICATION_NOT_FOUND");
+      if (error.message === "INVITE_NOT_PENDING") throw new Error("INVITE_NOT_PENDING");
+      if (error.message === "FORBIDDEN") throw new Error("FORBIDDEN");
     }
     throw error;
   }

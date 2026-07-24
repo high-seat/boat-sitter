@@ -197,6 +197,8 @@ export const applications = sqliteTable(
 
     initialMessage: text("initial_message").notNull(),
     status: text("status").notNull().default("new"),
+    /** True when the owner invited this sitter (vs sitter applied). Survives accept → new. */
+    invited: integer("invited", { mode: "boolean" }).notNull().default(false),
     partySize: integer("party_size").notNull().default(1),
     ownerPhone: text("owner_phone"),
     createdAt: text("created_at")

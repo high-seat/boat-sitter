@@ -45,6 +45,7 @@ const en = {
   "applications.status.accepted": "Accepted",
   "applications.status.declined": "Declined",
   "applications.status.withdrawn": "Withdrawn",
+  "applications.status.invited": "Invited",
   "applications.experience": "Experience",
   "applications.yearsExperience_one": "1 year of boating experience",
   "applications.yearsExperience_other": "{{count}} years of boating experience",
@@ -86,6 +87,11 @@ const en = {
   "applications.systemMessage.sitEndedEarlyOwner": "You ended this sit early with {{name}}",
   "applications.systemMessage.applicantsClosed":
     "The owner is no longer considering applicants for this sit",
+  "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+  "applications.systemMessage.inviteAccepted": "You accepted the invite for {{sit}}",
+  "applications.systemMessage.inviteAcceptedOwner": "{{name}} accepted the invite for {{sit}}",
+  "applications.systemMessage.inviteDeclined": "You declined the invite for {{sit}}",
+  "applications.systemMessage.inviteDeclinedOwner": "{{name}} declined the invite for {{sit}}",
   "applications.systemMessage.videoCallRequestTitle": "Video call proposed",
   "applications.systemMessage.videoCallRequest": "{{name}} proposed a video call.",
   "applications.systemMessage.videoCallCounterTitle": "New time suggested",
@@ -223,6 +229,7 @@ const en = {
   "notifications.items.sitEndedEarly":
     "{{actor}} ended the sit for {{boat}} early. You can leave a review.",
   "notifications.items.newApplication": "{{actor}} applied to sit {{boat}}.",
+  "notifications.items.sitInvite": "{{actor}} invited you to sit {{boat}}.",
   "notifications.items.availabilityMatch": "A new sit matches your availability: {{boat}}.",
   "notifications.items.availabilitySitsFound":
     "{{actor}} sits match your availability — tap to view.",
@@ -490,6 +497,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Acceptée",
     "applications.status.declined": "Refusée",
     "applications.status.withdrawn": "Retirée",
+    "applications.status.invited": "Invité",
     "applications.experience": "Expérience",
     "applications.yearsExperience_one": "1 an d’expérience nautique",
     "applications.yearsExperience_other": "{{count}} ans d’expérience nautique",
@@ -533,6 +541,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Vous avez terminé cette garde plus tôt avec {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Le propriétaire n’examine plus les candidatures pour cette garde",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Vous avez accepté l’invitation pour {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner":
+      "{{name}} a accepté l’invitation pour {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Vous avez refusé l’invitation pour {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} a refusé l’invitation pour {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Appel vidéo proposé",
     "applications.systemMessage.videoCallRequest": "{{name}} a proposé un appel vidéo.",
     "applications.sharePhoneInChat": "Partager le numéro de téléphone",
@@ -672,6 +686,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} a terminé plus tôt la garde pour {{boat}}. Vous pouvez laisser un avis.",
     "notifications.items.newApplication": "{{actor}} a proposé de garder {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} vous a invité à garder {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} vous a envoyé un nouveau message au sujet de {{boat}}.",
     "notifications.items.sitReminder": "Votre garde sur {{boat}} commence bientôt.",
@@ -934,6 +949,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Aceptada",
     "applications.status.declined": "Rechazada",
     "applications.status.withdrawn": "Retirada",
+    "applications.status.invited": "Invitado",
     "applications.experience": "Experiencia",
     "applications.yearsExperience_one": "1 año de experiencia náutica",
     "applications.yearsExperience_other": "{{count}} años de experiencia náutica",
@@ -976,6 +992,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "Terminaste este sit antes con {{name}}",
     "applications.systemMessage.applicantsClosed":
       "El propietario ya no está considerando solicitantes para esta estancia",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Aceptaste la invitación para {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} aceptó la invitación para {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Rechazaste la invitación para {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} rechazó la invitación para {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videollamada propuesta",
     "applications.systemMessage.videoCallRequest": "{{name}} propuso una videollamada.",
     "applications.sharePhoneInChat": "Compartir número de teléfono",
@@ -1114,6 +1135,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} terminó antes el sit de {{boat}}. Puedes dejar una reseña.",
     "notifications.items.newApplication": "{{actor}} solicitó cuidar {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} te invitó a cuidar {{boat}}.",
     "notifications.items.newMessage": "{{actor}} te envió un nuevo mensaje sobre {{boat}}.",
     "notifications.items.sitReminder": "Tu estancia en {{boat}} empieza pronto.",
     "notifications.items.welcome":
@@ -1379,6 +1401,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Accettata",
     "applications.status.declined": "Rifiutata",
     "applications.status.withdrawn": "Ritirata",
+    "applications.status.invited": "Invitato",
     "applications.experience": "Esperienza",
     "applications.yearsExperience_one": "1 anno di esperienza nautica",
     "applications.yearsExperience_other": "{{count}} anni di esperienza nautica",
@@ -1422,6 +1445,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Hai terminato questo sit in anticipo con {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Il proprietario non sta più considerando candidati per questo soggiorno",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Hai accettato l’invito per {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} ha accettato l’invito per {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Hai rifiutato l’invito per {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} ha rifiutato l’invito per {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videochiamata proposta",
     "applications.systemMessage.videoCallRequest": "{{name}} ha proposto una videochiamata.",
     "applications.sharePhoneInChat": "Condividi numero di telefono",
@@ -1563,6 +1591,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} ha terminato in anticipo il sit per {{boat}}. Puoi lasciare una recensione.",
     "notifications.items.newApplication": "{{actor}} si è candidato per occuparsi di {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} ti ha invitato a custodire {{boat}}.",
     "notifications.items.newMessage": "{{actor}} ti ha inviato un nuovo messaggio su {{boat}}.",
     "notifications.items.sitReminder": "Il tuo soggiorno su {{boat}} inizierà presto.",
     "notifications.items.welcome":
@@ -1826,6 +1855,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Angenommen",
     "applications.status.declined": "Abgelehnt",
     "applications.status.withdrawn": "Zurückgezogen",
+    "applications.status.invited": "Eingeladen",
     "applications.experience": "Erfahrung",
     "applications.yearsExperience_one": "1 Jahr Bootserfahrung",
     "applications.yearsExperience_other": "{{count}} Jahre Bootserfahrung",
@@ -1870,6 +1900,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Du hast diesen Sit mit {{name}} früher beendet",
     "applications.systemMessage.applicantsClosed":
       "Der Eigentümer prüft für diesen Sit keine Bewerber mehr",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Sie haben die Einladung für {{sit}} angenommen",
+    "applications.systemMessage.inviteAcceptedOwner":
+      "{{name}} hat die Einladung für {{sit}} angenommen",
+    "applications.systemMessage.inviteDeclined": "Sie haben die Einladung für {{sit}} abgelehnt",
+    "applications.systemMessage.inviteDeclinedOwner":
+      "{{name}} hat die Einladung für {{sit}} abgelehnt",
     "applications.systemMessage.videoCallRequestTitle": "Videoanruf vorgeschlagen",
     "applications.systemMessage.videoCallRequest": "{{name}} hat einen Videoanruf vorgeschlagen.",
     "applications.sharePhoneInChat": "Telefonnummer teilen",
@@ -2008,6 +2045,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} hat den Sit für {{boat}} früher beendet. Du kannst eine Bewertung abgeben.",
     "notifications.items.newApplication": "{{actor}} hat sich für {{boat}} beworben.",
+    "notifications.items.sitInvite": "{{actor}} hat dich eingeladen, {{boat}} zu hüten.",
     "notifications.items.newMessage":
       "{{actor}} hat Ihnen eine neue Nachricht zu {{boat}} gesendet.",
     "notifications.items.sitReminder": "Ihre Betreuung auf {{boat}} beginnt bald.",
@@ -2273,6 +2311,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Geaccepteerd",
     "applications.status.declined": "Afgewezen",
     "applications.status.withdrawn": "Ingetrokken",
+    "applications.status.invited": "Uitgenodigd",
     "applications.experience": "Ervaring",
     "applications.yearsExperience_one": "1 jaar vaarervaring",
     "applications.yearsExperience_other": "{{count}} jaar vaarervaring",
@@ -2316,6 +2355,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Je hebt deze sit met {{name}} eerder beëindigd",
     "applications.systemMessage.applicantsClosed":
       "De eigenaar overweegt geen sollicitanten meer voor dit verblijf",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Je hebt de uitnodiging voor {{sit}} geaccepteerd",
+    "applications.systemMessage.inviteAcceptedOwner":
+      "{{name}} heeft de uitnodiging voor {{sit}} geaccepteerd",
+    "applications.systemMessage.inviteDeclined": "Je hebt de uitnodiging voor {{sit}} geweigerd",
+    "applications.systemMessage.inviteDeclinedOwner":
+      "{{name}} heeft de uitnodiging voor {{sit}} geweigerd",
     "applications.systemMessage.videoCallRequestTitle": "Videogesprek voorgesteld",
     "applications.systemMessage.videoCallRequest": "{{name}} heeft een videogesprek voorgesteld.",
     "applications.sharePhoneInChat": "Telefoonnummer delen",
@@ -2457,6 +2503,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} heeft de sit voor {{boat}} eerder beëindigd. Je kunt een beoordeling achterlaten.",
     "notifications.items.newApplication": "{{actor}} heeft zich aangemeld voor {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} heeft je uitgenodigd om {{boat}} te zitten.",
     "notifications.items.newMessage":
       "{{actor}} heeft je een nieuw bericht over {{boat}} gestuurd.",
     "notifications.items.sitReminder": "Je verblijf op {{boat}} begint binnenkort.",
@@ -2718,6 +2765,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Aceite",
     "applications.status.declined": "Recusada",
     "applications.status.withdrawn": "Retirada",
+    "applications.status.invited": "Convidado",
     "applications.experience": "Experiência",
     "applications.yearsExperience_one": "1 ano de experiência náutica",
     "applications.yearsExperience_other": "{{count}} anos de experiência náutica",
@@ -2760,6 +2808,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "Terminou este sit mais cedo com {{name}}",
     "applications.systemMessage.applicantsClosed":
       "O proprietário já não está a considerar candidatos para esta estadia",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Aceitou o convite para {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} aceitou o convite para {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Recusou o convite para {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} recusou o convite para {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videochamada proposta",
     "applications.systemMessage.videoCallRequest": "{{name}} propôs uma videochamada.",
     "applications.sharePhoneInChat": "Partilhar número de telefone",
@@ -2895,6 +2948,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} terminou mais cedo o sit de {{boat}}. Pode deixar uma avaliação.",
     "notifications.items.newApplication": "{{actor}} candidatou-se para cuidar de {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} convidou-o para cuidar de {{boat}}.",
     "notifications.items.newMessage": "{{actor}} enviou-lhe uma nova mensagem sobre {{boat}}.",
     "notifications.items.sitReminder": "A sua estadia em {{boat}} começa em breve.",
     "notifications.items.welcome":
@@ -3158,6 +3212,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Αποδεκτή",
     "applications.status.declined": "Απορρίφθηκε",
     "applications.status.withdrawn": "Ανακλήθηκε",
+    "applications.status.invited": "Προσκεκλημένος",
     "applications.experience": "Εμπειρία",
     "applications.yearsExperience_one": "1 χρόνος ναυτικής εμπειρίας",
     "applications.yearsExperience_other": "{{count}} χρόνια ναυτικής εμπειρίας",
@@ -3201,6 +3256,13 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ολοκληρώσατε νωρίτερα αυτό το sit με τον/την {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Ο ιδιοκτήτης δεν εξετάζει πλέον υποψηφίους για αυτή τη διαμονή",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Αποδεχθήκατε την πρόσκληση για {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner":
+      "Ο/Η {{name}} αποδέχθηκε την πρόσκληση για {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Απορρίψατε την πρόσκληση για {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner":
+      "Ο/Η {{name}} απέρριψε την πρόσκληση για {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Προτάθηκε βιντεοκλήση",
     "applications.systemMessage.videoCallRequest": "Ο/Η {{name}} πρότεινε βιντεοκλήση.",
     "applications.sharePhoneInChat": "Κοινοποίηση αριθμού τηλεφώνου",
@@ -3343,6 +3405,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Ο/Η {{actor}} ολοκλήρωσε νωρίτερα το sit για {{boat}}. Μπορείτε να αφήσετε κριτική.",
     "notifications.items.newApplication":
       "Ο χρήστης {{actor}} έκανε αίτηση για τη φροντίδα του {{boat}}.",
+    "notifications.items.sitInvite": "Ο/Η {{actor}} σας προσκάλεσε να φυλάξετε το {{boat}}.",
     "notifications.items.newMessage":
       "Ο χρήστης {{actor}} σας έστειλε νέο μήνυμα σχετικά με το {{boat}}.",
     "notifications.items.sitReminder": "Η διαμονή σας στο {{boat}} ξεκινά σύντομα.",
@@ -3606,6 +3669,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Prihvaćena",
     "applications.status.declined": "Odbijena",
     "applications.status.withdrawn": "Povučena",
+    "applications.status.invited": "Pozvan",
     "applications.experience": "Iskustvo",
     "applications.yearsExperience_one": "1 godina iskustva s brodovima",
     "applications.yearsExperience_few": "{{count}} godine iskustva s brodovima",
@@ -3648,6 +3712,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "Ranije ste završili ovaj sit s {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Vlasnik više ne razmatra prijave za ovaj boravak",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Prihvatili ste pozivnicu za {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} je prihvatio pozivnicu za {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Odbili ste pozivnicu za {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} je odbio pozivnicu za {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Predložen video poziv",
     "applications.systemMessage.videoCallRequest": "{{name}} je predložio/la video poziv.",
     "applications.sharePhoneInChat": "Podijeli broj telefona",
@@ -3786,6 +3855,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} je ranije završio sit za {{boat}}. Možete ostaviti recenziju.",
     "notifications.items.newApplication": "{{actor}} se prijavio za čuvanje broda {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} pozvao vas je da čuvate {{boat}}.",
     "notifications.items.newMessage": "{{actor}} vam je poslao novu poruku o brodu {{boat}}.",
     "notifications.items.sitReminder": "Vaš boravak na brodu {{boat}} uskoro počinje.",
     "notifications.items.welcome":
@@ -4045,6 +4115,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Kabul edildi",
     "applications.status.declined": "Reddedildi",
     "applications.status.withdrawn": "Geri çekildi",
+    "applications.status.invited": "Davetli",
     "applications.experience": "Deneyim",
     "applications.yearsExperience_one": "1 yıllık tekne deneyimi",
     "applications.yearsExperience_other": "{{count}} yıllık tekne deneyimi",
@@ -4088,6 +4159,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "{{name}} ile bu siti erken bitirdiniz",
     "applications.systemMessage.applicantsClosed":
       "Sahip bu konaklama için artık başvuranları değerlendirmiyor",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "{{sit}} için daveti kabul ettiniz",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}}, {{sit}} için daveti kabul etti",
+    "applications.systemMessage.inviteDeclined": "{{sit}} için daveti reddettiniz",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}}, {{sit}} için daveti reddetti",
     "applications.systemMessage.videoCallRequestTitle": "Görüntülü arama önerildi",
     "applications.systemMessage.videoCallRequest": "{{name}} görüntülü arama önerdi.",
     "applications.sharePhoneInChat": "Telefon numarasını paylaş",
@@ -4222,6 +4298,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}}, {{boat}} için siti erken bitirdi. Değerlendirme yazabilirsiniz.",
     "notifications.items.newApplication": "{{actor}}, {{boat}} için bakıcılık başvurusu yaptı.",
+    "notifications.items.sitInvite": "{{actor}} sizi {{boat}} bakıcılığına davet etti.",
     "notifications.items.newMessage": "{{actor}}, {{boat}} hakkında size yeni bir mesaj gönderdi.",
     "notifications.items.sitReminder": "{{boat}} üzerindeki konaklamanız yakında başlıyor.",
     "notifications.items.welcome":
@@ -4480,6 +4557,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Accepterad",
     "applications.status.declined": "Avböjde",
     "applications.status.withdrawn": "Indragen",
+    "applications.status.invited": "Inbjuden",
     "applications.experience": "Uppleva",
     "applications.yearsExperience_one": "1 års båtlivserfarenhet",
     "applications.yearsExperience_other": "{{count}} års erfarenhet av båtliv",
@@ -4522,6 +4600,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "Du avslutade denna sitt tidigt med {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Ägaren överväger inte längre sökande till denna sitt",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Du accepterade inbjudan för {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} accepterade inbjudan för {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Du avböjde inbjudan för {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} avböjde inbjudan för {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtal föreslagits",
     "applications.systemMessage.videoCallRequest": "{{name}} föreslog ett videosamtal.",
     "applications.systemMessage.videoCallCounterTitle": "Ny tid föreslås",
@@ -4657,6 +4740,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} avslutade sitten för {{boat}} tidigt. Du kan lämna en recension.",
     "notifications.items.newApplication": "{{actor}} användes för att sitta {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} bjöd in dig att sitta {{boat}}.",
     "notifications.items.newMessage":
       "{{actor}} skickade ett nytt meddelande till dig om {{boat}}.",
     "notifications.items.sitReminder": "Din sittning på {{boat}} börjar snart.",
@@ -4919,6 +5003,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Godtatt",
     "applications.status.declined": "Avslått",
     "applications.status.withdrawn": "Tilbaketrukket",
+    "applications.status.invited": "Invitert",
     "applications.experience": "Erfaring",
     "applications.yearsExperience_one": "1 års båterfaring",
     "applications.yearsExperience_other": "{{count}} års båterfaring",
@@ -4960,6 +5045,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "Du avsluttet denne siten tidlig med {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Eieren vurderer ikke lenger søkere til dette setet",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Du godtok invitasjonen for {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} godtok invitasjonen for {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Du avslått invitasjonen for {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} avslått invitasjonen for {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videosamtale foreslått",
     "applications.systemMessage.videoCallRequest": "{{name}} foreslo en videosamtale.",
     "applications.systemMessage.videoCallCounterTitle": "Ny tid foreslått",
@@ -5095,6 +5185,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} avsluttet siten for {{boat}} tidlig. Du kan legge igjen en anmeldelse.",
     "notifications.items.newApplication": "{{actor}} brukt for å sitte {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} inviterte deg til å sitte {{boat}}.",
     "notifications.items.newMessage": "{{actor}} sendte deg en ny melding om {{boat}}.",
     "notifications.items.sitReminder": "Sitt på {{boat}} starter snart.",
     "notifications.items.welcome":
@@ -5354,6 +5445,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Accepteret",
     "applications.status.declined": "Afvist",
     "applications.status.withdrawn": "trukket tilbage",
+    "applications.status.invited": "Inviteret",
     "applications.experience": "Erfaring",
     "applications.yearsExperience_one": "1 års sejlerfaring",
     "applications.yearsExperience_other": "{{count}} års båderfaring",
@@ -5395,6 +5487,12 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitEndedEarlyOwner": "Du afsluttede denne sit tidligt med {{name}}",
     "applications.systemMessage.applicantsClosed":
       "Ejeren overvejer ikke længere ansøgere til denne sit",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Du accepterede invitationen til {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner":
+      "{{name}} accepterede invitationen til {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Du afviste invitationen til {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} afviste invitationen til {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videoopkald foreslået",
     "applications.systemMessage.videoCallRequest": "{{name}} foreslog et videoopkald.",
     "applications.systemMessage.videoCallCounterTitle": "Nyt tidspunkt foreslået",
@@ -5529,6 +5627,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} afsluttede siten for {{boat}} tidligt. Du kan skrive en anmeldelse.",
     "notifications.items.newApplication": "{{actor}} anvendt til at sidde {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} inviterede dig til at sidde {{boat}}.",
     "notifications.items.newMessage": "{{actor}} har sendt dig en ny besked om {{boat}}.",
     "notifications.items.sitReminder": "Din sit på {{boat}} starter snart.",
     "notifications.items.welcome":
@@ -5787,6 +5886,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "Hyväksytty",
     "applications.status.declined": "Hylätty",
     "applications.status.withdrawn": "Peruutettu",
+    "applications.status.invited": "Kutsuttu",
     "applications.experience": "Kokea",
     "applications.yearsExperience_one": "1 vuoden veneilykokemusta",
     "applications.yearsExperience_other": "{{count}} vuoden veneilykokemus",
@@ -5830,6 +5930,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
       "Lopetit tämän sitin aikaisemmin henkilön {{name}} kanssa",
     "applications.systemMessage.applicantsClosed":
       "Omistaja ei enää harkitse hakijoita tälle paikalle",
+    "applications.systemMessage.inviteSitDetail": "{{boat}} ({{dates}})",
+    "applications.systemMessage.inviteAccepted": "Hyväksyit kutsun kohteelle {{sit}}",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}} hyväksyi kutsun kohteelle {{sit}}",
+    "applications.systemMessage.inviteDeclined": "Hylkäsit kutsun kohteelle {{sit}}",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}} hylkäsi kutsun kohteelle {{sit}}",
     "applications.systemMessage.videoCallRequestTitle": "Videopuhelu ehdotettu",
     "applications.systemMessage.videoCallRequest": "{{name}} ehdotti videopuhelua.",
     "applications.systemMessage.videoCallCounterTitle": "Uusi aika ehdotettu",
@@ -5967,6 +6072,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} lopetti sitin kohteelle {{boat}} aikaisemmin. Voit jättää arvostelun.",
     "notifications.items.newApplication": "{{actor}} sovellettu istumaan {{boat}}.",
+    "notifications.items.sitInvite": "{{actor}} kutsui sinut istumaan {{boat}}.",
     "notifications.items.newMessage": "{{actor}} lähetti sinulle uuden viestin aiheesta {{boat}}.",
     "notifications.items.sitReminder": "Istuksesi {{boat}} alkaa pian.",
     "notifications.items.welcome":
@@ -6224,6 +6330,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.status.accepted": "承認されました",
     "applications.status.declined": "拒否されました",
     "applications.status.withdrawn": "撤回されました",
+    "applications.status.invited": "招待済み",
     "applications.experience": "経験",
     "applications.yearsExperience_one": "ボート経験1年以上",
     "applications.yearsExperience_other": "{{count}} 年のボート経験",
@@ -6262,6 +6369,11 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "applications.systemMessage.sitCancelledOwner": "{{name}} とのシットをキャンセルしました",
     "applications.systemMessage.sitEndedEarly": "このシットは早めに完了しました",
     "applications.systemMessage.sitEndedEarlyOwner": "{{name}} とのシットを早めに終了しました",
+    "applications.systemMessage.inviteSitDetail": "{{boat}}（{{dates}}）",
+    "applications.systemMessage.inviteAccepted": "{{sit}}の招待を承諾しました",
+    "applications.systemMessage.inviteAcceptedOwner": "{{name}}さんが{{sit}}の招待を承諾しました",
+    "applications.systemMessage.inviteDeclined": "{{sit}}の招待を辞退しました",
+    "applications.systemMessage.inviteDeclinedOwner": "{{name}}さんが{{sit}}の招待を辞退しました",
     "applications.systemMessage.applicantsClosed": "オーナーはこの座席への応募者を検討していません",
     "applications.systemMessage.videoCallRequestTitle": "ビデオ通話の提案",
     "applications.systemMessage.videoCallRequest": "{{name}} がビデオ通話を提案しました。",
@@ -6399,6 +6511,7 @@ const applicationTranslationsSource: Record<string, Record<string, string>> = {
     "notifications.items.sitEndedEarly":
       "{{actor}} が {{boat}} のシットを早めに終了しました。レビューを残せます。",
     "notifications.items.newApplication": "{{actor}} は {{boat}} に座るのに適用されます。",
+    "notifications.items.sitInvite": "{{actor}}さんから{{boat}}のシッター招待が届きました。",
     "notifications.items.newMessage":
       "{{actor}} さんが {{boat}} に関する新しいメッセージを送信しました。",
     "notifications.items.sitReminder": "{{boat}} での座り込みがまもなく始まります。",

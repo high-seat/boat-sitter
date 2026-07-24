@@ -23,7 +23,7 @@ import { isChatMessageNotification, notificationsForBell } from "@/unreadMessage
 function NotificationIcon({ type }: { type: MockNotification["type"] }) {
   const className = "size-4";
   if (type === "newMessage") return <MessageCircle className={className} />;
-  if (type === "newApplication") return <UserPlus className={className} />;
+  if (type === "newApplication" || type === "sitInvite") return <UserPlus className={className} />;
   if (type === "sitReminder") return <CalendarClock className={className} />;
   if (type === "availabilityMatch" || type === "availabilitySitsFound") {
     return <ShipWheel className={className} />;

@@ -67,6 +67,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { CommandPalette } from "@/components/command/CommandPalette";
+import { SittersPage } from "@/pages/SittersPage";
 import {
   AutoTranslationAttribution,
   useAutoTranslatedOwnerContent,
@@ -85,6 +86,7 @@ import { SitDetailSkeleton } from "@/components/ui/SitDetailSkeleton";
 import { MessagesPageSkeleton } from "@/components/ui/MessagesPageSkeleton";
 import { ApplicationReviewSkeleton } from "@/components/ui/ApplicationReviewSkeleton";
 import { MemberProfileSkeleton } from "@/components/ui/MemberProfileSkeleton";
+import { ProfileUpcomingAvailability } from "@/components/profile/ProfileUpcomingAvailability";
 import { AvatarImage } from "@/components/ui/AvatarImage";
 import { FeatureIcon } from "@/components/ui/FeatureIcon";
 import { FormLabel } from "@/components/ui/FormLabel";
@@ -167,6 +169,8 @@ import {
   submitSupportRequest,
   summarizeSitterRating,
   updateApplicationStatus,
+  acceptSitInvite,
+  declineSitInvite,
   withdrawApplication,
   updateOwnerOnVessels,
   isAcceptingApplications,
@@ -555,6 +559,9 @@ function Header() {
             <NavLink className={navClass} data-testid="nav-find" to="/boats">
               {t("nav.find")}
             </NavLink>
+            <NavLink className={navClass} data-testid="nav-find-sitter" to="/sitters">
+              {t("nav.findSitter")}
+            </NavLink>
             <NavLink className={navClass} data-testid="nav-how" to="/how-it-works">
               {t("nav.how")}
             </NavLink>
@@ -712,6 +719,13 @@ function Header() {
             <div className="flex flex-col gap-4 font-semibold">
               <Link data-testid="nav-mobile-find" onClick={() => setOpen(false)} to="/boats">
                 {t("nav.find")}
+              </Link>
+              <Link
+                data-testid="nav-mobile-find-sitter"
+                onClick={() => setOpen(false)}
+                to="/sitters"
+              >
+                {t("nav.findSitter")}
               </Link>
               <Link data-testid="nav-mobile-how" onClick={() => setOpen(false)} to="/how-it-works">
                 {t("nav.how")}
@@ -2892,7 +2906,10 @@ function DetailPage() {
               {activeApplication && user?.name !== boat.owner && (
                 <div className="mt-4 space-y-3">
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    <ApplicationStatusBadge status={activeApplication.status} />
+                    <ApplicationStatusBadge
+                      invited={Boolean(activeApplication.invited)}
+                      status={activeApplication.status}
+                    />
                   </div>
                   <Link
                     className="flex w-full items-center justify-center rounded-xl border border-line py-3 text-sm font-bold text-navy hover:border-teal"
@@ -3720,9 +3737,10 @@ function MemberPage() {
   if (isMe) profileName = currentUser?.name ?? "";
   else if (isBoatOwnerProfile) profileName = boat!.owner;
   else profileName = memberKey;
+  const publicProfileKey = isMe ? "" : profileName;
   const { data: namedMember, isLoading: namedLoading } = useQuery({
-    ...queries.memberProfile.detail(memberKey),
-    enabled: Boolean(currentUser) && isSitterNameProfile,
+    ...queries.memberProfile.detail(publicProfileKey || memberKey),
+    enabled: Boolean(currentUser) && Boolean(publicProfileKey),
   });
   const { data: sitterReviews = [] } = useQuery({
     ...queries.reviews.sitter(profileName),
@@ -3813,7 +3831,10 @@ function MemberPage() {
   if (isSitterNameProfile && namedLoading) {
     return <MemberProfileSkeleton />;
   }
-  if (!isMe && !boat && !namedMember) return <NotFound />;
+  if (!isMe && !boat && !namedMember && !namedLoading) return <NotFound />;
+  if (!isMe && !boat && !namedMember) {
+    return <MemberProfileSkeleton />;
+  }
 
   const ratingSummary = summarizeSitterRating(sitterReviews);
   let profile: {
@@ -3825,6 +3846,8 @@ function MemberPage() {
     since: string;
     about: string;
     badges: string[];
+    languages: string[];
+    preferredCountries: string[];
     ownerSits: number;
     sitterSits: number;
     rating: number;
@@ -3848,6 +3871,8 @@ function MemberPage() {
         "12V systems",
         "Pet friendly",
       ],
+      languages: currentUser!.languages ?? [],
+      preferredCountries: currentUser!.preferredCountries ?? [],
       ownerSits: currentUser!.name === "Maya & Finn" ? 14 : 0,
       sitterSits:
         currentUser!.name === "Alex Morgan"
@@ -3871,8 +3896,10 @@ function MemberPage() {
       since: memberDetails[id]?.since ?? "2022",
       about: memberDetails[id]?.about ?? boat!.description,
       badges: memberDetails[id]?.badges ?? ["Verified owner", "Fast responder"],
+      languages: namedMember?.languages ?? [],
+      preferredCountries: namedMember?.preferredCountries ?? [],
       ownerSits: memberDetails[id]?.ownerSits ?? boat!.reviews,
-      sitterSits: 0,
+      sitterSits: namedMember?.completedSits ?? 0,
       rating: boat!.rating,
       reviews: boat!.reviews,
       showSitterReviews: false,
@@ -3887,6 +3914,8 @@ function MemberPage() {
       since: String(namedMember!.memberSince),
       about: namedMember!.bio,
       badges: [...namedMember!.certifications, ...namedMember!.skills.slice(0, 3)],
+      languages: namedMember!.languages ?? [],
+      preferredCountries: namedMember!.preferredCountries ?? [],
       ownerSits: 0,
       sitterSits: namedMember!.completedSits,
       rating: ratingSummary.count ? ratingSummary.average : 0,
@@ -3980,9 +4009,19 @@ function MemberPage() {
               {!isMe && <BlockedUserBanner name={profile.name} />}
               <div className="mt-5">
                 <p className="eyebrow">{profile.activity}</p>
-                <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy">
-                  {profile.name}
-                </h1>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <h1 className="font-display text-4xl font-extrabold tracking-[-0.045em] text-navy">
+                    {profile.name}
+                  </h1>
+                  {isMe ? (
+                    <span
+                      className="inline-flex items-center rounded-full bg-seafoam px-2.5 py-1 text-[11px] font-bold text-teal"
+                      data-testid="profile-you-badge"
+                    >
+                      {t("member.youBadge")}
+                    </span>
+                  ) : null}
+                </div>
                 <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate">
                   <span className="flex items-center gap-1.5">
                     <MapPin size={16} /> {profile.location}
@@ -4013,11 +4052,11 @@ function MemberPage() {
                   </span>
                 ))}
               </div>
-              {isMe && (currentUser?.languages?.length ?? 0) > 0 && (
+              {profile.languages.length > 0 ? (
                 <>
                   <h2 className="detail-title mt-8">{t("member.languages")}</h2>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {currentUser?.languages?.map((language) => (
+                  <div className="mt-4 flex flex-wrap gap-2" data-testid="profile-languages">
+                    {profile.languages.map((language) => (
                       <span
                         className="rounded-full border border-line bg-cream px-3.5 py-2 text-sm font-semibold text-navy"
                         key={language}
@@ -4027,12 +4066,15 @@ function MemberPage() {
                     ))}
                   </div>
                 </>
-              )}
-              {isMe && (currentUser?.preferredCountries?.length ?? 0) > 0 && (
+              ) : null}
+              {profile.preferredCountries.length > 0 ? (
                 <>
                   <h2 className="detail-title mt-8">{t("profile.preferredCountries")}</h2>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {currentUser?.preferredCountries?.map((country) => (
+                  <div
+                    className="mt-4 flex flex-wrap gap-2"
+                    data-testid="profile-preferred-countries"
+                  >
+                    {profile.preferredCountries.map((country) => (
                       <span
                         className="flex items-center gap-2 rounded-full border border-line bg-cream px-3.5 py-2 text-sm font-semibold text-navy"
                         key={country}
@@ -4042,8 +4084,9 @@ function MemberPage() {
                     ))}
                   </div>
                 </>
-              )}
+              ) : null}
             </div>
+            <ProfileUpcomingAvailability isSelf={isMe} memberName={profile.name} />
             {pendingReviewApplication &&
               pendingReviewAuthorRole &&
               currentUser &&
@@ -6643,8 +6686,13 @@ function OwnerBoatsPage() {
   const activeSitterApplications = sitterApplications.filter(
     (application) =>
       application.status !== "withdrawn" &&
+      application.status !== "invited" &&
       sitterApplicationMatchesPhaseFilter(application) &&
       (showOlderCompletedSits || !isOlderCompletedSitterApplication(application)),
+  );
+  const invitedSitterApplications = sitterApplications.filter(
+    (application) =>
+      application.status === "invited" && sitterApplicationMatchesPhaseFilter(application),
   );
   const withdrawnSitterApplications = sitterApplications.filter(
     (application) =>
@@ -6867,6 +6915,7 @@ function OwnerBoatsPage() {
     const canWithdrawInterest =
       !isWithdrawn &&
       application.status !== "declined" &&
+      application.status !== "invited" &&
       applicationPhase !== "stayUnderway" &&
       applicationPhase !== "stayCompleted";
     const boatThumb = boatImage ? (
@@ -6936,7 +6985,10 @@ function OwnerBoatsPage() {
               ) : null}
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <SitParticipationBadge role="sitter" />
-                <ApplicationStatusBadge status={application.status} />
+                <ApplicationStatusBadge
+                  invited={Boolean(application.invited)}
+                  status={application.status}
+                />
                 {applicationPhase ? (
                   <SitPhaseBadge cancelled={Boolean(sit?.cancelledAt)} phase={applicationPhase} />
                 ) : null}
@@ -7392,6 +7444,21 @@ function OwnerBoatsPage() {
                 </section>
               ))}
             </>
+          )}
+          {invitedSitterApplications.length > 0 && (
+            <section className="space-y-4" data-testid="sitter-sits-phase-invited">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-display text-lg font-bold text-navy">
+                  {t("sits.invitedHeading")}
+                </h2>
+                <span className="rounded-full bg-cream px-2.5 py-1 text-xs font-bold text-slate">
+                  {t("sits.invitedCount", { count: invitedSitterApplications.length })}
+                </span>
+              </div>
+              {invitedSitterApplications.map((application) =>
+                renderSitterApplicationCard(application),
+              )}
+            </section>
           )}
           {withdrawnSitterApplications.length > 0 && (
             <section className="space-y-4" data-testid="sitter-sits-phase-withdrawn">
@@ -8506,16 +8573,27 @@ function TermsPage() {
 function ApplicationStatusBadge({
   status,
   ownerView = false,
+  invited = false,
 }: {
   status: ApplicationStatus;
   /** When true, show owner-only statuses such as shortlisted. */
   ownerView?: boolean;
+  /** When true and status is still in the applicant pool, show Invited. */
+  invited?: boolean;
 }) {
   const { t } = useTranslation();
-  const displayStatus = status === "shortlisted" && !ownerView ? "new" : status;
+  let displayStatus: ApplicationStatus = status === "shortlisted" && !ownerView ? "new" : status;
+  if (
+    invited &&
+    displayStatus !== "invited" &&
+    (displayStatus === "new" || displayStatus === "shortlisted")
+  ) {
+    displayStatus = "invited";
+  }
   const colors: Record<ApplicationStatus, string> = {
     new: "bg-aqua/20 text-teal",
     shortlisted: "bg-sun/25 text-navy",
+    invited: "bg-sun/25 text-navy",
     accepted: "bg-seafoam text-teal",
     declined: "bg-red-100 text-red-700",
     withdrawn: "bg-slate/15 text-slate",
@@ -9498,7 +9576,11 @@ function ApplicationReviewPage() {
                       >
                         {selected.applicant.name}
                       </Link>
-                      <ApplicationStatusBadge ownerView status={selected.status} />
+                      <ApplicationStatusBadge
+                        invited={Boolean(selected.invited)}
+                        ownerView
+                        status={selected.status}
+                      />
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate">
                       <span className="flex items-center gap-1.5">
@@ -9628,7 +9710,11 @@ function ApplicationReviewPage() {
                                 <span className="font-display text-xl font-bold text-navy">
                                   {application.applicant.name}
                                 </span>
-                                <ApplicationStatusBadge ownerView status={application.status} />
+                                <ApplicationStatusBadge
+                                  invited={Boolean(application.invited)}
+                                  ownerView
+                                  status={application.status}
+                                />
                               </span>
                               <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
                                 <span className="flex items-center gap-1.5">
@@ -9826,7 +9912,11 @@ function ApplicationReviewPage() {
                                     })}
                                   </span>
                                   <span className="mt-1 block">
-                                    <ApplicationStatusBadge ownerView status={application.status} />
+                                    <ApplicationStatusBadge
+                                      invited={Boolean(application.invited)}
+                                      ownerView
+                                      status={application.status}
+                                    />
                                   </span>
                                 </span>
                               </button>
@@ -9889,7 +9979,11 @@ function ApplicationReviewPage() {
                               <h2 className="font-display text-2xl font-bold text-navy">
                                 {selected.applicant.name}
                               </h2>
-                              <ApplicationStatusBadge ownerView status={selected.status} />
+                              <ApplicationStatusBadge
+                                invited={Boolean(selected.invited)}
+                                ownerView
+                                status={selected.status}
+                              />
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate">
                               <p className="flex items-center gap-1.5">
@@ -10417,7 +10511,7 @@ function ApplicationReviewPage() {
 }
 
 function MessagesPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useAppStore((state) => state.user);
   const archivedConversations = useAppStore((state) => state.archivedConversations);
   const deletedConversations = useAppStore((state) => state.deletedConversations);
@@ -10437,6 +10531,7 @@ function MessagesPage() {
   });
   const [messagesTab, setMessagesTab] = useState<"inbox" | "archived">("inbox");
   const [selectedId, setSelectedId] = useState("");
+  const [inviteConfirm, setInviteConfirm] = useState<"accept" | "decline" | null>(null);
   const [composerFocusKey, setComposerFocusKey] = useState(0);
   const [conversationPage, setConversationPage] = useState(0);
 
@@ -10542,6 +10637,10 @@ function MessagesPage() {
     setConversationPage(0);
   }, [messagesTab]);
 
+  useEffect(() => {
+    setInviteConfirm(null);
+  }, [selectedId]);
+
   const selected = tabApplications.find((application) => application.id === selectedId);
   const selectedSit = sits.find((sit) => sit.id === selected?.sitId);
   const messageMutation = useMutation({
@@ -10587,6 +10686,28 @@ function MessagesPage() {
       shareApplicationPhoneNumber(id, user!.name, phoneNumber),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+    },
+  });
+  const acceptInviteMutation = useMutation({
+    mutationFn: (id: string) => acceptSitInvite(id),
+    onSuccess: async (updated) => {
+      setInviteConfirm(null);
+      queryClient.setQueriesData({ queryKey: queries.applications.getQueryKey() }, (old) =>
+        patchApplicationInQueriesCache(old, updated),
+      );
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      await queryClient.invalidateQueries({ queryKey: queries.notifications.getQueryKey() });
+    },
+  });
+  const declineInviteMutation = useMutation({
+    mutationFn: (id: string) => declineSitInvite(id),
+    onSuccess: async (updated) => {
+      setInviteConfirm(null);
+      queryClient.setQueriesData({ queryKey: queries.applications.getQueryKey() }, (old) =>
+        patchApplicationInQueriesCache(old, updated),
+      );
+      await queryClient.invalidateQueries({ queryKey: queries.applications.getQueryKey() });
+      await queryClient.invalidateQueries({ queryKey: queries.notifications.getQueryKey() });
     },
   });
 
@@ -10726,6 +10847,7 @@ function MessagesPage() {
                                   </span>
                                 ) : null}
                                 <ApplicationStatusBadge
+                                  invited={Boolean(application.invited)}
                                   ownerView={participationRole === "owner"}
                                   status={application.status}
                                 />
@@ -10744,14 +10866,20 @@ function MessagesPage() {
                                 {(() => {
                                   const last = application.messages.at(-1);
                                   if (!last) return "";
-                                  return last.kind === "system"
-                                    ? formatApplicationSystemMessage(
-                                        t,
-                                        last,
-                                        application,
-                                        user.name,
-                                      )
-                                    : last.text;
+                                  if (last.kind !== "system") return last.text;
+                                  const sit = sits.find((item) => item.id === application.sitId);
+                                  return formatApplicationSystemMessage(
+                                    t,
+                                    last,
+                                    application,
+                                    user.name,
+                                    {
+                                      language: i18n.language,
+                                      sit: sit
+                                        ? { dateStart: sit.dateStart, duration: sit.duration }
+                                        : null,
+                                    },
+                                  );
                                 })()}
                               </span>
                               <ConversationUnreadBadge
@@ -10862,6 +10990,7 @@ function MessagesPage() {
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                           <ApplicationStatusBadge
+                            invited={Boolean(selected.invited)}
                             ownerView={sitParticipationRole(selected, user.name) === "owner"}
                             status={selected.status}
                           />
@@ -10887,6 +11016,48 @@ function MessagesPage() {
                         </div>
                       </div>
                       <BlockedUserBanner name={otherName} />
+                      {selected.status === "invited" && selected.applicant.name === user.name && (
+                        <div
+                          className="mb-4 rounded-2xl border border-sun/40 bg-sun/15 p-4"
+                          data-testid="messages-invite-actions"
+                        >
+                          <p className="font-display text-lg font-bold text-navy">
+                            {t("messages.inviteBannerTitle", { boat: selected.boatName })}
+                          </p>
+                          <p className="mt-1 text-sm text-slate">
+                            {t("messages.inviteBannerText", { owner: selected.ownerName })}
+                          </p>
+                          {acceptInviteMutation.isError || declineInviteMutation.isError ? (
+                            <p className="mt-2 text-sm font-semibold text-coral" role="alert">
+                              {t("messages.inviteActionFailed")}
+                            </p>
+                          ) : null}
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <button
+                              className="rounded-xl bg-teal px-5 py-2.5 text-sm font-bold text-white hover:bg-teal/90 disabled:opacity-60"
+                              data-testid="messages-accept-invite"
+                              disabled={
+                                acceptInviteMutation.isPending || declineInviteMutation.isPending
+                              }
+                              onClick={() => setInviteConfirm("accept")}
+                              type="button"
+                            >
+                              {t("messages.acceptInvite")}
+                            </button>
+                            <button
+                              className="rounded-xl border border-coral/40 px-5 py-2.5 text-sm font-bold text-coral hover:border-coral hover:bg-coral/5 disabled:opacity-60"
+                              data-testid="messages-decline-invite"
+                              disabled={
+                                acceptInviteMutation.isPending || declineInviteMutation.isPending
+                              }
+                              onClick={() => setInviteConfirm("decline")}
+                              type="button"
+                            >
+                              {t("messages.declineInvite")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                       {selected.status === "accepted" &&
                         selectedSit &&
                         !selectedSit.cancelledAt &&
@@ -10966,6 +11137,40 @@ function MessagesPage() {
           ) : null}
         </>
       )}
+      {inviteConfirm === "accept" && selected ? (
+        <ConfirmDialog
+          confirmLabel={t("messages.acceptInvite")}
+          confirmTestId="messages-accept-invite-confirm"
+          onCancel={() => setInviteConfirm(null)}
+          onConfirm={() => acceptInviteMutation.mutate(selected.id)}
+          pending={acceptInviteMutation.isPending}
+          testId="messages-accept-invite-dialog"
+          text={t("messages.acceptInviteConfirmText", {
+            boat: selected.boatName,
+            owner: selected.ownerName,
+          })}
+          title={t("messages.acceptInviteConfirmTitle")}
+          titleId="messages-accept-invite-confirm-title"
+          tone="default"
+        />
+      ) : null}
+      {inviteConfirm === "decline" && selected ? (
+        <ConfirmDialog
+          confirmLabel={t("messages.declineInvite")}
+          confirmTestId="messages-decline-invite-confirm"
+          onCancel={() => setInviteConfirm(null)}
+          onConfirm={() => declineInviteMutation.mutate(selected.id)}
+          pending={declineInviteMutation.isPending}
+          testId="messages-decline-invite-dialog"
+          text={t("messages.declineInviteConfirmText", {
+            boat: selected.boatName,
+            owner: selected.ownerName,
+          })}
+          title={t("messages.declineInviteConfirmTitle")}
+          titleId="messages-decline-invite-confirm-title"
+          tone="danger"
+        />
+      ) : null}
     </main>
   );
 }
@@ -11020,6 +11225,7 @@ export default function App() {
       <Routes>
         <Route index element={<HomePage />} />
         <Route path="/boats" element={<BoatsPage />} />
+        <Route path="/sitters" element={<SittersPage />} />
         <Route path="/boats/:id" element={<DetailPage />} />
         <Route path="/my-boats" element={<OwnerBoatsPage />} />
         <Route path="/my-sits" element={<OwnerBoatsPage />} />
